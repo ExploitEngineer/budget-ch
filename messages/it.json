@@ -33,5 +33,189 @@
         "no-account-yet": "Non hai ancora un account?",
         "dark-mode": "Modalità scura",
         "light-mode": "Modalità chiara"
+    },
+    "main-dashboard": {
+        "sidebar": {
+            "title": "NAVIGAZIONE",
+            "links": {
+                "dashboard": "Dashboard",
+                "transactions": "Transazioni",
+                "budgets": "Budget",
+                "savings": "Obiettivi di risparmio",
+                "content": "Contenuto",
+                "reports": "Report",
+                "imp-exp": "Importa / Esporta",
+                "settings": "Impostazioni",
+                "help": "Aiuto",
+                "logout": "Esci"
+            },
+            "header": {
+                "search": "Cerca..."
+            }
+        },
+        "dashboard-page": {
+            "dialog-box": {
+                "title": "Nuova registrazione",
+                "btn-close": "Chiudi",
+                "labels": {
+                    "date": "Data",
+                    "account": {
+                        "title": "Conto",
+                        "placeholder": "Scegli",
+                        "options": {
+                            "checking": "Conto corrente",
+                            "credit-card": "Carta di credito",
+                            "save": "Risparmio",
+                            "cash": "Contanti"
+                        }
+                    },
+                    "quelle": {
+                        "title": "Fonte",
+                        "placeholder": "es. Coop, datore di lavoro…"
+                    },
+                    "category": {
+                        "title": "Categoria",
+                        "options": {
+                            "groceries": "Spesa",
+                            "restaurant": "Ristorante & Café",
+                            "transportation": "Trasporti",
+                            "household": "Casa",
+                            "income": "Entrate"
+                        }
+                    },
+                    "amount": "Importo (CHF)",
+                    "note": {
+                        "title": "Nota",
+                        "placeholder": "Opzionale"
+                    }
+                },
+                "buttons": {
+                    "save": "Salva come modello",
+                    "post": "Registra"
+                }
+            },
+            "cards": {
+                "card-1": {
+                    "title": "Budget totale (Mese)",
+                    "content": "4’703 franchi svizzeri",
+                    "badge": "Fisso + Variabile • incl. CC & SERAFE"
+                },
+                "card-2": {
+                    "title": "Spese (Attuali)",
+                    "content": "2’456 franchi svizzeri",
+                    "badge": "60% del budget"
+                },
+                "card-3": {
+                    "title": "Disponibile",
+                    "content": "3’447 franchi svizzeri",
+                    "badge": "+40% margine"
+                },
+                "card-4": {
+                    "title": "Previsione fino al 30/09/2025",
+                    "content": "4’980 franchi svizzeri",
+                    "badge": "incl. Ricorrenti"
+                }
+            },
+            "chart": {
+                "primary-title": "Spese per mese",
+                "secondary-title": "in CHF"
+            },
+            "progress-cards": {
+                "title": "Obiettivi di risparmio",
+                "card-1": {
+                    "title": "Riserva tasse"
+                },
+                "card-2": {
+                    "title": "Fondo di emergenza"
+                },
+                "card-3": {
+                    "title": "Vacanza"
+                }
+            },
+            "line-progress-cards": {
+                "title": "Categorie principali (Mese)",
+                "button": "Tutti i budget",
+                "card-1": {
+                    "title": "Spesa"
+                },
+                "card-2": {
+                    "title": "Ristorante & Café"
+                },
+                "card-3": {
+                    "title": "Trasporti"
+                },
+                "card-4": {
+                    "title": "Casa"
+                }
+            },
+            "todos": {
+                "title": "Attività rapide",
+                "button": "fatto subito",
+                "placeholder": "Aggiungi attività…"
+            },
+            "upcoming-cards": {
+                "title": "Scadenze imminenti (Ricorrenti)",
+                "button": "Prossimi 14 giorni",
+                "table-data": {
+                    "table-heading": {
+                        "date": "DATA",
+                        "name": {
+                            "title": "NOME",
+                            "data": {
+                                "insurance": "Assicurazione sanitaria",
+                                "insurance-bill": "Fattura assicurazione sanitaria",
+                                "rent": "Affitto"
+                            }
+                        },
+                        "account": {
+                            "title": "CONTO",
+                            "data": {
+                                "checking": "Conto corrente",
+                                "credit-card": "Carta di credito"
+                            }
+                        },
+                        "amount": "IMPORTO"
+                    },
+                    "button": "Modifica"
+                }
+            },
+            "warning-cards": {
+                "title": "Note & Avvisi",
+                "button": "Nascondi tutto",
+                "card-1": {
+                    "title": "Budget spesa al 80%",
+                    "badge": "Modifica budget"
+                },
+                "card-2": {
+                    "title": "Budget ristorante superato",
+                    "badge": "Apri categoria"
+                },
+                "card-3": {
+                    "title": "3 nuove transazioni da ieri"
+                }
+            },
+            "recent-transactions-table": {
+                "title": "Transazioni recenti",
+                "button": "Mostra tutto"
+            },
+            "budget-health": {
+                "title": "Salute del budget",
+                "secondary-title": "Panoramica mensile",
+                "warning-card": {
+                    "title": "SCORE",
+                    "warning": "Avviso: alto",
+                    "spending": "Ritmo di spesa"
+                },
+                "card-1": {
+                    "title": "BUDGET"
+                },
+                "card-2": {
+                    "title": "Spese"
+                },
+                "card-3": {
+                    "title": "Avvisi"
+                }
+            }
+        }
     }
 }

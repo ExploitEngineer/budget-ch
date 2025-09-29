@@ -33,5 +33,189 @@
         "no-account-yet": "No account yet?",
         "dark-mode": "Dark mode",
         "light-mode": "Light mode"
+    },
+    "main-dashboard": {
+        "sidebar": {
+            "title": "NAVIGATION",
+            "links": {
+                "dashboard": "Dashboard",
+                "transactions": "Transactions",
+                "budgets": "Budgets",
+                "savings": "Savings Goals",
+                "content": "Content",
+                "reports": "Reports",
+                "imp-exp": "Import / Export",
+                "settings": "Settings",
+                "help": "Help",
+                "logout": "Logout"
+            },
+            "header": {
+                "search": "Search..."
+            }
+        },
+        "dashboard-page": {
+            "dialog-box": {
+                "title": "New Booking",
+                "btn-close": "Close",
+                "labels": {
+                    "date": "Date",
+                    "account": {
+                        "title": "Account",
+                        "placeholder": "Choose",
+                        "options": {
+                            "checking": "Checking",
+                            "credit-card": "Credit card",
+                            "save": "Save",
+                            "cash": "Cash"
+                        }
+                    },
+                    "quelle": {
+                        "title": "Quelle",
+                        "placeholder": "e.g. Coop, employer…"
+                    },
+                    "category": {
+                        "title": "Category",
+                        "options": {
+                            "groceries": "Groceries",
+                            "restaurant": "Restaurant & Café",
+                            "transportation": "Transportation",
+                            "household": "Household",
+                            "income": "Income"
+                        }
+                    },
+                    "amount": "Amount (CHF)",
+                    "note": {
+                        "title": "Note",
+                        "placeholder": "Optional"
+                    }
+                },
+                "buttons": {
+                    "save": "Save as template",
+                    "post": "Post"
+                }
+            },
+            "cards": {
+                "card-1": {
+                    "title": "Total Budget (Month)",
+                    "content": "4,703 Swiss Francs",
+                    "badge": "Fixed + Variable • incl. CC & SERAFE"
+                },
+                "card-2": {
+                    "title": "Expenses (Actual)",
+                    "content": "2,456 Swiss Francs",
+                    "badge": "60% of the budget"
+                },
+                "card-3": {
+                    "title": "Available",
+                    "content": "3,447 Swiss Francs",
+                    "badge": "+40% Buffer"
+                },
+                "card-4": {
+                    "title": "Forecast until 30/09/2025",
+                    "content": "4,980 Swiss Francs",
+                    "badge": "incl. Recurring"
+                }
+            },
+            "chart": {
+                "primary-title": "Expenses per Month",
+                "secondary-title": "in CHF"
+            },
+            "progress-cards": {
+                "title": "Savings Goals",
+                "card-1": {
+                    "title": "Tax Reserves"
+                },
+                "card-2": {
+                    "title": "Emergency Fund"
+                },
+                "card-3": {
+                    "title": "Vacation"
+                }
+            },
+            "line-progress-cards": {
+                "title": "Top Categories (Month)",
+                "button": "All Budgets",
+                "card-1": {
+                    "title": "Groceries"
+                },
+                "card-2": {
+                    "title": "Restaurant & Cafe"
+                },
+                "card-3": {
+                    "title": "Transportation"
+                },
+                "card-4": {
+                    "title": "Household"
+                }
+            },
+            "todos": {
+                "title": "Quick Tasks",
+                "button": "quick done",
+                "placeholder": "Add Task…"
+            },
+            "upcoming-cards": {
+                "title": "Upcoming Due (Recurring)",
+                "button": "Next 14 Days",
+                "table-data": {
+                    "table-heading": {
+                        "date": "DATE",
+                        "name": {
+                            "title": "NAME",
+                            "data": {
+                                "insurance": "Health Insurance",
+                                "insurance-bill": "Health Insurance Bill",
+                                "rent": "Rent"
+                            }
+                        },
+                        "account": {
+                            "title": "ACCOUNT",
+                            "data": {
+                                "checking": "Checking",
+                                "credit-card": "Credit Card"
+                            }
+                        },
+                        "amount": "AMOUNT"
+                    },
+                    "button": "Adjust"
+                }
+            },
+            "warning-cards": {
+                "title": "Notes & Warnings",
+                "button": "Hide All",
+                "card-1": {
+                    "title": "Groceries budget at 80%",
+                    "badge": "Adjust Budget"
+                },
+                "card-2": {
+                    "title": "Restaurant budget exceeded",
+                    "badge": "Open Category"
+                },
+                "card-3": {
+                    "title": "3 new transactions since yesterday"
+                }
+            },
+            "recent-transactions-table": {
+                "title": "Recent Transactions",
+                "button": "Show all"
+            },
+            "budget-health": {
+                "title": "Budget Health",
+                "secondary-title": "Monthly overview",
+                "warning-card": {
+                    "title": "SCORE",
+                    "warning": "Warning: high",
+                    "spending": "Spending pace"
+                },
+                "card-1": {
+                    "title": "BUDGET"
+                },
+                "card-2": {
+                    "title": "Expenses"
+                },
+                "card-3": {
+                    "title": "Warnings"
+                }
+            }
+        }
     }
 }
