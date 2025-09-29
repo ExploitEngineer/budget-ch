@@ -196,7 +196,45 @@
             },
             "recent-transactions-table": {
                 "title": "Recent Transactions",
-                "button": "Show all"
+                "button": "Show all",
+                "table-headings": {
+                    "date": "Date",
+                    "recipient": {
+                        "title": "Recipient",
+                        "data": {
+                            "coop": "Cooperative",
+                            "sbb": "SBB",
+                            "cafe": "Cafe Rome",
+                            "employer": "Employer"
+                        }
+                    },
+                    "account": {
+                        "title": "Account",
+                        "data": {
+                            "current-account": "Current account",
+                            "credit-card": "Credit card"
+                        }
+                    },
+                    "category": {
+                        "title": "Category",
+                        "data": {
+                            "groceries": "Groceries",
+                            "transportation": "Transportation",
+                            "restaurant": "Restaurant",
+                            "income": "Income"
+                        }
+                    },
+                    "note": {
+                        "title": "Note",
+                        "data": {
+                            "shopping": "Weekly shopping",
+                            "ga": "GA day pass",
+                            "lunch": "Lunch",
+                            "salary": "Salary"
+                        }
+                    },
+                    "amount": "Amount"
+                }
             },
             "budget-health": {
                 "title": "Budget Health",

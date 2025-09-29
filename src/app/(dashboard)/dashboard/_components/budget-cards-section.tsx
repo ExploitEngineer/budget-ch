@@ -5,39 +5,18 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { useTranslations } from "next-intl";
 
 interface CardsContent {
   title: string;
   content: string;
   badge: string;
 }
-export function BudgetCardsSection() {
-  const t = useTranslations("main-dashboard.dashboard-page");
 
-  const cards: CardsContent[] = [
-    {
-      title: t("cards.card-1.title"),
-      content: t("cards.card-1.content"),
-      badge: t("cards.card-1.badge"),
-    },
-    {
-      title: t("cards.card-2.title"),
-      content: t("cards.card-2.content"),
-      badge: t("cards.card-2.badge"),
-    },
-    {
-      title: t("cards.card-3.title"),
-      content: t("cards.card-3.content"),
-      badge: t("cards.card-3.badge"),
-    },
-    {
-      title: t("cards.card-4.title"),
-      content: t("cards.card-4.content"),
-      badge: t("cards.card-4.badge"),
-    },
-  ];
+interface BudgetCardsSectionProps {
+  cards: CardsContent[];
+}
 
+export function BudgetCardsSection({ cards }: BudgetCardsSectionProps) {
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
       {cards.map((card) => (

@@ -8,14 +8,12 @@ interface Cards {
   value: string;
 }
 
-export function BudgetHealthSection() {
-  const t = useTranslations("main-dashboard.dashboard-page.budget-health");
+interface BudgetHealthSectionProps {
+  cards: Cards[];
+}
 
-  const cards: Cards[] = [
-    { title: t("card-1.title"), value: "CHF 4’703" },
-    { title: t("card-2.title"), value: "CHF 2’456" },
-    { title: t("card-3.title"), value: "3" },
-  ];
+export function BudgetHealthSection({ cards }: BudgetHealthSectionProps) {
+  const t = useTranslations("main-dashboard.dashboard-page.budget-health");
 
   return (
     <div className="w-full">

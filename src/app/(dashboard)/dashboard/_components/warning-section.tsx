@@ -12,7 +12,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 
-interface UpcomingTables {
+interface UpComingTables {
   name: string;
   account: string;
   amount: string;
@@ -23,55 +23,19 @@ interface WarningCards {
   badge?: string;
 }
 
-export function WarningSection() {
+interface WarningSectionProps {
+  upComingTableHeadings: string[];
+  upComingTables: UpComingTables[];
+  warningCards: WarningCards[];
+}
+
+export function WarningSection({
+  warningCards,
+  upComingTableHeadings,
+  upComingTables,
+}: WarningSectionProps) {
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  const upcomingTableHeading: string[] = [
-    t("upcoming-cards.table-data.table-heading.date"),
-    t("upcoming-cards.table-data.table-heading.name.title"),
-    t("upcoming-cards.table-data.table-heading.account.title"),
-    t("upcoming-cards.table-data.table-heading.amount"),
-  ];
-
-  const upcomingTables: UpcomingTables[] = [
-    {
-      name: t("upcoming-cards.table-data.table-heading.name.data.insurance"),
-      account: t(
-        "upcoming-cards.table-data.table-heading.account.data.checking",
-      ),
-      amount: "CHF 420.00",
-    },
-    {
-      name: t(
-        "upcoming-cards.table-data.table-heading.name.data.insurance-bill",
-      ),
-      account: t(
-        "upcoming-cards.table-data.table-heading.account.data.credit-card",
-      ),
-      amount: "CHF 880.00",
-    },
-    {
-      name: t("upcoming-cards.table-data.table-heading.name.data.rent"),
-      account: t(
-        "upcoming-cards.table-data.table-heading.account.data.checking",
-      ),
-      amount: "CHF 1’920.00",
-    },
-  ];
-
-  const warningCards: WarningCards[] = [
-    {
-      title: t("warning-cards.card-1.title"),
-      badge: t("warning-cards.card-1.badge"),
-    },
-    {
-      title: t("warning-cards.card-2.title"),
-      badge: t("warning-cards.card-2.badge"),
-    },
-    {
-      title: t("warning-cards.card-2.title"),
-    },
-  ];
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-6">
       <Card className="lg:col-span-3">
@@ -84,13 +48,13 @@ export function WarningSection() {
           <Table>
             <TableHeader>
               <TableRow>
-                {upcomingTableHeading.map((heading) => (
-                  <TableHead>{heading}</TableHead>
+                {upComingTableHeadings.map((heading) => (
+                  <TableHead key={heading}>{heading}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {upcomingTables.map((data) => (
+              {upComingTables.map((data) => (
                 <TableRow key={data.name}>
                   <TableCell>25.9.2025</TableCell>
                   <TableCell>{data.name}</TableCell>
@@ -115,7 +79,10 @@ export function WarningSection() {
         <Separator />
         <CardContent className="space-y-3">
           {warningCards.map((card) => (
-            <div className="flex items-center gap-2 rounded-full border px-4 py-3">
+            <div
+              key={card.badge}
+              className="flex items-center gap-2 rounded-full border px-4 py-3"
+            >
               <p>{card.title}</p>
               {card.badge && <Badge>{card.badge}</Badge>}
             </div>

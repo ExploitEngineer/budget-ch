@@ -196,7 +196,45 @@
             },
             "recent-transactions-table": {
                 "title": "Transazioni recenti",
-                "button": "Mostra tutto"
+                "button": "Mostra tutto",
+                "table-headings": {
+                    "date": "Data",
+                    "recipient": {
+                        "title": "Destinatario",
+                        "data": {
+                            "coop": "Cooperativa",
+                            "sbb": "SBB",
+                            "cafe": "Caffè Roma",
+                            "employer": "Datore di lavoro"
+                        }
+                    },
+                    "account": {
+                        "title": "Conto",
+                        "data": {
+                            "current-account": "Conto corrente",
+                            "credit-card": "Carta di credito"
+                        }
+                    },
+                    "category": {
+                        "title": "Categoria",
+                        "data": {
+                            "groceries": "Spesa",
+                            "transportation": "Trasporti",
+                            "restaurant": "Ristorante",
+                            "income": "Entrate"
+                        }
+                    },
+                    "note": {
+                        "title": "Nota",
+                        "data": {
+                            "shopping": "Spesa settimanale",
+                            "ga": "Biglietto giornaliero GA",
+                            "lunch": "Pranzo",
+                            "salary": "Stipendio"
+                        }
+                    },
+                    "amount": "Importo"
+                }
             },
             "budget-health": {
                 "title": "Salute del budget",

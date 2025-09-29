@@ -9,22 +9,12 @@ interface CircleProgressCards {
   value: number;
 }
 
-export function BarChartSection() {
+interface BarChartSectionProps {
+  circleProgressCards: CircleProgressCards[];
+}
+
+export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
   const t = useTranslations("main-dashboard.dashboard-page");
-  const circleProgressCards: CircleProgressCards[] = [
-    {
-      title: t("progress-cards.card-1.title"),
-      value: 65,
-    },
-    {
-      title: t("progress-cards.card-2.title"),
-      value: 47,
-    },
-    {
-      title: t("progress-cards.card-3.title"),
-      value: 22,
-    },
-  ];
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
       <div className="lg:col-span-3">

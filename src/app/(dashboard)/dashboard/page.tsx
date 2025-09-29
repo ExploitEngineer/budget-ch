@@ -3,9 +3,22 @@ import { BudgetCardsSection } from "./_components/budget-cards-section";
 import { BarChartSection } from "./_components/bar-chart-section";
 import { BudgetProgressSection } from "./_components/budget-progress-section";
 import { WarningSection } from "./_components/warning-section";
+import { RecentTransactionsTableSection } from "./_components/recent-transactions-table-section";
 import { BudgetHealthSection } from "./_components/budget-health-section";
+import { useDashboardData } from "./_components/data";
 
 export default function Dashboard() {
+  const {
+    cards,
+    circleProgressCards,
+    progressCards,
+    upComingTableHeadings,
+    upComingTables,
+    warningCards,
+    healthCards,
+    recentTransactionsTables,
+    recentTransactionsTableHeadings,
+  } = useDashboardData();
   return (
     <section>
       <div>
@@ -13,11 +26,19 @@ export default function Dashboard() {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <BudgetCardsSection />
-        <BarChartSection />
-        <BudgetProgressSection />
-        <WarningSection />
-        <BudgetHealthSection />
+        <BudgetCardsSection cards={cards} />
+        <BarChartSection circleProgressCards={circleProgressCards} />
+        <BudgetProgressSection progressCards={progressCards} />
+        <WarningSection
+          warningCards={warningCards}
+          upComingTableHeadings={upComingTableHeadings}
+          upComingTables={upComingTables}
+        />
+        <RecentTransactionsTableSection
+          recentTransactionsTableHeadings={recentTransactionsTableHeadings}
+          recentTranasactionsTables={recentTransactionsTables}
+        />
+        <BudgetHealthSection cards={healthCards} />
       </div>
     </section>
   );

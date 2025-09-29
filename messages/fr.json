@@ -196,7 +196,45 @@
             },
             "recent-transactions-table": {
                 "title": "Dernières transactions",
-                "button": "Tout afficher"
+                "button": "Tout afficher",
+                "table-headings": {
+                    "date": "Date",
+                    "recipient": {
+                        "title": "Bénéficiaire",
+                        "data": {
+                            "coop": "Coopérative",
+                            "sbb": "SBB",
+                            "cafe": "Cafe Roma",
+                            "employer": "Employeur"
+                        }
+                    },
+                    "account": {
+                        "title": "Compte",
+                        "data": {
+                            "current-account": "Compte courant",
+                            "credit-card": "Carte de crédit"
+                        }
+                    },
+                    "category": {
+                        "title": "Catégorie",
+                        "data": {
+                            "groceries": "Courses",
+                            "transportation": "Transport",
+                            "restaurant": "Restaurant",
+                            "income": "Revenu"
+                        }
+                    },
+                    "note": {
+                        "title": "Note",
+                        "data": {
+                            "shopping": "Courses hebdomadaires",
+                            "ga": "Pass GA journalier",
+                            "lunch": "Déjeuner",
+                            "salary": "Salaire"
+                        }
+                    },
+                    "amount": "Montant"
+                }
             },
             "budget-health": {
                 "title": "Santé du budget",

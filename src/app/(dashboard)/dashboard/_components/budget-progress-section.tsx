@@ -14,31 +14,15 @@ interface ProgressCards {
   value: number;
 }
 
-export function BudgetProgressSection() {
+interface BudgetProgressSectionProps {
+  progressCards: ProgressCards[];
+}
+
+export function BudgetProgressSection({
+  progressCards,
+}: BudgetProgressSectionProps) {
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  const progressCards: ProgressCards[] = [
-    {
-      title: t("line-progress-cards.card-1.title"),
-      content: "CHF 520 / 800",
-      value: 70,
-    },
-    {
-      title: t("line-progress-cards.card-2.title"),
-      content: "CHF 410 / 500",
-      value: 60,
-    },
-    {
-      title: t("line-progress-cards.card-3.title"),
-      content: "CHF 190 / 300",
-      value: 50,
-    },
-    {
-      title: t("line-progress-cards.card-4.title"),
-      content: "CHF 260 / 400",
-      value: 40,
-    },
-  ];
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
       <Card className="lg:col-span-3">
