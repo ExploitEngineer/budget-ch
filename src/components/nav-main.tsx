@@ -1,0 +1,119 @@
+"use client";
+
+import {
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import {
+  Home,
+  Rows4,
+  ChartNoAxesCombined,
+  CircleDotDashed,
+  Luggage,
+  ChartSpline,
+  Download,
+  LampWallUp,
+  CircleQuestionMark,
+  LogOut,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/ui/sidebar";
+import { useTranslations } from "next-intl";
+
+interface Items {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+}
+
+export function NavMain() {
+  const { open } = useSidebar();
+  const t = useTranslations("main-dashboard");
+
+  const items: Items[] = [
+    {
+      title: t("sidebar.links.dashboard"),
+      url: "#",
+      icon: Home,
+    },
+    {
+      title: t("sidebar.links.transactions"),
+      url: "#",
+      icon: Rows4,
+    },
+    {
+      title: t("sidebar.links.budgets"),
+      url: "#",
+      icon: ChartNoAxesCombined,
+    },
+    {
+      title: t("sidebar.links.savings"),
+      url: "#",
+      icon: CircleDotDashed,
+    },
+    {
+      title: t("sidebar.links.content"),
+      url: "#",
+      icon: Luggage,
+    },
+    {
+      title: t("sidebar.links.reports"),
+      url: "#",
+      icon: ChartSpline,
+    },
+    {
+      title: t("sidebar.links.imp-exp"),
+      url: "#",
+      icon: Download,
+    },
+    {
+      title: t("sidebar.links.settings"),
+      url: "#",
+      icon: LampWallUp,
+    },
+    {
+      title: t("sidebar.links.help"),
+      url: "#",
+      icon: CircleQuestionMark,
+    },
+    {
+      title: t("sidebar.links.logout"),
+      url: "#",
+      icon: LogOut,
+    },
+  ];
+
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-sm font-bold">
+        {t("sidebar.title")}
+      </SidebarGroupLabel>
+      <SidebarMenu className={cn(open ? "flex" : "items-center")}>
+        {items.map((item) => (
+          <div key={item.title}>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                className={cn(
+                  open
+                    ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 transition-all duration-300 hover:border-blue-600 hover:bg-gray-100"
+                    : "",
+                )}
+                tooltip={item.title}
+              >
+                {item.icon && <item.icon />}
+                <span>{item.title}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            {(item.title === t("sidebar.links.reports") ||
+              item.title === t("sidebar.links.help")) && <Separator />}
+          </div>
+        ))}
+      </SidebarMenu>
+    </SidebarGroup>
+  );
+}
