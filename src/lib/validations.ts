@@ -22,3 +22,30 @@ export const userForgotPasswordSchema = userSignUpSchema.pick({
 });
 
 export type UserForgotPasswordValues = z.infer<typeof userForgotPasswordSchema>;
+
+export const entrySchema = z.object({
+  select: z.string().min(1, { message: "Select is required" }),
+  amount: z.coerce.number().min(0, { message: "Must be 0 or more" }),
+  description: z.string().optional(),
+});
+
+export type EntryValues = z.infer<typeof entrySchema>;
+
+export const mainFormSchema = z.object({
+  date: z.coerce
+    .date()
+    .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
+  account: z.string().min(1, { message: "Account is required" }),
+  text: z.string().min(1, { message: "Text is required" }),
+  select: z.string().min(1, { message: "Select is required" }),
+  amount: z.coerce.number().min(0).default(0),
+  file: z
+    .any()
+    .refine((f) => f instanceof File || f === undefined, {
+      message: "Invalid file",
+    })
+    .optional(),
+  entries: z.array(entrySchema),
+});
+
+export type MainFormValues = z.infer<typeof mainFormSchema>;

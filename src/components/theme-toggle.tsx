@@ -2,6 +2,14 @@
 
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Sun, Moon, SunMoon } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+  DropdownMenuContent,
+} from "@/components/ui/dropdown-menu";
 
 export function ModeToggle() {
   const { setTheme, theme } = useTheme();
@@ -21,5 +29,40 @@ export function ModeToggle() {
         {theme === "dark" ? t("light-mode") : t("dark-mode")}
       </span>
     </div>
+  );
+}
+
+export function ThemeToggleDropdown() {
+  const { theme, setTheme } = useTheme();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" className="rounded-lg" size="icon">
+          {theme === "system" ? (
+            <SunMoon className="h-5 w-5" />
+          ) : theme === "light" ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+          <span className="sr-only">Toggle theme</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent side="right" align="end">
+        <DropdownMenuItem onClick={() => setTheme("light")}>
+          <Sun className="mr-2 h-4 w-4" />
+          Light
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("dark")}>
+          <Moon className="mr-2 h-4 w-4" />
+          Dark
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => setTheme("system")}>
+          <SunMoon className="mr-2 h-4 w-4" />
+          Auto
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
