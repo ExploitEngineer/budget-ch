@@ -13,11 +13,11 @@ interface CardsContent {
   badge: string;
 }
 
-interface BudgetCardsSectionProps {
+interface BudgetCardsProps {
   cards: CardsContent[];
 }
 
-export function BudgetCardsSection({ cards }: BudgetCardsSectionProps) {
+export function BudgetCardsSection({ cards }: BudgetCardsProps) {
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
       {cards.map((card) => (

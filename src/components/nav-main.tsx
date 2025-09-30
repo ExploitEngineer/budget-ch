@@ -49,7 +49,7 @@ export function NavMain() {
     },
     {
       title: t("sidebar.links.budgets"),
-      url: "#",
+      url: "/me/budgets",
       icon: ChartNoAxesCombined,
     },
     {
