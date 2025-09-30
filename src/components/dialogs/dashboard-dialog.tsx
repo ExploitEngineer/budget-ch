@@ -68,7 +68,7 @@ export default function DashBoardDialog() {
           <span className="text-sm">{t("dialog-box.title")}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-3xl [&>button]:hidden">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Header */}
