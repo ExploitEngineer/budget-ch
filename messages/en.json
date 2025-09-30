@@ -254,6 +254,99 @@
                     "title": "Warnings"
                 }
             }
+        },
+        "transactions-page": {
+            "labels": {
+                "from": "From",
+                "to": "To",
+                "account": {
+                    "title": "Account",
+                    "data": {
+                        "accounts": "All Accounts",
+                        "current-account": "Current account",
+                        "credit-card": "Credit card",
+                        "savings": "Savings",
+                        "cash": "Cash"
+                    }
+                },
+                "category": {
+                    "title": "Category",
+                    "data": {
+                        "categories": "All Categories",
+                        "groceries": "Groceries",
+                        "restaurant": "Restaurant & Café",
+                        "transportation": "Transportation"
+                    }
+                },
+                "search": {
+                    "title": "Search",
+                    "placeholder": "e.g., Coop, Rent, Credit Card…"
+                }
+            },
+            "checkboxes": {
+                "receipt": "With Receipt",
+                "recurring": "Recurring",
+                "transfers": "Transfers Only"
+            },
+            "buttons": {
+                "reset": "Reset",
+                "apply": "Apply"
+            },
+            "data-table": {
+                "header": {
+                    "checkbox": "All",
+                    "buttons": {
+                        "delete": "Delete",
+                        "category": "Category",
+                        "export": "Export",
+                        "update": "Update"
+                    },
+                    "badge": "Balance:"
+                },
+                "headings": {
+                    "date": "Date",
+                    "recipient": "Recipient",
+                    "account": "Account",
+                    "category": "Category",
+                    "note": "Note",
+                    "amount": "Amount",
+                    "action": "Action"
+                },
+                "action": "Edit",
+                "recipients": {
+                    "amazon": "Amazon",
+                    "salary": "Salary Payment",
+                    "netflix": "Netflix",
+                    "starbucks": "Starbucks",
+                    "uber": "Uber",
+                    "apple": "Apple Store"
+                },
+                "accounts": {
+                    "creditCard": "Credit Card",
+                    "bank": "Bank Account",
+                    "paypal": "PayPal"
+                },
+                "categories": {
+                    "shopping": "Shopping",
+                    "income": "Income",
+                    "entertainment": "Entertainment",
+                    "food": "Food & Drinks",
+                    "transport": "Transport",
+                    "tech": "Electronics"
+                },
+                "notes": {
+                    "electronicsOrder": "Electronics order",
+                    "salarySeptember": "September Salary",
+                    "netflixMonthly": "Monthly subscription",
+                    "coffeeFriends": "Coffee with friends",
+                    "rideOffice": "Ride to office",
+                    "applePurchase": "MacBook purchase"
+                },
+                "pagination": {
+                    "previous": "Previous",
+                    "next": "Next"
+                }
+            }
         }
     }
 }

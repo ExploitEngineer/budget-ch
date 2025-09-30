@@ -254,6 +254,99 @@
                     "title": "Warnungen"
                 }
             }
+        },
+        "transactions-page": {
+            "labels": {
+                "from": "Von",
+                "to": "Bis",
+                "account": {
+                    "title": "Konto",
+                    "data": {
+                        "accounts": "Alle Konten",
+                        "current-account": "Girokonto",
+                        "credit-card": "Kreditkarte",
+                        "savings": "Sparkonto",
+                        "cash": "Bargeld"
+                    }
+                },
+                "category": {
+                    "title": "Kategorie",
+                    "data": {
+                        "categories": "Alle Kategorien",
+                        "groceries": "Lebensmittel",
+                        "restaurant": "Restaurant & Café",
+                        "transportation": "Transport"
+                    }
+                },
+                "search": {
+                    "title": "Suche",
+                    "placeholder": "z. B. Coop, Miete, Kreditkarte…"
+                }
+            },
+            "checkboxes": {
+                "receipt": "Mit Beleg",
+                "recurring": "Wiederkehrend",
+                "transfers": "Nur Überweisungen"
+            },
+            "buttons": {
+                "reset": "Zurücksetzen",
+                "apply": "Anwenden"
+            },
+            "data-table": {
+                "header": {
+                    "checkbox": "Alle",
+                    "buttons": {
+                        "delete": "Löschen",
+                        "category": "Kategorie",
+                        "export": "Exportieren",
+                        "update": "Aktualisieren"
+                    },
+                    "badge": "Saldo:"
+                },
+                "headings": {
+                    "date": "Datum",
+                    "recipient": "Empfänger",
+                    "account": "Konto",
+                    "category": "Kategorie",
+                    "note": "Notiz",
+                    "amount": "Betrag",
+                    "action": "Aktion"
+                },
+                "action": "Bearbeiten",
+                "recipients": {
+                    "amazon": "Amazon",
+                    "salary": "Gehaltszahlung",
+                    "netflix": "Netflix",
+                    "starbucks": "Starbucks",
+                    "uber": "Uber",
+                    "apple": "Apple Store"
+                },
+                "accounts": {
+                    "creditCard": "Kreditkarte",
+                    "bank": "Bankkonto",
+                    "paypal": "PayPal"
+                },
+                "categories": {
+                    "shopping": "Einkaufen",
+                    "income": "Einkommen",
+                    "entertainment": "Unterhaltung",
+                    "food": "Essen & Trinken",
+                    "transport": "Transport",
+                    "tech": "Elektronik"
+                },
+                "notes": {
+                    "electronicsOrder": "Elektronikbestellung",
+                    "salarySeptember": "September Gehalt",
+                    "netflixMonthly": "Monatliches Abo",
+                    "coffeeFriends": "Kaffee mit Freunden",
+                    "rideOffice": "Fahrt ins Büro",
+                    "applePurchase": "MacBook-Kauf"
+                },
+                "pagination": {
+                    "previous": "Zurück",
+                    "next": "Weiter"
+                }
+            }
         }
     }
 }
