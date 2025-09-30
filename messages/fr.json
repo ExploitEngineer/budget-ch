@@ -347,6 +347,30 @@
                     "next": "Suivant"
                 }
             }
+        },
+        "budgets-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Budget total (mois)",
+                    "content": "CHF 2’900.00",
+                    "badge": "Report: Inactif"
+                },
+                "card-2": {
+                    "title": "Dépensé jusqu'à présent",
+                    "content": "CHF 1’915.00",
+                    "badge": "66% du budget"
+                },
+                "card-3": {
+                    "title": "Disponible",
+                    "content": "CHF 985.00",
+                    "badge": "+34% disponible"
+                },
+                "card-4": {
+                    "title": "Nombre de catégories",
+                    "content": "8",
+                    "badge": "Avertissements: 2"
+                }
+            }
         }
     }
 }

@@ -347,6 +347,30 @@
                     "next": "Next"
                 }
             }
+        },
+        "budgets-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Total Budget (Month)",
+                    "content": "CHF 2’900.00",
+                    "badge": "Carryover: Inactive"
+                },
+                "card-2": {
+                    "title": "Spent so far",
+                    "content": "CHF 1’915.00",
+                    "badge": "66% of the budget"
+                },
+                "card-3": {
+                    "title": "Available",
+                    "content": "CHF 985.00",
+                    "badge": "+34% available"
+                },
+                "card-4": {
+                    "title": "Number of categories",
+                    "content": "8",
+                    "badge": "Warnings: 2"
+                }
+            }
         }
     }
 }

@@ -347,6 +347,30 @@
                     "next": "Weiter"
                 }
             }
+        },
+        "budgets-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtbudget (Monat)",
+                    "content": "CHF 2’900.00",
+                    "badge": "Übertrag: Inaktiv"
+                },
+                "card-2": {
+                    "title": "Bisher ausgegeben",
+                    "content": "CHF 1’915.00",
+                    "badge": "66% des Budgets"
+                },
+                "card-3": {
+                    "title": "Verfügbar",
+                    "content": "CHF 985.00",
+                    "badge": "+34% verfügbar"
+                },
+                "card-4": {
+                    "title": "Anzahl Kategorien",
+                    "content": "8",
+                    "badge": "Warnungen: 2"
+                }
+            }
         }
     }
 }
