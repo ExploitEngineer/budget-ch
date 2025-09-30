@@ -5,8 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "./ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Search, Plus } from "lucide-react";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import DashBoardDialog from "./dialogs/dashboard-dialog";
 import { useTranslations } from "next-intl";
 
@@ -71,24 +70,7 @@ export default function SidebarHeader() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-
-          <Dialog>
-            <DialogTrigger className="min-w-40 cursor-pointer" asChild>
-              <Button
-                className="flex items-center gap-2"
-                variant="default"
-                size="icon"
-              >
-                <Plus className="h-5 w-5" />
-                <span className="text-sm">
-                  {t("dashboard-page.dialog-box.title")}
-                </span>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-3xl">
-              <DashBoardDialog />
-            </DialogContent>
-          </Dialog>
+          <DashBoardDialog />
         </div>
       </div>
     </header>

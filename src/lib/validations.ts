@@ -36,9 +36,19 @@ export const mainFormSchema = z.object({
     .date()
     .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
   account: z.string().min(1, { message: "Account is required" }),
+  dateFrom: z.coerce
+    .date()
+    .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
+  dateTo: z.coerce
+    .date()
+    .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
   text: z.string().min(1, { message: "Text is required" }),
   select: z.string().min(1, { message: "Select is required" }),
+  select1: z.string().min(1, { message: "Select is required" }),
+  select2: z.string().min(1, { message: "Select is required" }),
   amount: z.coerce.number().min(0).default(0),
+  amountMax: z.coerce.number().min(0).default(0),
+  amountMin: z.coerce.number().min(0).default(0),
   file: z
     .any()
     .refine((f) => f instanceof File || f === undefined, {

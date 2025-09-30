@@ -24,6 +24,7 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 interface Items {
   title: string;
@@ -38,12 +39,12 @@ export function NavMain() {
   const items: Items[] = [
     {
       title: t("sidebar.links.dashboard"),
-      url: "#",
+      url: "/me/dashboard",
       icon: Home,
     },
     {
       title: t("sidebar.links.transactions"),
-      url: "#",
+      url: "/me/transactions",
       icon: Rows4,
     },
     {
@@ -96,19 +97,21 @@ export function NavMain() {
       <SidebarMenu className={cn(open ? "flex" : "items-center")}>
         {items.map((item) => (
           <div key={item.title}>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                className={cn(
-                  open
-                    ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 transition-all duration-300 hover:border-blue-600 hover:bg-gray-100"
-                    : "",
-                )}
-                tooltip={item.title}
-              >
-                {item.icon && <item.icon />}
-                <span>{item.title}</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+            <Link key={item.title} href={item.url}>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  className={cn(
+                    open
+                      ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 transition-all duration-300 hover:border-blue-600 hover:bg-gray-100"
+                      : "",
+                  )}
+                  tooltip={item.title}
+                >
+                  {item.icon && <item.icon />}
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </Link>
             {(item.title === t("sidebar.links.reports") ||
               item.title === t("sidebar.links.help")) && <Separator />}
           </div>
