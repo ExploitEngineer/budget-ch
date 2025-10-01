@@ -370,6 +370,56 @@
                     "content": "8",
                     "badge": "Warnings: 2"
                 }
+            },
+            "data-table": {
+                "title": "All categories",
+                "badge": "Total Budget: CHF 2’900.00 • Rest: CHF 985.00",
+                "buttons": {
+                    "export": "Export CSV",
+                    "reset": "Reset (Demo)"
+                },
+                "headings": {
+                    "category": "CATEGORY",
+                    "budget": "BUDGET",
+                    "ist": "IST",
+                    "rest": "REST",
+                    "progress": "PROGRESS",
+                    "action": "ACTION"
+                },
+                "data": {
+                    "category": {
+                        "clothing": "Clothing",
+                        "sports": "Leisure & Sports",
+                        "health": "Health",
+                        "transportation": "Transportation",
+                        "travel": "Travel & Holidays",
+                        "household": "Household"
+                    },
+                    "action": "Edit"
+                },
+                "toggle-groups": {
+                    "month": "Month",
+                    "week": "Week",
+                    "warn-80": "Warn at 80%",
+                    "warn-90": "Warn at 90%",
+                    "warn-100": "Warn at 100%"
+                }
+            },
+            "warning-section": {
+                "title": "Notes & Warnings",
+                "button": "Hide all",
+                "badges": {
+                    "restaurant": "Budget Restaurant & Café at 82%",
+                    "health": "Budget Health at 96%"
+                },
+                "settings": {
+                    "title": "Settings (Month)",
+                    "button": "+ Budget",
+                    "checkboxes": {
+                        "carry": "Carry over surplus/deficit to next month",
+                        "e-mail": "Email warnings at 80% / 100%"
+                    }
+                }
             }
         }
     }

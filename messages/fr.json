@@ -351,9 +351,9 @@
         "budgets-page": {
             "cards": {
                 "card-1": {
-                    "title": "Budget total (mois)",
+                    "title": "Budget total (Mois)",
                     "content": "CHF 2’900.00",
-                    "badge": "Report: Inactif"
+                    "badge": "Report : Inactif"
                 },
                 "card-2": {
                     "title": "Dépensé jusqu'à présent",
@@ -368,7 +368,57 @@
                 "card-4": {
                     "title": "Nombre de catégories",
                     "content": "8",
-                    "badge": "Avertissements: 2"
+                    "badge": "Avertissements : 2"
+                }
+            },
+            "data-table": {
+                "title": "Toutes les catégories",
+                "badge": "Budget total : CHF 2’900.00 • Restant : CHF 985.00",
+                "buttons": {
+                    "export": "Exporter CSV",
+                    "reset": "Réinitialiser (Demo)"
+                },
+                "headings": {
+                    "category": "CATÉGORIE",
+                    "budget": "BUDGET",
+                    "ist": "RÉEL",
+                    "rest": "RESTE",
+                    "progress": "PROGRÈS",
+                    "action": "ACTION"
+                },
+                "data": {
+                    "category": {
+                        "clothing": "Vêtements",
+                        "sports": "Loisirs & Sports",
+                        "health": "Santé",
+                        "transportation": "Transport",
+                        "travel": "Voyages & Vacances",
+                        "household": "Ménage"
+                    },
+                    "action": "Modifier"
+                },
+                "toggle-groups": {
+                    "month": "Mois",
+                    "week": "Semaine",
+                    "warn-80": "Avertir à 80%",
+                    "warn-90": "Avertir à 90%",
+                    "warn-100": "Avertir à 100%"
+                }
+            },
+            "warning-section": {
+                "title": "Notes & Avertissements",
+                "button": "Tout masquer",
+                "badges": {
+                    "restaurant": "Budget Restaurant & Café à 82%",
+                    "health": "Budget Santé à 96%"
+                },
+                "settings": {
+                    "title": "Paramètres (Mois)",
+                    "button": "+ Budget",
+                    "checkboxes": {
+                        "carry": "Reporter le surplus/déficit au mois suivant",
+                        "e-mail": "Envoyer les alertes par email à 80% / 100%"
+                    }
                 }
             }
         }

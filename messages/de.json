@@ -370,6 +370,56 @@
                     "content": "8",
                     "badge": "Warnungen: 2"
                 }
+            },
+            "data-table": {
+                "title": "Alle Kategorien",
+                "badge": "Gesamtbudget: CHF 2’900.00 • Rest: CHF 985.00",
+                "buttons": {
+                    "export": "CSV exportieren",
+                    "reset": "Zurücksetzen (Demo)"
+                },
+                "headings": {
+                    "category": "KATEGORIE",
+                    "budget": "BUDGET",
+                    "ist": "IST",
+                    "rest": "REST",
+                    "progress": "FORTSCHRITT",
+                    "action": "AKTION"
+                },
+                "data": {
+                    "category": {
+                        "clothing": "Kleidung",
+                        "sports": "Freizeit & Sport",
+                        "health": "Gesundheit",
+                        "transportation": "Transport",
+                        "travel": "Reisen & Urlaub",
+                        "household": "Haushalt"
+                    },
+                    "action": "Bearbeiten"
+                },
+                "toggle-groups": {
+                    "month": "Monat",
+                    "week": "Woche",
+                    "warn-80": "Warnung bei 80%",
+                    "warn-90": "Warnung bei 90%",
+                    "warn-100": "Warnung bei 100%"
+                }
+            },
+            "warning-section": {
+                "title": "Notizen & Warnungen",
+                "button": "Alle ausblenden",
+                "badges": {
+                    "restaurant": "Budget Restaurant & Café bei 82%",
+                    "health": "Budget Gesundheit bei 96%"
+                },
+                "settings": {
+                    "title": "Einstellungen (Monat)",
+                    "button": "+ Budget",
+                    "checkboxes": {
+                        "carry": "Überschuss/Defizit in den nächsten Monat übertragen",
+                        "e-mail": "Warnungen per E-Mail bei 80% / 100%"
+                    }
+                }
             }
         }
     }

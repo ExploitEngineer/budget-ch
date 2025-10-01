@@ -351,7 +351,7 @@
         "budgets-page": {
             "cards": {
                 "card-1": {
-                    "title": "Budget totale (mese)",
+                    "title": "Budget totale (Mese)",
                     "content": "CHF 2’900.00",
                     "badge": "Riporto: Inattivo"
                 },
@@ -369,6 +369,56 @@
                     "title": "Numero di categorie",
                     "content": "8",
                     "badge": "Avvisi: 2"
+                }
+            },
+            "data-table": {
+                "title": "Tutte le categorie",
+                "badge": "Budget totale: CHF 2’900.00 • Rimanente: CHF 985.00",
+                "buttons": {
+                    "export": "Esporta CSV",
+                    "reset": "Resetta (Demo)"
+                },
+                "headings": {
+                    "category": "CATEGORIA",
+                    "budget": "BUDGET",
+                    "ist": "EFFETTIVO",
+                    "rest": "RIMANENTE",
+                    "progress": "PROGRESSO",
+                    "action": "AZIONE"
+                },
+                "data": {
+                    "category": {
+                        "clothing": "Abbigliamento",
+                        "sports": "Tempo libero & Sport",
+                        "health": "Salute",
+                        "transportation": "Trasporto",
+                        "travel": "Viaggi & Vacanze",
+                        "household": "Casa"
+                    },
+                    "action": "Modifica"
+                },
+                "toggle-groups": {
+                    "month": "Mese",
+                    "week": "Settimana",
+                    "warn-80": "Avvisa al 80%",
+                    "warn-90": "Avvisa al 90%",
+                    "warn-100": "Avvisa al 100%"
+                }
+            },
+            "warning-section": {
+                "title": "Note & Avvisi",
+                "button": "Nascondi tutto",
+                "badges": {
+                    "restaurant": "Budget Ristorante & Caffè al 82%",
+                    "health": "Budget Salute al 96%"
+                },
+                "settings": {
+                    "title": "Impostazioni (Mese)",
+                    "button": "+ Budget",
+                    "checkboxes": {
+                        "carry": "Riporta avanzo/deficit al mese successivo",
+                        "e-mail": "Invia avvisi via email al 80% / 100%"
+                    }
                 }
             }
         }
