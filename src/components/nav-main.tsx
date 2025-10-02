@@ -54,17 +54,17 @@ export function NavMain() {
     },
     {
       title: t("sidebar.links.savings"),
-      url: "#",
+      url: "/me/saving-goals",
       icon: CircleDotDashed,
     },
     {
       title: t("sidebar.links.content"),
-      url: "#",
+      url: "/me/content",
       icon: Luggage,
     },
     {
       title: t("sidebar.links.reports"),
-      url: "#",
+      url: "/me/reports",
       icon: ChartSpline,
     },
     {
@@ -102,7 +102,7 @@ export function NavMain() {
                 <SidebarMenuButton
                   className={cn(
                     open
-                      ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 transition-all duration-300 hover:border-blue-600 hover:bg-gray-100"
+                      ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 transition-all duration-300 hover:border-blue-600"
                       : "",
                   )}
                   tooltip={item.title}
