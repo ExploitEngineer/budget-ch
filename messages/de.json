@@ -421,6 +421,220 @@
                     }
                 }
             }
+        },
+        "saving-goals-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtzielbetrag",
+                    "content": "CHF 18’000.00",
+                    "badge": "Alle aktiven Ziele"
+                },
+                "card-2": {
+                    "title": "Bisher gespart",
+                    "content": "CHF 8’610.00",
+                    "badge": "48% erreicht"
+                },
+                "card-3": {
+                    "title": "Noch zu sparen",
+                    "content": "CHF 9’390.00",
+                    "badge": "Monatliches Ziel: CHF 700.00"
+                },
+                "card-4": {
+                    "title": "Anzahl Ziele",
+                    "content": "3",
+                    "badge": "Keine dringenden Posten"
+                }
+            },
+            "active-goals-section": {
+                "title": "Aktive Ziele",
+                "badge": "3 Ziele • Automatische Zuweisung: CHF 700.00",
+                "buttons": {
+                    "due": "Fällig",
+                    "progress": "Fortschritt",
+                    "remaining-amount": "Verbleibender Betrag"
+                },
+                "cards": {
+                    "tax-reserves": {
+                        "header": {
+                            "title": "Steuerrücklagen",
+                            "button": "Bearbeiten"
+                        },
+                        "content": {
+                            "goal": "Ziel",
+                            "saved": "Gespart",
+                            "rest": "Rest",
+                            "due": "Fällig",
+                            "account": {
+                                "title": "Konto",
+                                "save": "Sparen"
+                            },
+                            "days": "Tage",
+                            "saving": "Sparen",
+                            "auto": "Automatisch",
+                            "remaining": "Verbleibend",
+                            "checking-account": "Girokonto",
+                            "button": "Zuweisung",
+                            "new-balance": "Neuer Kontostand",
+                            "placeholder": "Betrag"
+                        }
+                    }
+                }
+            },
+            "warning-section": {
+                "title": "Notizen & Warnungen",
+                "button": "Alle ausblenden",
+                "badge": "Keine Notizen"
+            },
+            "settings-section": {
+                "title": "Einstellungen",
+                "button": "Demo zurücksetzen",
+                "checkboxes": {
+                    "monthly": "Monatliche Auto-Zuweisung aktiv",
+                    "goals": "Überfinanzierte Ziele anzeigen"
+                }
+            }
+        },
+        "content-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtvermögen",
+                    "content": "CHF 15’500.00",
+                    "badge": "Summe aller Konten"
+                },
+                "card-2": {
+                    "title": "Liquidität",
+                    "content": "CHF 2’620.00",
+                    "badge": "Girokonto + Bargeld"
+                },
+                "card-3": {
+                    "title": "Sparguthaben",
+                    "content": "CHF 13’200.00",
+                    "badge": "inkl. Säule 3a"
+                },
+                "card-4": {
+                    "title": "Kreditkarten",
+                    "content": "CHF-320.00",
+                    "badge": "Sollsaldo"
+                }
+            },
+            "data-table": {
+                "title": "Alle Kategorien",
+                "badge": "5 Konten • Liquidität CHF 2’620.00",
+                "buttons": {
+                    "export": "CSV exportieren",
+                    "reset": "Demo zurücksetzen"
+                },
+                "headings": {
+                    "name": "NAME",
+                    "type": "TYP",
+                    "iban": "IBAN / Hinweis",
+                    "balance": "Kontostand",
+                    "action": "AKTION"
+                },
+                "data": {
+                    "name": {
+                        "cash": "Bargeld",
+                        "current-account": "Girokonto",
+                        "credit-card": "Kreditkarte",
+                        "saving": "Sparen",
+                        "pillar": "Säule 3a"
+                    },
+                    "action": "Bearbeiten"
+                },
+                "total": "Gesamt"
+            },
+            "latest-tranfers-section": {
+                "title": "Letzte Überweisungen",
+                "button": "CSV exportieren",
+                "data-table": {
+                    "headings": {
+                        "date": "DATUM",
+                        "from": "VON",
+                        "to": "AN",
+                        "note": "HINWEIS",
+                        "amount": "BETRAG"
+                    }
+                }
+            }
+        },
+        "report-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Einkommen",
+                    "content": "CHF 5’800.00",
+                    "badge": "Letzter Monat"
+                },
+                "card-2": {
+                    "title": "Ausgaben",
+                    "content": "CHF 4’800.00",
+                    "badge": "Letzter Monat"
+                },
+                "card-3": {
+                    "title": "Saldo",
+                    "content": "CHF 1’000.00",
+                    "badge": "Einnahmen − Ausgaben"
+                },
+                "card-4": {
+                    "title": "Sparquote",
+                    "content": "17%",
+                    "badge": "vom Einkommen"
+                }
+            },
+            "analysis-table-data": {
+                "title": "Analyse",
+                "badge": "Letzter Monat: CHF 5’800.00 Einnahmen • CHF 4’800.00 Ausgaben",
+                "toggle-groups": {
+                    "month": "Monat",
+                    "quarter": "Quartal",
+                    "year": "Jahr"
+                },
+                "exp-by-cat": {
+                    "title": "Ausgaben nach Kategorien",
+                    "progress": {
+                        "groceries": "Lebensmittel",
+                        "rent": "Miete",
+                        "transportation": "Transport",
+                        "restaurant": "Restaurant",
+                        "household": "Haushalt",
+                        "leisure": "Freizeit"
+                    }
+                }
+            },
+            "income-exp": {
+                "title": "Einnahmen vs. Ausgaben (letzte 9 Monate)",
+                "data-table": {
+                    "headings": {
+                        "month": "MONAT",
+                        "income": "EINKOMMEN",
+                        "expenses": "Ausgaben",
+                        "balance": "Saldo"
+                    }
+                }
+            },
+            "detailed-table": {
+                "title": "Detaillierte Tabelle",
+                "buttons": {
+                    "categories-csv": "Kategorien CSV",
+                    "trend-csv": "Trend CSV"
+                },
+                "data-table": {
+                    "headings": {
+                        "category": "Kategorie",
+                        "amount": "Betrag"
+                    },
+                    "data": {
+                        "category": {
+                            "groceries": "Lebensmittel",
+                            "rent": "Miete",
+                            "transportation": "Transport",
+                            "restaurant": "Restaurant",
+                            "household": "Haushalt",
+                            "leisure": "Freizeit"
+                        },
+                        "total": "Gesamt"
+                    }
+                }
+            }
         }
     }
 }

@@ -421,6 +421,220 @@
                     }
                 }
             }
+        },
+        "saving-goals-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Montant cible total",
+                    "content": "CHF 18’000.00",
+                    "badge": "Tous les objectifs actifs"
+                },
+                "card-2": {
+                    "title": "Économisé jusqu'à présent",
+                    "content": "CHF 8’610.00",
+                    "badge": "48% atteint"
+                },
+                "card-3": {
+                    "title": "Restant à épargner",
+                    "content": "CHF 9’390.00",
+                    "badge": "Objectif mensuel : CHF 700.00"
+                },
+                "card-4": {
+                    "title": "Nombre d'objectifs",
+                    "content": "3",
+                    "badge": "Aucun élément urgent"
+                }
+            },
+            "active-goals-section": {
+                "title": "Objectifs actifs",
+                "badge": "3 objectifs • Allocation automatique : CHF 700.00",
+                "buttons": {
+                    "due": "Échéance",
+                    "progress": "Progression",
+                    "remaining-amount": "Montant restant"
+                },
+                "cards": {
+                    "tax-reserves": {
+                        "header": {
+                            "title": "Réserves fiscales",
+                            "button": "Modifier"
+                        },
+                        "content": {
+                            "goal": "Objectif",
+                            "saved": "Économisé",
+                            "rest": "Reste",
+                            "due": "Échéance",
+                            "account": {
+                                "title": "Compte",
+                                "save": "Épargner"
+                            },
+                            "days": "Jours",
+                            "saving": "Épargne",
+                            "auto": "Auto",
+                            "remaining": "Restant",
+                            "checking-account": "Compte courant",
+                            "button": "Allocation",
+                            "new-balance": "Nouveau solde",
+                            "placeholder": "Montant"
+                        }
+                    }
+                }
+            },
+            "warning-section": {
+                "title": "Notes & Avertissements",
+                "button": "Tout masquer",
+                "badge": "Aucune note"
+            },
+            "settings-section": {
+                "title": "Paramètres",
+                "button": "Réinitialiser la démo",
+                "checkboxes": {
+                    "monthly": "Allocation automatique mensuelle active",
+                    "goals": "Afficher les objectifs surfinancés"
+                }
+            }
+        },
+        "content-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Actifs totaux",
+                    "content": "CHF 15’500.00",
+                    "badge": "Total de tous les comptes"
+                },
+                "card-2": {
+                    "title": "Actifs liquides",
+                    "content": "CHF 2’620.00",
+                    "badge": "Courant + Cash"
+                },
+                "card-3": {
+                    "title": "Solde d'épargne",
+                    "content": "CHF 13’200.00",
+                    "badge": "y compris Pilier 3a"
+                },
+                "card-4": {
+                    "title": "Cartes de crédit",
+                    "content": "CHF-320.00",
+                    "badge": "Solde débiteur"
+                }
+            },
+            "data-table": {
+                "title": "Toutes les catégories",
+                "badge": "5 comptes • Liquidité CHF 2’620.00",
+                "buttons": {
+                    "export": "Exporter CSV",
+                    "reset": "Réinitialiser la démo"
+                },
+                "headings": {
+                    "name": "NOM",
+                    "type": "TYPE",
+                    "iban": "IBAN / Note",
+                    "balance": "Solde",
+                    "action": "ACTION"
+                },
+                "data": {
+                    "name": {
+                        "cash": "Cash",
+                        "current-account": "Compte courant",
+                        "credit-card": "Carte de crédit",
+                        "saving": "Épargne",
+                        "pillar": "Pilier 3a"
+                    },
+                    "action": "Modifier"
+                },
+                "total": "Total"
+            },
+            "latest-tranfers-section": {
+                "title": "Derniers transferts",
+                "button": "Exporter CSV",
+                "data-table": {
+                    "headings": {
+                        "date": "DATE",
+                        "from": "DE",
+                        "to": "À",
+                        "note": "NOTE",
+                        "amount": "MONTANT"
+                    }
+                }
+            }
+        },
+        "report-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Revenus",
+                    "content": "CHF 5’800.00",
+                    "badge": "Mois dernier"
+                },
+                "card-2": {
+                    "title": "Dépenses",
+                    "content": "CHF 4’800.00",
+                    "badge": "Mois dernier"
+                },
+                "card-3": {
+                    "title": "Solde",
+                    "content": "CHF 1’000.00",
+                    "badge": "Revenus − Dépenses"
+                },
+                "card-4": {
+                    "title": "Taux d'épargne",
+                    "content": "17%",
+                    "badge": "du revenu"
+                }
+            },
+            "analysis-table-data": {
+                "title": "Analyse",
+                "badge": "Mois dernier : CHF 5’800.00 Revenus • CHF 4’800.00 Dépenses",
+                "toggle-groups": {
+                    "month": "Mois",
+                    "quarter": "Trimestre",
+                    "year": "Année"
+                },
+                "exp-by-cat": {
+                    "title": "Dépenses par catégorie",
+                    "progress": {
+                        "groceries": "Courses",
+                        "rent": "Loyer",
+                        "transportation": "Transport",
+                        "restaurant": "Restaurant",
+                        "household": "Ménage",
+                        "leisure": "Loisirs"
+                    }
+                }
+            },
+            "income-exp": {
+                "title": "Revenus vs Dépenses (9 derniers mois)",
+                "data-table": {
+                    "headings": {
+                        "month": "MOIS",
+                        "income": "REVENU",
+                        "expenses": "Dépenses",
+                        "balance": "Solde"
+                    }
+                }
+            },
+            "detailed-table": {
+                "title": "Tableau détaillé",
+                "buttons": {
+                    "categories-csv": "CSV catégories",
+                    "trend-csv": "CSV tendances"
+                },
+                "data-table": {
+                    "headings": {
+                        "category": "Catégorie",
+                        "amount": "Montant"
+                    },
+                    "data": {
+                        "category": {
+                            "groceries": "Courses",
+                            "rent": "Loyer",
+                            "transportation": "Transport",
+                            "restaurant": "Restaurant",
+                            "household": "Ménage",
+                            "leisure": "Loisirs"
+                        },
+                        "total": "Total"
+                    }
+                }
+            }
         }
     }
 }

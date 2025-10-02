@@ -421,6 +421,220 @@
                     }
                 }
             }
+        },
+        "saving-goals-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Total Target Amount",
+                    "content": "CHF 18’000.00",
+                    "badge": "All Active Goals"
+                },
+                "card-2": {
+                    "title": "Saved So Far",
+                    "content": "CHF 8’610.00",
+                    "badge": "48% Achieved"
+                },
+                "card-3": {
+                    "title": "Remaining to Save",
+                    "content": "CHF 9’390.00",
+                    "badge": "Monthly car: CHF 700.00"
+                },
+                "card-4": {
+                    "title": "Number of Goals",
+                    "content": "3",
+                    "badge": "No Urgent Due Items"
+                }
+            },
+            "active-goals-section": {
+                "title": "Active Goals",
+                "badge": "3 Goals • Auto Allocation: CHF 700.00",
+                "buttons": {
+                    "due": "Due",
+                    "progress": "Progress",
+                    "remaining-amount": "Remaining Amount"
+                },
+                "cards": {
+                    "tax-reserves": {
+                        "header": {
+                            "title": "Tax Reserves",
+                            "button": "Edit"
+                        },
+                        "content": {
+                            "goal": "Goal",
+                            "saved": "Saved",
+                            "rest": "Rest",
+                            "due": "Due",
+                            "account": {
+                                "title": "Account",
+                                "save": "Save"
+                            },
+                            "days": "Days",
+                            "saving": "Saving",
+                            "auto": "Auto",
+                            "remaining": "Remaining",
+                            "checking-account": "Checking Account",
+                            "button": "Allocation",
+                            "new-balance": "New Balance",
+                            "placeholder": "Amount"
+                        }
+                    }
+                }
+            },
+            "warning-section": {
+                "title": "Notes & Warnings",
+                "button": "Hide All",
+                "badge": "No Notes"
+            },
+            "settings-section": {
+                "title": "Settings",
+                "button": "Reset Demo",
+                "checkboxes": {
+                    "monthly": "Monthly Auto-Allocation Active",
+                    "goals": "Show Overfunded Goals"
+                }
+            }
+        },
+        "content-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Total Assets",
+                    "content": "CHF 15’500.00",
+                    "badge": "Total of All Accounts"
+                },
+                "card-2": {
+                    "title": "Liquid Assets",
+                    "content": "CHF 2’620.00",
+                    "badge": "Checking + Cash"
+                },
+                "card-3": {
+                    "title": "Savings Balance",
+                    "content": "CHF 13’200.00",
+                    "badge": "including Pillar 3a"
+                },
+                "card-4": {
+                    "title": "Credit Cards",
+                    "content": "CHF-320.00",
+                    "badge": "Debit Balance"
+                }
+            },
+            "data-table": {
+                "title": "All categories",
+                "badge": "5 Konten • Liquid CHF 2’620.00",
+                "buttons": {
+                    "export": "Export CSV",
+                    "reset": "Reset Demo"
+                },
+                "headings": {
+                    "name": "NAME",
+                    "type": "TYPE",
+                    "iban": "IBAN / Note",
+                    "balance": "Balance",
+                    "action": "ACTION"
+                },
+                "data": {
+                    "name": {
+                        "cash": "Cash",
+                        "current-account": "Current Account",
+                        "credit-card": "Credit card",
+                        "saving": "Saving",
+                        "pillar": "Pillar 3a"
+                    },
+                    "action": "Edit"
+                },
+                "total": "Total"
+            },
+            "latest-tranfers-section": {
+                "title": "Latest transfers",
+                "button": "Export CSV",
+                "data-table": {
+                    "headings": {
+                        "date": "DATE",
+                        "from": "FROM",
+                        "to": "TO",
+                        "note": "NOTE",
+                        "amount": "AMOUNT"
+                    }
+                }
+            }
+        },
+        "report-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Income",
+                    "content": "CHF 5’800.00",
+                    "badge": "Last Month"
+                },
+                "card-2": {
+                    "title": "Expenses",
+                    "content": "CHF 4’800.00",
+                    "badge": "Last month"
+                },
+                "card-3": {
+                    "title": "Balance",
+                    "content": "CHF 1’000.00",
+                    "badge": "Income − Expenses"
+                },
+                "card-4": {
+                    "title": "Savings rate",
+                    "content": "17%",
+                    "badge": "of income"
+                }
+            },
+            "analysis-table-data": {
+                "title": "Analysis",
+                "badge": "Last month: CHF 5,800.00 Income • CHF 4,800.00 Expenses",
+                "toggle-groups": {
+                    "month": "Month",
+                    "quarter": "Quarter",
+                    "year": "Year"
+                },
+                "exp-by-cat": {
+                    "title": "Expenses by categories",
+                    "progress": {
+                        "groceries": "Groceries",
+                        "rent": "Rent",
+                        "transportation": "Transportation",
+                        "restaurant": "Restaurant",
+                        "household": "Household",
+                        "leisure": "Leisure"
+                    }
+                }
+            },
+            "income-exp": {
+                "title": "Income vs. Expenses (last 9 months)",
+                "data-table": {
+                    "headings": {
+                        "month": "MONTH",
+                        "income": "INCOME",
+                        "expenses": "Expenses",
+                        "balance": "Balance"
+                    }
+                }
+            },
+            "detailed-table": {
+                "title": "Detailed table",
+                "buttons": {
+                    "categories-csv": "Categories CSV",
+                    "trend-csv": "Trend CSV"
+                },
+                "data-table": {
+                    "headings": {
+                        "category": "Category",
+                        "amount": "Amount"
+                    },
+                    "data": {
+                        "category": {
+                            "groceries": "Groceries",
+                            "rent": "Rent",
+                            "transportation": "Transportation",
+                            "restaurant": "Restaurant",
+                            "household": "Household",
+                            "leisure": "Leisure"
+                        },
+                        "total": "Total"
+                    }
+                }
+            }
         }
     }
 }

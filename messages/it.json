@@ -421,6 +421,220 @@
                     }
                 }
             }
+        },
+        "saving-goals-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Importo totale obiettivo",
+                    "content": "CHF 18’000.00",
+                    "badge": "Tutti gli obiettivi attivi"
+                },
+                "card-2": {
+                    "title": "Risparmiato finora",
+                    "content": "CHF 8’610.00",
+                    "badge": "48% raggiunto"
+                },
+                "card-3": {
+                    "title": "Rimanente da risparmiare",
+                    "content": "CHF 9’390.00",
+                    "badge": "Obiettivo mensile: CHF 700.00"
+                },
+                "card-4": {
+                    "title": "Numero di obiettivi",
+                    "content": "3",
+                    "badge": "Nessun elemento urgente"
+                }
+            },
+            "active-goals-section": {
+                "title": "Obiettivi attivi",
+                "badge": "3 obiettivi • Assegnazione automatica: CHF 700.00",
+                "buttons": {
+                    "due": "Scadenza",
+                    "progress": "Progresso",
+                    "remaining-amount": "Importo rimanente"
+                },
+                "cards": {
+                    "tax-reserves": {
+                        "header": {
+                            "title": "Riserve fiscali",
+                            "button": "Modifica"
+                        },
+                        "content": {
+                            "goal": "Obiettivo",
+                            "saved": "Risparmiato",
+                            "rest": "Resto",
+                            "due": "Scadenza",
+                            "account": {
+                                "title": "Conto",
+                                "save": "Risparmia"
+                            },
+                            "days": "Giorni",
+                            "saving": "Risparmio",
+                            "auto": "Automatico",
+                            "remaining": "Rimanente",
+                            "checking-account": "Conto corrente",
+                            "button": "Assegnazione",
+                            "new-balance": "Nuovo saldo",
+                            "placeholder": "Importo"
+                        }
+                    }
+                }
+            },
+            "warning-section": {
+                "title": "Note e Avvisi",
+                "button": "Nascondi tutto",
+                "badge": "Nessuna nota"
+            },
+            "settings-section": {
+                "title": "Impostazioni",
+                "button": "Reimposta demo",
+                "checkboxes": {
+                    "monthly": "Assegnazione automatica mensile attiva",
+                    "goals": "Mostra obiettivi sovrafinanziati"
+                }
+            }
+        },
+        "content-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Attività totali",
+                    "content": "CHF 15’500.00",
+                    "badge": "Totale di tutti i conti"
+                },
+                "card-2": {
+                    "title": "Attività liquide",
+                    "content": "CHF 2’620.00",
+                    "badge": "Conto corrente + contanti"
+                },
+                "card-3": {
+                    "title": "Saldo risparmio",
+                    "content": "CHF 13’200.00",
+                    "badge": "incluso Pilastro 3a"
+                },
+                "card-4": {
+                    "title": "Carte di credito",
+                    "content": "CHF-320.00",
+                    "badge": "Saldo debitore"
+                }
+            },
+            "data-table": {
+                "title": "Tutte le categorie",
+                "badge": "5 conti • Liquidità CHF 2’620.00",
+                "buttons": {
+                    "export": "Esporta CSV",
+                    "reset": "Reimposta demo"
+                },
+                "headings": {
+                    "name": "NOME",
+                    "type": "TIPO",
+                    "iban": "IBAN / Nota",
+                    "balance": "Saldo",
+                    "action": "AZIONE"
+                },
+                "data": {
+                    "name": {
+                        "cash": "Contanti",
+                        "current-account": "Conto corrente",
+                        "credit-card": "Carta di credito",
+                        "saving": "Risparmio",
+                        "pillar": "Pilastro 3a"
+                    },
+                    "action": "Modifica"
+                },
+                "total": "Totale"
+            },
+            "latest-tranfers-section": {
+                "title": "Ultimi trasferimenti",
+                "button": "Esporta CSV",
+                "data-table": {
+                    "headings": {
+                        "date": "DATA",
+                        "from": "DA",
+                        "to": "A",
+                        "note": "NOTA",
+                        "amount": "IMPORTO"
+                    }
+                }
+            }
+        },
+        "report-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Entrate",
+                    "content": "CHF 5’800.00",
+                    "badge": "Mese scorso"
+                },
+                "card-2": {
+                    "title": "Spese",
+                    "content": "CHF 4’800.00",
+                    "badge": "Mese scorso"
+                },
+                "card-3": {
+                    "title": "Saldo",
+                    "content": "CHF 1’000.00",
+                    "badge": "Entrate − Spese"
+                },
+                "card-4": {
+                    "title": "Tasso di risparmio",
+                    "content": "17%",
+                    "badge": "delle entrate"
+                }
+            },
+            "analysis-table-data": {
+                "title": "Analisi",
+                "badge": "Mese scorso: CHF 5’800.00 Entrate • CHF 4’800.00 Spese",
+                "toggle-groups": {
+                    "month": "Mese",
+                    "quarter": "Trimestre",
+                    "year": "Anno"
+                },
+                "exp-by-cat": {
+                    "title": "Spese per categoria",
+                    "progress": {
+                        "groceries": "Generi alimentari",
+                        "rent": "Affitto",
+                        "transportation": "Trasporti",
+                        "restaurant": "Ristorante",
+                        "household": "Casa",
+                        "leisure": "Tempo libero"
+                    }
+                }
+            },
+            "income-exp": {
+                "title": "Entrate vs Spese (ultimi 9 mesi)",
+                "data-table": {
+                    "headings": {
+                        "month": "MESE",
+                        "income": "ENTRATE",
+                        "expenses": "Spese",
+                        "balance": "Saldo"
+                    }
+                }
+            },
+            "detailed-table": {
+                "title": "Tabella dettagliata",
+                "buttons": {
+                    "categories-csv": "CSV categorie",
+                    "trend-csv": "CSV tendenze"
+                },
+                "data-table": {
+                    "headings": {
+                        "category": "Categoria",
+                        "amount": "Importo"
+                    },
+                    "data": {
+                        "category": {
+                            "groceries": "Generi alimentari",
+                            "rent": "Affitto",
+                            "transportation": "Trasporti",
+                            "restaurant": "Ristorante",
+                            "household": "Casa",
+                            "leisure": "Tempo libero"
+                        },
+                        "total": "Totale"
+                    }
+                }
+            }
         }
     }
 }
