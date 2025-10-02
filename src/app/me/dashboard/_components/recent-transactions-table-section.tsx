@@ -50,7 +50,7 @@ export function RecentTransactionsTableSection({
             <TableHeader>
               <TableRow>
                 {recentTransactionsTableHeadings.map((heading) => (
-                  <TableHead>{heading}</TableHead>
+                  <TableHead key={heading}>{heading}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
