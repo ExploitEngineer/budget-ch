@@ -423,6 +423,28 @@
             }
         },
         "saving-goals-page": {
+            "dialog": {
+                "title": "Sparziel bearbeiten",
+                "button": "Schließen",
+                "edit": "Bearbeiten",
+                "labels": {
+                    "name": "Name",
+                    "target-amount": "Zielbetrag (CHF)",
+                    "already-saved": "Bereits gespart (CHF)",
+                    "due-on": "Fällig am",
+                    "account": "Konto",
+                    "monthly-allocation": "Monatliche Zuweisung (CHF)"
+                },
+                "buttons": {
+                    "delete": "Löschen",
+                    "save": "Speichern"
+                },
+                "account-options": {
+                    "checking": "Girokonto",
+                    "savings": "Sparkonto",
+                    "cash": "Bargeld"
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Gesamtzielbetrag",
@@ -634,6 +656,401 @@
                         "total": "Gesamt"
                     }
                 }
+            }
+        },
+        "import-export-page": {
+            "export-section": {
+                "title": "Exportieren",
+                "badge": "CSV & JSON",
+                "export-card": {
+                    "title": "Schnell-Export (CSV)",
+                    "buttons": {
+                        "transactions": "Transaktionen",
+                        "budgets": "Budgets",
+                        "savings-goals": "Sparziele",
+                        "accounts": "Konten",
+                        "transfers": "Überweisungen"
+                    }
+                },
+                "export-json-card": {
+                    "title": "Vollständiger Export (JSON)",
+                    "content": "Exportiert alle Daten aus dem localStorage in eine JSON-Datei.",
+                    "button": "Alles exportieren"
+                },
+                "csv-template-card": {
+                    "title": "CSV-Vorlagen"
+                }
+            },
+            "import-section": {
+                "title": "Importieren",
+                "badge": "CSV & JSON",
+                "data-type": {
+                    "title": "Datentyp",
+                    "transactions": "Transaktionen",
+                    "budgets": "Budgets",
+                    "saving-goals": "Sparziele",
+                    "accounts": "Konten",
+                    "transfers": "Überweisungen",
+                    "full-export": "Vollständiger Export (JSON)"
+                },
+                "modes": {
+                    "title": "Modi",
+                    "append": "Anhängen",
+                    "replace-existing": "Bestehende ersetzen"
+                },
+                "input": "Datei hier ablegen oder klicken",
+                "supported-files": "Unterstützt: .csv, .json. Trenner ‘;’ oder ‘,’ wird erkannt."
+            }
+        },
+        "settings-page": {
+            "profile-household-section": {
+                "title": "Profil & Haushalt",
+                "badge": "Plan: Kostenlos",
+                "labels": {
+                    "name": {
+                        "title": "Name",
+                        "placeholder": "Vor- und Nachname"
+                    }
+                },
+                "email": {
+                    "title": "E-Mail",
+                    "placeholder": "name@example.com"
+                },
+                "household-size": {
+                    "title": "Haushaltsgröße",
+                    "single": "Alleinstehend"
+                },
+                "subscription-local": {
+                    "title": "Abonnement (Lokal)",
+                    "plans": {
+                        "free": "Kostenlos",
+                        "individual": "Einzeln",
+                        "family": "Familie"
+                    }
+                },
+                "address": {
+                    "title": "Adresse (optional)",
+                    "placeholder": "Straße & Nr., PLZ, Ort"
+                }
+            },
+            "plans-upgrade-section": {
+                "title": "Pläne & Upgrade",
+                "buttons": {
+                    "monthly": "Monatlich",
+                    "yearly": "Jährlich",
+                    "2-months": "2 Monate gratis"
+                },
+                "plans-cards": {
+                    "free-card": {
+                        "title": "Kostenlos",
+                        "sub-title": "Für Anfänger.",
+                        "options": {
+                            "manual-entry": "Manuelle Eingabe & CSV-Import",
+                            "basic-budgets": "Basisbudgets & Sparziele",
+                            "transactions": "2 Konten, 300 Transaktionen/Monat",
+                            "community-support": "Community Support"
+                        },
+                        "button": "Kostenlos nutzen"
+                    },
+                    "individual-card": {
+                        "title": "Einzeln",
+                        "sub-title": "Für Einzelpersonen (1 Nutzer).",
+                        "year": "Jahr",
+                        "options": {
+                            "all-free-features": "Alle kostenlosen Funktionen ohne Limits",
+                            "unlimited": "Unbegrenzte Transaktionen, Konten, Budgets & Sparziele",
+                            "forecasts": "Prognosen, Kategorien, PDF/CSV-Export",
+                            "1-user": "1 Nutzer",
+                            "email-support": "E-Mail Support"
+                        },
+                        "button": "Jetzt upgraden"
+                    },
+                    "family-card": {
+                        "title": "Familie",
+                        "sub-title": "Für Familien & Teams (unbegrenzte Nutzer).",
+                        "year": "Jahr",
+                        "options": {
+                            "all-individual-features": "Alle Einzelfunktionen",
+                            "unlimited-users": "Unbegrenzte Nutzer (Familienmitglieder, Partner usw. einladen)",
+                            "shared-budgets": "Gemeinsame Budgets & Sparziele",
+                            "role-permission": "Rollenberechtigungen (Admin, Mitglied)"
+                        },
+                        "button": "Jetzt upgraden"
+                    },
+                    "stripe-portal-button": "Abonnement verwalten (Stripe Portal)"
+                }
+            },
+            "members-invitations-section": {
+                "title": "Mitglieder & Einladungen",
+                "badge": "0 Mitglieder",
+                "labels": {
+                    "invite-email": {
+                        "title": "Per E-Mail einladen",
+                        "placeholder": "person@example.ch"
+                    },
+                    "role": {
+                        "title": "Rolle",
+                        "select-options": {
+                            "member": "Mitglied",
+                            "admin": "Admin"
+                        }
+                    }
+                },
+                "button": "Einladung senden",
+                "table": {
+                    "table-headings": {
+                        "email": "E-MAIL",
+                        "role": "ROLLE",
+                        "status": "STATUS",
+                        "action": "AKTION"
+                    },
+                    "content": "Keine Einladungen oder Mitglieder vorhanden."
+                }
+            },
+            "appearance-section": {
+                "title": "Lokalisierung & Erscheinungsbild",
+                "content": "Synchronisiert auch die Auswahl in der Seitenleisten-Fußzeile.",
+                "labels": {
+                    "language": {
+                        "title": "Bevorzugte Sprache",
+                        "options": {
+                            "en": "Englisch",
+                            "de": "Deutsch",
+                            "fr": "Französisch",
+                            "it": "Italienisch"
+                        }
+                    },
+                    "currency": {
+                        "title": "Währung",
+                        "options": {
+                            "chf": "CHF",
+                            "eur": "EUR",
+                            "usd": "USD"
+                        }
+                    },
+                    "theme": {
+                        "title": "Thema",
+                        "options": {
+                            "dark": "Dunkel",
+                            "light": "Hell",
+                            "auto": "Automatisch"
+                        }
+                    },
+                    "first-day": {
+                        "title": "Erster Wochentag",
+                        "options": {
+                            "monday": "Montag",
+                            "sunday": "Sonntag"
+                        }
+                    },
+                    "density": {
+                        "title": "Dichte",
+                        "options": {
+                            "comfort": "Komfort",
+                            "compact": "Kompakt"
+                        }
+                    },
+                    "rounding": {
+                        "title": "Rundung",
+                        "options": {
+                            "5-rappen": "5 Rappen",
+                            "1-rappen": "1 Rappen"
+                        }
+                    }
+                }
+            },
+            "notifications-section": {
+                "title": "Benachrichtigungen",
+                "labels": {
+                    "email-alerts": {
+                        "title": "E-Mail Benachrichtigungen",
+                        "badges": {
+                            "budget": "Budget bei 80%",
+                            "budget-exceeded": "Budget überschritten",
+                            "payment": "Wiederkehrende Zahlung fällig"
+                        }
+                    },
+                    "push-browser": {
+                        "title": "Push (Browser)",
+                        "badges": {
+                            "new-transaction": "Neue Transaktion",
+                            "savings": "Sparziel-Meilenstein"
+                        }
+                    },
+                    "monthly-report": {
+                        "title": "Monatsbericht",
+                        "options": {
+                            "off": "Aus",
+                            "monthly": "Monatlich",
+                            "quarterly": "Quartalsweise"
+                        }
+                    }
+                }
+            },
+            "security-section": {
+                "title": "Sicherheit",
+                "labels": {
+                    "two-factor": {
+                        "title": "Zwei-Faktor",
+                        "content": "TOTP kompatibel mit gängigen Authenticator-Apps. (Demo)",
+                        "options": {
+                            "off": "Aus",
+                            "totp-app": "TOTP App",
+                            "email-code": "E-Mail Code"
+                        },
+                        "buttons": {
+                            "show-backup-codes": "Backup-Codes anzeigen",
+                            "regenerate-backup-codes": "Backup-Codes neu erzeugen"
+                        }
+                    },
+                    "password": {
+                        "title": "Passwort",
+                        "content": "„Zurücksetzen“ sendet einen E-Mail-Link (Demo).",
+                        "buttons": {
+                            "change-password": "Passwort ändern",
+                            "reset-password": "Passwort zurücksetzen"
+                        }
+                    }
+                }
+            },
+            "data-privacy-section": {
+                "title": "Daten & Datenschutz",
+                "labels": {
+                    "anonymous": {
+                        "title": "Anonyme Nutzungsstatistik",
+                        "options": {
+                            "on": "An",
+                            "off": "Aus"
+                        }
+                    },
+                    "retention": {
+                        "title": "Aufbewahrung gelöschter Daten",
+                        "options": {
+                            "delete-im": "Sofort löschen",
+                            "30-days": "30 Tage",
+                            "90-days": "90 Tage"
+                        }
+                    },
+                    "data-export": {
+                        "title": "Datenauszug",
+                        "buttons": {
+                            "json": "Daten exportieren (JSON)",
+                            "local-data": "Lokale Demo-Daten löschen",
+                            "delete-account": "Konto löschen"
+                        }
+                    }
+                },
+                "content": "„Konto löschen“ ist in der Demo lokal – produktiv serverseitig mit Bestätigung."
+            },
+            "billing-details-section": {
+                "title": "Rechnungsdetails (Demo)",
+                "labels": {
+                    "billing-name": {
+                        "title": "Rechnungsname",
+                        "placeholder": "Legal Name / Firma"
+                    },
+                    "vat-no": {
+                        "title": "MWST-Nr. (optional)",
+                        "placeholder": "CHE-123.456.789 MWST"
+                    }
+                },
+                "buttons": {
+                    "test-invoice": "Test-Abrechnung (Demo)",
+                    "save-payment": "Zahlungsdaten speichern"
+                }
+            },
+            "about-section": {
+                "title": "Über budgethub.ch",
+                "version": {
+                    "title": "Version",
+                    "label": "v1.0 — Demo Build"
+                },
+                "legal": {
+                    "title": "Rechtliches",
+                    "links": {
+                        "terms": "AGB",
+                        "privacy": "Datenschutz",
+                        "imprint": "Impressum"
+                    }
+                },
+                "support": {
+                    "title": "Support",
+                    "placeholder": "Frage oder Feedback …",
+                    "button": "An Support senden"
+                }
+            }
+        },
+        "help-page": {
+            "title": "Schnellzugriff",
+            "badge": "/ Suche • ? Kurzbefehle",
+            "buttons": {
+                "tour": "Schnell-Tour starten",
+                "faqs": "Alle FAQs öffnen",
+                "close-all": "Alles schließen",
+                "attach": "Diagnose anhängen",
+                "contact-support": "Support kontaktieren"
+            },
+            "faqs-section": {
+                "title": "FAQ",
+                "placeholder": "FAQs durchsuchen…",
+                "data": {
+                    "question-1": "Wie kann ich eine neue Transaktion erfassen?",
+                    "answer-1": "Klicke auf ‘+ Neue Transaktion’ im Dashboard oder drücke Strg + N auf der Transaktionsseite.",
+                    "question-2": "Wie erstelle ich ein Budget?",
+                    "answer-2": "Gehe zu Budgets → ‘Neues Budget’, wähle Kategorie, Zeitraum und Limit. Der Fortschritt wird automatisch berechnet.",
+                    "question-3": "Wie arbeite ich ohne Bankintegration?",
+                    "answer-3": "CSV unter Import/Export importieren oder Transaktionen manuell eingeben. Kontostände in Konten verwalten.",
+                    "question-4": "Kann ich Familienmitglieder einladen?",
+                    "answer-4": "Im Familienplan können mehrere Nutzer verwaltet werden (Einstellungen → Mitglieder & Einladungen).",
+                    "question-5": "Wie setze ich die Demo zurück?",
+                    "answer-5": "Unter Einstellungen → Daten & Datenschutz → ‘Alle lokalen Daten löschen’. Nur dein Browser-Speicher wird gelöscht.",
+                    "question-6": "Wie exportiere ich meine Daten?",
+                    "answer-6": "Unter Import/Export sind CSV-Exporte sowie ein Voll-Export (JSON) verfügbar.",
+                    "question-7": "Welche Sprachen/Themen sind verfügbar?",
+                    "answer-7": "DE/FR/IT/EN sowie Hell/Dunkel/Auto. Wechsel unten links in der Seitenleiste oder in den Einstellungen."
+                }
+            },
+            "content-section": {
+                "title": "Inhalt",
+                "faq": "FAQ",
+                "contact-support": "Kontakt & Support",
+                "keyboard-shortcuts": "Tastenkürzel",
+                "troubleshooting": "Fehlerbehebung",
+                "privacy": "Datenschutz",
+                "release-notes": "Release Notes",
+                "help": "Benötigst du individuelle Hilfe? Erstelle ein Ticket – du erhältst eine Antwort per E-Mail."
+            },
+            "contact-support-section": {
+                "title": "Kontakt & Support",
+                "subject": {
+                    "title": "Betreff",
+                    "placeholder": "Kurze Beschreibung"
+                },
+                "message": {
+                    "title": "Nachricht",
+                    "placeholder": "Wie können wir helfen? Bitte so genau wie möglich sein."
+                },
+                "button": "Ticket senden"
+            },
+            "keyboard-shortcuts-section": {
+                "title": "Tastenkürzel",
+                "badge": "? zeigt diese Liste",
+                "key-functions": {
+                    "search": "Fokus auf Suche",
+                    "new-account": "Neues Konto / Neue Transaktion (abhängig von der Seite)",
+                    "transfer": "Überweisung starten (Konten)",
+                    "close": "Modale/Overlays schließen"
+                }
+            },
+            "privary-section": {
+                "title": "Datenschutz (Kurz)",
+                "content": "In Produktion gelten die AGB und Datenschutzrichtlinien, die in der App verlinkt sind."
+            },
+            "release-notes-section": {
+                "title": "Release Notes",
+                "badge": "v1.0.0",
+                "list-1": "Dashboard, Transaktionen, Budgets, Sparziele, Konten, Reports, Import/Export, Einstellungen.",
+                "list-2": "Hell/Dunkel/Auto-Thema, DE/FR/IT/EN Umschaltung."
             }
         }
     }
