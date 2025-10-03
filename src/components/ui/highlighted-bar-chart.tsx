@@ -36,7 +36,7 @@ const chartData = [
 const chartConfig = {
   desktop: {
     label: "Desktop",
-    color: "var(--chart-1)",
+    color: "url(#bar-gradient)",
   },
 } satisfies ChartConfig;
 
@@ -72,13 +72,12 @@ export function HighlightedBarChart() {
             data={chartData}
             onMouseLeave={() => setActiveIndex(null)}
           >
-            <rect
-              x="0"
-              y="0"
-              width="100%"
-              height="85%"
-              fill="url(#highlighted-pattern-dots)"
-            />
+            <defs>
+              <linearGradient id="bar-gradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#677DF8" />
+                <stop offset="100%" stopColor="#2BC1E9" />
+              </linearGradient>
+            </defs>
             <XAxis
               dataKey="month"
               tickLine={false}

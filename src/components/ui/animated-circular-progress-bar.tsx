@@ -13,8 +13,6 @@ export function AnimatedCircularProgressBar({
   max = 100,
   min = 0,
   value = 0,
-  gaugePrimaryColor,
-  gaugeSecondaryColor,
   className,
 }: AnimatedCircularProgressBarProps) {
   const circumference = 2 * Math.PI * 45;
@@ -45,6 +43,18 @@ export function AnimatedCircularProgressBar({
         strokeWidth="2"
         viewBox="0 0 100 100"
       >
+        <defs>
+          <linearGradient
+            id="progress-gradient"
+            x1="0%"
+            y1="0%"
+            x2="0%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="#677DF8" />
+            <stop offset="100%" stopColor="#2BC1E9" />
+          </linearGradient>
+        </defs>
         {currentPercent <= 90 && currentPercent >= 0 && (
           <circle
             cx="50"
@@ -57,7 +67,7 @@ export function AnimatedCircularProgressBar({
             className="opacity-100"
             style={
               {
-                stroke: gaugeSecondaryColor,
+                stroke: "darkgray",
                 "--stroke-percent": 90 - currentPercent,
                 "--offset-factor-secondary": "calc(1 - var(--offset-factor))",
                 strokeDasharray:
@@ -82,7 +92,7 @@ export function AnimatedCircularProgressBar({
           className="opacity-100"
           style={
             {
-              stroke: gaugePrimaryColor,
+              stroke: "url(#progress-gradient)",
               "--stroke-percent": currentPercent,
               strokeDasharray:
                 "calc(var(--stroke-percent) * var(--percent-to-px)) var(--circumference)",
