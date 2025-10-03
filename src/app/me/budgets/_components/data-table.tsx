@@ -48,7 +48,7 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
   return (
     <section>
       <Card>
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <CardTitle>{t("data-table.title")}</CardTitle>{" "}
             <Badge className="rounded-full px-3 py-2" variant="outline">

@@ -3,6 +3,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
+import SavingGoalsDialog from "@/components/dialogs/saving-goals-dialog";
 import { Separator } from "@/components/ui/separator";
 import { ActiveGoalsData } from "./data";
 import { Button } from "@/components/ui/button";
@@ -87,7 +88,7 @@ export function ActiveGoalsSection({
                     <Badge variant="outline" className="rounded-full px-3 py-2">
                       {data.badgeValue}%
                     </Badge>
-                    <Button>{t("cards.tax-reserves.header.button")}</Button>
+                    <SavingGoalsDialog />
                   </div>
                 </CardHeader>
 

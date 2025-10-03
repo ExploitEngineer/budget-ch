@@ -69,17 +69,17 @@ export function NavMain() {
     },
     {
       title: t("sidebar.links.imp-exp"),
-      url: "#",
+      url: "/me/import-export",
       icon: Download,
     },
     {
       title: t("sidebar.links.settings"),
-      url: "#",
+      url: "/me/settings",
       icon: LampWallUp,
     },
     {
       title: t("sidebar.links.help"),
-      url: "#",
+      url: "/me/help",
       icon: CircleQuestionMark,
     },
     {

@@ -35,6 +35,7 @@ import {
   DialogContent,
   DialogClose,
 } from "@/components/ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 export default function DashBoardDialog() {
   const form = useForm<MainFormValues>({
@@ -69,22 +70,23 @@ export default function DashBoardDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl [&>button]:hidden">
+        <div className="flex items-center justify-between border-b pb-3">
+          <DialogTitle className="text-lg font-semibold">
+            {t("dialog-box.title")}
+          </DialogTitle>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              className="cursor-pointer border"
+              variant="ghost"
+            >
+              {t("dialog-box.btn-close")}
+            </Button>
+          </DialogClose>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between border-b pb-3">
-              <h2 className="text-lg font-semibold">{t("dialog-box.title")}</h2>
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  className="cursor-pointer border"
-                  variant="ghost"
-                >
-                  {t("dialog-box.btn-close")}
-                </Button>
-              </DialogClose>
-            </div>
-
             {/* Row 1 */}
             <div className="flex items-center justify-between gap-3">
               <FormField

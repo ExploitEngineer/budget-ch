@@ -79,9 +79,6 @@ export function HighlightedBarChart() {
               height="85%"
               fill="url(#highlighted-pattern-dots)"
             />
-            <defs>
-              <DottedBackgroundPattern />
-            </defs>
             <XAxis
               dataKey="month"
               tickLine={false}
@@ -112,24 +109,3 @@ export function HighlightedBarChart() {
     </Card>
   );
 }
-
-const DottedBackgroundPattern = () => {
-  return (
-    <pattern
-      id="highlighted-pattern-dots"
-      x="0"
-      y="0"
-      width="10"
-      height="10"
-      patternUnits="userSpaceOnUse"
-    >
-      <circle
-        className="dark:text-muted/40 text-muted"
-        cx="2"
-        cy="2"
-        r="1"
-        fill="currentColor"
-      />
-    </pattern>
-  );
-};
