@@ -14,6 +14,7 @@ import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
+  CustomTooltipProps,
 } from "@/components/ui/chart";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
@@ -87,7 +88,9 @@ export function HighlightedBarChart() {
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={(props: CustomTooltipProps) => (
+                <ChartTooltipContent {...props} hideIndicator hideLabel />
+              )}
             />
             <Bar dataKey="desktop" radius={4} fill="var(--color-desktop)">
               {chartData.map((_, index) => (
