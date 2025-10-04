@@ -9,9 +9,8 @@ export default function Greeting() {
   return (
     <div className="flex h-screen flex-col items-center justify-center gap-4">
       <LangSwitcher />
-      <h1 className="text-2xl font-bold">{t("title")}</h1>
       <Button className="" asChild>
-        <Link href="/intro">{t("cta")}</Link>
+        <Link href="/me/dashboard">{t("cta")}</Link>
       </Button>
     </div>
   );
