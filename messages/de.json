@@ -1,7 +1,1057 @@
 {
-  "greeting": {
-    "title": "Wie geht es dir?",
-    "cta": "Klicken Sie auf mich"
-  },
-  "intro": "Hallo {name}, Du hast {count, plural, =0 {noch keine Follower} =1 {einen Follower} other {# Follower}}."
+    "greeting": {
+        "title": "Wie geht es dir?",
+        "cta": "Klick mich"
+    },
+    "intro": "Hallo {name}, du hast {count, plural, =0 {noch keine Follower} =1 {einen Follower} other {# Follower}}.",
+    "authpages": {
+        "signup": "Registrieren",
+        "signin": "Anmelden",
+        "forgot-password": "Passwort zurücksetzen",
+        "labels": {
+            "name": "Name",
+            "email": "E-Mail",
+            "password": "Passwort"
+        },
+        "placeholders": {
+            "name": "Dein Name",
+            "email": "deine@example.com"
+        },
+        "checkboxes": {
+            "password": "Passwort anzeigen",
+            "terms": "Ich akzeptiere die <terms>AGB</terms> & die <privacy>Datenschutzbestimmungen</privacy>"
+        },
+        "tip": "Tipp: Länge ≥ 8, Zahlen & Buchstaben enthalten.",
+        "buttons": {
+            "create-account": "Konto erstellen",
+            "google": "mit Google",
+            "send-email": "E-Mail zum Zurücksetzen senden",
+            "back-to-signin": "Zur Anmeldung zurück"
+        },
+        "already": "Hast du bereits ein Konto?",
+        "forgot-pass": "Passwort vergessen?",
+        "no-account-yet": "Noch kein Konto?",
+        "dark-mode": "Dunkelmodus",
+        "light-mode": "Hellmodus"
+    },
+    "main-dashboard": {
+        "sidebar": {
+            "title": "NAVIGATION",
+            "links": {
+                "dashboard": "Dashboard",
+                "transactions": "Transaktionen",
+                "budgets": "Budgets",
+                "savings": "Sparziele",
+                "content": "Inhalt",
+                "reports": "Berichte",
+                "imp-exp": "Import / Export",
+                "settings": "Einstellungen",
+                "help": "Hilfe",
+                "logout": "Abmelden"
+            },
+            "header": {
+                "search": "Suchen..."
+            }
+        },
+        "dashboard-page": {
+            "dialog-box": {
+                "title": "Neue Buchung",
+                "btn-close": "Schließen",
+                "labels": {
+                    "date": "Datum",
+                    "account": {
+                        "title": "Konto",
+                        "placeholder": "Wählen",
+                        "options": {
+                            "checking": "Girokonto",
+                            "credit-card": "Kreditkarte",
+                            "save": "Sparen",
+                            "cash": "Bargeld"
+                        }
+                    },
+                    "quelle": {
+                        "title": "Quelle",
+                        "placeholder": "z. B. Coop, Arbeitgeber…"
+                    },
+                    "category": {
+                        "title": "Kategorie",
+                        "options": {
+                            "groceries": "Lebensmittel",
+                            "restaurant": "Restaurant & Café",
+                            "transportation": "Transport",
+                            "household": "Haushalt",
+                            "income": "Einkommen"
+                        }
+                    },
+                    "amount": "Betrag (CHF)",
+                    "note": {
+                        "title": "Notiz",
+                        "placeholder": "Optional"
+                    }
+                },
+                "buttons": {
+                    "save": "Als Vorlage speichern",
+                    "post": "Buchen"
+                }
+            },
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtbudget (Monat)",
+                    "content": "4’703 Schweizer Franken",
+                    "badge": "Fix + Variabel • inkl. KK & SERAFE"
+                },
+                "card-2": {
+                    "title": "Ausgaben (Aktuell)",
+                    "content": "2’456 Schweizer Franken",
+                    "badge": "60% des Budgets"
+                },
+                "card-3": {
+                    "title": "Verfügbar",
+                    "content": "3’447 Schweizer Franken",
+                    "badge": "+40% Puffer"
+                },
+                "card-4": {
+                    "title": "Prognose bis 30.09.2025",
+                    "content": "4’980 Schweizer Franken",
+                    "badge": "inkl. Wiederkehrend"
+                }
+            },
+            "chart": {
+                "primary-title": "Ausgaben pro Monat",
+                "secondary-title": "in CHF"
+            },
+            "progress-cards": {
+                "title": "Sparziele",
+                "card-1": {
+                    "title": "Steuerrücklagen"
+                },
+                "card-2": {
+                    "title": "Notfallfonds"
+                },
+                "card-3": {
+                    "title": "Ferien"
+                }
+            },
+            "line-progress-cards": {
+                "title": "Top Kategorien (Monat)",
+                "button": "Alle Budgets",
+                "card-1": {
+                    "title": "Lebensmittel"
+                },
+                "card-2": {
+                    "title": "Restaurant & Café"
+                },
+                "card-3": {
+                    "title": "Transport"
+                },
+                "card-4": {
+                    "title": "Haushalt"
+                }
+            },
+            "todos": {
+                "title": "Schnellaufgaben",
+                "button": "schnell erledigt",
+                "placeholder": "Aufgabe hinzufügen…"
+            },
+            "upcoming-cards": {
+                "title": "Bevorstehende Fälligkeiten (Wiederkehrend)",
+                "button": "Nächste 14 Tage",
+                "table-data": {
+                    "table-heading": {
+                        "date": "DATUM",
+                        "name": {
+                            "title": "NAME",
+                            "data": {
+                                "insurance": "Krankenversicherung",
+                                "insurance-bill": "Krankenversicherungsrechnung",
+                                "rent": "Miete"
+                            }
+                        },
+                        "account": {
+                            "title": "KONTO",
+                            "data": {
+                                "checking": "Girokonto",
+                                "credit-card": "Kreditkarte"
+                            }
+                        },
+                        "amount": "BETRAG"
+                    },
+                    "button": "Anpassen"
+                }
+            },
+            "warning-cards": {
+                "title": "Notizen & Warnungen",
+                "button": "Alle ausblenden",
+                "card-1": {
+                    "title": "Lebensmittelbudget bei 80%",
+                    "badge": "Budget anpassen"
+                },
+                "card-2": {
+                    "title": "Restaurantbudget überschritten",
+                    "badge": "Kategorie öffnen"
+                },
+                "card-3": {
+                    "title": "3 neue Transaktionen seit gestern"
+                }
+            },
+            "recent-transactions-table": {
+                "title": "Letzte Transaktionen",
+                "button": "Alle anzeigen",
+                "table-headings": {
+                    "date": "Datum",
+                    "recipient": {
+                        "title": "Empfänger",
+                        "data": {
+                            "coop": "Cooperative",
+                            "sbb": "SBB",
+                            "cafe": "Cafe Roma",
+                            "employer": "Arbeitgeber"
+                        }
+                    },
+                    "account": {
+                        "title": "Konto",
+                        "data": {
+                            "current-account": "Girokonto",
+                            "credit-card": "Kreditkarte"
+                        }
+                    },
+                    "category": {
+                        "title": "Kategorie",
+                        "data": {
+                            "groceries": "Lebensmittel",
+                            "transportation": "Transport",
+                            "restaurant": "Restaurant",
+                            "income": "Einkommen"
+                        }
+                    },
+                    "note": {
+                        "title": "Notiz",
+                        "data": {
+                            "shopping": "Wocheneinkauf",
+                            "ga": "GA Tageskarte",
+                            "lunch": "Mittagessen",
+                            "salary": "Lohn"
+                        }
+                    },
+                    "amount": "Betrag"
+                }
+            },
+            "budget-health": {
+                "title": "Budgetgesundheit",
+                "secondary-title": "Monatliche Übersicht",
+                "warning-card": {
+                    "title": "SCORE",
+                    "warning": "Achtung: hoch",
+                    "spending": "Ausgaben-Tempo"
+                },
+                "card-1": {
+                    "title": "BUDGET"
+                },
+                "card-2": {
+                    "title": "Ausgaben"
+                },
+                "card-3": {
+                    "title": "Warnungen"
+                }
+            }
+        },
+        "transactions-page": {
+            "labels": {
+                "from": "Von",
+                "to": "Bis",
+                "account": {
+                    "title": "Konto",
+                    "data": {
+                        "accounts": "Alle Konten",
+                        "current-account": "Girokonto",
+                        "credit-card": "Kreditkarte",
+                        "savings": "Sparkonto",
+                        "cash": "Bargeld"
+                    }
+                },
+                "category": {
+                    "title": "Kategorie",
+                    "data": {
+                        "categories": "Alle Kategorien",
+                        "groceries": "Lebensmittel",
+                        "restaurant": "Restaurant & Café",
+                        "transportation": "Transport"
+                    }
+                },
+                "search": {
+                    "title": "Suche",
+                    "placeholder": "z. B. Coop, Miete, Kreditkarte…"
+                }
+            },
+            "checkboxes": {
+                "receipt": "Mit Beleg",
+                "recurring": "Wiederkehrend",
+                "transfers": "Nur Überweisungen"
+            },
+            "buttons": {
+                "reset": "Zurücksetzen",
+                "apply": "Anwenden"
+            },
+            "data-table": {
+                "header": {
+                    "checkbox": "Alle",
+                    "buttons": {
+                        "delete": "Löschen",
+                        "category": "Kategorie",
+                        "export": "Exportieren",
+                        "update": "Aktualisieren"
+                    },
+                    "badge": "Saldo:"
+                },
+                "headings": {
+                    "date": "Datum",
+                    "recipient": "Empfänger",
+                    "account": "Konto",
+                    "category": "Kategorie",
+                    "note": "Notiz",
+                    "amount": "Betrag",
+                    "action": "Aktion"
+                },
+                "action": "Bearbeiten",
+                "recipients": {
+                    "amazon": "Amazon",
+                    "salary": "Gehaltszahlung",
+                    "netflix": "Netflix",
+                    "starbucks": "Starbucks",
+                    "uber": "Uber",
+                    "apple": "Apple Store"
+                },
+                "accounts": {
+                    "creditCard": "Kreditkarte",
+                    "bank": "Bankkonto",
+                    "paypal": "PayPal"
+                },
+                "categories": {
+                    "shopping": "Einkaufen",
+                    "income": "Einkommen",
+                    "entertainment": "Unterhaltung",
+                    "food": "Essen & Trinken",
+                    "transport": "Transport",
+                    "tech": "Elektronik"
+                },
+                "notes": {
+                    "electronicsOrder": "Elektronikbestellung",
+                    "salarySeptember": "September Gehalt",
+                    "netflixMonthly": "Monatliches Abo",
+                    "coffeeFriends": "Kaffee mit Freunden",
+                    "rideOffice": "Fahrt ins Büro",
+                    "applePurchase": "MacBook-Kauf"
+                },
+                "pagination": {
+                    "previous": "Zurück",
+                    "next": "Weiter"
+                }
+            }
+        },
+        "budgets-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtbudget (Monat)",
+                    "content": "CHF 2’900.00",
+                    "badge": "Übertrag: Inaktiv"
+                },
+                "card-2": {
+                    "title": "Bisher ausgegeben",
+                    "content": "CHF 1’915.00",
+                    "badge": "66% des Budgets"
+                },
+                "card-3": {
+                    "title": "Verfügbar",
+                    "content": "CHF 985.00",
+                    "badge": "+34% verfügbar"
+                },
+                "card-4": {
+                    "title": "Anzahl Kategorien",
+                    "content": "8",
+                    "badge": "Warnungen: 2"
+                }
+            },
+            "data-table": {
+                "title": "Alle Kategorien",
+                "badge": "Gesamtbudget: CHF 2’900.00 • Rest: CHF 985.00",
+                "buttons": {
+                    "export": "CSV exportieren",
+                    "reset": "Zurücksetzen (Demo)"
+                },
+                "headings": {
+                    "category": "KATEGORIE",
+                    "budget": "BUDGET",
+                    "ist": "IST",
+                    "rest": "REST",
+                    "progress": "FORTSCHRITT",
+                    "action": "AKTION"
+                },
+                "data": {
+                    "category": {
+                        "clothing": "Kleidung",
+                        "sports": "Freizeit & Sport",
+                        "health": "Gesundheit",
+                        "transportation": "Transport",
+                        "travel": "Reisen & Urlaub",
+                        "household": "Haushalt"
+                    },
+                    "action": "Bearbeiten"
+                },
+                "toggle-groups": {
+                    "month": "Monat",
+                    "week": "Woche",
+                    "warn-80": "Warnung bei 80%",
+                    "warn-90": "Warnung bei 90%",
+                    "warn-100": "Warnung bei 100%"
+                }
+            },
+            "warning-section": {
+                "title": "Notizen & Warnungen",
+                "button": "Alle ausblenden",
+                "badges": {
+                    "restaurant": "Budget Restaurant & Café bei 82%",
+                    "health": "Budget Gesundheit bei 96%"
+                },
+                "settings": {
+                    "title": "Einstellungen (Monat)",
+                    "button": "+ Budget",
+                    "checkboxes": {
+                        "carry": "Überschuss/Defizit in den nächsten Monat übertragen",
+                        "e-mail": "Warnungen per E-Mail bei 80% / 100%"
+                    }
+                }
+            }
+        },
+        "saving-goals-page": {
+            "dialog": {
+                "title": "Sparziel bearbeiten",
+                "button": "Schließen",
+                "edit": "Bearbeiten",
+                "labels": {
+                    "name": "Name",
+                    "target-amount": "Zielbetrag (CHF)",
+                    "already-saved": "Bereits gespart (CHF)",
+                    "due-on": "Fällig am",
+                    "account": "Konto",
+                    "monthly-allocation": "Monatliche Zuweisung (CHF)"
+                },
+                "buttons": {
+                    "delete": "Löschen",
+                    "save": "Speichern"
+                },
+                "account-options": {
+                    "checking": "Girokonto",
+                    "savings": "Sparkonto",
+                    "cash": "Bargeld"
+                }
+            },
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtzielbetrag",
+                    "content": "CHF 18’000.00",
+                    "badge": "Alle aktiven Ziele"
+                },
+                "card-2": {
+                    "title": "Bisher gespart",
+                    "content": "CHF 8’610.00",
+                    "badge": "48% erreicht"
+                },
+                "card-3": {
+                    "title": "Noch zu sparen",
+                    "content": "CHF 9’390.00",
+                    "badge": "Monatliches Ziel: CHF 700.00"
+                },
+                "card-4": {
+                    "title": "Anzahl Ziele",
+                    "content": "3",
+                    "badge": "Keine dringenden Posten"
+                }
+            },
+            "active-goals-section": {
+                "title": "Aktive Ziele",
+                "badge": "3 Ziele • Automatische Zuweisung: CHF 700.00",
+                "buttons": {
+                    "due": "Fällig",
+                    "progress": "Fortschritt",
+                    "remaining-amount": "Verbleibender Betrag"
+                },
+                "cards": {
+                    "tax-reserves": {
+                        "header": {
+                            "title": "Steuerrücklagen",
+                            "button": "Bearbeiten"
+                        },
+                        "content": {
+                            "goal": "Ziel",
+                            "saved": "Gespart",
+                            "rest": "Rest",
+                            "due": "Fällig",
+                            "account": {
+                                "title": "Konto",
+                                "save": "Sparen"
+                            },
+                            "days": "Tage",
+                            "saving": "Sparen",
+                            "auto": "Automatisch",
+                            "remaining": "Verbleibend",
+                            "checking-account": "Girokonto",
+                            "button": "Zuweisung",
+                            "new-balance": "Neuer Kontostand",
+                            "placeholder": "Betrag"
+                        }
+                    }
+                }
+            },
+            "warning-section": {
+                "title": "Notizen & Warnungen",
+                "button": "Alle ausblenden",
+                "badge": "Keine Notizen"
+            },
+            "settings-section": {
+                "title": "Einstellungen",
+                "button": "Demo zurücksetzen",
+                "checkboxes": {
+                    "monthly": "Monatliche Auto-Zuweisung aktiv",
+                    "goals": "Überfinanzierte Ziele anzeigen"
+                }
+            }
+        },
+        "content-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Gesamtvermögen",
+                    "content": "CHF 15’500.00",
+                    "badge": "Summe aller Konten"
+                },
+                "card-2": {
+                    "title": "Liquidität",
+                    "content": "CHF 2’620.00",
+                    "badge": "Girokonto + Bargeld"
+                },
+                "card-3": {
+                    "title": "Sparguthaben",
+                    "content": "CHF 13’200.00",
+                    "badge": "inkl. Säule 3a"
+                },
+                "card-4": {
+                    "title": "Kreditkarten",
+                    "content": "CHF-320.00",
+                    "badge": "Sollsaldo"
+                }
+            },
+            "data-table": {
+                "title": "Alle Kategorien",
+                "badge": "5 Konten • Liquidität CHF 2’620.00",
+                "buttons": {
+                    "export": "CSV exportieren",
+                    "reset": "Demo zurücksetzen"
+                },
+                "headings": {
+                    "name": "NAME",
+                    "type": "TYP",
+                    "iban": "IBAN / Hinweis",
+                    "balance": "Kontostand",
+                    "action": "AKTION"
+                },
+                "data": {
+                    "name": {
+                        "cash": "Bargeld",
+                        "current-account": "Girokonto",
+                        "credit-card": "Kreditkarte",
+                        "saving": "Sparen",
+                        "pillar": "Säule 3a"
+                    },
+                    "action": "Bearbeiten"
+                },
+                "total": "Gesamt"
+            },
+            "latest-tranfers-section": {
+                "title": "Letzte Überweisungen",
+                "button": "CSV exportieren",
+                "data-table": {
+                    "headings": {
+                        "date": "DATUM",
+                        "from": "VON",
+                        "to": "AN",
+                        "note": "HINWEIS",
+                        "amount": "BETRAG"
+                    }
+                }
+            }
+        },
+        "report-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Einkommen",
+                    "content": "CHF 5’800.00",
+                    "badge": "Letzter Monat"
+                },
+                "card-2": {
+                    "title": "Ausgaben",
+                    "content": "CHF 4’800.00",
+                    "badge": "Letzter Monat"
+                },
+                "card-3": {
+                    "title": "Saldo",
+                    "content": "CHF 1’000.00",
+                    "badge": "Einnahmen − Ausgaben"
+                },
+                "card-4": {
+                    "title": "Sparquote",
+                    "content": "17%",
+                    "badge": "vom Einkommen"
+                }
+            },
+            "analysis-table-data": {
+                "title": "Analyse",
+                "badge": "Letzter Monat: CHF 5’800.00 Einnahmen • CHF 4’800.00 Ausgaben",
+                "toggle-groups": {
+                    "month": "Monat",
+                    "quarter": "Quartal",
+                    "year": "Jahr"
+                },
+                "exp-by-cat": {
+                    "title": "Ausgaben nach Kategorien",
+                    "progress": {
+                        "groceries": "Lebensmittel",
+                        "rent": "Miete",
+                        "transportation": "Transport",
+                        "restaurant": "Restaurant",
+                        "household": "Haushalt",
+                        "leisure": "Freizeit"
+                    }
+                }
+            },
+            "income-exp": {
+                "title": "Einnahmen vs. Ausgaben (letzte 9 Monate)",
+                "data-table": {
+                    "headings": {
+                        "month": "MONAT",
+                        "income": "EINKOMMEN",
+                        "expenses": "Ausgaben",
+                        "balance": "Saldo"
+                    }
+                }
+            },
+            "detailed-table": {
+                "title": "Detaillierte Tabelle",
+                "buttons": {
+                    "categories-csv": "Kategorien CSV",
+                    "trend-csv": "Trend CSV"
+                },
+                "data-table": {
+                    "headings": {
+                        "category": "Kategorie",
+                        "amount": "Betrag"
+                    },
+                    "data": {
+                        "category": {
+                            "groceries": "Lebensmittel",
+                            "rent": "Miete",
+                            "transportation": "Transport",
+                            "restaurant": "Restaurant",
+                            "household": "Haushalt",
+                            "leisure": "Freizeit"
+                        },
+                        "total": "Gesamt"
+                    }
+                }
+            }
+        },
+        "import-export-page": {
+            "export-section": {
+                "title": "Exportieren",
+                "badge": "CSV & JSON",
+                "export-card": {
+                    "title": "Schnell-Export (CSV)",
+                    "buttons": {
+                        "transactions": "Transaktionen",
+                        "budgets": "Budgets",
+                        "savings-goals": "Sparziele",
+                        "accounts": "Konten",
+                        "transfers": "Überweisungen"
+                    }
+                },
+                "export-json-card": {
+                    "title": "Vollständiger Export (JSON)",
+                    "content": "Exportiert alle Daten aus dem localStorage in eine JSON-Datei.",
+                    "button": "Alles exportieren"
+                },
+                "csv-template-card": {
+                    "title": "CSV-Vorlagen"
+                }
+            },
+            "import-section": {
+                "title": "Importieren",
+                "badge": "CSV & JSON",
+                "data-type": {
+                    "title": "Datentyp",
+                    "transactions": "Transaktionen",
+                    "budgets": "Budgets",
+                    "saving-goals": "Sparziele",
+                    "accounts": "Konten",
+                    "transfers": "Überweisungen",
+                    "full-export": "Vollständiger Export (JSON)"
+                },
+                "modes": {
+                    "title": "Modi",
+                    "append": "Anhängen",
+                    "replace-existing": "Bestehende ersetzen"
+                },
+                "input": "Datei hier ablegen oder klicken",
+                "supported-files": "Unterstützt: .csv, .json. Trenner ‘;’ oder ‘,’ wird erkannt."
+            }
+        },
+        "settings-page": {
+            "profile-household-section": {
+                "title": "Profil & Haushalt",
+                "badge": "Plan: Kostenlos",
+                "labels": {
+                    "name": {
+                        "title": "Name",
+                        "placeholder": "Vor- und Nachname"
+                    }
+                },
+                "email": {
+                    "title": "E-Mail",
+                    "placeholder": "name@example.com"
+                },
+                "household-size": {
+                    "title": "Haushaltsgröße",
+                    "single": "Alleinstehend"
+                },
+                "subscription-local": {
+                    "title": "Abonnement (Lokal)",
+                    "plans": {
+                        "free": "Kostenlos",
+                        "individual": "Einzeln",
+                        "family": "Familie"
+                    }
+                },
+                "address": {
+                    "title": "Adresse (optional)",
+                    "placeholder": "Straße & Nr., PLZ, Ort"
+                }
+            },
+            "plans-upgrade-section": {
+                "title": "Pläne & Upgrade",
+                "buttons": {
+                    "monthly": "Monatlich",
+                    "yearly": "Jährlich",
+                    "2-months": "2 Monate gratis"
+                },
+                "plans-cards": {
+                    "free-card": {
+                        "title": "Kostenlos",
+                        "sub-title": "Für Anfänger.",
+                        "options": {
+                            "manual-entry": "Manuelle Eingabe & CSV-Import",
+                            "basic-budgets": "Basisbudgets & Sparziele",
+                            "transactions": "2 Konten, 300 Transaktionen/Monat",
+                            "community-support": "Community Support"
+                        },
+                        "button": "Kostenlos nutzen"
+                    },
+                    "individual-card": {
+                        "title": "Einzeln",
+                        "sub-title": "Für Einzelpersonen (1 Nutzer).",
+                        "year": "Jahr",
+                        "options": {
+                            "all-free-features": "Alle kostenlosen Funktionen ohne Limits",
+                            "unlimited": "Unbegrenzte Transaktionen, Konten, Budgets & Sparziele",
+                            "forecasts": "Prognosen, Kategorien, PDF/CSV-Export",
+                            "1-user": "1 Nutzer",
+                            "email-support": "E-Mail Support"
+                        },
+                        "button": "Jetzt upgraden"
+                    },
+                    "family-card": {
+                        "title": "Familie",
+                        "sub-title": "Für Familien & Teams (unbegrenzte Nutzer).",
+                        "year": "Jahr",
+                        "options": {
+                            "all-individual-features": "Alle Einzelfunktionen",
+                            "unlimited-users": "Unbegrenzte Nutzer (Familienmitglieder, Partner usw. einladen)",
+                            "shared-budgets": "Gemeinsame Budgets & Sparziele",
+                            "role-permission": "Rollenberechtigungen (Admin, Mitglied)"
+                        },
+                        "button": "Jetzt upgraden"
+                    },
+                    "stripe-portal-button": "Abonnement verwalten (Stripe Portal)"
+                }
+            },
+            "members-invitations-section": {
+                "title": "Mitglieder & Einladungen",
+                "badge": "0 Mitglieder",
+                "labels": {
+                    "invite-email": {
+                        "title": "Per E-Mail einladen",
+                        "placeholder": "person@example.ch"
+                    },
+                    "role": {
+                        "title": "Rolle",
+                        "select-options": {
+                            "member": "Mitglied",
+                            "admin": "Admin"
+                        }
+                    }
+                },
+                "button": "Einladung senden",
+                "table": {
+                    "table-headings": {
+                        "email": "E-MAIL",
+                        "role": "ROLLE",
+                        "status": "STATUS",
+                        "action": "AKTION"
+                    },
+                    "content": "Keine Einladungen oder Mitglieder vorhanden."
+                }
+            },
+            "appearance-section": {
+                "title": "Lokalisierung & Erscheinungsbild",
+                "content": "Synchronisiert auch die Auswahl in der Seitenleisten-Fußzeile.",
+                "labels": {
+                    "language": {
+                        "title": "Bevorzugte Sprache",
+                        "options": {
+                            "en": "Englisch",
+                            "de": "Deutsch",
+                            "fr": "Französisch",
+                            "it": "Italienisch"
+                        }
+                    },
+                    "currency": {
+                        "title": "Währung",
+                        "options": {
+                            "chf": "CHF",
+                            "eur": "EUR",
+                            "usd": "USD"
+                        }
+                    },
+                    "theme": {
+                        "title": "Thema",
+                        "options": {
+                            "dark": "Dunkel",
+                            "light": "Hell",
+                            "auto": "Automatisch"
+                        }
+                    },
+                    "first-day": {
+                        "title": "Erster Wochentag",
+                        "options": {
+                            "monday": "Montag",
+                            "sunday": "Sonntag"
+                        }
+                    },
+                    "density": {
+                        "title": "Dichte",
+                        "options": {
+                            "comfort": "Komfort",
+                            "compact": "Kompakt"
+                        }
+                    },
+                    "rounding": {
+                        "title": "Rundung",
+                        "options": {
+                            "5-rappen": "5 Rappen",
+                            "1-rappen": "1 Rappen"
+                        }
+                    }
+                }
+            },
+            "notifications-section": {
+                "title": "Benachrichtigungen",
+                "labels": {
+                    "email-alerts": {
+                        "title": "E-Mail Benachrichtigungen",
+                        "badges": {
+                            "budget": "Budget bei 80%",
+                            "budget-exceeded": "Budget überschritten",
+                            "payment": "Wiederkehrende Zahlung fällig"
+                        }
+                    },
+                    "push-browser": {
+                        "title": "Push (Browser)",
+                        "badges": {
+                            "new-transaction": "Neue Transaktion",
+                            "savings": "Sparziel-Meilenstein"
+                        }
+                    },
+                    "monthly-report": {
+                        "title": "Monatsbericht",
+                        "options": {
+                            "off": "Aus",
+                            "monthly": "Monatlich",
+                            "quarterly": "Quartalsweise"
+                        }
+                    }
+                }
+            },
+            "security-section": {
+                "title": "Sicherheit",
+                "labels": {
+                    "two-factor": {
+                        "title": "Zwei-Faktor",
+                        "content": "TOTP kompatibel mit gängigen Authenticator-Apps. (Demo)",
+                        "options": {
+                            "off": "Aus",
+                            "totp-app": "TOTP App",
+                            "email-code": "E-Mail Code"
+                        },
+                        "buttons": {
+                            "show-backup-codes": "Backup-Codes anzeigen",
+                            "regenerate-backup-codes": "Backup-Codes neu erzeugen"
+                        }
+                    },
+                    "password": {
+                        "title": "Passwort",
+                        "content": "„Zurücksetzen“ sendet einen E-Mail-Link (Demo).",
+                        "buttons": {
+                            "change-password": "Passwort ändern",
+                            "reset-password": "Passwort zurücksetzen"
+                        }
+                    }
+                }
+            },
+            "data-privacy-section": {
+                "title": "Daten & Datenschutz",
+                "labels": {
+                    "anonymous": {
+                        "title": "Anonyme Nutzungsstatistik",
+                        "options": {
+                            "on": "An",
+                            "off": "Aus"
+                        }
+                    },
+                    "retention": {
+                        "title": "Aufbewahrung gelöschter Daten",
+                        "options": {
+                            "delete-im": "Sofort löschen",
+                            "30-days": "30 Tage",
+                            "90-days": "90 Tage"
+                        }
+                    },
+                    "data-export": {
+                        "title": "Datenauszug",
+                        "buttons": {
+                            "json": "Daten exportieren (JSON)",
+                            "local-data": "Lokale Demo-Daten löschen",
+                            "delete-account": "Konto löschen"
+                        }
+                    }
+                },
+                "content": "„Konto löschen“ ist in der Demo lokal – produktiv serverseitig mit Bestätigung."
+            },
+            "billing-details-section": {
+                "title": "Rechnungsdetails (Demo)",
+                "labels": {
+                    "billing-name": {
+                        "title": "Rechnungsname",
+                        "placeholder": "Legal Name / Firma"
+                    },
+                    "vat-no": {
+                        "title": "MWST-Nr. (optional)",
+                        "placeholder": "CHE-123.456.789 MWST"
+                    }
+                },
+                "buttons": {
+                    "test-invoice": "Test-Abrechnung (Demo)",
+                    "save-payment": "Zahlungsdaten speichern"
+                }
+            },
+            "about-section": {
+                "title": "Über budgethub.ch",
+                "version": {
+                    "title": "Version",
+                    "label": "v1.0 — Demo Build"
+                },
+                "legal": {
+                    "title": "Rechtliches",
+                    "links": {
+                        "terms": "AGB",
+                        "privacy": "Datenschutz",
+                        "imprint": "Impressum"
+                    }
+                },
+                "support": {
+                    "title": "Support",
+                    "placeholder": "Frage oder Feedback …",
+                    "button": "An Support senden"
+                }
+            }
+        },
+        "help-page": {
+            "title": "Schnellzugriff",
+            "badge": "/ Suche • ? Kurzbefehle",
+            "buttons": {
+                "tour": "Schnell-Tour starten",
+                "faqs": "Alle FAQs öffnen",
+                "close-all": "Alles schließen",
+                "attach": "Diagnose anhängen",
+                "contact-support": "Support kontaktieren"
+            },
+            "faqs-section": {
+                "title": "FAQ",
+                "placeholder": "FAQs durchsuchen…",
+                "data": {
+                    "question-1": "Wie kann ich eine neue Transaktion erfassen?",
+                    "answer-1": "Klicke auf ‘+ Neue Transaktion’ im Dashboard oder drücke Strg + N auf der Transaktionsseite.",
+                    "question-2": "Wie erstelle ich ein Budget?",
+                    "answer-2": "Gehe zu Budgets → ‘Neues Budget’, wähle Kategorie, Zeitraum und Limit. Der Fortschritt wird automatisch berechnet.",
+                    "question-3": "Wie arbeite ich ohne Bankintegration?",
+                    "answer-3": "CSV unter Import/Export importieren oder Transaktionen manuell eingeben. Kontostände in Konten verwalten.",
+                    "question-4": "Kann ich Familienmitglieder einladen?",
+                    "answer-4": "Im Familienplan können mehrere Nutzer verwaltet werden (Einstellungen → Mitglieder & Einladungen).",
+                    "question-5": "Wie setze ich die Demo zurück?",
+                    "answer-5": "Unter Einstellungen → Daten & Datenschutz → ‘Alle lokalen Daten löschen’. Nur dein Browser-Speicher wird gelöscht.",
+                    "question-6": "Wie exportiere ich meine Daten?",
+                    "answer-6": "Unter Import/Export sind CSV-Exporte sowie ein Voll-Export (JSON) verfügbar.",
+                    "question-7": "Welche Sprachen/Themen sind verfügbar?",
+                    "answer-7": "DE/FR/IT/EN sowie Hell/Dunkel/Auto. Wechsel unten links in der Seitenleiste oder in den Einstellungen."
+                }
+            },
+            "content-section": {
+                "title": "Inhalt",
+                "faq": "FAQ",
+                "contact-support": "Kontakt & Support",
+                "keyboard-shortcuts": "Tastenkürzel",
+                "troubleshooting": "Fehlerbehebung",
+                "privacy": "Datenschutz",
+                "release-notes": "Release Notes",
+                "help": "Benötigst du individuelle Hilfe? Erstelle ein Ticket – du erhältst eine Antwort per E-Mail."
+            },
+            "contact-support-section": {
+                "title": "Kontakt & Support",
+                "subject": {
+                    "title": "Betreff",
+                    "placeholder": "Kurze Beschreibung"
+                },
+                "message": {
+                    "title": "Nachricht",
+                    "placeholder": "Wie können wir helfen? Bitte so genau wie möglich sein."
+                },
+                "button": "Ticket senden"
+            },
+            "keyboard-shortcuts-section": {
+                "title": "Tastenkürzel",
+                "badge": "? zeigt diese Liste",
+                "key-functions": {
+                    "search": "Fokus auf Suche",
+                    "new-account": "Neues Konto / Neue Transaktion (abhängig von der Seite)",
+                    "transfer": "Überweisung starten (Konten)",
+                    "close": "Modale/Overlays schließen"
+                }
+            },
+            "privary-section": {
+                "title": "Datenschutz (Kurz)",
+                "content": "In Produktion gelten die AGB und Datenschutzrichtlinien, die in der App verlinkt sind."
+            },
+            "release-notes-section": {
+                "title": "Release Notes",
+                "badge": "v1.0.0",
+                "list-1": "Dashboard, Transaktionen, Budgets, Sparziele, Konten, Reports, Import/Export, Einstellungen.",
+                "list-2": "Hell/Dunkel/Auto-Thema, DE/FR/IT/EN Umschaltung."
+            }
+        }
+    }
 }

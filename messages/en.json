@@ -1,7 +1,1057 @@
 {
-  "greeting": {
-    "title": "How are you?",
-    "cta": "Click Me"
-  },
-  "intro": "Hi {name}, You have {count, plural, =0 {no followers yet} =1 {one follower} other {# followers}}."
+    "greeting": {
+        "title": "How are you?",
+        "cta": "Click Me"
+    },
+    "intro": "Hi {name}, You have {count, plural, =0 {no followers yet} =1 {one follower} other {# followers}}.",
+    "authpages": {
+        "signup": "Sign up",
+        "signin": "Sign in",
+        "forgot-password": "Password reset",
+        "labels": {
+            "name": "Name",
+            "email": "Email",
+            "password": "Password"
+        },
+        "placeholders": {
+            "name": "Your name",
+            "email": "your@example.com"
+        },
+        "checkboxes": {
+            "password": "Show password",
+            "terms": "I accept the <terms>terms</terms> & the <privacy>privacy</privacy>"
+        },
+        "tip": "Tip: Length ≥ 8, include numbers & letters.",
+        "buttons": {
+            "create-account": "Create account",
+            "google": "with google",
+            "send-email": "Send reset email",
+            "back-to-signin": "Back to sign in"
+        },
+        "already": "Already have an account?",
+        "forgot-pass": "Forgot password?",
+        "no-account-yet": "No account yet?",
+        "dark-mode": "Dark mode",
+        "light-mode": "Light mode"
+    },
+    "main-dashboard": {
+        "sidebar": {
+            "title": "NAVIGATION",
+            "links": {
+                "dashboard": "Dashboard",
+                "transactions": "Transactions",
+                "budgets": "Budgets",
+                "savings": "Savings Goals",
+                "content": "Content",
+                "reports": "Reports",
+                "imp-exp": "Import / Export",
+                "settings": "Settings",
+                "help": "Help",
+                "logout": "Logout"
+            },
+            "header": {
+                "search": "Search..."
+            }
+        },
+        "dashboard-page": {
+            "dialog-box": {
+                "title": "New Transaction",
+                "btn-close": "Close",
+                "labels": {
+                    "date": "Date",
+                    "account": {
+                        "title": "Account",
+                        "placeholder": "Choose",
+                        "options": {
+                            "checking": "Checking",
+                            "credit-card": "Credit card",
+                            "save": "Save",
+                            "cash": "Cash"
+                        }
+                    },
+                    "quelle": {
+                        "title": "Quelle",
+                        "placeholder": "e.g. Coop, employer…"
+                    },
+                    "category": {
+                        "title": "Category",
+                        "options": {
+                            "groceries": "Groceries",
+                            "restaurant": "Restaurant & Café",
+                            "transportation": "Transportation",
+                            "household": "Household",
+                            "income": "Income"
+                        }
+                    },
+                    "amount": "Amount (CHF)",
+                    "note": {
+                        "title": "Note",
+                        "placeholder": "Optional"
+                    }
+                },
+                "buttons": {
+                    "save": "Save as template",
+                    "post": "Post"
+                }
+            },
+            "cards": {
+                "card-1": {
+                    "title": "Total Budget (Month)",
+                    "content": "4,703 Swiss Francs",
+                    "badge": "Fixed + Variable • incl. CC & SERAFE"
+                },
+                "card-2": {
+                    "title": "Expenses (Actual)",
+                    "content": "2,456 Swiss Francs",
+                    "badge": "60% of the budget"
+                },
+                "card-3": {
+                    "title": "Available",
+                    "content": "3,447 Swiss Francs",
+                    "badge": "+40% Buffer"
+                },
+                "card-4": {
+                    "title": "Forecast until 30/09/2025",
+                    "content": "4,980 Swiss Francs",
+                    "badge": "incl. Recurring"
+                }
+            },
+            "chart": {
+                "primary-title": "Expenses per Month",
+                "secondary-title": "in CHF"
+            },
+            "progress-cards": {
+                "title": "Savings Goals",
+                "card-1": {
+                    "title": "Tax Reserves"
+                },
+                "card-2": {
+                    "title": "Emergency Fund"
+                },
+                "card-3": {
+                    "title": "Vacation"
+                }
+            },
+            "line-progress-cards": {
+                "title": "Top Categories (Month)",
+                "button": "All Budgets",
+                "card-1": {
+                    "title": "Groceries"
+                },
+                "card-2": {
+                    "title": "Restaurant & Cafe"
+                },
+                "card-3": {
+                    "title": "Transportation"
+                },
+                "card-4": {
+                    "title": "Household"
+                }
+            },
+            "todos": {
+                "title": "Quick Tasks",
+                "button": "quick done",
+                "placeholder": "Add Task…"
+            },
+            "upcoming-cards": {
+                "title": "Upcoming Due (Recurring)",
+                "button": "Next 14 Days",
+                "table-data": {
+                    "table-heading": {
+                        "date": "DATE",
+                        "name": {
+                            "title": "NAME",
+                            "data": {
+                                "insurance": "Health Insurance",
+                                "insurance-bill": "Health Insurance Bill",
+                                "rent": "Rent"
+                            }
+                        },
+                        "account": {
+                            "title": "ACCOUNT",
+                            "data": {
+                                "checking": "Checking",
+                                "credit-card": "Credit Card"
+                            }
+                        },
+                        "amount": "AMOUNT"
+                    },
+                    "button": "Adjust"
+                }
+            },
+            "warning-cards": {
+                "title": "Notes & Warnings",
+                "button": "Hide All",
+                "card-1": {
+                    "title": "Groceries budget at 80%",
+                    "badge": "Adjust Budget"
+                },
+                "card-2": {
+                    "title": "Restaurant budget exceeded",
+                    "badge": "Open Category"
+                },
+                "card-3": {
+                    "title": "3 new transactions since yesterday"
+                }
+            },
+            "recent-transactions-table": {
+                "title": "Recent Transactions",
+                "button": "Show all",
+                "table-headings": {
+                    "date": "Date",
+                    "recipient": {
+                        "title": "Recipient",
+                        "data": {
+                            "coop": "Cooperative",
+                            "sbb": "SBB",
+                            "cafe": "Cafe Rome",
+                            "employer": "Employer"
+                        }
+                    },
+                    "account": {
+                        "title": "Account",
+                        "data": {
+                            "current-account": "Current account",
+                            "credit-card": "Credit card"
+                        }
+                    },
+                    "category": {
+                        "title": "Category",
+                        "data": {
+                            "groceries": "Groceries",
+                            "transportation": "Transportation",
+                            "restaurant": "Restaurant",
+                            "income": "Income"
+                        }
+                    },
+                    "note": {
+                        "title": "Note",
+                        "data": {
+                            "shopping": "Weekly shopping",
+                            "ga": "GA day pass",
+                            "lunch": "Lunch",
+                            "salary": "Salary"
+                        }
+                    },
+                    "amount": "Amount"
+                }
+            },
+            "budget-health": {
+                "title": "Budget Health",
+                "secondary-title": "Monthly overview",
+                "warning-card": {
+                    "title": "SCORE",
+                    "warning": "Warning: high",
+                    "spending": "Spending pace"
+                },
+                "card-1": {
+                    "title": "BUDGET"
+                },
+                "card-2": {
+                    "title": "Expenses"
+                },
+                "card-3": {
+                    "title": "Warnings"
+                }
+            }
+        },
+        "transactions-page": {
+            "labels": {
+                "from": "From",
+                "to": "To",
+                "account": {
+                    "title": "Account",
+                    "data": {
+                        "accounts": "All Accounts",
+                        "current-account": "Current account",
+                        "credit-card": "Credit card",
+                        "savings": "Savings",
+                        "cash": "Cash"
+                    }
+                },
+                "category": {
+                    "title": "Category",
+                    "data": {
+                        "categories": "All Categories",
+                        "groceries": "Groceries",
+                        "restaurant": "Restaurant & Café",
+                        "transportation": "Transportation"
+                    }
+                },
+                "search": {
+                    "title": "Search",
+                    "placeholder": "e.g., Coop, Rent, Credit Card…"
+                }
+            },
+            "checkboxes": {
+                "receipt": "With Receipt",
+                "recurring": "Recurring",
+                "transfers": "Transfers Only"
+            },
+            "buttons": {
+                "reset": "Reset",
+                "apply": "Apply"
+            },
+            "data-table": {
+                "header": {
+                    "checkbox": "All",
+                    "buttons": {
+                        "delete": "Delete",
+                        "category": "Category",
+                        "export": "Export",
+                        "update": "Update"
+                    },
+                    "badge": "Balance:"
+                },
+                "headings": {
+                    "date": "Date",
+                    "recipient": "Recipient",
+                    "account": "Account",
+                    "category": "Category",
+                    "note": "Note",
+                    "amount": "Amount",
+                    "action": "Action"
+                },
+                "action": "Edit",
+                "recipients": {
+                    "amazon": "Amazon",
+                    "salary": "Salary Payment",
+                    "netflix": "Netflix",
+                    "starbucks": "Starbucks",
+                    "uber": "Uber",
+                    "apple": "Apple Store"
+                },
+                "accounts": {
+                    "creditCard": "Credit Card",
+                    "bank": "Bank Account",
+                    "paypal": "PayPal"
+                },
+                "categories": {
+                    "shopping": "Shopping",
+                    "income": "Income",
+                    "entertainment": "Entertainment",
+                    "food": "Food & Drinks",
+                    "transport": "Transport",
+                    "tech": "Electronics"
+                },
+                "notes": {
+                    "electronicsOrder": "Electronics order",
+                    "salarySeptember": "September Salary",
+                    "netflixMonthly": "Monthly subscription",
+                    "coffeeFriends": "Coffee with friends",
+                    "rideOffice": "Ride to office",
+                    "applePurchase": "MacBook purchase"
+                },
+                "pagination": {
+                    "previous": "Previous",
+                    "next": "Next"
+                }
+            }
+        },
+        "budgets-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Total Budget (Month)",
+                    "content": "CHF 2’900.00",
+                    "badge": "Carryover: Inactive"
+                },
+                "card-2": {
+                    "title": "Spent so far",
+                    "content": "CHF 1’915.00",
+                    "badge": "66% of the budget"
+                },
+                "card-3": {
+                    "title": "Available",
+                    "content": "CHF 985.00",
+                    "badge": "+34% available"
+                },
+                "card-4": {
+                    "title": "Number of categories",
+                    "content": "8",
+                    "badge": "Warnings: 2"
+                }
+            },
+            "data-table": {
+                "title": "All categories",
+                "badge": "Total Budget: CHF 2’900.00 • Rest: CHF 985.00",
+                "buttons": {
+                    "export": "Export CSV",
+                    "reset": "Reset (Demo)"
+                },
+                "headings": {
+                    "category": "CATEGORY",
+                    "budget": "BUDGET",
+                    "ist": "IST",
+                    "rest": "REST",
+                    "progress": "PROGRESS",
+                    "action": "ACTION"
+                },
+                "data": {
+                    "category": {
+                        "clothing": "Clothing",
+                        "sports": "Leisure & Sports",
+                        "health": "Health",
+                        "transportation": "Transportation",
+                        "travel": "Travel & Holidays",
+                        "household": "Household"
+                    },
+                    "action": "Edit"
+                },
+                "toggle-groups": {
+                    "month": "Month",
+                    "week": "Week",
+                    "warn-80": "Warn at 80%",
+                    "warn-90": "Warn at 90%",
+                    "warn-100": "Warn at 100%"
+                }
+            },
+            "warning-section": {
+                "title": "Notes & Warnings",
+                "button": "Hide all",
+                "badges": {
+                    "restaurant": "Budget Restaurant & Café at 82%",
+                    "health": "Budget Health at 96%"
+                },
+                "settings": {
+                    "title": "Settings (Month)",
+                    "button": "+ Budget",
+                    "checkboxes": {
+                        "carry": "Carry over surplus/deficit to next month",
+                        "e-mail": "Email warnings at 80% / 100%"
+                    }
+                }
+            }
+        },
+        "saving-goals-page": {
+            "dialog": {
+                "title": "Edit savings goal",
+                "button": "Close",
+                "edit": "Edit",
+                "labels": {
+                    "name": "Name",
+                    "target-amount": "Target Amount (CHF)",
+                    "already-saved": "Already Saved (CHF)",
+                    "due-on": "Due on",
+                    "account": "Account",
+                    "monthly-allocation": "Monthly Allocation (CHF)"
+                },
+                "buttons": {
+                    "delete": "Delete",
+                    "save": "Save"
+                },
+                "account-options": {
+                    "checking": "Checking",
+                    "savings": "Savings",
+                    "cash": "Cash"
+                }
+            },
+            "cards": {
+                "card-1": {
+                    "title": "Total Target Amount",
+                    "content": "CHF 18’000.00",
+                    "badge": "All Active Goals"
+                },
+                "card-2": {
+                    "title": "Saved So Far",
+                    "content": "CHF 8’610.00",
+                    "badge": "48% Achieved"
+                },
+                "card-3": {
+                    "title": "Remaining to Save",
+                    "content": "CHF 9’390.00",
+                    "badge": "Monthly car: CHF 700.00"
+                },
+                "card-4": {
+                    "title": "Number of Goals",
+                    "content": "3",
+                    "badge": "No Urgent Due Items"
+                }
+            },
+            "active-goals-section": {
+                "title": "Active Goals",
+                "badge": "3 Goals • Auto Allocation: CHF 700.00",
+                "buttons": {
+                    "due": "Due",
+                    "progress": "Progress",
+                    "remaining-amount": "Remaining Amount"
+                },
+                "cards": {
+                    "tax-reserves": {
+                        "header": {
+                            "title": "Tax Reserves",
+                            "button": "Edit"
+                        },
+                        "content": {
+                            "goal": "Goal",
+                            "saved": "Saved",
+                            "rest": "Rest",
+                            "due": "Due",
+                            "account": {
+                                "title": "Account",
+                                "save": "Save"
+                            },
+                            "days": "Days",
+                            "saving": "Saving",
+                            "auto": "Auto",
+                            "remaining": "Remaining",
+                            "checking-account": "Checking Account",
+                            "button": "Allocation",
+                            "new-balance": "New Balance",
+                            "placeholder": "Amount"
+                        }
+                    }
+                }
+            },
+            "warning-section": {
+                "title": "Notes & Warnings",
+                "button": "Hide All",
+                "badge": "No Notes"
+            },
+            "settings-section": {
+                "title": "Settings",
+                "button": "Reset Demo",
+                "checkboxes": {
+                    "monthly": "Monthly Auto-Allocation Active",
+                    "goals": "Show Overfunded Goals"
+                }
+            }
+        },
+        "content-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Total Assets",
+                    "content": "CHF 15’500.00",
+                    "badge": "Total of All Accounts"
+                },
+                "card-2": {
+                    "title": "Liquid Assets",
+                    "content": "CHF 2’620.00",
+                    "badge": "Checking + Cash"
+                },
+                "card-3": {
+                    "title": "Savings Balance",
+                    "content": "CHF 13’200.00",
+                    "badge": "including Pillar 3a"
+                },
+                "card-4": {
+                    "title": "Credit Cards",
+                    "content": "CHF-320.00",
+                    "badge": "Debit Balance"
+                }
+            },
+            "data-table": {
+                "title": "All categories",
+                "badge": "5 Konten • Liquid CHF 2’620.00",
+                "buttons": {
+                    "export": "Export CSV",
+                    "reset": "Reset Demo"
+                },
+                "headings": {
+                    "name": "NAME",
+                    "type": "TYPE",
+                    "iban": "IBAN / Note",
+                    "balance": "Balance",
+                    "action": "ACTION"
+                },
+                "data": {
+                    "name": {
+                        "cash": "Cash",
+                        "current-account": "Current Account",
+                        "credit-card": "Credit card",
+                        "saving": "Saving",
+                        "pillar": "Pillar 3a"
+                    },
+                    "action": "Edit"
+                },
+                "total": "Total"
+            },
+            "latest-tranfers-section": {
+                "title": "Latest transfers",
+                "button": "Export CSV",
+                "data-table": {
+                    "headings": {
+                        "date": "DATE",
+                        "from": "FROM",
+                        "to": "TO",
+                        "note": "NOTE",
+                        "amount": "AMOUNT"
+                    }
+                }
+            }
+        },
+        "report-page": {
+            "cards": {
+                "card-1": {
+                    "title": "Income",
+                    "content": "CHF 5’800.00",
+                    "badge": "Last Month"
+                },
+                "card-2": {
+                    "title": "Expenses",
+                    "content": "CHF 4’800.00",
+                    "badge": "Last month"
+                },
+                "card-3": {
+                    "title": "Balance",
+                    "content": "CHF 1’000.00",
+                    "badge": "Income − Expenses"
+                },
+                "card-4": {
+                    "title": "Savings rate",
+                    "content": "17%",
+                    "badge": "of income"
+                }
+            },
+            "analysis-table-data": {
+                "title": "Analysis",
+                "badge": "Last month: CHF 5,800.00 Income • CHF 4,800.00 Expenses",
+                "toggle-groups": {
+                    "month": "Month",
+                    "quarter": "Quarter",
+                    "year": "Year"
+                },
+                "exp-by-cat": {
+                    "title": "Expenses by categories",
+                    "progress": {
+                        "groceries": "Groceries",
+                        "rent": "Rent",
+                        "transportation": "Transportation",
+                        "restaurant": "Restaurant",
+                        "household": "Household",
+                        "leisure": "Leisure"
+                    }
+                }
+            },
+            "income-exp": {
+                "title": "Income vs. Expenses (last 9 months)",
+                "data-table": {
+                    "headings": {
+                        "month": "MONTH",
+                        "income": "INCOME",
+                        "expenses": "Expenses",
+                        "balance": "Balance"
+                    }
+                }
+            },
+            "detailed-table": {
+                "title": "Detailed table",
+                "buttons": {
+                    "categories-csv": "Categories CSV",
+                    "trend-csv": "Trend CSV"
+                },
+                "data-table": {
+                    "headings": {
+                        "category": "Category",
+                        "amount": "Amount"
+                    },
+                    "data": {
+                        "category": {
+                            "groceries": "Groceries",
+                            "rent": "Rent",
+                            "transportation": "Transportation",
+                            "restaurant": "Restaurant",
+                            "household": "Household",
+                            "leisure": "Leisure"
+                        },
+                        "total": "Total"
+                    }
+                }
+            }
+        },
+        "import-export-page": {
+            "export-section": {
+                "title": "Export",
+                "badge": "CSV & JSON",
+                "export-card": {
+                    "title": "Quick Export (CSV)",
+                    "buttons": {
+                        "transactions": "Transactions",
+                        "budgets": "Budgets",
+                        "savings-goals": "Savings Goals",
+                        "accounts": "Accounts",
+                        "transfers": "Transfers"
+                    }
+                },
+                "export-json-card": {
+                    "title": "Full Export (JSON)",
+                    "content": "Exports all data from localStorage into a JSON file.",
+                    "button": "Export All"
+                },
+                "csv-template-card": {
+                    "title": "CSV Templates"
+                }
+            },
+            "import-section": {
+                "title": "Import",
+                "badge": "CSV & JSON",
+                "data-type": {
+                    "title": "Data Type",
+                    "transactions": "Transactions",
+                    "budgets": "Budgets",
+                    "saving-goals": "Saving Goals",
+                    "accounts": "Accounts",
+                    "transfers": "Transfers",
+                    "full-export": "Full Export (JSON)"
+                },
+                "modes": {
+                    "title": "Modes",
+                    "append": "Append",
+                    "replace-existing": "Replace Existing"
+                },
+                "input": "Drop file here or click",
+                "supported-files": "Supported: .csv, .json. Separator ‘;’ or ‘,’ will be recognized."
+            }
+        },
+        "settings-page": {
+            "profile-household-section": {
+                "title": "Profile & Household",
+                "badge": "Plan: Free",
+                "labels": {
+                    "name": {
+                        "title": "Name",
+                        "placeholder": "First and Last Name"
+                    }
+                },
+                "email": {
+                    "title": "E-Mail",
+                    "placeholder": "name@example.com"
+                },
+                "household-size": {
+                    "title": "Household Size",
+                    "single": "Single"
+                },
+                "subscription-local": {
+                    "title": "Subscription (Local)",
+                    "plans": {
+                        "free": "Free",
+                        "individual": "Individual",
+                        "family": "Family"
+                    }
+                },
+                "address": {
+                    "title": "Address (optional)",
+                    "placeholder": "Street & Number, ZIP Code, City"
+                }
+            },
+            "plans-upgrade-section": {
+                "title": "Plans & Upgrade",
+                "buttons": {
+                    "monthly": "Monthly",
+                    "yearly": "Yearly",
+                    "2-months": "2 Months Free"
+                },
+                "plans-cards": {
+                    "free-card": {
+                        "title": "Free",
+                        "sub-title": "For Beginners.",
+                        "options": {
+                            "manual-entry": "Manual Entry & CSV Import",
+                            "basic-budgets": "Basic Budgets & Savings Goals",
+                            "transactions": "2 Accounts, 300 Transactions/Month",
+                            "community-support": "Community Support"
+                        },
+                        "button": "Use for Free"
+                    },
+                    "individual-card": {
+                        "title": "Individual",
+                        "sub-title": "For Individuals (1 User).",
+                        "year": "Year",
+                        "options": {
+                            "all-free-features": "All Free Features Without Limits",
+                            "unlimited": "Unlimited Transactions, Accounts, Budgets & Savings Goals",
+                            "forecasts": "Forecasts, Categories, PDF/CSV Export",
+                            "1-user": "1 User",
+                            "email-support": "Email Support"
+                        },
+                        "button": "Upgrade Now"
+                    },
+                    "family-card": {
+                        "title": "Family",
+                        "sub-title": "For Families & Teams (Unlimited Users).",
+                        "year": "Year",
+                        "options": {
+                            "all-individual-features": "All Individual Features",
+                            "unlimited-users": "Unlimited Users (Invite Family Members, Partners, etc.)",
+                            "shared-budgets": "Shared Budgets & Savings Goals",
+                            "role-permission": "Role Permissions (Admin, Member)"
+                        },
+                        "button": "Upgrade Now"
+                    },
+                    "stripe-portal-button": "Manage Subscription (Stripe Portal)"
+                }
+            },
+            "members-invitations-section": {
+                "title": "Members & Invitations",
+                "badge": "0 Members",
+                "labels": {
+                    "invite-email": {
+                        "title": "Invite via Email",
+                        "placeholder": "person@example.ch"
+                    },
+                    "role": {
+                        "title": "Role",
+                        "select-options": {
+                            "member": "Member",
+                            "admin": "Admin"
+                        }
+                    }
+                },
+                "button": "Send Invitation",
+                "table": {
+                    "table-headings": {
+                        "email": "E-MAIL",
+                        "role": "ROLE",
+                        "status": "STATUS",
+                        "action": "ACTION"
+                    },
+                    "content": "No Invitations or Members Yet."
+                }
+            },
+            "appearance-section": {
+                "title": "Localization & Appearance",
+                "content": "Also synchronizes the selection in the sidebar footer.",
+                "labels": {
+                    "language": {
+                        "title": "Preferred Language",
+                        "options": {
+                            "en": "English",
+                            "de": "German",
+                            "fr": "French",
+                            "it": "Italian"
+                        }
+                    },
+                    "currency": {
+                        "title": "Currency",
+                        "options": {
+                            "chf": "CHF",
+                            "eur": "EUR",
+                            "usd": "USB"
+                        }
+                    },
+                    "theme": {
+                        "title": "Theme",
+                        "options": {
+                            "dark": "Dark",
+                            "light": "Light",
+                            "auto": "Auto"
+                        }
+                    },
+                    "first-day": {
+                        "title": "First Day of the Week",
+                        "options": {
+                            "monday": "Monday",
+                            "sunday": "Sunday"
+                        }
+                    },
+                    "density": {
+                        "title": "Density",
+                        "options": {
+                            "comfort": "Comfort",
+                            "compact": "Compact"
+                        }
+                    },
+                    "rounding": {
+                        "title": "Rounding",
+                        "options": {
+                            "5-rappen": "5 Rappen",
+                            "1-rappen": "1 Rappen"
+                        }
+                    }
+                }
+            },
+            "notifications-section": {
+                "title": "Notifications",
+                "labels": {
+                    "email-alerts": {
+                        "title": "E-Mail Alerts",
+                        "badges": {
+                            "budget": "Budget at 80%",
+                            "budget-exceeded": "Budget Exceeded",
+                            "payment": "Recurring Payment Due"
+                        }
+                    },
+                    "push-browser": {
+                        "title": "Push (Browser)",
+                        "badges": {
+                            "new-transaction": "New Transaction",
+                            "savings": "Savings Goal Milestone"
+                        }
+                    },
+                    "monthly-report": {
+                        "title": "Monthly Report",
+                        "options": {
+                            "off": "Off",
+                            "monthly": "Monthly",
+                            "quarterly": "Quarterly"
+                        }
+                    }
+                }
+            },
+            "security-section": {
+                "title": "Security",
+                "labels": {
+                    "two-factor": {
+                        "title": "Two-Factor",
+                        "content": "TOTP compatible with common authenticator apps. (Demo)",
+                        "options": {
+                            "off": "Off",
+                            "totp-app": "TOTP App",
+                            "email-code": "Email Code"
+                        },
+                        "buttons": {
+                            "show-backup-codes": "Show Backup Codes",
+                            "regenerate-backup-codes": "Regenerate Backup Codes"
+                        }
+                    },
+                    "password": {
+                        "title": "Password",
+                        "content": "Reset sends an email link (demo).",
+                        "buttons": {
+                            "change-password": "Change Password",
+                            "reset-password": "Reset Password"
+                        }
+                    }
+                }
+            },
+            "data-privacy-section": {
+                "title": "Data & Privacy",
+                "labels": {
+                    "anonymous": {
+                        "title": "Anonymous usage statistics",
+                        "options": {
+                            "on": "On",
+                            "off": "Off"
+                        }
+                    },
+                    "retention": {
+                        "title": "Retention of Deleted Data",
+                        "options": {
+                            "delete-im": "Delete Immediately",
+                            "30-days": "30 Days",
+                            "90-days": "90 Days"
+                        }
+                    },
+                    "data-export": {
+                        "title": "Data Export",
+                        "buttons": {
+                            "json": "Export Data (JSON)",
+                            "local-data": "Delete Local Demo Data",
+                            "delete-account": "Delete Account"
+                        }
+                    }
+                },
+                "content": "“Delete Account” is local in the demo – in production handled server-side with confirmation"
+            },
+            "billing-details-section": {
+                "title": "Billing Details (Demo)",
+                "labels": {
+                    "billing-name": {
+                        "title": "Billing Name",
+                        "placeholder": "Legal Name / Company"
+                    },
+                    "vat-no": {
+                        "title": "VAT No. (optional)",
+                        "placeholder": "CHE-123.456.789 VAT"
+                    }
+                },
+                "buttons": {
+                    "test-invoice": "Test Invoice (Demo)",
+                    "save-payment": "Save Payment Details"
+                }
+            },
+            "about-section": {
+                "title": "About budgethub.ch",
+                "version": {
+                    "title": "Version",
+                    "label": "v1.0 — Demo Build"
+                },
+                "legal": {
+                    "title": "Legal",
+                    "links": {
+                        "terms": "Terms & Conditions",
+                        "privacy": "Privacy Policy",
+                        "imprint": "Imprint"
+                    }
+                },
+                "support": {
+                    "title": "Support",
+                    "placeholder": "Question or Feedback …",
+                    "button": "Send to Support"
+                }
+            }
+        },
+        "help-page": {
+            "title": "Quick Access",
+            "badge": "/ Search • ? Shortcuts",
+            "buttons": {
+                "tour": "Start Quick Tour",
+                "faqs": "Open All FAQs",
+                "close-all": "Close All",
+                "attach": "Attach Diagnostics",
+                "contact-support": "Contact Support"
+            },
+            "faqs-section": {
+                "title": "FAQ",
+                "placeholder": "Search FAQs…",
+                "data": {
+                    "question-1": "How do I record a new transaction?",
+                    "answer-1": "Click on ‘+ New Transaction’ in the dashboard or press Ctrl + N on the transactions page.",
+                    "question-2": "How do I create a budget?",
+                    "answer-2": "Go to Budgets → ‘New Budget’, select category, period, and limit. Progress is calculated automatically.",
+                    "question-3": "How do I work without bank integration?",
+                    "answer-3": "Import CSV under Import / Export or enter transactions manually. Manage account balances in Accounts.",
+                    "question-4": "Can I invite family members?",
+                    "answer-4": "In the Family Plan, you can manage multiple users (Settings → Members & Invitations).",
+                    "question-5": "How do I reset the demo?",
+                    "answer-5": "Under Settings → Data & Privacy, you can select ‘Delete all local data’. Only your browser storage will be cleared.",
+                    "question-6": "How do I export my data?",
+                    "answer-6": "Under Import / Export, CSV exports as well as a full export (JSON) are available.",
+                    "question-7": "Which languages/themes are available?",
+                    "answer-7": "DE/FR/IT/EN as well as Light/Dark/Auto. Switch at the bottom left of the sidebar or in Settings."
+                }
+            },
+            "content-section": {
+                "title": "Content",
+                "faq": "FAQ",
+                "contact-support": "Contact & Support",
+                "keyboard-shortcuts": "Keyboard shortcuts",
+                "troubleshooting": "Troubleshooting",
+                "privacy": "Privacy",
+                "release-notes": "Release Notes",
+                "help": "Do you need individual help? Create a ticket – you’ll receive a reply by email."
+            },
+            "contact-support-section": {
+                "title": "Contact & Support",
+                "subject": {
+                    "title": "Suject",
+                    "placeholder": "Short description"
+                },
+                "message": {
+                    "title": "Message",
+                    "placeholder": "How can we help? Please be as specific as possible."
+                },
+                "button": "Send ticket"
+            },
+            "keyboard-shortcuts-section": {
+                "title": "Keyboard Shortcuts",
+                "badge": "? shows this list",
+                "key-functions": {
+                    "search": "Focus search",
+                    "new-account": "New Account / New Transaction (depending on the page)",
+                    "transfer": "Start transfer (Accounts)",
+                    "close": "Close modals/overlays"
+                }
+            },
+            "privary-section": {
+                "title": "Privacy (Short)",
+                "content": "In production, the Terms & Conditions and Privacy Policy linked in the app apply."
+            },
+            "release-notes-section": {
+                "title": "Release Notes",
+                "badge": "v1.0.0",
+                "list-1": "Dashboard, transactions, budgets, savings goals, accounts, reports, import/export, settings.",
+                "list-2": "Light/Dark/Auto theme, DE/FR/IT/EN switching."
+            }
+        }
+    }
 }

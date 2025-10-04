@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { useTranslations } from "next-intl";
 import {
   Form,
   FormField,
@@ -29,13 +30,15 @@ export default function SignUp() {
     },
   });
 
+  const t = useTranslations("authpages");
+
   function onSubmit(values: UserSignUpValues) {
-    console.log("✅ Submitted:", values);
+    console.log("Submitted:", values);
   }
 
   return (
-    <Card className="h-full w-full flex-1 border-1 p-6 shadow-lg">
-      <h1 className="text-center text-xl font-semibold">Sign up</h1>
+    <Card className="w-full flex-1 border-1 p-6 shadow-lg sm:max-w-lg">
+      <h1 className="text-center text-xl font-semibold">{t("signup")}</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4">
@@ -45,9 +48,9 @@ export default function SignUp() {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>{t("labels.name")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
-                  <Input placeholder="Your name" {...field} />
+                  <Input placeholder={t("placeholders.name")} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -60,11 +63,11 @@ export default function SignUp() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("labels.email")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input
                     type="email"
-                    placeholder="your@example.com"
+                    placeholder={t("placeholders.email")}
                     {...field}
                   />
                 </FormControl>
@@ -79,7 +82,7 @@ export default function SignUp() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("labels.password")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input type="password" placeholder="********" {...field} />
                 </FormControl>
@@ -89,47 +92,49 @@ export default function SignUp() {
           />
 
           {/* show password */}
-          <FormItem className="flex items-center justify-between border-0">
+          <FormItem className="flex flex-col items-start justify-between border-0 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2">
               <Checkbox className="cursor-pointer" />
-              <span className="text-sm">Show password</span>
+              <span className="text-sm">{t("checkboxes.password")}</span>
             </div>
-            <p className="text-sm">
-              Tip: Length ≥ 8, include numbers & letters.
-            </p>
+            <p className="text-sm">{t("tip")}</p>
           </FormItem>
 
           {/* Terms & Privacy */}
           <FormItem className="flex items-center border-0">
             <Checkbox className="cursor-pointer" />
             <span className="text-sm">
-              I accept the{" "}
-              <a
-                className="text-blue-600 underline"
-                href="/terms"
-                target="_blank"
-                rel="noopener"
-              >
-                Terms
-              </a>{" "}
-              &amp; the{" "}
-              <a
-                className="text-blue-600 underline"
-                href="/privacy"
-                target="_blank"
-                rel="noopener"
-              >
-                Privacy
-              </a>
+              {t.rich("checkboxes.terms", {
+                terms: (chunks) => (
+                  <a
+                    className="text-blue-600 underline"
+                    href="/terms"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {chunks}
+                  </a>
+                ),
+                privacy: (chunks) => (
+                  <a
+                    className="text-blue-600 underline"
+                    href="/privacy"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    {chunks}
+                  </a>
+                ),
+              })}
             </span>
           </FormItem>
 
           {/* Submit */}
           <Button
             type="submit"
-            className="w-full cursor-pointer rounded-xl py-5 font-bold text-white"
+            className="w-full cursor-pointer rounded-xl py-5 font-bold text-white dark:bg-blue-600"
           >
-            Create account
+            {t("buttons.create-account")}
           </Button>
 
           {/* Google sign-in */}
@@ -144,17 +149,19 @@ export default function SignUp() {
               height={15}
               alt="google image"
             />
-            <span>Sign up with Google</span>
+            <span>
+              {t("signup")} {t("buttons.google")}
+            </span>
           </Button>
 
           <Separator />
           <div className="text-center text-sm text-slate-500">
-            <span>Already have an account? </span>
+            <span>{t("already")} </span>
             <Link
               className="text-sm text-blue-600 transition-all duration-300 hover:underline"
               href="/signin"
             >
-              Sign in
+              {t("signin")}
             </Link>
           </div>
         </form>

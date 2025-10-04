@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Image from "next/image";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { useTranslations } from "next-intl";
 import {
   Form,
   FormField,
@@ -28,13 +29,15 @@ export default function SignIn() {
     },
   });
 
+  const t = useTranslations("authpages");
+
   function onSubmit(values: UserSignInValues) {
-    console.log("✅ Submitted:", values);
+    console.log("Submitted:", values);
   }
 
   return (
-    <Card className="h-full w-full flex-1 border-1 p-6 shadow-lg">
-      <h1 className="text-center text-xl font-semibold">Sign in</h1>
+    <Card className="h-full w-full flex-1 border-1 p-6 shadow-lg sm:max-w-lg">
+      <h1 className="text-center text-xl font-semibold">{t("signin")}</h1>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4">
@@ -44,11 +47,11 @@ export default function SignIn() {
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>{t("labels.email")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input
                     type="email"
-                    placeholder="your@example.com"
+                    placeholder={t("placeholders.email")}
                     {...field}
                   />
                 </FormControl>
@@ -63,7 +66,7 @@ export default function SignIn() {
             name="password"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password</FormLabel>
+                <FormLabel>{t("labels.password")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input type="password" placeholder="********" {...field} />
                 </FormControl>
@@ -76,22 +79,22 @@ export default function SignIn() {
           <FormItem className="flex items-center justify-between border-0">
             <div className="flex items-center gap-2">
               <Checkbox className="cursor-pointer" />
-              <span className="text-sm">Show password</span>
+              <span className="text-sm">{t("checkboxes.password")}</span>
             </div>
             <Link
               className="text-sm text-blue-600 transition-all duration-300 hover:underline"
               href="/forgot-password"
             >
-              Forgot password?
+              {t("forgot-pass")}
             </Link>
           </FormItem>
 
           {/* Submit */}
           <Button
             type="submit"
-            className="w-full cursor-pointer rounded-xl py-5 font-bold text-white"
+            className="w-full cursor-pointer rounded-xl py-5 font-bold text-white dark:bg-blue-600"
           >
-            Sign in
+            {t("signin")}
           </Button>
 
           {/* Google sign-in */}
@@ -106,17 +109,19 @@ export default function SignIn() {
               height={15}
               alt="google image"
             />
-            <span>Sign in with Google</span>
+            <span>
+              {t("signin")} {t("buttons.google")}
+            </span>
           </Button>
 
           <Separator />
           <div className="text-center text-sm text-slate-500">
-            <span>No account yet? </span>
+            <span>{t("no-account-yet")} </span>
             <Link
               className="text-sm text-blue-600 transition-all duration-300 hover:underline"
               href="/signup"
             >
-              Create account
+              {t("buttons.create-account")}
             </Link>
           </div>
         </form>

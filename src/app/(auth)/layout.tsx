@@ -8,27 +8,31 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center bg-gray-50">
-      <section className="relative flex h-full w-full max-w-xl flex-1 flex-col items-center gap-4">
-        <div className="flex items-center">
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-gray-100 px-4 py-6 dark:bg-zinc-900">
+      <div className="mb-6 flex w-full max-w-lg items-center justify-between">
+        <div className="flex items-center gap-2">
           <Image
             src="/assets/images/bh-logo.png"
-            width={50}
-            height={50}
+            width={40}
+            height={40}
             alt="company logo"
+            className="sm:h-[50px] sm:w-[50px]"
           />
-          <div className="flex items-center font-bold">
+          <div className="flex items-center font-bold sm:text-lg">
             <span>budgethub</span>
             <span className="text-blue-600">.ch</span>
           </div>
         </div>
 
-        <div className="absolute -top-4 right-0 flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <ModeToggle />
           <LangSwitcher />
         </div>
+      </div>
+
+      <div className="flex w-full max-w-lg items-center justify-center">
         {children}
-      </section>
+      </div>
     </main>
   );
 }
