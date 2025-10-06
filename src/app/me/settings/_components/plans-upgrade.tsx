@@ -72,13 +72,13 @@ export function PlansUpgrade() {
                 </ul>
               </CardContent>
               <CardFooter className="flex justify-end">
-                <Button>{card.button}</Button>
+                <Button variant="outline">{card.button}</Button>
               </CardFooter>
             </Card>
           ))}
         </CardContent>
         <CardFooter className="mt-3 flex justify-end">
-          <Button className="cursor-pointer">
+          <Button variant="outline" className="cursor-pointer">
             {t("plans-cards.stripe-portal-button")}
           </Button>
         </CardFooter>

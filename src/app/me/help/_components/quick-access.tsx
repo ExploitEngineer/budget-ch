@@ -18,11 +18,14 @@ export function QuickAccess() {
         </CardHeader>
         <Separator />
         <CardContent className="flex flex-wrap items-center gap-2">
-          <Button>{t("buttons.tour")}</Button>
-          <Button>{t("buttons.faqs")}</Button>
-          <Button>{t("buttons.close-all")}</Button>
-          <Button>{t("buttons.attach")}</Button>
-          <Button className="cursor-pointer px-6 py-4 transition-all duration-300 hover:bg-blue-600 hover:text-white">
+          <Button variant="outline">{t("buttons.tour")}</Button>
+          <Button variant="outline">{t("buttons.faqs")}</Button>
+          <Button variant="outline">{t("buttons.close-all")}</Button>
+          <Button variant="outline">{t("buttons.attach")}</Button>
+          <Button
+            variant="outline"
+            className="cursor-pointer px-6 py-4 transition-all duration-300 hover:bg-blue-600 hover:text-white"
+          >
             {t("buttons.contact-support")}
           </Button>
         </CardContent>

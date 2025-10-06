@@ -219,7 +219,9 @@ export function LocalizationAppearance() {
 
             {/* Submit Button */}
             <div className="flex justify-end">
-              <Button type="submit">Save Changes</Button>
+              <Button variant="outline" type="submit">
+                Save Changes
+              </Button>
             </div>
           </form>
         </Form>

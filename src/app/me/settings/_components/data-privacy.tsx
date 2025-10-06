@@ -117,7 +117,9 @@ export function DataPrivacy() {
                   <div className="flex flex-col gap-2">
                     <h3 className="text-sm">{t("labels.data-export.title")}</h3>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Button>{t("labels.data-export.buttons.json")}</Button>
+                      <Button variant="outline">
+                        {t("labels.data-export.buttons.json")}
+                      </Button>
                       <Button variant="destructive">
                         {t("labels.data-export.buttons.local-data")}
                       </Button>

@@ -85,10 +85,10 @@ export function Security() {
               </p>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Button className="cursor-pointer">
+                <Button variant="outline" className="cursor-pointer">
                   {t("labels.two-factor.buttons.show-backup-codes")}
                 </Button>
-                <Button className="cursor-pointer">
+                <Button variant="outline" className="cursor-pointer">
                   {t("labels.two-factor.buttons.regenerate-backup-codes")}
                 </Button>
               </div>
@@ -99,10 +99,10 @@ export function Security() {
                 <FormLabel>{t("labels.password.title")}</FormLabel>
               </Form>
               <div className="flex flex-wrap items-center gap-2">
-                <Button className="cursor-pointer">
+                <Button variant="outline" className="cursor-pointer">
                   {t("labels.password.buttons.change-password")}
                 </Button>
-                <Button className="cursor-pointer">
+                <Button variant="outline" className="cursor-pointer">
                   {t("labels.password.buttons.reset-password")}
                 </Button>
               </div>

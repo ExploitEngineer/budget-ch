@@ -67,7 +67,9 @@ export function ContactSupport() {
                 )}
               />
               <div className="flex justify-end">
-                <Button type="submit">{t("button")}</Button>
+                <Button variant="outline" type="submit">
+                  {t("button")}
+                </Button>
               </div>
             </form>
           </Form>

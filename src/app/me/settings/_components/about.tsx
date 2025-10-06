@@ -39,7 +39,9 @@ export function AboutSection() {
         </div>
 
         <div className="flex justify-end">
-          <Button className="cursor-pointer">{t("support.button")}</Button>
+          <Button variant="outline" className="cursor-pointer">
+            {t("support.button")}
+          </Button>
         </div>
       </CardContent>
     </Card>

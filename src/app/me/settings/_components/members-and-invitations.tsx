@@ -122,7 +122,11 @@ export function MembersInvitations() {
 
               {/* Button */}
               <div className="flex justify-end gap-3 pt-4">
-                <Button type="button" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  type="button"
+                  className="cursor-pointer"
+                >
                   {t("button")}
                 </Button>
               </div>

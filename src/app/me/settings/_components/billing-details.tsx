@@ -88,7 +88,11 @@ export function BillingDetails() {
                 <Button variant="secondary" className="cursor-pointer">
                   {t("buttons.test-invoice")}
                 </Button>
-                <Button type="submit" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  type="submit"
+                  className="cursor-pointer"
+                >
                   {t("buttons.save-payment")}
                 </Button>
               </div>
