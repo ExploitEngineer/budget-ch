@@ -38,7 +38,11 @@ export function ThemeToggleDropdown() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="rounded-lg" size="icon">
+        <Button
+          variant="outline"
+          className="rounded-lg bg-gray-100"
+          size="icon"
+        >
           {theme === "system" ? (
             <SunMoon className="h-5 w-5" />
           ) : theme === "light" ? (
