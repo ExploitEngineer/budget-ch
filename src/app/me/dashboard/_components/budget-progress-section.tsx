@@ -28,7 +28,9 @@ export function BudgetProgressSection({
       <Card className="lg:col-span-3">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("line-progress-cards.title")}</CardTitle>
-          <Button>{t("line-progress-cards.button")}</Button>
+          <Button variant="outline" className="cursor-pointer">
+            {t("line-progress-cards.button")}
+          </Button>
         </CardHeader>
         <Separator />
         <div className="grid grid-cols-2 gap-4 pb-10">
@@ -47,7 +49,7 @@ export function BudgetProgressSection({
         <div className="flex flex-col gap-4">
           <CardHeader className="flex items-center justify-between">
             <CardTitle>{t("todos.title")}</CardTitle>
-            <Badge>{t("todos.button")}</Badge>
+            <Badge variant="outline">{t("todos.button")}</Badge>
           </CardHeader>
           <Separator />
           <CardContent>
@@ -56,7 +58,7 @@ export function BudgetProgressSection({
                 <Checkbox />
                 <h3>new todo</h3>
               </div>
-              <Button>
+              <Button variant="outline" className="cursor-pointer">
                 <X />
               </Button>
             </div>
@@ -64,7 +66,7 @@ export function BudgetProgressSection({
         </div>
         <CardContent className="flex items-center justify-between gap-2">
           <Input type="text" placeholder={t("todos.placeholder")} />
-          <Button>
+          <Button variant="outline" className="cursor-pointer">
             <Plus />
           </Button>
         </CardContent>

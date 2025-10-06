@@ -38,15 +38,15 @@ export function RecentTransactionsTableSection({
   ];
 
   return (
-    <section className="w-full overflow-hidden">
-      <Card>
+    <section className="grid auto-rows-min grid-cols-6">
+      <Card className="col-span-full">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("upcoming-cards.title")}</CardTitle>
-          <Badge>{t("upcoming-cards.button")}</Badge>
+          <Badge variant="outline">{t("upcoming-cards.button")}</Badge>
         </CardHeader>
         <Separator />
-        <CardContent>
-          <Table className="overflow-x-auto">
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-[600px]">
             <TableHeader>
               <TableRow>
                 {recentTransactionsTableHeadings.map((heading) => (
@@ -59,7 +59,9 @@ export function RecentTransactionsTableSection({
                 <TableRow key={data.recipient}>
                   <TableCell>25.9.2025</TableCell>
                   <TableCell>{data.recipient}</TableCell>
-                  <TableCell>{data.account}</TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    {data.account}
+                  </TableCell>
                   <TableCell>{data.category}</TableCell>
                   <TableCell>{data.note}</TableCell>
                   <TableCell className="self-end">{data.amount}</TableCell>

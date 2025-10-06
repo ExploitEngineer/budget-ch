@@ -115,9 +115,9 @@ export function DataTable({ transactions }: DataTableProps) {
   });
 
   return (
-    <section>
-      <Card>
-        <CardHeader className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+    <section className="grid auto-rows-min grid-cols-6">
+      <Card className="col-span-full">
+        <CardHeader className="flex flex-col flex-wrap items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <Badge
               variant="outline"
@@ -135,13 +135,13 @@ export function DataTable({ transactions }: DataTableProps) {
                 <span>{t("data-table.header.checkbox")}</span>
               </label>
             </Badge>
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               {t("data-table.header.buttons.delete")}
             </Button>
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               {t("data-table.header.buttons.category")}
             </Button>
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               {t("data-table.header.buttons.export")} CSV
             </Button>
           </div>
@@ -150,7 +150,7 @@ export function DataTable({ transactions }: DataTableProps) {
               {t("data-table.header.badge")}{" "}
               <span className="font-bold">CHF 4’443.90</span>
             </Badge>
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               {t("data-table.header.buttons.update")}
             </Button>
           </div>

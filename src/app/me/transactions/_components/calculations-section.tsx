@@ -54,8 +54,7 @@ export function CalculationSection() {
         <Card>
           <CardContent>
             <Form {...form}>
-              {/* Row 1: Dates */}
-              <div className="flex flex-col gap-4 md:flex-row">
+              <div className="flex flex-col flex-wrap gap-4 md:flex-row">
                 <FormField
                   control={form.control}
                   name="dateFrom"
@@ -121,10 +120,7 @@ export function CalculationSection() {
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* Row 2: Selects */}
-              <div className="mt-4 flex flex-col gap-4 md:flex-row">
                 <FormField
                   control={form.control}
                   name="select1"
@@ -202,8 +198,7 @@ export function CalculationSection() {
                 />
               </div>
 
-              {/* Row 3: Number Inputs */}
-              <div className="mt-4 flex flex-col gap-4 md:flex-row">
+              <div className="mt-4 flex flex-col flex-wrap gap-4 md:flex-row">
                 <FormField
                   control={form.control}
                   name="amountMax"
@@ -241,15 +236,12 @@ export function CalculationSection() {
                     </FormItem>
                   )}
                 />
-              </div>
 
-              {/* Row 4: Text */}
-              <div className="mt-4 md:w-1/2">
                 <FormField
                   control={form.control}
                   name="text"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex-1">
                       <FormLabel>{t("labels.search.title")}</FormLabel>
                       <FormControl>
                         <Input
@@ -299,8 +291,12 @@ export function CalculationSection() {
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <Button className="cursor-pointer">{t("buttons.reset")}</Button>
-              <Button className="cursor-pointer">{t("buttons.apply")}</Button>
+              <Button variant="outline" className="cursor-pointer">
+                {t("buttons.reset")}
+              </Button>
+              <Button variant="outline" className="cursor-pointer">
+                {t("buttons.apply")}
+              </Button>
             </div>
           </CardFooter>
         </Card>

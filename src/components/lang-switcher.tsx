@@ -59,7 +59,7 @@ export function LangSwitcherDefault() {
 
   return (
     <Select value={currentLocale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="w-fit rounded-lg [&>svg:last-child]:hidden">
+      <SelectTrigger className="w-fit rounded-lg bg-gray-100 [&>svg:last-child]:hidden">
         <Globe className="h-5 w-5" />
       </SelectTrigger>
       <SelectContent>

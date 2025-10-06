@@ -42,44 +42,51 @@ export function WarningSection({
   ];
 
   return (
-    <section className="grid auto-rows-min grid-cols-6 gap-4 overflow-hidden">
+    <section className="grid auto-rows-min grid-cols-6 gap-4">
       <Card className="col-span-full lg:col-span-3">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("upcoming-cards.title")}</CardTitle>
-          <Badge>{t("upcoming-cards.button")}</Badge>
+          <Badge variant="outline">{t("upcoming-cards.button")}</Badge>
         </CardHeader>
         <Separator />
-        <CardContent>
-          <Table className="min-w-[600px]">
-            <TableHeader>
-              <TableRow>
-                {upComingTableHeadings.map((heading) => (
-                  <TableHead key={heading}>{heading}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {upComingTables.map((data) => (
-                <TableRow key={data.name}>
-                  <TableCell>25.9.2025</TableCell>
-                  <TableCell>{data.name}</TableCell>
-                  <TableCell>{data.account}</TableCell>
-                  <TableCell>{data.amount}</TableCell>
-                  <TableCell>
-                    <Button className="text-xs">
-                      {t("upcoming-cards.table-data.button")}
-                    </Button>
-                  </TableCell>
+        <CardContent className="overflow-x-auto">
+          <div className="min-w-full">
+            <Table className="min-w-[600px]">
+              <TableHeader>
+                <TableRow>
+                  {upComingTableHeadings.map((heading) => (
+                    <TableHead key={heading}>{heading}</TableHead>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody className="overflow-x-scroll">
+                {upComingTables.map((data) => (
+                  <TableRow key={data.name}>
+                    <TableCell>25.9.2025</TableCell>
+                    <TableCell>{data.name}</TableCell>
+                    <TableCell>{data.account}</TableCell>
+                    <TableCell>{data.amount}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outline"
+                        className="cursor-pointer text-xs"
+                      >
+                        {t("upcoming-cards.table-data.button")}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
       <Card className="col-span-full lg:col-span-3">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("warning-cards.title")}</CardTitle>
-          <Button>{t("warning-cards.button")}</Button>
+          <Button variant="outline" className="cursor-pointer">
+            {t("warning-cards.button")}
+          </Button>
         </CardHeader>
         <Separator />
         <CardContent className="space-y-3">
@@ -89,7 +96,7 @@ export function WarningSection({
               className="flex items-center gap-2 rounded-full border px-4 py-3"
             >
               <p>{card.title}</p>
-              {card.badge && <Badge>{card.badge}</Badge>}
+              {card.badge && <Badge variant="outline">{card.badge}</Badge>}
             </div>
           ))}
         </CardContent>
