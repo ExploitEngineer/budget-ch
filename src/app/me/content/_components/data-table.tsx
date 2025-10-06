@@ -35,8 +35,8 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
   ];
 
   return (
-    <section>
-      <Card>
+    <section className="grid auto-rows-min grid-cols-6">
+      <Card className="col-span-full">
         <CardHeader className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <CardTitle>{t("title")}</CardTitle>{" "}
@@ -45,12 +45,16 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button className="cursor-pointer">{t("buttons.export")}</Button>
-            <Button className="cursor-pointer">{t("buttons.reset")}</Button>
+            <Button variant="outline" className="cursor-pointer">
+              {t("buttons.export")}
+            </Button>
+            <Button variant="outline" className="cursor-pointer">
+              {t("buttons.reset")}
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          <Table>
+        <CardContent className="overflow-x-auto">
+          <Table className="min-w-[620px]">
             <TableHeader>
               <TableRow>
                 {budgetDataTableHeadings.map((heading) => (
@@ -66,7 +70,10 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
                   <TableCell>{data.iban}</TableCell>
                   <TableCell>{data.balance}</TableCell>
                   <TableCell>
-                    <Button className="cursor-pointer text-xs">
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer text-xs"
+                    >
                       {data.action}
                     </Button>
                   </TableCell>

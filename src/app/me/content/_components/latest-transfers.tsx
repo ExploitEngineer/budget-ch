@@ -22,7 +22,7 @@ export function LatestTransfers() {
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <Button>{t("button")}</Button>
+          <Button variant="outline">{t("button")}</Button>
         </CardHeader>
         <Separator />
         <CardContent className="flex flex-wrap items-center gap-2">

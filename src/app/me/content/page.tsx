@@ -7,7 +7,7 @@ import { useContentData } from "./_components/data";
 export default function Content() {
   const { cards, tableData } = useContentData();
   return (
-    <section>
+    <section className="flex flex-col md:block">
       <div>
         <SidebarHeader />
       </div>

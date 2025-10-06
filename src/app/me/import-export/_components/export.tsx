@@ -33,7 +33,9 @@ export function Export() {
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               {buttons.map((title) => (
-                <Button key={title}>{title}</Button>
+                <Button variant="outline" key={title}>
+                  {title}
+                </Button>
               ))}
             </CardContent>
           </Card>
@@ -45,7 +47,7 @@ export function Export() {
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               <p>{t("export-json-card.content")}</p>
-              <Button>{t("export-json-card.button")}</Button>
+              <Button variant="outline">{t("export-json-card.button")}</Button>
             </CardContent>
           </Card>
 
@@ -56,7 +58,9 @@ export function Export() {
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
               {buttons.map((title) => (
-                <Button key={title}>{title}</Button>
+                <Button variant="outline" key={title}>
+                  {title}
+                </Button>
               ))}
             </CardContent>
           </Card>

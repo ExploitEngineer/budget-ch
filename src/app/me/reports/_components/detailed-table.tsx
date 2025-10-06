@@ -29,8 +29,8 @@ export function DetailedTable({
         <CardHeader className="flex flex-wrap items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>{" "}
           <div className="flex items-center gap-2">
-            <Button>{t("buttons.categories-csv")}</Button>
-            <Button>{t("buttons.trend-csv")}</Button>
+            <Button variant="outline">{t("buttons.categories-csv")}</Button>
+            <Button variant="outline">{t("buttons.trend-csv")}</Button>
           </div>
         </CardHeader>
         <Separator />
