@@ -34,6 +34,12 @@
         "light-mode": "Light mode"
     },
     "main-dashboard": {
+        "export": "Export",
+        "export-json": "Export JSON",
+        "csv-templates": "CSV Templates",
+        "diagnose": "Diagnose",
+        "support": "Support",
+        "save": "Save",
         "sidebar": {
             "title": "NAVIGATION",
             "links": {
@@ -516,6 +522,44 @@
             }
         },
         "content-page": {
+            "sidebar-header": {
+                "button": "Transfer",
+                "dialog-box": {
+                    "title": "Transfer between accounts",
+                    "button": "Close",
+                    "labels": {
+                        "from": {
+                            "title": "From",
+                            "options": {
+                                "giro": "Checking",
+                                "sparen": "Savings",
+                                "kreditkarte": "Credit Card",
+                                "bar": "Cash",
+                                "vorsorge": "Retirement 3a"
+                            }
+                        },
+                        "to": {
+                            "title": "To",
+                            "options": {
+                                "giro": "Checking",
+                                "sparen": "Savings",
+                                "kreditkarte": "Credit Card",
+                                "bar": "Cash",
+                                "vorsorge": "Retirement 3a"
+                            }
+                        },
+                        "amount": "Amount (CHF)",
+                        "date": "Date",
+                        "note": {
+                            "title": "Note",
+                            "placeholder": "optional"
+                        }
+                    },
+                    "buttons": {
+                        "post": "Post"
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Total Assets",
@@ -579,6 +623,28 @@
             }
         },
         "report-page": {
+            "sidebar-header": {
+                "filter-dialog": {
+                    "button": "Filter",
+                    "dialog-box": {
+                        "title": "Filter",
+                        "button": "Close",
+                        "labels": {
+                            "from": "From",
+                            "fromPlaceholder": "mm/dd/yyyy",
+                            "to": "To",
+                            "toPlaceholder": "mm/dd/yyyy",
+                            "text": {
+                                "title": "Text contains",
+                                "placeholder": "e.g., Coop, Rent …"
+                            }
+                        },
+                        "buttons": {
+                            "apply": "Apply"
+                        }
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Income",

@@ -35,6 +35,12 @@
         "light-mode": "Hellmodus"
     },
     "main-dashboard": {
+        "export": "Exportieren",
+        "export-json": "JSON exportieren",
+        "csv-templates": "CSV-Vorlagen",
+        "diagnose": "Diagnose",
+        "support": "Support",
+        "save": "Speichern",
         "sidebar": {
             "title": "NAVIGATION",
             "links": {
@@ -517,6 +523,44 @@
             }
         },
         "content-page": {
+            "sidebar-header": {
+                "button": "Überweisen",
+                "dialog-box": {
+                    "title": "Transfer zwischen Konten",
+                    "button": "Schliessen",
+                    "labels": {
+                        "from": {
+                            "title": "Von",
+                            "options": {
+                                "giro": "Girokonto",
+                                "sparen": "Sparkonto",
+                                "kreditkarte": "Kreditkarte",
+                                "bar": "Bar",
+                                "vorsorge": "Vorsorge 3a"
+                            }
+                        },
+                        "to": {
+                            "title": "Zu",
+                            "options": {
+                                "giro": "Girokonto",
+                                "sparen": "Sparkonto",
+                                "kreditkarte": "Kreditkarte",
+                                "bar": "Bar",
+                                "vorsorge": "Vorsorge 3a"
+                            }
+                        },
+                        "amount": "Betrag (CHF)",
+                        "date": "Datum",
+                        "note": {
+                            "title": "Notiz",
+                            "placeholder": "optional"
+                        }
+                    },
+                    "buttons": {
+                        "post": "Buchen"
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Gesamtvermögen",
@@ -580,6 +624,28 @@
             }
         },
         "report-page": {
+            "sidebar-header": {
+                "filter-dialog": {
+                    "button": "Filter",
+                    "dialog-box": {
+                        "title": "Filter",
+                        "button": "Schliessen",
+                        "labels": {
+                            "from": "Von",
+                            "fromPlaceholder": "TT/MM/JJJJ",
+                            "to": "Bis",
+                            "toPlaceholder": "TT/MM/JJJJ",
+                            "text": {
+                                "title": "Text enthält",
+                                "placeholder": "z. B. Coop, Miete …"
+                            }
+                        },
+                        "buttons": {
+                            "apply": "Anwenden"
+                        }
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Einkommen",

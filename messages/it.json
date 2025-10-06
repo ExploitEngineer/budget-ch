@@ -35,6 +35,12 @@
         "light-mode": "Modalità chiara"
     },
     "main-dashboard": {
+        "export": "Esporta",
+        "export-json": "Esporta JSON",
+        "csv-templates": "Modelli CSV",
+        "diagnose": "Diagnostica",
+        "support": "Supporto",
+        "save": "Salva",
         "sidebar": {
             "title": "NAVIGAZIONE",
             "links": {
@@ -517,6 +523,44 @@
             }
         },
         "content-page": {
+            "sidebar-header": {
+                "button": "Trasferisci",
+                "dialog-box": {
+                    "title": "Trasferimento tra conti",
+                    "button": "Chiudi",
+                    "labels": {
+                        "from": {
+                            "title": "Da",
+                            "options": {
+                                "giro": "Conto corrente",
+                                "sparen": "Risparmio",
+                                "kreditkarte": "Carta di credito",
+                                "bar": "Contanti",
+                                "vorsorge": "Previdenza 3a"
+                            }
+                        },
+                        "to": {
+                            "title": "A",
+                            "options": {
+                                "giro": "Conto corrente",
+                                "sparen": "Risparmio",
+                                "kreditkarte": "Carta di credito",
+                                "bar": "Contanti",
+                                "vorsorge": "Previdenza 3a"
+                            }
+                        },
+                        "amount": "Importo (CHF)",
+                        "date": "Data",
+                        "note": {
+                            "title": "Nota",
+                            "placeholder": "facoltativo"
+                        }
+                    },
+                    "buttons": {
+                        "post": "Registrare"
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Attività totali",
@@ -580,6 +624,28 @@
             }
         },
         "report-page": {
+            "sidebar-header": {
+                "filter-dialog": {
+                    "button": "Filtro",
+                    "dialog-box": {
+                        "title": "Filtro",
+                        "button": "Chiudi",
+                        "labels": {
+                            "from": "Da",
+                            "fromPlaceholder": "gg/mm/aaaa",
+                            "to": "A",
+                            "toPlaceholder": "gg/mm/aaaa",
+                            "text": {
+                                "title": "Il testo contiene",
+                                "placeholder": "es. Coop, Affitto …"
+                            }
+                        },
+                        "buttons": {
+                            "apply": "Applica"
+                        }
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Entrate",
