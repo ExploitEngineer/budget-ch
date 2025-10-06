@@ -24,6 +24,7 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 
 interface Items {
@@ -35,6 +36,7 @@ interface Items {
 export function NavMain() {
   const { open } = useSidebar();
   const t = useTranslations("main-dashboard");
+  const pathname = usePathname();
 
   const items: Items[] = [
     {
@@ -104,6 +106,8 @@ export function NavMain() {
                     open
                       ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 transition-all duration-300 hover:border-blue-600"
                       : "",
+                    pathname === item.url &&
+                      "border-blue-600 bg-gray-100 dark:bg-zinc-700",
                   )}
                   tooltip={item.title}
                 >

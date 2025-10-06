@@ -5,9 +5,20 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "./ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Search } from "lucide-react";
+import {
+  ChevronLeft,
+  File,
+  Download,
+  ChevronRight,
+  Search,
+  MessageSquare,
+  Check,
+} from "lucide-react";
 import DashBoardDialog from "./dialogs/dashboard-dialog";
 import { useTranslations } from "next-intl";
+import { usePathname } from "next/navigation";
+import TransferDialog from "@/app/me/content/_components/transfer-dialog";
+import FilterDialog from "@/app/me/reports/_components/filter-dialog";
 
 const monthNames: string[] = [
   "January",
@@ -30,6 +41,8 @@ export default function SidebarHeader() {
   const [date, setDate] = useState(
     new Date(today.getFullYear(), today.getMonth()),
   );
+  const pathname = usePathname();
+  const route = pathname.split("/").pop();
 
   const goToPrevMonth = () => {
     setDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));
@@ -40,17 +53,17 @@ export default function SidebarHeader() {
   };
 
   return (
-    <header className="mb-2 flex h-16 shrink-0 items-center gap-2 p-2 pt-6 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
-      <div className="flex w-full items-center px-4">
-        <SidebarTrigger className="-ml-1 cursor-pointer" />
+    <header className="relative mb-2 flex items-center gap-2 px-2 pt-6">
+      <div className="flex w-full px-4 lg:items-center">
+        <SidebarTrigger className="mt-1 -ml-1 cursor-pointer lg:mt-0" />
 
         <Separator
           orientation="vertical"
-          className="mr-2 data-[orientation=vertical]:h-4"
+          className="mt-[11px] mr-2 data-[orientation=vertical]:h-4 lg:mt-0"
         />
 
-        <div className="flex w-full items-center gap-4">
-          <div className="relative flex-1">
+        <div className="flex w-full flex-col items-center gap-4 lg:flex-row">
+          <div className="relative w-full flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               type="search"
@@ -70,7 +83,69 @@ export default function SidebarHeader() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          <DashBoardDialog />
+          {route !== "reports" &&
+            route !== "import-export" &&
+            route !== "help" &&
+            route !== "settings" && <DashBoardDialog />}
+
+          {route === "content" && <TransferDialog />}
+          {route === "reports" && (
+            <>
+              <Button
+                variant="outline"
+                className="flex cursor-pointer items-center justify-center gap-2"
+              >
+                <Download />
+                <span>{t("export")}</span>
+              </Button>
+              <FilterDialog />
+            </>
+          )}
+          {route === "import-export" && (
+            <>
+              <Button
+                variant="outline"
+                className="flex cursor-pointer items-center justify-center gap-2"
+              >
+                <Download />
+                <span>{t("export-json")}</span>
+              </Button>
+              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2">
+                <File />
+                <span>{t("csv-templates")}</span>
+              </Button>
+            </>
+          )}
+          {route === "help" && (
+            <>
+              <Button
+                variant="outline"
+                className="flex cursor-pointer items-center justify-center gap-2"
+              >
+                <Download />
+                <span>{t("diagnose")}</span>
+              </Button>
+              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2">
+                <MessageSquare />
+                <span>{t("support")}</span>
+              </Button>
+            </>
+          )}
+          {route === "settings" && (
+            <>
+              <Button
+                variant="outline"
+                className="flex cursor-pointer items-center justify-center gap-2"
+              >
+                <Download />
+                <span>{t("export")}</span>
+              </Button>
+              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2">
+                <Check />
+                <span>{t("save")}</span>
+              </Button>
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -22,7 +22,7 @@ export function NavUser() {
           <>
             <LangSwitcherDefault />
             <ThemeToggleDropdown />
-            <div className="flex cursor-pointer items-center rounded-full border px-4 py-3 text-xs">
+            <div className="flex cursor-pointer items-center rounded-full border bg-gray-100 px-4 py-3 text-xs dark:bg-transparent">
               Plan: <span className="ml-1 font-medium">Free</span>
             </div>
           </>

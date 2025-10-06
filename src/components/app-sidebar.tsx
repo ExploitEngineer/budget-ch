@@ -16,39 +16,48 @@ import { cn } from "@/lib/utils";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { open } = useSidebar();
+
   return (
     <Sidebar collapsible="icon" {...props} className={cn(open ? "p-2" : "p-0")}>
-      <SidebarHeader className={cn(open ? "mb-3" : "mb-0")}>
-        <div
-          className={cn(
-            "flex items-center gap-2 overflow-hidden transition-all duration-300",
-            open ? "opacity-100" : "opacity-90",
+      {/*
+      <SidebarHeader
+        className={cn(
+          "flex items-center justify-start transition-all duration-300",
+          open ? "mb-3" : "mb-0",
+        )}
+      >
+        <div className="flex items-center justify-start">
+          {open ? (
+            <Image
+              src="/assets/images/budgethub-light-logo.png"
+              alt="company logo"
+              width={140}
+              height={40}
+              className="object-contain transition-all duration-300"
+              priority
+            />
+          ) : (
+            <Image
+              src="/assets/images/budgetch-small-logo.png"
+              alt="company small logo"
+              width={100}
+              height={100}
+              className="object-contain transition-all duration-300"
+              priority
+            />
           )}
-        >
-          <Image
-            src="/assets/images/bh-logo.png"
-            width={50}
-            height={50}
-            alt="company logo"
-            className="shrink-0"
-          />
-          <div
-            className={cn(
-              "flex items-center font-semibold transition-opacity duration-300 sm:text-lg",
-              open ? "translate-x-0 opacity-100" : "-translate-x-2 opacity-0",
-            )}
-          >
-            <span>budgethub</span>
-            <span className="text-blue-600">.ch</span>
-          </div>
         </div>
       </SidebarHeader>
+      */}
+
       <SidebarContent>
         <NavMain />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>
+
       <SidebarRail />
     </Sidebar>
   );
