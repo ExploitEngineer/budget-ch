@@ -4,8 +4,6 @@ interface AnimatedCircularProgressBarProps {
   max?: number;
   min?: number;
   value: number;
-  gaugePrimaryColor: string;
-  gaugeSecondaryColor: string;
   className?: string;
 }
 
@@ -15,7 +13,8 @@ export function AnimatedCircularProgressBar({
   value = 0,
   className,
 }: AnimatedCircularProgressBarProps) {
-  const circumference = 2 * Math.PI * 45;
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
   const percentPx = circumference / 100;
   const currentPercent = Math.round(((value - min) / (max - min)) * 100);
 
@@ -40,8 +39,8 @@ export function AnimatedCircularProgressBar({
       <svg
         fill="none"
         className="size-full"
-        strokeWidth="2"
         viewBox="0 0 100 100"
+        strokeWidth="2"
       >
         <defs>
           <linearGradient
@@ -51,23 +50,22 @@ export function AnimatedCircularProgressBar({
             x2="0%"
             y2="100%"
           >
-            <stop offset="0%" stopColor="#677DF8" />
-            <stop offset="100%" stopColor="#2BC1E9" />
+            <stop offset="0%" stopColor="var(--brand)" />
+            <stop offset="100%" stopColor="var(--acc)" />
           </linearGradient>
         </defs>
+
         {currentPercent <= 90 && currentPercent >= 0 && (
           <circle
             cx="50"
             cy="50"
-            r="45"
-            strokeWidth="10"
-            strokeDashoffset="0"
+            r={radius}
+            strokeWidth="20"
+            stroke="oklch(0.25 0 0 / 0.2)"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="opacity-100"
             style={
               {
-                stroke: "darkgray",
                 "--stroke-percent": 90 - currentPercent,
                 "--offset-factor-secondary": "calc(1 - var(--offset-factor))",
                 strokeDasharray:
@@ -81,24 +79,23 @@ export function AnimatedCircularProgressBar({
             }
           />
         )}
+
         <circle
           cx="50"
           cy="50"
-          r="45"
-          strokeWidth="10"
-          strokeDashoffset="0"
+          r={radius}
+          strokeWidth="20"
+          stroke="url(#progress-gradient)"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="opacity-100"
           style={
             {
-              stroke: "url(#progress-gradient)",
               "--stroke-percent": currentPercent,
               strokeDasharray:
                 "calc(var(--stroke-percent) * var(--percent-to-px)) var(--circumference)",
               transition:
                 "var(--transition-length) ease var(--delay),stroke var(--transition-length) ease var(--delay)",
-              transitionProperty: "stroke-dasharray,transform",
+              transitionProperty: "stroke-dasharray, transform",
               transform:
                 "rotate(calc(-90deg + var(--gap-percent) * var(--offset-factor) * var(--percent-to-deg)))",
               transformOrigin:

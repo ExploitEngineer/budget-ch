@@ -1,14 +1,8 @@
 "use client";
 
-import { Bar, BarChart, XAxis, Cell } from "recharts";
+import { Bar, BarChart, XAxis, YAxis, Cell } from "recharts";
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -45,11 +39,6 @@ export function HighlightedBarChart() {
   const t = useTranslations("main-dashboard");
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
-  const activeData = React.useMemo(() => {
-    if (activeIndex === null) return null;
-    return chartData[activeIndex];
-  }, [activeIndex]);
-
   return (
     <Card>
       <CardHeader>
@@ -60,11 +49,6 @@ export function HighlightedBarChart() {
           </CardTitle>
         </div>
         <Separator className="my-2" />
-        <CardDescription>
-          {activeData
-            ? `${activeData.month}: ${activeData.desktop}`
-            : "January - June 2025"}
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -72,13 +56,26 @@ export function HighlightedBarChart() {
             accessibilityLayer
             data={chartData}
             onMouseLeave={() => setActiveIndex(null)}
+            barSize={50}
           >
             <defs>
               <linearGradient id="bar-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#677DF8" />
-                <stop offset="100%" stopColor="#2BC1E9" />
+                <stop offset="0%" stopColor="var(--brand)" />
+                <stop offset="100%" stopColor="var(--acc)" />
               </linearGradient>
             </defs>
+
+            <YAxis
+              ticks={[0, 300, 600, 900]}
+              domain={[0, 900]}
+              tickFormatter={(value) => `CHF ${value.toLocaleString("de-CH")}`}
+              axisLine={false}
+              tickLine={false}
+              width={60}
+              tick={{ fill: "oklch(0.4 0 0)", fontSize: 12 }}
+              style={{ userSelect: "none" }}
+            />
+
             <XAxis
               dataKey="month"
               tickLine={false}
@@ -86,21 +83,23 @@ export function HighlightedBarChart() {
               axisLine={false}
               tickFormatter={(value) => value.slice(0, 3)}
             />
+
             <ChartTooltip
               cursor={false}
               content={(props: CustomTooltipProps) => (
                 <ChartTooltipContent {...props} hideIndicator hideLabel />
               )}
             />
-            <Bar dataKey="desktop" radius={4} fill="var(--color-desktop)">
+
+            <Bar dataKey="desktop" radius={4} fill="url(#bar-gradient)">
               {chartData.map((_, index) => (
                 <Cell
-                  className="duration-200"
                   key={`cell-${index}`}
                   fillOpacity={
                     activeIndex === null ? 1 : activeIndex === index ? 1 : 0.3
                   }
-                  stroke={activeIndex === index ? "var(--color-desktop)" : ""}
+                  stroke={activeIndex === index ? "url(#bar-gradient)" : ""}
+                  className="duration-200"
                   onMouseEnter={() => setActiveIndex(index)}
                 />
               ))}
