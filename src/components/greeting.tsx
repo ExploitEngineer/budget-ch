@@ -12,6 +12,16 @@ export default function Greeting() {
       <Button className="" asChild>
         <Link href="/me/dashboard">{t("cta")}</Link>
       </Button>
+
+      <Link href="/signup">
+        <Button className="cursor-pointer">Signup</Button>
+      </Link>
+      <Link href="/signin">
+        <Button className="cursor-pointer">Signin</Button>
+      </Link>
+      <Link href="/forgot-password">
+        <Button className="cursor-pointer">Forgot Password</Button>
+      </Link>
     </div>
   );
 }
