@@ -132,7 +132,10 @@ export function ActiveGoalsSection({
 
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <Button className="flex cursor-pointer items-center gap-3">
+                      <Button
+                        variant="outline"
+                        className="flex cursor-pointer items-center gap-3"
+                      >
                         <Plus />
                         <span>{t("cards.tax-reserves.content.button")}</span>
                       </Button>

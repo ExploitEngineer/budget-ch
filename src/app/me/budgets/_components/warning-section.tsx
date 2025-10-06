@@ -11,7 +11,9 @@ export function WarningSection() {
       <Card>
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <Button className="cursor-pointer">{t("button")}</Button>
+          <Button variant="outline" className="cursor-pointer">
+            {t("button")}
+          </Button>
         </CardHeader>
         <Separator />
         <CardContent className="flex items-center gap-2">

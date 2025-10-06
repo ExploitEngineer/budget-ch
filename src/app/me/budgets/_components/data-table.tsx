@@ -56,10 +56,10 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               {t("data-table.buttons.export")}
             </Button>
-            <Button className="cursor-pointer">
+            <Button variant="outline" className="cursor-pointer">
               {t("data-table.buttons.reset")}
             </Button>
           </div>
@@ -84,7 +84,10 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
                     <Progress value={data.value} />
                   </TableCell>
                   <TableCell>
-                    <Button className="cursor-pointer text-xs">
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer text-xs"
+                    >
                       {data.action}
                     </Button>
                   </TableCell>
