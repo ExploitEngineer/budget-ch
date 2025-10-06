@@ -25,10 +25,10 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon, MoveHorizontal } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { mainFormSchema, MainFormValues } from "@/lib/validations";
+import { transferDialogSchema, TransferDialogValues } from "@/lib/validations";
 import {
   Dialog,
   DialogTrigger,
@@ -37,23 +37,21 @@ import {
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function DashBoardDialog() {
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
+export default function TransferDialog() {
+  const form = useForm<TransferDialogValues>({
+    resolver: zodResolver(transferDialogSchema) as any,
     defaultValues: {
-      date: undefined,
-      account: "",
-      text: "",
-      select: "",
+      from: "",
+      to: "",
       amount: 0,
-      file: undefined,
-      entries: [],
+      date: undefined,
+      text: "",
     },
   });
 
-  const t = useTranslations("main-dashboard.dashboard-page");
+  const t = useTranslations("main-dashboard.content-page.sidebar-header");
 
-  function onSubmit(values: MainFormValues) {
+  function onSubmit(values: TransferDialogValues) {
     console.log(values);
   }
 
@@ -63,12 +61,12 @@ export default function DashBoardDialog() {
         <Button
           className="btn-gradient flex items-center gap-2"
           variant="default"
-          size="icon"
         >
-          <Plus className="h-5 w-5" />
-          <span className="text-sm">{t("dialog-box.title")}</span>
+          <MoveHorizontal className="h-5 w-5" />
+          <span className="text-sm">{t("button")}</span>
         </Button>
       </DialogTrigger>
+
       <DialogContent className="max-w-3xl [&>button]:hidden">
         <div className="flex items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
@@ -80,15 +78,113 @@ export default function DashBoardDialog() {
               className="cursor-pointer border"
               variant="ghost"
             >
-              {t("dialog-box.btn-close")}
+              {t("dialog-box.button")}
             </Button>
           </DialogClose>
         </div>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Row 1 */}
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+              <FormField
+                control={form.control}
+                name="from"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("dialog-box.labels.from.title")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Choose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="giro">
+                            {t("dialog-box.labels.from.options.giro")}
+                          </SelectItem>
+                          <SelectItem value="sparen">
+                            {t("dialog-box.labels.from.options.sparen")}
+                          </SelectItem>
+                          <SelectItem value="kreditkarte">
+                            {t("dialog-box.labels.from.options.kreditkarte")}
+                          </SelectItem>
+                          <SelectItem value="bar">
+                            {t("dialog-box.labels.from.options.bar")}
+                          </SelectItem>
+                          <SelectItem value="vorsorge">
+                            {t("dialog-box.labels.from.options.vorsorge")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* To */}
+              <FormField
+                control={form.control}
+                name="to"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("dialog-box.labels.to.title")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Choose" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="giro">
+                            {t("dialog-box.labels.to.options.giro")}
+                          </SelectItem>
+                          <SelectItem value="sparen">
+                            {t("dialog-box.labels.to.options.sparen")}
+                          </SelectItem>
+                          <SelectItem value="kreditkarte">
+                            {t("dialog-box.labels.to.options.kreditkarte")}
+                          </SelectItem>
+                          <SelectItem value="bar">
+                            {t("dialog-box.labels.to.options.bar")}
+                          </SelectItem>
+                          <SelectItem value="vorsorge">
+                            {t("dialog-box.labels.to.options.vorsorge")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Amount + Date */}
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("dialog-box.labels.amount")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step={0.5}
+                        placeholder="0.00"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="date"
@@ -104,8 +200,8 @@ export default function DashBoardDialog() {
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {field.value
-                              ? format(field.value, "PPP")
-                              : "Pick a date"}
+                              ? format(field.value, "dd/MM/yyyy")
+                              : "10/06/2025"}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent>
@@ -121,132 +217,9 @@ export default function DashBoardDialog() {
                   </FormItem>
                 )}
               />
-
-              <FormField
-                control={form.control}
-                name="account"
-                render={({ field }) => (
-                  <FormItem className="flex !flex-1 flex-col">
-                    <FormLabel>
-                      {t("dialog-box.labels.account.title")}
-                    </FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue
-                            placeholder={t(
-                              "dialog-box.labels.account.placeholder",
-                            )}
-                          />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="checking">
-                            {t("dialog-box.labels.account.options.checking")}
-                          </SelectItem>
-                          <SelectItem value="card">
-                            {t("dialog-box.labels.account.options.credit-card")}
-                          </SelectItem>
-                          <SelectItem value="save">
-                            {t("dialog-box.labels.account.options.save")}
-                          </SelectItem>
-                          <SelectItem value="cash">
-                            {t("dialog-box.labels.account.options.cash")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </div>
 
-            {/* Row 2 */}
-            <FormField
-              control={form.control}
-              name="text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("dialog-box.labels.quelle.title")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={t("dialog-box.labels.quelle.placeholder")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Row 3 */}
-            <div className="flex items-center justify-between gap-3">
-              <FormField
-                control={form.control}
-                name="select"
-                render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>
-                      {t("dialog-box.labels.category.title")}
-                    </FormLabel>
-                    <FormControl>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Choose" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="groceries">
-                            {t("dialog-box.labels.category.options.groceries")}
-                          </SelectItem>
-                          <SelectItem value="restaurant">
-                            {t("dialog-box.labels.category.options.restaurant")}
-                          </SelectItem>
-                          <SelectItem value="transportation">
-                            {t(
-                              "dialog-box.labels.category.options.transportation",
-                            )}
-                          </SelectItem>
-                          <SelectItem value="household">
-                            {t("dialog-box.labels.category.options.household")}
-                          </SelectItem>
-                          <SelectItem value="income">
-                            {t("dialog-box.labels.category.options.income")}
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>{t("dialog-box.labels.amount")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        placeholder="0.00"
-                        step={0.5}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Row 4 */}
+            {/* Note */}
             <FormField
               control={form.control}
               name="text"
@@ -264,11 +237,8 @@ export default function DashBoardDialog() {
               )}
             />
 
-            {/* Footer Buttons */}
-            <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline">
-                {t("dialog-box.buttons.save")}
-              </Button>
+            {/* Submit */}
+            <div className="flex justify-end pt-4">
               <Button type="submit">{t("dialog-box.buttons.post")}</Button>
             </div>
           </form>

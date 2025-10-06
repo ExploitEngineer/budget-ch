@@ -60,7 +60,7 @@ export default function SavingGoalsDialog() {
   return (
     <Dialog>
       <DialogTrigger className="cursor-pointer" asChild>
-        <Button>{t("edit")}</Button>
+        <Button variant="outline">{t("edit")}</Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
