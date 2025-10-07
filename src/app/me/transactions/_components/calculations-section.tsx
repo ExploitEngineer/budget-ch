@@ -258,7 +258,7 @@ export function CalculationSection() {
             </Form>
           </CardContent>
           <CardFooter className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
                 className="cursor-pointer rounded-full px-3 py-2"

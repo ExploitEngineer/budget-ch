@@ -37,7 +37,7 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
   return (
     <section className="grid auto-rows-min grid-cols-6">
       <Card className="col-span-full">
-        <CardHeader className="flex items-center justify-between">
+        <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <CardTitle>{t("title")}</CardTitle>{" "}
             <Badge className="rounded-full px-3 py-2" variant="outline">

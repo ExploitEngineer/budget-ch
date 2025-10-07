@@ -36,9 +36,9 @@ export function BudgetProgressSection({
         <div className="grid grid-cols-2 gap-4 pb-10">
           {progressCards.map((card) => (
             <CardContent key={card.title} className="flex flex-col">
-              <div className="flex items-center justify-between">
-                <h3>{card.title}</h3>
-                <h3>{card.content}</h3>
+              <div className="mb-3 flex flex-wrap items-center justify-between sm:mb-0">
+                <h3 className="text-sm sm:text-base">{card.title}</h3>
+                <h3 className="text-sm sm:text-base">{card.content}</h3>
               </div>
               <Progress value={card.value} />
             </CardContent>

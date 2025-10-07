@@ -16,7 +16,7 @@ export function WarningSection() {
           </Button>
         </CardHeader>
         <Separator />
-        <CardContent className="flex items-center gap-2">
+        <CardContent className="flex flex-wrap items-center gap-2">
           <Badge className="rounded-full px-3 py-2" variant="outline">
             {t("badges.restaurant")}
           </Badge>

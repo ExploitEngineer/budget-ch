@@ -36,7 +36,7 @@ export function ActiveGoalsSection({
     <section>
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex min-w-0 items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
             <CardTitle className="truncate">{t("title")}</CardTitle>
             <Badge variant="outline" className="rounded-full px-3 py-2">
               {t("badge")}

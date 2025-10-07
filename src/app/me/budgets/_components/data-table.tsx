@@ -49,7 +49,7 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
     <section>
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <CardTitle>{t("data-table.title")}</CardTitle>{" "}
             <Badge className="rounded-full px-3 py-2" variant="outline">
               {t("data-table.badge")}
@@ -97,7 +97,7 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
           </Table>
           <Separator className="mt-2" />
         </CardContent>
-        <CardFooter className="flex items-center justify-between">
+        <CardFooter className="flex flex-wrap items-center justify-between gap-2">
           <ToggleGroup className="border" type="single">
             <ToggleGroupItem value="month" aria-label="toggle-month">
               {t("data-table.toggle-groups.month")}

@@ -84,7 +84,7 @@ export function BillingDetails() {
                 />
               </div>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-wrap justify-end gap-2">
                 <Button variant="secondary" className="cursor-pointer">
                   {t("buttons.test-invoice")}
                 </Button>

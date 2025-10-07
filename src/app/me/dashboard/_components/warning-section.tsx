@@ -95,7 +95,7 @@ export function WarningSection({
               key={card.title}
               className="flex items-center gap-2 rounded-full border px-4 py-3"
             >
-              <p>{card.title}</p>
+              <p className="text-sm sm:text-base">{card.title}</p>
               {card.badge && <Badge variant="outline">{card.badge}</Badge>}
             </div>
           ))}

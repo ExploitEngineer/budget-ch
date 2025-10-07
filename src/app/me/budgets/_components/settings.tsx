@@ -19,7 +19,7 @@ export function Settings() {
           </Button>
         </CardHeader>
         <Separator />
-        <CardContent className="flex items-center gap-2">
+        <CardContent className="flex flex-wrap items-center gap-2">
           <Badge
             variant="outline"
             className="cursor-pointer rounded-full px-3 py-2"

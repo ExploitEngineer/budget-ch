@@ -71,9 +71,12 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
     <section>
       <Card>
         <CardHeader className="flex flex-wrap items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <CardTitle>{t("analysis-table-data.title")}</CardTitle>{" "}
-            <Badge className="rounded-full px-3 py-2" variant="outline">
+            <Badge
+              className="rounded-full px-3 py-2 whitespace-pre-wrap"
+              variant="outline"
+            >
               {t("analysis-table-data.badge")}
             </Badge>
           </div>
@@ -119,7 +122,7 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
               ))}
             </div>
           </div>
-          <div>
+          <div className="overflow-x-auto">
             <h2 className="mb-4 font-bold">{t("income-exp.title")}</h2>
             <Table>
               <TableHeader>
