@@ -96,7 +96,7 @@ export function NavMain() {
       <SidebarGroupLabel className="text-sm font-bold">
         {t("sidebar.title")}
       </SidebarGroupLabel>
-      <SidebarMenu className={cn(open ? "flex" : "items-center")}>
+      <SidebarMenu className={cn(open ? "flex" : "")}>
         {items.map((item) => (
           <div key={item.title}>
             <Link key={item.title} href={item.url}>
