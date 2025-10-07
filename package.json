@@ -2,6 +2,7 @@
   "name": "budget-ch",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@9.15.4",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "next dev --turbopack",
