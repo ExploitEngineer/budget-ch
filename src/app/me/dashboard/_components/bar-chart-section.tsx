@@ -31,8 +31,9 @@ export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar
                   className="h-20 w-20"
-                  gaugePrimaryColor="gray"
-                  gaugeSecondaryColor="blue"
+                  // Below two props don't exist in the component
+                  // gaugePrimaryColor="gray"
+                  // gaugeSecondaryColor="blue"
                   value={card.value}
                 />
                 <div className="flex flex-col gap-2">

@@ -30,8 +30,9 @@ export function BudgetHealthSection({ cards }: BudgetHealthSectionProps) {
             <CardContent className="flex items-center gap-3 p-4">
               <AnimatedCircularProgressBar
                 className="h-20 w-20"
-                gaugePrimaryColor="gray"
-                gaugeSecondaryColor="blue"
+                  // Below two props don't exist in the component
+                  // gaugePrimaryColor="gray"
+                  // gaugeSecondaryColor="blue"
                 value={33}
               />
               <div>
