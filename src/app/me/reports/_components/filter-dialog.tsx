@@ -47,7 +47,7 @@ export default function FilterDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="btn-gradient flex cursor-pointer items-center gap-2">
+        <Button className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white">
           <FilterIcon className="h-5 w-5" />
           <span className="text-sm">{t("button")}</span>
         </Button>

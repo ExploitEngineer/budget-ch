@@ -61,7 +61,7 @@ export default function DashBoardDialog() {
     <Dialog>
       <DialogTrigger className="min-w-40 cursor-pointer" asChild>
         <Button
-          className="btn-gradient flex items-center gap-2"
+          className="btn-gradient flex items-center gap-2 dark:text-white"
           variant="default"
           size="icon"
         >

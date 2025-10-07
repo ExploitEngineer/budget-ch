@@ -354,6 +354,32 @@
             }
         },
         "budgets-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "New Budget",
+                    "button": "Close",
+                    "labels": {
+                        "category": {
+                            "title": "Category",
+                            "placeholder": "e.g. groceries"
+                        },
+                        "budget-chf": "Budget (CHF)",
+                        "1-chf": "1st (CHF)",
+                        "warning": "Warning at (%)",
+                        "color-marker": {
+                            "title": "Color Marker",
+                            "options": {
+                                "std": "Standard",
+                                "green": "Green",
+                                "orange": "Orange",
+                                "red": "Red"
+                            }
+                        }
+                    },
+                    "delete-btn": "Delete",
+                    "save": "Save"
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Total Budget (Month)",
@@ -428,6 +454,35 @@
             }
         },
         "saving-goals-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "New Goal",
+                    "subtitle": "New Savings Goal",
+                    "button": "Close",
+                    "labels": {
+                        "name": {
+                            "title": "Name",
+                            "placeholder": "e.g. Emergency fund, Vacation, Taxes"
+                        },
+                        "goal-amount": "Target Amount (CHF)",
+                        "saved-amount": "Already Saved (CHF)",
+                        "due-date": {
+                            "title": "Due Date",
+                            "placeholder": "mm/dd/yyyy"
+                        },
+                        "account": {
+                            "title": "Account",
+                            "options": {
+                                "save": "Savings",
+                                "checking": "Checking",
+                                "cash": "Cash"
+                            }
+                        },
+                        "monthly-allocation": "Monthly Allocation (CHF)"
+                    },
+                    "save": "Save"
+                }
+            },
             "dialog": {
                 "title": "Edit savings goal",
                 "button": "Close",
@@ -524,6 +579,37 @@
         "content-page": {
             "sidebar-header": {
                 "button": "Transfer",
+                "new-account-dialog": {
+                    "title": "New Account",
+                    "subtitle": "New Account",
+                    "button": "Close",
+                    "labels": {
+                        "name": {
+                            "title": "Name",
+                            "placeholder": "e.g. ZKB Checking, Revolut, Wallet"
+                        },
+                        "type": {
+                            "title": "Type",
+                            "options": {
+                                "checking": "Checking",
+                                "savings": "Savings",
+                                "credit-card": "Credit Card",
+                                "cash": "Cash",
+                                "retirement-3a": "Retirement 3a"
+                            }
+                        },
+                        "balance": "Starting Balance (CHF)",
+                        "iban": {
+                            "title": "IBAN",
+                            "placeholder": "optional"
+                        },
+                        "note": {
+                            "title": "Note",
+                            "placeholder": "optional"
+                        }
+                    },
+                    "save": "Save"
+                },
                 "dialog-box": {
                     "title": "Transfer between accounts",
                     "button": "Close",

@@ -355,6 +355,32 @@
             }
         },
         "budgets-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "Nouveau budget",
+                    "button": "Fermer",
+                    "labels": {
+                        "category": {
+                            "title": "Catégorie",
+                            "placeholder": "ex. courses"
+                        },
+                        "budget-chf": "Budget (CHF)",
+                        "1-chf": "Réel (CHF)",
+                        "warning": "Alerte à (%)",
+                        "color-marker": {
+                            "title": "Marqueur de couleur",
+                            "options": {
+                                "std": "Standard",
+                                "green": "Vert",
+                                "orange": "Orange",
+                                "red": "Rouge"
+                            }
+                        }
+                    },
+                    "delete-btn": "Supprimer",
+                    "save": "Enregistrer"
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Budget total (Mois)",
@@ -429,6 +455,35 @@
             }
         },
         "saving-goals-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "Nouvel objectif",
+                    "subtitle": "Nouvel objectif d'épargne",
+                    "button": "Fermer",
+                    "labels": {
+                        "name": {
+                            "title": "Nom",
+                            "placeholder": "ex. fonds d'urgence, vacances, impôts"
+                        },
+                        "goal-amount": "Montant cible (CHF)",
+                        "saved-amount": "Déjà épargné (CHF)",
+                        "due-date": {
+                            "title": "Date d'échéance",
+                            "placeholder": "mm/dd/yyyy"
+                        },
+                        "account": {
+                            "title": "Compte",
+                            "options": {
+                                "save": "Épargne",
+                                "checking": "Compte courant",
+                                "cash": "Espèces"
+                            }
+                        },
+                        "monthly-allocation": "Allocation mensuelle (CHF)"
+                    },
+                    "save": "Enregistrer"
+                }
+            },
             "dialog": {
                 "title": "Modifier l'objectif d'épargne",
                 "button": "Fermer",
@@ -525,6 +580,37 @@
         "content-page": {
             "sidebar-header": {
                 "button": "Transfert",
+                "new-account-dialog": {
+                    "title": "Nouveau compte",
+                    "subtitle": "Nouveau compte",
+                    "button": "Fermer",
+                    "labels": {
+                        "name": {
+                            "title": "Nom",
+                            "placeholder": "ex. ZKB Compte courant, Revolut, Portefeuille"
+                        },
+                        "type": {
+                            "title": "Type",
+                            "options": {
+                                "checking": "Compte courant",
+                                "savings": "Épargne",
+                                "credit-card": "Carte de crédit",
+                                "cash": "Espèces",
+                                "retirement-3a": "Prévoyance 3a"
+                            }
+                        },
+                        "balance": "Solde initial (CHF)",
+                        "iban": {
+                            "title": "IBAN",
+                            "placeholder": "facultatif"
+                        },
+                        "note": {
+                            "title": "Note",
+                            "placeholder": "facultatif"
+                        }
+                    },
+                    "save": "Enregistrer"
+                },
                 "dialog-box": {
                     "title": "Transfert entre comptes",
                     "button": "Fermer",

@@ -19,6 +19,9 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import TransferDialog from "@/app/me/content/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
+import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
+import SavingsGoalMainDialog from "@/app/me/budgets/_components/saving-goals-main-dialog";
+import NewAccountDialog from "@/app/me/content/_components/content-dialog";
 
 const monthNames: string[] = [
   "January",
@@ -83,12 +86,21 @@ export default function SidebarHeader() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          {route !== "reports" &&
-            route !== "import-export" &&
-            route !== "help" &&
-            route !== "settings" && <DashBoardDialog />}
+          {route === "dashboard" || route === "transactions" ? (
+            <DashBoardDialog />
+          ) : null}
 
-          {route === "content" && <TransferDialog />}
+          {route === "budgets" && <BudgetDialog />}
+
+          {route === "saving-goals" && <SavingsGoalMainDialog />}
+
+          {route === "content" && (
+            <>
+              <NewAccountDialog />
+              <TransferDialog />
+            </>
+          )}
+
           {route === "reports" && (
             <>
               <Button
@@ -110,27 +122,13 @@ export default function SidebarHeader() {
                 <Download />
                 <span>{t("export-json")}</span>
               </Button>
-              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2">
+              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2 dark:text-white">
                 <File />
                 <span>{t("csv-templates")}</span>
               </Button>
             </>
           )}
-          {route === "help" && (
-            <>
-              <Button
-                variant="outline"
-                className="flex cursor-pointer items-center justify-center gap-2"
-              >
-                <Download />
-                <span>{t("diagnose")}</span>
-              </Button>
-              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2">
-                <MessageSquare />
-                <span>{t("support")}</span>
-              </Button>
-            </>
-          )}
+
           {route === "settings" && (
             <>
               <Button
@@ -140,9 +138,25 @@ export default function SidebarHeader() {
                 <Download />
                 <span>{t("export")}</span>
               </Button>
-              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2">
+              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2 dark:text-white">
                 <Check />
                 <span>{t("save")}</span>
+              </Button>
+            </>
+          )}
+
+          {route === "help" && (
+            <>
+              <Button
+                variant="outline"
+                className="flex cursor-pointer items-center justify-center gap-2"
+              >
+                <Download />
+                <span>{t("diagnose")}</span>
+              </Button>
+              <Button className="btn-gradient flex cursor-pointer items-center justify-center gap-2 dark:text-white">
+                <MessageSquare />
+                <span>{t("support")}</span>
               </Button>
             </>
           )}

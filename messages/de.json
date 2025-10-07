@@ -355,6 +355,32 @@
             }
         },
         "budgets-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "Neues Budget",
+                    "button": "Schließen",
+                    "labels": {
+                        "category": {
+                            "title": "Kategorie",
+                            "placeholder": "z. B. Lebensmittel"
+                        },
+                        "budget-chf": "Budget (CHF)",
+                        "1-chf": "Ist (CHF)",
+                        "warning": "Warnung bei (%)",
+                        "color-marker": {
+                            "title": "Farbmarker",
+                            "options": {
+                                "std": "Standard",
+                                "green": "Grün",
+                                "orange": "Orange",
+                                "red": "Rot"
+                            }
+                        }
+                    },
+                    "delete-btn": "Löschen",
+                    "save": "Speichern"
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Gesamtbudget (Monat)",
@@ -429,6 +455,35 @@
             }
         },
         "saving-goals-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "Neues Ziel",
+                    "subtitle": "Neues Sparziel",
+                    "button": "Schließen",
+                    "labels": {
+                        "name": {
+                            "title": "Name",
+                            "placeholder": "z. B. Notgroschen, Ferien, Steuern"
+                        },
+                        "goal-amount": "Zielbetrag (CHF)",
+                        "saved-amount": "Bereits gespart (CHF)",
+                        "due-date": {
+                            "title": "Fällig am",
+                            "placeholder": "mm/dd/yyyy"
+                        },
+                        "account": {
+                            "title": "Konto",
+                            "options": {
+                                "save": "Sparen",
+                                "checking": "Giro",
+                                "cash": "Bar"
+                            }
+                        },
+                        "monthly-allocation": "Monatliche Zuweisung (CHF)"
+                    },
+                    "save": "Speichern"
+                }
+            },
             "dialog": {
                 "title": "Sparziel bearbeiten",
                 "button": "Schließen",
@@ -525,6 +580,37 @@
         "content-page": {
             "sidebar-header": {
                 "button": "Überweisen",
+                "new-account-dialog": {
+                    "title": "Neues Konto",
+                    "subtitle": "Neues Konto",
+                    "button": "Schließen",
+                    "labels": {
+                        "name": {
+                            "title": "Name",
+                            "placeholder": "z. B. ZKB Giro, Revolut, Portemonnaie"
+                        },
+                        "type": {
+                            "title": "Typ",
+                            "options": {
+                                "checking": "Giro",
+                                "savings": "Sparen",
+                                "credit-card": "Kreditkarte",
+                                "cash": "Bar",
+                                "retirement-3a": "Vorsorge 3a"
+                            }
+                        },
+                        "balance": "Startsaldo (CHF)",
+                        "iban": {
+                            "title": "IBAN",
+                            "placeholder": "optional"
+                        },
+                        "note": {
+                            "title": "Notiz",
+                            "placeholder": "optional"
+                        }
+                    },
+                    "save": "Speichern"
+                },
                 "dialog-box": {
                     "title": "Transfer zwischen Konten",
                     "button": "Schliessen",
@@ -624,28 +710,6 @@
             }
         },
         "report-page": {
-            "sidebar-header": {
-                "filter-dialog": {
-                    "button": "Filter",
-                    "dialog-box": {
-                        "title": "Filter",
-                        "button": "Schliessen",
-                        "labels": {
-                            "from": "Von",
-                            "fromPlaceholder": "TT/MM/JJJJ",
-                            "to": "Bis",
-                            "toPlaceholder": "TT/MM/JJJJ",
-                            "text": {
-                                "title": "Text enthält",
-                                "placeholder": "z. B. Coop, Miete …"
-                            }
-                        },
-                        "buttons": {
-                            "apply": "Anwenden"
-                        }
-                    }
-                }
-            },
             "cards": {
                 "card-1": {
                     "title": "Einkommen",

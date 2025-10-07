@@ -355,6 +355,32 @@
             }
         },
         "budgets-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "Nuovo budget",
+                    "button": "Chiudi",
+                    "labels": {
+                        "category": {
+                            "title": "Categoria",
+                            "placeholder": "es. generi alimentari"
+                        },
+                        "budget-chf": "Budget (CHF)",
+                        "1-chf": "Effettivo (CHF)",
+                        "warning": "Avviso a (%)",
+                        "color-marker": {
+                            "title": "Indicatore colore",
+                            "options": {
+                                "std": "Standard",
+                                "green": "Verde",
+                                "orange": "Arancione",
+                                "red": "Rosso"
+                            }
+                        }
+                    },
+                    "delete-btn": "Elimina",
+                    "save": "Salva"
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Budget totale (Mese)",
@@ -429,6 +455,35 @@
             }
         },
         "saving-goals-page": {
+            "sidebar-header": {
+                "dialog": {
+                    "title": "Nuovo obiettivo",
+                    "subtitle": "Nuovo obiettivo di risparmio",
+                    "button": "Chiudi",
+                    "labels": {
+                        "name": {
+                            "title": "Nome",
+                            "placeholder": "es. fondo emergenze, vacanze, tasse"
+                        },
+                        "goal-amount": "Importo obiettivo (CHF)",
+                        "saved-amount": "Già risparmiato (CHF)",
+                        "due-date": {
+                            "title": "Scadenza",
+                            "placeholder": "mm/dd/yyyy"
+                        },
+                        "account": {
+                            "title": "Conto",
+                            "options": {
+                                "save": "Risparmio",
+                                "checking": "Conto corrente",
+                                "cash": "Contanti"
+                            }
+                        },
+                        "monthly-allocation": "Assegnazione mensile (CHF)"
+                    },
+                    "save": "Salva"
+                }
+            },
             "dialog": {
                 "title": "Modifica obiettivo di risparmio",
                 "button": "Chiudi",
@@ -525,6 +580,37 @@
         "content-page": {
             "sidebar-header": {
                 "button": "Trasferisci",
+                "new-account-dialog": {
+                    "title": "Nuovo conto",
+                    "subtitle": "Nuovo conto",
+                    "button": "Chiudi",
+                    "labels": {
+                        "name": {
+                            "title": "Nome",
+                            "placeholder": "es. ZKB Conto corrente, Revolut, Portafoglio"
+                        },
+                        "type": {
+                            "title": "Tipo",
+                            "options": {
+                                "checking": "Conto corrente",
+                                "savings": "Risparmio",
+                                "credit-card": "Carta di credito",
+                                "cash": "Contanti",
+                                "retirement-3a": "Previdenza 3a"
+                            }
+                        },
+                        "balance": "Saldo iniziale (CHF)",
+                        "iban": {
+                            "title": "IBAN",
+                            "placeholder": "opzionale"
+                        },
+                        "note": {
+                            "title": "Nota",
+                            "placeholder": "opzionale"
+                        }
+                    },
+                    "save": "Salva"
+                },
                 "dialog-box": {
                     "title": "Trasferimento tra conti",
                     "button": "Chiudi",
