@@ -19,7 +19,7 @@ export function FAQs({ FAQs }: FAQsProps) {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
           <Input
@@ -28,7 +28,7 @@ export function FAQs({ FAQs }: FAQsProps) {
             placeholder="Search FAQs…"
           />
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent>
           <Accordion
             type="single"

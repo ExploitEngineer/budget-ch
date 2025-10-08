@@ -25,14 +25,14 @@ export function BudgetProgressSection({
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
-      <Card className="lg:col-span-3">
+      <Card className="bg-blue-background lg:col-span-3 dark:border-[#1A2441]">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("line-progress-cards.title")}</CardTitle>
           <Button variant="outline" className="cursor-pointer">
             {t("line-progress-cards.button")}
           </Button>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <div className="grid grid-cols-2 gap-4 pb-10">
           {progressCards.map((card) => (
             <CardContent key={card.title} className="flex flex-col">
@@ -45,13 +45,13 @@ export function BudgetProgressSection({
           ))}
         </div>
       </Card>
-      <Card className="flex flex-col justify-between lg:col-span-2">
+      <Card className="bg-blue-background flex flex-col justify-between lg:col-span-2 dark:border-[#1A2441]">
         <div className="flex flex-col gap-4">
           <CardHeader className="flex items-center justify-between">
             <CardTitle>{t("todos.title")}</CardTitle>
             <Badge variant="outline">{t("todos.button")}</Badge>
           </CardHeader>
-          <Separator />
+          <Separator className="dark:bg-[#1A2441]" />
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">

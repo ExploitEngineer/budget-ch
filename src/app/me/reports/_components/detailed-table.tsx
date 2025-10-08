@@ -25,7 +25,7 @@ export function DetailedTable({
 
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>{" "}
           <div className="flex items-center gap-2">
@@ -33,7 +33,7 @@ export function DetailedTable({
             <Button variant="outline">{t("buttons.trend-csv")}</Button>
           </div>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent>
           <Table>
             <TableHeader>

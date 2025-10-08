@@ -57,6 +57,10 @@
             },
             "header": {
                 "search": "Suchen..."
+            },
+            "footer": {
+                "content-1": "Gemacht mit",
+                "content-2": "von innopulse.io"
             }
         },
         "dashboard-page": {

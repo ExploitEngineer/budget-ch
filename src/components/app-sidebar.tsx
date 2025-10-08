@@ -30,11 +30,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   return (
-    <Sidebar collapsible="icon" {...props} className={cn(open ? "p-2" : "p-0")}>
+    <Sidebar
+      collapsible="icon"
+      {...props}
+      className={cn(
+        "dark:bg-blue-background bg-gray-100/55",
+        open ? "p-2" : "p-0",
+      )}
+    >
       <SidebarHeader
         className={cn(
-          "flex items-center justify-start transition-all duration-300",
-          open ? "mb-3" : "mb-0",
+          "bg-blue-background flex items-center justify-start transition-all duration-300",
+          open ? "pb-3" : "pb-0",
         )}
       >
         <div className="relative m-0 flex h-auto w-full items-center justify-start p-0">
@@ -66,11 +73,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="bg-blue-background">
         <NavMain />
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="bg-blue-background">
         <NavUser />
       </SidebarFooter>
 

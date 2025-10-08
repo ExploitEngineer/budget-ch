@@ -34,7 +34,7 @@ export function ActiveGoalsSection({
   );
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <CardTitle className="truncate">{t("title")}</CardTitle>
@@ -81,7 +81,10 @@ export function ActiveGoalsSection({
             });
 
             return (
-              <Card key={idx}>
+              <Card
+                className="bg-blue-background dark:border-[#1A2441]"
+                key={idx}
+              >
                 <CardHeader className="flex items-center justify-between">
                   <CardTitle>{data.title}</CardTitle>
                   <div className="flex items-center gap-2">
@@ -92,7 +95,7 @@ export function ActiveGoalsSection({
                   </div>
                 </CardHeader>
 
-                <Separator />
+                <Separator className="dark:bg-[#1A2441]" />
 
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">

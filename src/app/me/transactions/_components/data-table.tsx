@@ -82,11 +82,7 @@ export function DataTable({ transactions }: DataTableProps) {
           currency: "CHF",
         }).format(amount);
 
-        return (
-          <span className={amount < 0 ? "text-red-600" : "text-green-600"}>
-            {formatted}
-          </span>
-        );
+        return <span>{formatted}</span>;
       },
     },
     {
@@ -116,7 +112,7 @@ export function DataTable({ transactions }: DataTableProps) {
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
-      <Card className="col-span-full">
+      <Card className="bg-blue-background col-span-full dark:border-[#1A2441]">
         <CardHeader className="flex flex-col flex-wrap items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <Badge

@@ -39,12 +39,12 @@ export function RecentTransactionsTableSection({
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
-      <Card className="col-span-full">
+      <Card className="bg-blue-background col-span-full dark:border-[#1A2441]">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("upcoming-cards.title")}</CardTitle>
           <Badge variant="outline">{t("upcoming-cards.button")}</Badge>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="overflow-x-auto">
           <Table className="min-w-[600px]">
             <TableHeader>

@@ -55,14 +55,14 @@ export function MembersInvitations() {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
           <Badge variant="outline" className="rounded-full px-3 py-2">
             {t("badge")}
           </Badge>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent>
           <Form {...form}>
             <form className="space-y-4">
@@ -133,7 +133,7 @@ export function MembersInvitations() {
             </form>
           </Form>
 
-          <div className="mt-8 overflow-x-auto rounded-lg border px-2 py-4">
+          <div className="mt-8 overflow-x-auto rounded-lg border px-2 py-4 dark:border-[#1A2441]">
             <Table>
               <TableHeader>
                 <TableRow>

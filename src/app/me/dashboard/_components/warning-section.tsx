@@ -11,6 +11,7 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table";
+import { cn } from "@/lib/utils";
 
 interface UpComingTables {
   name: string;
@@ -43,12 +44,12 @@ export function WarningSection({
 
   return (
     <section className="grid auto-rows-min grid-cols-6 gap-4">
-      <Card className="col-span-full lg:col-span-3">
+      <Card className="bg-blue-background col-span-full lg:col-span-3 dark:border-[#1A2441]">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("upcoming-cards.title")}</CardTitle>
           <Badge variant="outline">{t("upcoming-cards.button")}</Badge>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="overflow-x-auto">
           <div className="min-w-full">
             <Table className="min-w-[600px]">
@@ -81,19 +82,23 @@ export function WarningSection({
           </div>
         </CardContent>
       </Card>
-      <Card className="col-span-full lg:col-span-3">
+      <Card className="bg-blue-background col-span-full lg:col-span-3 dark:border-[#1A2441]">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("warning-cards.title")}</CardTitle>
           <Button variant="outline" className="cursor-pointer">
             {t("warning-cards.button")}
           </Button>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="space-y-3">
-          {warningCards.map((card) => (
+          {warningCards.map((card, idx) => (
             <div
               key={card.title}
-              className="flex items-center gap-2 rounded-full border px-4 py-3"
+              className={cn(
+                "flex items-center gap-2 rounded-full border px-4 py-3",
+                idx === 0 && "border-[#9A6F42]",
+                idx === 1 && "border-[#9A4249]",
+              )}
             >
               <p className="text-sm sm:text-base">{card.title}</p>
               {card.badge && <Badge variant="outline">{card.badge}</Badge>}

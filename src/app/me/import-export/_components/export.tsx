@@ -17,17 +17,17 @@ export function Export() {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
           <Badge variant="outline" className="rounded-full px-3 py-2">
             {t("badge")}
           </Badge>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {/* Card 1 */}
-          <Card>
+          <Card className="bg-blue-background dark:border-[#1A2441]">
             <CardHeader>
               <CardTitle>{t("export-card.title")}</CardTitle>
             </CardHeader>
@@ -41,7 +41,7 @@ export function Export() {
           </Card>
 
           {/* Card 2 */}
-          <Card>
+          <Card className="bg-blue-background dark:border-[#1A2441]">
             <CardHeader>
               <CardTitle>{t("export-json-card.title")}</CardTitle>
             </CardHeader>
@@ -52,7 +52,7 @@ export function Export() {
           </Card>
 
           {/* Card 3 */}
-          <Card>
+          <Card className="bg-blue-background dark:border-[#1A2441]">
             <CardHeader>
               <CardTitle>{t("csv-template-card.title")}</CardTitle>
             </CardHeader>

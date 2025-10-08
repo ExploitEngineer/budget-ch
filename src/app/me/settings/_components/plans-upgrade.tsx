@@ -21,7 +21,7 @@ export function PlansUpgrade() {
 
   return (
     <section className="space-y-4">
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
           <ToggleGroup
@@ -50,10 +50,13 @@ export function PlansUpgrade() {
             </ToggleGroupItem>
           </ToggleGroup>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {cards.map((card, idx) => (
-            <Card key={idx} className="flex flex-col justify-between gap-3">
+            <Card
+              key={idx}
+              className="bg-blue-background flex flex-col justify-between gap-3 dark:border-[#1A2441]"
+            >
               <CardHeader className="mb-5 flex flex-wrap items-center justify-between gap-2">
                 <CardTitle>{card.title}</CardTitle>
                 <h1 className="text-lg font-bold">

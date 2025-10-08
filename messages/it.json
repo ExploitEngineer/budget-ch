@@ -57,6 +57,10 @@
             },
             "header": {
                 "search": "Cerca..."
+            },
+            "footer": {
+                "content-1": "Fatto con",
+                "content-2": "da innopulse.io"
             }
         },
         "dashboard-page": {

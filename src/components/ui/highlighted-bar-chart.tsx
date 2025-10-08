@@ -40,7 +40,7 @@ export function HighlightedBarChart() {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
 
   return (
-    <Card>
+    <Card className="bg-blue-background dark:border-[#1A2441]">
       <CardHeader>
         <div className="flex w-full items-center justify-between">
           <CardTitle>{t("dashboard-page.chart.primary-title")}</CardTitle>
@@ -48,7 +48,7 @@ export function HighlightedBarChart() {
             {t("dashboard-page.chart.secondary-title")}
           </CardTitle>
         </div>
-        <Separator className="my-2" />
+        <Separator className="my-2 dark:bg-[#1A2441]" />
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>

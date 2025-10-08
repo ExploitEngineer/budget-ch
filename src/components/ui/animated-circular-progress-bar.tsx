@@ -61,7 +61,7 @@ export function AnimatedCircularProgressBar({
             cy="50"
             r={radius}
             strokeWidth="20"
-            stroke="oklch(0.25 0 0 / 0.2)"
+            className="stroke-neutral-300 dark:stroke-neutral-700/40"
             strokeLinecap="round"
             strokeLinejoin="round"
             style={

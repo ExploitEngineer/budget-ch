@@ -11,11 +11,11 @@ export function AboutSection() {
   const t = useTranslations("main-dashboard.settings-page.about-section");
 
   return (
-    <Card>
+    <Card className="bg-blue-background dark:border-[#1A2441]">
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
-      <Separator />
+      <Separator className="dark:bg-[#1A2441]" />
       <CardContent className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="flex flex-col gap-2">

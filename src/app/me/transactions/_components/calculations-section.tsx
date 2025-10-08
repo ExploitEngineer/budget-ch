@@ -51,7 +51,7 @@ export function CalculationSection() {
   return (
     <section>
       <FormProvider {...form}>
-        <Card>
+        <Card className="bg-blue-background dark:border-[#1A2441]">
           <CardContent>
             <Form {...form}>
               <div className="flex flex-col flex-wrap gap-4 md:flex-row">

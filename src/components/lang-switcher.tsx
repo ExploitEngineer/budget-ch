@@ -62,7 +62,7 @@ export function LangSwitcherDefault() {
       <SelectTrigger className="w-fit rounded-lg bg-gray-100 [&>svg:last-child]:hidden">
         <Globe className="h-5 w-5" />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="bg-blue-background">
         {languages.map((language) => (
           <SelectItem key={language.code} value={language.code}>
             {language.name}

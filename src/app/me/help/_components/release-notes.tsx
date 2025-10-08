@@ -8,7 +8,7 @@ export function ReleaseNotes() {
   const lists: string[] = [t("list-1"), t("list-2")];
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
           <Badge variant="outline" className="rounded-full px-3 py-2">

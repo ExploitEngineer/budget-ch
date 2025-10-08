@@ -8,12 +8,12 @@ export function WarningSection() {
   const t = useTranslations("main-dashboard.saving-goals-page.warning-section");
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
           <Button variant="outline">{t("button")}</Button>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent>
           <Badge variant="outline" className="rounded-full px-3 py-2">
             {t("badge")}

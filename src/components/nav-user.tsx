@@ -10,22 +10,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Heart } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function NavUser() {
+  const t = useTranslations("main-dashboard.sidebar.footer");
   const { open } = useSidebar();
 
   return (
     <SidebarMenu>
       <SidebarMenuItem className="flex w-full items-center gap-4">
         {open ? (
-          <>
-            <LangSwitcherDefault />
-            <ThemeToggleDropdown />
-            <div className="flex cursor-pointer items-center rounded-full border bg-gray-100 px-4 py-3 text-xs dark:bg-transparent">
-              Plan: <span className="ml-1 font-medium">Free</span>
+          <div className="flex w-full flex-col items-center justify-center gap-2">
+            <div className="flex w-full items-center justify-between">
+              <LangSwitcherDefault />
+              <ThemeToggleDropdown />
+              <div className="flex cursor-pointer items-center rounded-full border bg-gray-100 px-4 py-3 text-xs dark:bg-transparent">
+                Plan: <span className="ml-1 font-medium">Free</span>
+              </div>
             </div>
-          </>
+            <p className="flex items-center gap-1 text-xs text-gray-400">
+              {t("content-1")}{" "}
+              <Heart size={10} fill="currentColor" className="text-red-600" />
+              {t("content-2")}
+            </p>
+          </div>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger className="cursor-pointer" asChild>

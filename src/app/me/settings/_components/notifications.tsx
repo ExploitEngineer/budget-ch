@@ -46,11 +46,11 @@ export function Notifications() {
   ];
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent>
           <div className="mb-5 grid grid-cols-2 gap-5">
             <div>

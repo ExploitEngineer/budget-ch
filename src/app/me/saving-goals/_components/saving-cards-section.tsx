@@ -21,7 +21,10 @@ export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
       {cards.map((card) => (
-        <Card key={card.title} className="flex flex-col gap-0 rounded-xl">
+        <Card
+          key={card.title}
+          className="bg-blue-background flex flex-col gap-0 rounded-xl dark:border-[#1A2441]"
+        >
           <CardHeader>
             <CardTitle className="text-sm font-light">{card.title}</CardTitle>
           </CardHeader>

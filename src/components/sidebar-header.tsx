@@ -66,7 +66,7 @@ export default function SidebarHeader() {
         />
 
         <div className="flex w-full flex-col items-center gap-4 lg:flex-row">
-          <div className="relative w-full flex-1">
+          <div className="bg-blue-background relative w-full flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               type="search"
@@ -75,7 +75,7 @@ export default function SidebarHeader() {
             />
           </div>
 
-          <div className="flex items-center gap-2 rounded-lg border">
+          <div className="bg-blue-background flex items-center gap-2 rounded-lg border">
             <Button variant="ghost" size="icon" onClick={goToPrevMonth}>
               <ChevronLeft className="h-4 w-4" />
             </Button>

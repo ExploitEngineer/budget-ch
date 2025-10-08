@@ -9,14 +9,14 @@ export function QuickAccess() {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
           <Badge variant="outline" className="rounded-full px-3 py-2">
             {t("badge")}
           </Badge>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="flex flex-wrap items-center gap-2">
           <Button variant="outline">{t("buttons.tour")}</Button>
           <Button variant="outline">{t("buttons.faqs")}</Button>

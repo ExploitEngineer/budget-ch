@@ -20,14 +20,17 @@ export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
       <div className="lg:col-span-3">
         <HighlightedBarChart />
       </div>
-      <Card className="flex w-full gap-4 lg:col-span-2 lg:flex-col">
+      <Card className="bg-blue-background flex w-full gap-4 lg:col-span-2 lg:flex-col">
         <CardHeader>
           <CardTitle>{t("progress-cards.title")}</CardTitle>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         {circleProgressCards.map((card) => (
           <CardContent key={card.title}>
-            <Card key={card.title} className="w-full flex-1">
+            <Card
+              key={card.title}
+              className="bg-blue-background w-full flex-1 dark:border-[#1A2441]"
+            >
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar
                   className="h-20 w-20"

@@ -69,7 +69,7 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
 
   return (
     <section>
-      <Card>
+      <Card className="bg-blue-background dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <CardTitle>{t("analysis-table-data.title")}</CardTitle>{" "}
@@ -104,7 +104,7 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
             </ToggleGroupItem>
           </ToggleGroup>
         </CardHeader>
-        <Separator />
+        <Separator className="dark:bg-[#1A2441]" />
         <CardContent className="grid gap-10 lg:grid-cols-2 lg:gap-3">
           <div>
             <h2 className="mb-4 font-bold">

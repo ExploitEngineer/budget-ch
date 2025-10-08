@@ -36,7 +36,7 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
-      <Card className="col-span-full">
+      <Card className="bg-blue-background col-span-full dark:border-[#1A2441]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <CardTitle>{t("title")}</CardTitle>{" "}
