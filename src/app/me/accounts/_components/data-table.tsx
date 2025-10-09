@@ -10,6 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import NewAccountDialog from "./new-account-dialog";
 
 interface TableData {
   name: string;
@@ -84,12 +85,7 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
                   <TableCell>{data.iban}</TableCell>
                   <TableCell>{data.balance}</TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      className="dark:border-border-blue !bg-dark-blue-background cursor-pointer text-xs"
-                    >
-                      {data.action}
-                    </Button>
+                    <NewAccountDialog variant="outline" text={data.action} />
                   </TableCell>
                 </TableRow>
               ))}

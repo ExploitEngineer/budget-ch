@@ -30,7 +30,13 @@ import { useTranslations } from "next-intl";
 import { BudgetDialogSchema, BudgetDialogValues } from "@/lib/validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function BudgetDialog() {
+export default function BudgetDialog({
+  variant = "gradient",
+  text,
+}: {
+  variant?: "gradient" | "outline";
+  text?: string;
+}) {
   const t = useTranslations(
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
@@ -54,11 +60,23 @@ export default function BudgetDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="btn-gradient flex items-center gap-2 dark:text-white"
-          variant="default"
+          className={
+            variant === "gradient"
+              ? "btn-gradient flex items-center gap-2 dark:text-white"
+              : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+          }
+          variant={variant === "gradient" ? "default" : "outline"}
         >
-          <Plus className="h-5 w-5" />
-          <span className="text-sm">{t("title")}</span>
+          <span className="text-sm">
+            {variant === "gradient" ? (
+              <div className="flex items-center gap-2">
+                <Plus className="h-5 w-5" />
+                {t("title")}
+              </div>
+            ) : (
+              text
+            )}
+          </span>
         </Button>
       </DialogTrigger>
 

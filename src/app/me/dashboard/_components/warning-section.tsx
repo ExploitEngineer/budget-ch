@@ -12,6 +12,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
+import DashboardTableAdjustDialog from "./dashboard-table-dialog";
 
 interface UpComingTables {
   name: string;
@@ -78,12 +79,7 @@ export function WarningSection({
                     <TableCell>{data.account}</TableCell>
                     <TableCell>{data.amount}</TableCell>
                     <TableCell>
-                      <Button
-                        variant="outline"
-                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer text-xs"
-                      >
-                        {t("upcoming-cards.table-data.button")}
-                      </Button>
+                      <DashboardTableAdjustDialog />
                     </TableCell>
                   </TableRow>
                 ))}

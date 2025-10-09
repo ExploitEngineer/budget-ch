@@ -105,7 +105,7 @@ export default function DashBoardDialog() {
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {field.value
                               ? format(field.value, "PPP")
-                              : "Pick a date"}
+                              : "mm/dd/yyy"}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent>

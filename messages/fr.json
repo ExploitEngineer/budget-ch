@@ -104,6 +104,33 @@
                     "post": "Valider"
                 }
             },
+            "dashbaord-table-adjust-dialog": {
+                "button": "Ajuster",
+                "dialog": {
+                    "title": "Ajuster le paiement récurrent",
+                    "close": "Fermer",
+                    "labels": {
+                        "date": "Date",
+                        "account": "Compte",
+                        "name": "Nom",
+                        "amount": "Montant (CHF)"
+                    },
+                    "placeholders": {
+                        "date": "25/09/2025",
+                        "account": "Choisir un compte",
+                        "name": "Saisir le nom"
+                    },
+                    "options": {
+                        "giro": "Compte courant",
+                        "credit-card": "Carte de crédit",
+                        "sparen": "Compte épargne"
+                    },
+                    "buttons": {
+                        "delete": "Supprimer",
+                        "save": "Enregistrer"
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Budget total (Mois)",
@@ -165,6 +192,7 @@
             },
             "upcoming-cards": {
                 "title": "Échéances à venir (Répétitif)",
+                "last-transaction": "Dernières transactions",
                 "button": "Prochains 14 jours",
                 "table-data": {
                     "table-heading": {
@@ -266,6 +294,52 @@
             }
         },
         "transactions-page": {
+            "transaction-edit-dialog": {
+                "title-1": "Modifier",
+                "title-2": "Nouvelle transaction",
+                "dialog": {
+                    "title": "Modifier la transaction",
+                    "close": "Fermer",
+                    "labels": {
+                        "date": "Date",
+                        "account": "Compte",
+                        "recipient": "Bénéficiaire / Source",
+                        "category": "Catégorie",
+                        "amount": "Montant (CHF)",
+                        "note": "Remarque",
+                        "file": "Reçus (PDF/JPG/PNG)",
+                        "splitSum": "Diviser la transaction"
+                    },
+                    "placeholders": {
+                        "date": "21/09/2025",
+                        "account": "Choisir un compte",
+                        "recipient": "Saisir le bénéficiaire",
+                        "category": "Choisir une catégorie",
+                        "note": "Saisir une remarque",
+                        "note-optional": "Remarque (optionnelle)"
+                    },
+                    "options": {
+                        "giro": "Compte courant",
+                        "credit-card": "Carte de crédit",
+                        "sparen": "Compte épargne",
+                        "bar": "Espèces",
+                        "lebensmittel": "Courses",
+                        "restaurant": "Restaurant & Café",
+                        "oev": "Transports publics & mobilité",
+                        "haushalt": "Ménage",
+                        "einnahmen": "Revenus"
+                    },
+                    "badges": {
+                        "row": "Ligne",
+                        "splitTotal": "Total de la division : CHF 0.00"
+                    },
+                    "buttons": {
+                        "demo": "OCR (Démo)",
+                        "delete": "Supprimer",
+                        "save": "Enregistrer"
+                    }
+                }
+            },
             "labels": {
                 "from": "De",
                 "to": "À",

@@ -36,7 +36,7 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
     {
       title: t("analysis-table-data.exp-by-cat.progress.rent"),
       amount: "CHF 1’920.00",
-      value: 100,
+      value: 70,
     },
     {
       title: t("analysis-table-data.exp-by-cat.progress.transportation"),

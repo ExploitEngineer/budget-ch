@@ -46,7 +46,7 @@ export function useSavingGoalsData() {
       title: t("active-goals-section.cards.tax-reserves.header.title"),
       badgeValue: 65,
       button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 80,
+      progress: 60,
       accountBadge: t(
         "active-goals-section.cards.tax-reserves.content.account.save",
       ),

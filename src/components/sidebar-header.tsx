@@ -17,11 +17,12 @@ import {
 import DashBoardDialog from "./dialogs/dashboard-dialog";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import TransferDialog from "@/app/me/content/_components/transfer-dialog";
+import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
 import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
 import SavingsGoalMainDialog from "@/app/me/budgets/_components/saving-goals-main-dialog";
-import NewAccountDialog from "@/app/me/content/_components/content-dialog";
+import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
+import TransactionEditDialog from "@/app/me/transactions/_components/transactions-edit-dialog";
 
 const monthNames: string[] = [
   "January",
@@ -86,18 +87,20 @@ export default function SidebarHeader() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          {route === "dashboard" || route === "transactions" ? (
-            <DashBoardDialog />
-          ) : null}
+          {route === "dashboard" && <DashBoardDialog />}
+
+          {route === "transactions" && (
+            <TransactionEditDialog variant="gradient" />
+          )}
 
           {route === "budgets" && <BudgetDialog />}
 
           {route === "saving-goals" && <SavingsGoalMainDialog />}
 
-          {route === "content" && (
+          {route === "accounts" && (
             <>
               <TransferDialog />
-              <NewAccountDialog />
+              <NewAccountDialog variant="gradient" />
             </>
           )}
 

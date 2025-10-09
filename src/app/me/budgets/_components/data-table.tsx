@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
+import BudgetDialog from "./budget-dialog";
 
 interface TableData {
   category: string;
@@ -101,12 +102,7 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
                     <Progress value={data.value} />
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant="outline"
-                      className="!bg-dark-blue-background dark:border-border-blue cursor-pointer text-xs"
-                    >
-                      {data.action}
-                    </Button>
+                    <BudgetDialog variant="outline" text={data.action} />
                   </TableCell>
                 </TableRow>
               ))}

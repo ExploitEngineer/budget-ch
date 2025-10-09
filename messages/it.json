@@ -104,6 +104,33 @@
                     "post": "Registra"
                 }
             },
+            "dashbaord-table-adjust-dialog": {
+                "button": "Modifica",
+                "dialog": {
+                    "title": "Modifica pagamento ricorrente",
+                    "close": "Chiudi",
+                    "labels": {
+                        "date": "Data",
+                        "account": "Conto",
+                        "name": "Nome",
+                        "amount": "Importo (CHF)"
+                    },
+                    "placeholders": {
+                        "date": "25/09/2025",
+                        "account": "Scegli un conto",
+                        "name": "Inserisci nome"
+                    },
+                    "options": {
+                        "giro": "Conto corrente",
+                        "credit-card": "Carta di credito",
+                        "sparen": "Conto risparmio"
+                    },
+                    "buttons": {
+                        "delete": "Elimina",
+                        "save": "Salva"
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Budget totale (Mese)",
@@ -165,6 +192,7 @@
             },
             "upcoming-cards": {
                 "title": "Scadenze imminenti (Ricorrenti)",
+                "last-transaction": "Ultime transazioni",
                 "button": "Prossimi 14 giorni",
                 "table-data": {
                     "table-heading": {
@@ -266,6 +294,52 @@
             }
         },
         "transactions-page": {
+            "transaction-edit-dialog": {
+                "title-1": "Modifica",
+                "title-2": "Nuova transazione",
+                "dialog": {
+                    "title": "Modifica transazione",
+                    "close": "Chiudi",
+                    "labels": {
+                        "date": "Data",
+                        "account": "Conto",
+                        "recipient": "Destinatario / Fonte",
+                        "category": "Categoria",
+                        "amount": "Importo (CHF)",
+                        "note": "Nota",
+                        "file": "Ricevute (PDF/JPG/PNG)",
+                        "splitSum": "Dividi transazione"
+                    },
+                    "placeholders": {
+                        "date": "21/09/2025",
+                        "account": "Scegli un conto",
+                        "recipient": "Inserisci destinatario",
+                        "category": "Scegli una categoria",
+                        "note": "Inserisci una nota",
+                        "note-optional": "Nota (facoltativa)"
+                    },
+                    "options": {
+                        "giro": "Conto corrente",
+                        "credit-card": "Carta di credito",
+                        "sparen": "Conto risparmio",
+                        "bar": "Contanti",
+                        "lebensmittel": "Spesa",
+                        "restaurant": "Ristorante & Caffè",
+                        "oev": "Trasporto pubblico & mobilità",
+                        "haushalt": "Casa",
+                        "einnahmen": "Entrate"
+                    },
+                    "badges": {
+                        "row": "Riga",
+                        "splitTotal": "Totale divisione: CHF 0.00"
+                    },
+                    "buttons": {
+                        "demo": "OCR (Demo)",
+                        "delete": "Elimina",
+                        "save": "Salva"
+                    }
+                }
+            },
             "labels": {
                 "from": "Da",
                 "to": "A",
