@@ -89,7 +89,11 @@ export function DataTable({ transactions }: DataTableProps) {
       id: "action",
       header: t("data-table.headings.action"),
       cell: () => (
-        <Button className="cursor-pointer" size="sm" variant="outline">
+        <Button
+          className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+          size="sm"
+          variant="outline"
+        >
           {t("data-table.action")}
         </Button>
       ),
@@ -112,12 +116,12 @@ export function DataTable({ transactions }: DataTableProps) {
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
-      <Card className="bg-blue-background col-span-full dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue col-span-full">
         <CardHeader className="flex flex-col flex-wrap items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <Badge
               variant="outline"
-              className="cursor-pointer rounded-full px-3 py-2"
+              className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
               asChild
             >
               <label className="flex items-center gap-2">
@@ -131,22 +135,37 @@ export function DataTable({ transactions }: DataTableProps) {
                 <span>{t("data-table.header.checkbox")}</span>
               </label>
             </Badge>
-            <Button variant="outline" className="cursor-pointer">
+            <Button
+              variant="outline"
+              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+            >
               {t("data-table.header.buttons.delete")}
             </Button>
-            <Button variant="outline" className="cursor-pointer">
+            <Button
+              variant="outline"
+              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+            >
               {t("data-table.header.buttons.category")}
             </Button>
-            <Button variant="outline" className="cursor-pointer">
+            <Button
+              variant="outline"
+              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+            >
               {t("data-table.header.buttons.export")} CSV
             </Button>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="outline" className="rounded-full px-3 py-2">
+            <Badge
+              variant="outline"
+              className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+            >
               {t("data-table.header.badge")}{" "}
               <span className="font-bold">CHF 4’443.90</span>
             </Badge>
-            <Button variant="outline" className="cursor-pointer">
+            <Button
+              variant="outline"
+              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+            >
               {t("data-table.header.buttons.update")}
             </Button>
           </div>
@@ -156,9 +175,15 @@ export function DataTable({ transactions }: DataTableProps) {
           <Table className="min-w-[800px] overflow-x-auto">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
+                <TableRow
+                  className="dark:border-border-blue"
+                  key={headerGroup.id}
+                >
                   {headerGroup.headers.map((header) => (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      className="font-bold text-gray-500 dark:text-gray-400/80"
+                      key={header.id}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -175,6 +200,7 @@ export function DataTable({ transactions }: DataTableProps) {
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
+                    className="dark:border-border-blue"
                     data-state={row.getIsSelected() ? "selected" : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (
@@ -210,6 +236,7 @@ export function DataTable({ transactions }: DataTableProps) {
             <Button
               variant="outline"
               size="sm"
+              className="dark:border-border-blue !bg-dark-blue-background/80"
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
@@ -218,6 +245,7 @@ export function DataTable({ transactions }: DataTableProps) {
             <Button
               variant="outline"
               size="sm"
+              className="dark:border-border-blue !bg-dark-blue-background"
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >

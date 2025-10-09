@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
 import { AppearanceValues, appearanceSchema } from "@/lib/validations";
 import { useTranslations } from "next-intl";
 
@@ -42,11 +41,11 @@ export function LocalizationAppearance() {
   };
 
   return (
-    <Card className="bg-blue-background dark:border-[#1A2441]">
+    <Card className="bg-blue-background dark:border-border-blue">
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
       </CardHeader>
-      <Separator className="dark:bg-[#1A2441]" />
+      <Separator className="dark:bg-border-blue" />
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -63,7 +62,7 @@ export function LocalizationAppearance() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                           <SelectValue
                             placeholder={t("labels.language.title")}
                           />
@@ -91,7 +90,7 @@ export function LocalizationAppearance() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                           <SelectValue
                             placeholder={t("labels.currency.title")}
                           />
@@ -118,7 +117,7 @@ export function LocalizationAppearance() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                           <SelectValue placeholder={t("labels.theme.title")} />
                         </SelectTrigger>
                         <SelectContent>
@@ -149,7 +148,7 @@ export function LocalizationAppearance() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                           <SelectValue
                             placeholder={t("labels.first-day.title")}
                           />
@@ -175,7 +174,7 @@ export function LocalizationAppearance() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                           <SelectValue
                             placeholder={t("labels.density.title")}
                           />
@@ -201,7 +200,7 @@ export function LocalizationAppearance() {
                         value={field.value}
                         onValueChange={field.onChange}
                       >
-                        <SelectTrigger className="w-full">
+                        <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                           <SelectValue
                             placeholder={t("labels.rounding.title")}
                           />
@@ -215,13 +214,6 @@ export function LocalizationAppearance() {
                   </FormItem>
                 )}
               />
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex justify-end">
-              <Button variant="outline" type="submit">
-                Save Changes
-              </Button>
             </div>
           </form>
         </Form>

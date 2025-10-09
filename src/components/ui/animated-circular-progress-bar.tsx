@@ -13,7 +13,7 @@ export function AnimatedCircularProgressBar({
   value = 0,
   className,
 }: AnimatedCircularProgressBarProps) {
-  const radius = 40;
+  const radius = 38;
   const circumference = 2 * Math.PI * radius;
   const percentPx = circumference / 100;
   const currentPercent = Math.round(((value - min) / (max - min)) * 100);
@@ -60,8 +60,8 @@ export function AnimatedCircularProgressBar({
             cx="50"
             cy="50"
             r={radius}
-            strokeWidth="20"
-            className="stroke-neutral-300 dark:stroke-neutral-700/40"
+            strokeWidth="23"
+            className="stroke-neutral-300 dark:stroke-[#1A2441]"
             strokeLinecap="round"
             strokeLinejoin="round"
             style={
@@ -84,7 +84,7 @@ export function AnimatedCircularProgressBar({
           cx="50"
           cy="50"
           r={radius}
-          strokeWidth="20"
+          strokeWidth="23"
           stroke="url(#progress-gradient)"
           strokeLinecap="round"
           strokeLinejoin="round"

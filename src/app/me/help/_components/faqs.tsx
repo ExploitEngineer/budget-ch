@@ -19,29 +19,33 @@ export function FAQs({ FAQs }: FAQsProps) {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
           <Input
             type="text"
-            className="w-[25%] md:w-[40%] lg:w-[30%]"
+            className="dark:border-border-blue !bg-dark-blue-background w-[25%] md:w-[40%] lg:w-[30%]"
             placeholder="Search FAQs…"
           />
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Accordion
             type="single"
             collapsible
-            className="w-full rounded-lg border p-2 px-4"
+            className="dark:border-border-blue !bg-dark-blue-background w-full rounded-lg border p-2 px-4"
             defaultValue="item-1"
           >
             {FAQs.map((faq, idx: number) => (
-              <AccordionItem key={idx} value={idx.toString()}>
-                <AccordionTrigger className="!cursor-pointer">
+              <AccordionItem
+                className="!bg-dark-blue-background dark:border-border-blue"
+                key={idx}
+                value={idx.toString()}
+              >
+                <AccordionTrigger className="!bg-dark-blue-background dark:border-border-blue !cursor-pointer">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="flex flex-col gap-4 pe-2">
+                <AccordionContent className="!bg-dark-blue-background dark:border-border-blue flex flex-col gap-4 pe-2">
                   <p>{faq.answer}</p>
                 </AccordionContent>
               </AccordionItem>

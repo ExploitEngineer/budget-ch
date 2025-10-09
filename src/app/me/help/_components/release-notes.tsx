@@ -8,10 +8,13 @@ export function ReleaseNotes() {
   const lists: string[] = [t("list-1"), t("list-2")];
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
-          <Badge variant="outline" className="rounded-full px-3 py-2">
+          <Badge
+            variant="outline"
+            className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+          >
             {t("badge")}
           </Badge>
         </CardHeader>

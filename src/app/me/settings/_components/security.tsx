@@ -34,11 +34,11 @@ export function Security() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <div className="mb-5 grid grid-cols-2 gap-5">
             <div className="flex flex-col gap-6">
@@ -56,12 +56,12 @@ export function Security() {
                           value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger className="w-[40%] cursor-pointer">
+                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-[40%] cursor-pointer">
                             <SelectValue
                               placeholder={t("labels.two-factor.options.off")}
                             />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="!bg-dark-blue-background">
                             <SelectItem value="off">
                               {t("labels.two-factor.options.off")}
                             </SelectItem>
@@ -85,10 +85,16 @@ export function Security() {
               </p>
 
               <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                >
                   {t("labels.two-factor.buttons.show-backup-codes")}
                 </Button>
-                <Button variant="outline" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                >
                   {t("labels.two-factor.buttons.regenerate-backup-codes")}
                 </Button>
               </div>
@@ -99,10 +105,16 @@ export function Security() {
                 <FormLabel>{t("labels.password.title")}</FormLabel>
               </Form>
               <div className="flex flex-wrap items-center gap-2">
-                <Button variant="outline" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                >
                   {t("labels.password.buttons.change-password")}
                 </Button>
-                <Button variant="outline" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                >
                   {t("labels.password.buttons.reset-password")}
                 </Button>
               </div>

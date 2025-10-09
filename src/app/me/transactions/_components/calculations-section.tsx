@@ -51,7 +51,7 @@ export function CalculationSection() {
   return (
     <section>
       <FormProvider {...form}>
-        <Card className="bg-blue-background dark:border-[#1A2441]">
+        <Card className="bg-blue-background dark:border-border-blue">
           <CardContent>
             <Form {...form}>
               <div className="flex flex-col flex-wrap gap-4 md:flex-row">
@@ -66,7 +66,7 @@ export function CalculationSection() {
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              className="w-full justify-start"
+                              className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full justify-start"
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
@@ -99,7 +99,7 @@ export function CalculationSection() {
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              className="w-full justify-start"
+                              className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full justify-start"
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
@@ -132,7 +132,7 @@ export function CalculationSection() {
                           onValueChange={field.onChange}
                           value={field.value}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
                             <SelectValue
                               placeholder={t(
                                 "labels.account.data.current-account",
@@ -171,7 +171,7 @@ export function CalculationSection() {
                           onValueChange={field.onChange}
                           value={field.value}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
                             <SelectValue
                               placeholder={t("labels.category.data.categories")}
                             />
@@ -208,6 +208,7 @@ export function CalculationSection() {
                       <FormControl>
                         <Input
                           type="number"
+                          className="!bg-dark-blue-background dark:border-border-blue"
                           placeholder="0.00"
                           step={0.5}
                           {...field}
@@ -227,6 +228,7 @@ export function CalculationSection() {
                       <FormControl>
                         <Input
                           type="number"
+                          className="!bg-dark-blue-background dark:border-border-blue"
                           placeholder="0.00"
                           step={0.5}
                           {...field}
@@ -246,8 +248,9 @@ export function CalculationSection() {
                       <FormControl>
                         <Input
                           type="text"
-                          {...field}
+                          className="!bg-dark-blue-background dark:border-border-blue"
                           placeholder={t("labels.search.placeholder")}
+                          {...field}
                         />
                       </FormControl>
                       <FormMessage />
@@ -261,7 +264,7 @@ export function CalculationSection() {
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
-                className="cursor-pointer rounded-full px-3 py-2"
+                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
                 asChild
               >
                 <label className="flex items-center gap-2">
@@ -271,7 +274,7 @@ export function CalculationSection() {
               </Badge>
               <Badge
                 variant="outline"
-                className="cursor-pointer rounded-full px-3 py-2"
+                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
                 asChild
               >
                 <label className="flex items-center gap-2">
@@ -281,7 +284,7 @@ export function CalculationSection() {
               </Badge>
               <Badge
                 variant="outline"
-                className="cursor-pointer rounded-full px-3 py-2"
+                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
                 asChild
               >
                 <label className="flex items-center gap-2">
@@ -291,10 +294,16 @@ export function CalculationSection() {
               </Badge>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" className="cursor-pointer">
+              <Button
+                variant="outline"
+                className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+              >
                 {t("buttons.reset")}
               </Button>
-              <Button variant="outline" className="cursor-pointer">
+              <Button
+                variant="outline"
+                className="btn-gradient cursor-pointer border-transparent"
+              >
                 {t("buttons.apply")}
               </Button>
             </div>

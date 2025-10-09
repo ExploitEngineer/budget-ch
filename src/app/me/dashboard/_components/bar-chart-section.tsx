@@ -24,26 +24,26 @@ export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
         <CardHeader>
           <CardTitle>{t("progress-cards.title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         {circleProgressCards.map((card) => (
           <CardContent key={card.title}>
             <Card
               key={card.title}
-              className="bg-blue-background w-full flex-1 dark:border-[#1A2441]"
+              className="bg-blue-background dark:border-border-blue shadow-dark-blue-background w-full flex-1 py-4 shadow-2xl"
             >
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar
-                  className="h-20 w-20"
+                  className="h-16 w-16"
                   // Below two props don't exist in the component
                   // gaugePrimaryColor="gray"
                   // gaugeSecondaryColor="blue"
                   value={card.value}
                 />
-                <div className="flex flex-col gap-2">
-                  <CardTitle className="text-sm font-light">
+                <div className="flex flex-col">
+                  <CardTitle className="text-xs font-light uppercase">
                     {card.title}
                   </CardTitle>
-                  <p className="text-2xl font-bold">{card.value + "%"}</p>
+                  <p className="text-lg font-bold">{card.value + "%"}</p>
                 </div>
               </CardContent>
             </Card>

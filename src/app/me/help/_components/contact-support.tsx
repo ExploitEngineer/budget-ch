@@ -31,11 +31,11 @@ export function ContactSupport() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -46,7 +46,11 @@ export function ContactSupport() {
                   <FormItem>
                     <FormLabel>{t("subject.title")}</FormLabel>
                     <FormControl>
-                      <Input placeholder={t("subject.title")} {...field} />
+                      <Input
+                        className="dark:border-border-blue !bg-dark-blue-background"
+                        placeholder={t("subject.title")}
+                        {...field}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -59,6 +63,7 @@ export function ContactSupport() {
                     <FormLabel>{t("message.title")}</FormLabel>
                     <FormControl>
                       <Textarea
+                        className="dark:border-border-blue !bg-dark-blue-background"
                         placeholder={t("message.placeholder")}
                         {...field}
                       />
@@ -67,7 +72,11 @@ export function ContactSupport() {
                 )}
               />
               <div className="flex justify-end">
-                <Button variant="outline" type="submit">
+                <Button
+                  variant="outline"
+                  className="dark:border-border-blue !bg-dark-blue-background"
+                  type="submit"
+                >
                   {t("button")}
                 </Button>
               </div>

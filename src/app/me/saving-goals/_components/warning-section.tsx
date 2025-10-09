@@ -8,14 +8,22 @@ export function WarningSection() {
   const t = useTranslations("main-dashboard.saving-goals-page.warning-section");
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <Button variant="outline">{t("button")}</Button>
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+          >
+            {t("button")}
+          </Button>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
-          <Badge variant="outline" className="rounded-full px-3 py-2">
+          <Badge
+            variant="outline"
+            className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+          >
             {t("badge")}
           </Badge>
         </CardContent>

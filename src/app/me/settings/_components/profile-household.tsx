@@ -48,10 +48,13 @@ export function ProfileHousehold() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
-          <Badge variant="outline" className="rounded-full px-3 py-2">
+          <Badge
+            variant="outline"
+            className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
+          >
             {t("badge")}
           </Badge>
         </CardHeader>
@@ -69,6 +72,7 @@ export function ProfileHousehold() {
                       <FormLabel>{t("labels.name.title")}</FormLabel>
                       <FormControl>
                         <Input
+                          className="dark:border-border-blue !bg-dark-blue-background"
                           placeholder={t("labels.name.placeholder")}
                           {...field}
                         />
@@ -85,6 +89,7 @@ export function ProfileHousehold() {
                       <FormControl>
                         <Input
                           type="email"
+                          className="dark:border-border-blue !bg-dark-blue-background"
                           placeholder={t("email.placeholder")}
                           {...field}
                         />
@@ -107,7 +112,7 @@ export function ProfileHousehold() {
                           value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger className="w-full cursor-pointer">
+                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
                             <SelectValue
                               placeholder={t("household-size.single")}
                             />
@@ -137,7 +142,7 @@ export function ProfileHousehold() {
                           value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger className="w-full cursor-pointer">
+                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
                             <SelectValue
                               placeholder={t("subscription-local.plans.free")}
                             />
@@ -169,6 +174,7 @@ export function ProfileHousehold() {
                     <FormLabel>{t("address.title")}</FormLabel>
                     <FormControl>
                       <Input
+                        className="dark:border-border-blue !bg-dark-blue-background"
                         placeholder={t("address.placeholder")}
                         {...field}
                       />

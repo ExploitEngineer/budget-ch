@@ -106,22 +106,22 @@
             "cards": {
                 "card-1": {
                     "title": "Total Budget (Month)",
-                    "content": "4,703 Swiss Francs",
+                    "content": "CHF 4’703",
                     "badge": "Fixed + Variable • incl. CC & SERAFE"
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
-                    "content": "2,456 Swiss Francs",
+                    "content": "CHF 2’456",
                     "badge": "60% of the budget"
                 },
                 "card-3": {
                     "title": "Available",
-                    "content": "3,447 Swiss Francs",
+                    "content": "CHF 3’447",
                     "badge": "+40% Buffer"
                 },
                 "card-4": {
                     "title": "Forecast until 30/09/2025",
-                    "content": "4,980 Swiss Francs",
+                    "content": "CHF 4’980",
                     "badge": "incl. Recurring"
                 }
             },

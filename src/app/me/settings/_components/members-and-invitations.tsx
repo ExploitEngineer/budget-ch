@@ -55,14 +55,17 @@ export function MembersInvitations() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
-          <Badge variant="outline" className="rounded-full px-3 py-2">
+          <Badge
+            variant="outline"
+            className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+          >
             {t("badge")}
           </Badge>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Form {...form}>
             <form className="space-y-4">
@@ -77,6 +80,7 @@ export function MembersInvitations() {
                       <FormControl>
                         <Input
                           {...field}
+                          className="dark:border-border-blue !bg-dark-blue-background"
                           placeholder={t("labels.invite-email.placeholder")}
                         />
                       </FormControl>
@@ -97,14 +101,14 @@ export function MembersInvitations() {
                           value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
                             <SelectValue
                               placeholder={t(
                                 "labels.role.select-options.member",
                               )}
                             />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="!bg-dark-blue-background">
                             <SelectItem value="member">
                               {t("labels.role.select-options.member")}
                             </SelectItem>
@@ -125,7 +129,7 @@ export function MembersInvitations() {
                 <Button
                   variant="outline"
                   type="button"
-                  className="cursor-pointer"
+                  className="btn-gradient cursor-pointer"
                 >
                   {t("button")}
                 </Button>
@@ -133,12 +137,17 @@ export function MembersInvitations() {
             </form>
           </Form>
 
-          <div className="mt-8 overflow-x-auto rounded-lg border px-2 py-4 dark:border-[#1A2441]">
+          <div className="dark:border-border-blue mt-8 overflow-x-auto rounded-lg border px-2 py-4">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="dark:border-border-blue">
                   {tableHeadings.map((heading) => (
-                    <TableHead key={heading}>{heading}</TableHead>
+                    <TableHead
+                      className="font-bold text-gray-500 dark:text-gray-400/80"
+                      key={heading}
+                    >
+                      {heading}
+                    </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>

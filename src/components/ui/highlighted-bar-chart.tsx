@@ -50,13 +50,16 @@ export function HighlightedBarChart() {
         </div>
         <Separator className="my-2 dark:bg-[#1A2441]" />
       </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
+      <CardContent className="flex justify-center">
+        <ChartContainer
+          className="w-full xl:h-[360px] xl:w-[80%]"
+          config={chartConfig}
+        >
           <BarChart
             accessibilityLayer
             data={chartData}
             onMouseLeave={() => setActiveIndex(null)}
-            barSize={50}
+            barSize={80}
           >
             <defs>
               <linearGradient id="bar-gradient" x1="0" y1="0" x2="0" y2="1">
@@ -69,9 +72,11 @@ export function HighlightedBarChart() {
               ticks={[0, 300, 600, 900]}
               domain={[0, 900]}
               tickFormatter={(value) => `CHF ${value.toLocaleString("de-CH")}`}
-              axisLine={false}
-              tickLine={false}
+              axisLine={true}
+              tickLine={true}
               width={60}
+              tickMargin={14}
+              className="flex items-center"
               tick={{ fill: "oklch(0.4 0 0)", fontSize: 12 }}
               style={{ userSelect: "none" }}
             />

@@ -68,11 +68,11 @@ export function DataPrivacy() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -93,12 +93,12 @@ export function DataPrivacy() {
                             value={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="w-full cursor-pointer">
+                            <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
                               <SelectValue
                                 placeholder={t("labels.anonymous.options.off")}
                               />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="!bg-dark-blue-background">
                               <SelectItem value="on">
                                 {t("labels.anonymous.options.on")}
                               </SelectItem>
@@ -117,13 +117,22 @@ export function DataPrivacy() {
                   <div className="flex flex-col gap-2">
                     <h3 className="text-sm">{t("labels.data-export.title")}</h3>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Button variant="outline">
+                      <Button
+                        variant="outline"
+                        className="dark:border-border-blue !bg-dark-blue-background"
+                      >
                         {t("labels.data-export.buttons.json")}
                       </Button>
-                      <Button variant="destructive">
+                      <Button
+                        variant="outline"
+                        className="!bg-[#F59E0B] text-white"
+                      >
                         {t("labels.data-export.buttons.local-data")}
                       </Button>
-                      <Button variant="secondary">
+                      <Button
+                        variant="outline"
+                        className="!bg-[#EF4444] text-white"
+                      >
                         {t("labels.data-export.buttons.delete-account")}
                       </Button>
                     </div>
@@ -146,14 +155,14 @@ export function DataPrivacy() {
                             value={field.value}
                             onValueChange={field.onChange}
                           >
-                            <SelectTrigger className="w-full cursor-pointer">
+                            <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
                               <SelectValue
                                 placeholder={t(
                                   "labels.retention.options.delete-im",
                                 )}
                               />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="!dark:bg-dark-blue-background">
                               <SelectItem value="delete-im">
                                 {t("labels.retention.options.delete-im")}
                               </SelectItem>

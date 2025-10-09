@@ -66,12 +66,12 @@ export default function SidebarHeader() {
         />
 
         <div className="flex w-full flex-col items-center gap-4 lg:flex-row">
-          <div className="bg-blue-background relative w-full flex-1">
+          <div className="relative w-full flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               type="search"
               placeholder={t("sidebar.header.search")}
-              className="rounded-lg py-5 pr-3 pl-9"
+              className="!bg-blue-background dark:border-border-blue rounded-lg py-5 pr-3 pl-9"
             />
           </div>
 
@@ -96,8 +96,8 @@ export default function SidebarHeader() {
 
           {route === "content" && (
             <>
-              <NewAccountDialog />
               <TransferDialog />
+              <NewAccountDialog />
             </>
           )}
 
@@ -105,7 +105,7 @@ export default function SidebarHeader() {
             <>
               <Button
                 variant="outline"
-                className="flex cursor-pointer items-center justify-center gap-2"
+                className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center justify-center gap-2"
               >
                 <Download />
                 <span>{t("export")}</span>
@@ -117,7 +117,7 @@ export default function SidebarHeader() {
             <>
               <Button
                 variant="outline"
-                className="flex cursor-pointer items-center justify-center gap-2"
+                className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center justify-center gap-2"
               >
                 <Download />
                 <span>{t("export-json")}</span>
@@ -133,7 +133,7 @@ export default function SidebarHeader() {
             <>
               <Button
                 variant="outline"
-                className="flex cursor-pointer items-center justify-center gap-2"
+                className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center justify-center gap-2"
               >
                 <Download />
                 <span>{t("export")}</span>
@@ -149,7 +149,7 @@ export default function SidebarHeader() {
             <>
               <Button
                 variant="outline"
-                className="flex cursor-pointer items-center justify-center gap-2"
+                className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center justify-center gap-2"
               >
                 <Download />
                 <span>{t("diagnose")}</span>

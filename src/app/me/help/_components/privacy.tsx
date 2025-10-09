@@ -6,11 +6,11 @@ export function Privacy() {
   const t = useTranslations("main-dashboard.help-page.privary-section");
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <p className="opacity-60">{t("content")}</p>
         </CardContent>

@@ -19,18 +19,28 @@ export function LatestTransfers() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <Button variant="outline">{t("button")}</Button>
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+          >
+            {t("button")}
+          </Button>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent className="flex flex-wrap items-center gap-2">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="dark:border-border-blue">
                 {tableHeadings.map((heading) => (
-                  <TableHead key={heading}>{heading}</TableHead>
+                  <TableHead
+                    className="font-bold text-gray-500 dark:text-gray-400/80"
+                    key={heading}
+                  >
+                    {heading}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>

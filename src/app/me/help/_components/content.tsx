@@ -14,8 +14,8 @@ export function Content() {
   ];
 
   return (
-    <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+    <section className="h-full">
+      <Card className="bg-blue-background dark:border-border-blue h-full">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>

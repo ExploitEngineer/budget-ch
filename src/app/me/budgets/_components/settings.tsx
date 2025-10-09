@@ -11,10 +11,13 @@ export function Settings() {
   );
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <Button variant="outline" className="cursor-pointer">
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+          >
             {t("button")}
           </Button>
         </CardHeader>
@@ -22,7 +25,7 @@ export function Settings() {
         <CardContent className="flex flex-wrap items-center gap-2">
           <Badge
             variant="outline"
-            className="cursor-pointer rounded-full px-3 py-2"
+            className="dark:border-border-blue bg-badge-background cursor-pointer rounded-full px-3 py-2"
             asChild
           >
             <label className="flex items-center gap-2">
@@ -32,7 +35,7 @@ export function Settings() {
           </Badge>
           <Badge
             variant="outline"
-            className="cursor-pointer rounded-full px-3 py-2"
+            className="dark:border-border-blue bg-badge-background cursor-pointer rounded-full px-3 py-2"
             asChild
           >
             <label className="flex items-center gap-2">

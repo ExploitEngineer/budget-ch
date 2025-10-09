@@ -46,11 +46,11 @@ export function Notifications() {
   ];
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <div className="mb-5 grid grid-cols-2 gap-5">
             <div>
@@ -62,7 +62,7 @@ export function Notifications() {
                   <Badge
                     key={badge}
                     variant="outline"
-                    className="rounded-full px-3 py-2"
+                    className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
                   >
                     {badge}
                   </Badge>
@@ -78,7 +78,7 @@ export function Notifications() {
                   <Badge
                     key={badge}
                     variant="outline"
-                    className="rounded-full px-3 py-2"
+                    className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
                   >
                     {badge}
                   </Badge>
@@ -98,12 +98,12 @@ export function Notifications() {
                   </FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="w-full cursor-pointer">
+                      <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
                         <SelectValue
                           placeholder={t("labels.monthly-report.options.off")}
                         />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="!bg-dark-blue-background">
                         <SelectItem value="off">
                           {t("labels.monthly-report.options.off")}
                         </SelectItem>

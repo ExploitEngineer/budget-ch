@@ -24,7 +24,7 @@ export function BudgetCardsSection({ cards }: BudgetCardsSectionProps) {
       {cards.map((card, idx) => (
         <Card
           key={card.title}
-          className="bg-blue-background flex flex-col gap-0 rounded-xl dark:border-[#1A2441]"
+          className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
         >
           <CardHeader>
             <CardTitle className="text-sm font-light">{card.title}</CardTitle>
@@ -36,7 +36,7 @@ export function BudgetCardsSection({ cards }: BudgetCardsSectionProps) {
             <Badge
               variant="outline"
               className={cn(
-                "rounded-full px-4 py-2",
+                "bg-badge-background rounded-full px-2 py-1 whitespace-pre-wrap",
                 idx === 1 && "border-[#996E41]",
                 idx === 2 && "border-[#308BA4]",
               )}

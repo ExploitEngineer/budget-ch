@@ -69,18 +69,21 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between">
           <div className="flex flex-wrap items-center gap-2">
             <CardTitle>{t("analysis-table-data.title")}</CardTitle>{" "}
             <Badge
-              className="rounded-full px-3 py-2 whitespace-pre-wrap"
+              className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2 whitespace-pre-wrap"
               variant="outline"
             >
               {t("analysis-table-data.badge")}
             </Badge>
           </div>
-          <ToggleGroup className="border" type="single">
+          <ToggleGroup
+            className="dark:border-border-blue bg-dark-blue-background border"
+            type="single"
+          >
             <ToggleGroupItem
               className="px-3"
               value="month"
@@ -126,15 +129,23 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
             <h2 className="mb-4 font-bold">{t("income-exp.title")}</h2>
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="dark:border-border-blue">
                   {tableHeadings.map((heading) => (
-                    <TableHead key={heading}>{heading}</TableHead>
+                    <TableHead
+                      className="font-bold text-gray-500 dark:text-gray-400/80"
+                      key={heading}
+                    >
+                      {heading}
+                    </TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tableData.map((data) => (
-                  <TableRow key={data.month}>
+                  <TableRow
+                    className="dark:border-border-blue"
+                    key={data.month}
+                  >
                     <TableCell>{data.month}</TableCell>
                     <TableCell>{data.income}</TableCell>
                     <TableCell>{data.expenses}</TableCell>

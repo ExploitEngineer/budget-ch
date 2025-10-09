@@ -24,21 +24,24 @@ export function Import() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
-          <Badge variant="outline" className="rounded-full px-3 py-2">
+          <Badge
+            variant="outline"
+            className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+          >
             {t("badge")}
           </Badge>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <div className="flex items-center justify-between gap-2">
             <Select>
-              <SelectTrigger className="w-full cursor-pointer">
+              <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue w-full cursor-pointer">
                 <SelectValue placeholder="Choose" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-dark-blue-background">
                 <SelectItem value="groceries">
                   {t("data-type.transactions")}
                 </SelectItem>
@@ -60,10 +63,10 @@ export function Import() {
               </SelectContent>
             </Select>
             <Select>
-              <SelectTrigger className="w-full cursor-pointer">
+              <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue w-full cursor-pointer">
                 <SelectValue placeholder="Choose" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-dark-blue-background">
                 <SelectItem value="income">{t("modes.append")}</SelectItem>
                 <SelectItem value="income">
                   {t("modes.replace-existing")}
@@ -73,7 +76,7 @@ export function Import() {
           </div>
           <div
             onClick={handleFileClick}
-            className="mt-6 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-8"
+            className="bg-dark-blue-background mt-6 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed px-6 py-8"
           >
             <h3 className="text-center text-lg font-semibold">{t("input")}</h3>
             <p className="mt-2 text-center text-sm text-gray-500">

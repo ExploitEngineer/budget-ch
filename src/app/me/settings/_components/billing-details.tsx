@@ -42,11 +42,11 @@ export function BillingDetails() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
           <CardTitle>{t("title")}</CardTitle>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -59,6 +59,7 @@ export function BillingDetails() {
                       <FormLabel>{t("labels.billing-name.title")}</FormLabel>
                       <FormControl>
                         <Input
+                          className="dark:border-border-blue !bg-dark-blue-background"
                           placeholder={t("labels.billing-name.placeholder")}
                           {...field}
                         />
@@ -75,6 +76,7 @@ export function BillingDetails() {
                       <FormLabel>{t("labels.vat-no.title")}</FormLabel>
                       <FormControl>
                         <Input
+                          className="dark:border-border-blue !bg-dark-blue-background"
                           placeholder={t("labels.vat-no.placeholder")}
                           {...field}
                         />
@@ -85,13 +87,16 @@ export function BillingDetails() {
               </div>
 
               <div className="flex flex-wrap justify-end gap-2">
-                <Button variant="secondary" className="cursor-pointer">
+                <Button
+                  variant="outline"
+                  className="dark:border-border-blue !bg-dark-blue-background"
+                >
                   {t("buttons.test-invoice")}
                 </Button>
                 <Button
                   variant="outline"
                   type="submit"
-                  className="cursor-pointer"
+                  className="btn-gradient cursor-pointer"
                 >
                   {t("buttons.save-payment")}
                 </Button>

@@ -24,7 +24,7 @@ export function ContentCardsSection({ cards }: ContentCardsSectionProps) {
       {cards.map((card, idx) => (
         <Card
           key={card.title}
-          className="bg-blue-background flex flex-col gap-0 rounded-xl dark:border-[#1A2441]"
+          className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
         >
           <CardHeader>
             <CardTitle className="text-sm font-light">{card.title}</CardTitle>
@@ -36,9 +36,12 @@ export function ContentCardsSection({ cards }: ContentCardsSectionProps) {
             <Badge
               variant="outline"
               className={cn(
-                "rounded-full px-4 py-2",
-                idx === 2 && "border-[#308BA4]",
-                idx === 3 && "border-[#9A4249]",
+                "bg-badge-background rounded-full px-4 py-2",
+                idx === 2
+                  ? "border-[#308BA4]"
+                  : idx === 3
+                    ? "border-[#9A4249]"
+                    : "dark:border-border-blue",
               )}
             >
               <p className="w-full text-xs">{card.badge}</p>

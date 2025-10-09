@@ -25,32 +25,41 @@ export function DetailedTable({
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>{" "}
           <div className="flex items-center gap-2">
-            <Button variant="outline">{t("buttons.categories-csv")}</Button>
-            <Button variant="outline">{t("buttons.trend-csv")}</Button>
+            <Button variant="outline" className="!bg-dark-blue-background">
+              {t("buttons.categories-csv")}
+            </Button>
+            <Button variant="outline" className="!bg-dark-blue-background">
+              {t("buttons.trend-csv")}
+            </Button>
           </div>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="dark:border-border-blue">
                 {tableHeadings.map((heading) => (
-                  <TableHead key={heading}>{heading}</TableHead>
+                  <TableHead
+                    className="font-bold text-gray-500 dark:text-gray-400/80"
+                    key={heading}
+                  >
+                    {heading}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {detailedTableData.map((data, idx: number) => (
-                <TableRow key={idx}>
+                <TableRow className="dark:border-border-blue" key={idx}>
                   <TableCell>{data}</TableCell>
                   <TableCell>CHF 1’920.00</TableCell>
                 </TableRow>
               ))}
-              <TableRow>
+              <TableRow className="dark:border-border-blue">
                 <TableCell className="font-bold opacity-60">
                   {t("data-table.data.total")}
                 </TableCell>

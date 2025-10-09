@@ -36,19 +36,28 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
-      <Card className="bg-blue-background col-span-full dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue col-span-full">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <CardTitle>{t("title")}</CardTitle>{" "}
-            <Badge className="rounded-full px-3 py-2" variant="outline">
+            <Badge
+              className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+              variant="outline"
+            >
               {t("badge")}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" className="cursor-pointer">
+            <Button
+              variant="outline"
+              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+            >
               {t("buttons.export")}
             </Button>
-            <Button variant="outline" className="cursor-pointer">
+            <Button
+              variant="outline"
+              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+            >
               {t("buttons.reset")}
             </Button>
           </div>
@@ -56,15 +65,20 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
         <CardContent className="overflow-x-auto">
           <Table className="min-w-[620px]">
             <TableHeader>
-              <TableRow>
+              <TableRow className="dark:border-border-blue">
                 {budgetDataTableHeadings.map((heading) => (
-                  <TableHead key={heading}>{heading}</TableHead>
+                  <TableHead
+                    className="font-bold text-gray-500 dark:text-gray-400/80"
+                    key={heading}
+                  >
+                    {heading}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {tableData.map((data) => (
-                <TableRow key={data.name}>
+                <TableRow className="dark:border-border-blue" key={data.name}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell>{data.type}</TableCell>
                   <TableCell>{data.iban}</TableCell>
@@ -72,7 +86,7 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
                   <TableCell>
                     <Button
                       variant="outline"
-                      className="cursor-pointer text-xs"
+                      className="dark:border-border-blue !bg-dark-blue-background cursor-pointer text-xs"
                     >
                       {data.action}
                     </Button>

@@ -59,8 +59,8 @@ export default function TransferDialog() {
     <Dialog>
       <DialogTrigger className="min-w-40 cursor-pointer" asChild>
         <Button
-          className="btn-gradient flex items-center gap-2 dark:text-white"
-          variant="default"
+          className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2 dark:text-white"
+          variant="outline"
         >
           <MoveHorizontal className="h-5 w-5" />
           <span className="text-sm">{t("button")}</span>

@@ -23,7 +23,7 @@ export function ReportCardsSection({ cards }: ReportCardsProps) {
       {cards.map((card) => (
         <Card
           key={card.title}
-          className="bg-blue-background flex flex-col gap-0 rounded-xl dark:border-[#1A2441]"
+          className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
         >
           <CardHeader>
             <CardTitle className="text-sm font-light">{card.title}</CardTitle>
@@ -32,7 +32,10 @@ export function ReportCardsSection({ cards }: ReportCardsProps) {
             <h1 className="text-2xl font-bold">{card.content}</h1>
           </CardContent>
           <CardFooter className="mt-2">
-            <Badge variant="outline" className="rounded-full px-4 py-2">
+            <Badge
+              variant="outline"
+              className="bg-badge-background dark:border-border-blue rounded-full px-4 py-2"
+            >
               <p className="w-full text-xs">{card.badge}</p>
             </Badge>
           </CardFooter>

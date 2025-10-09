@@ -93,7 +93,7 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-sm font-bold">
+      <SidebarGroupLabel className="text-xs font-bold text-[#8C98B2]">
         {t("sidebar.title")}
       </SidebarGroupLabel>
       <SidebarMenu className={cn(open ? "flex" : "")}>
@@ -104,7 +104,7 @@ export function NavMain() {
                 <SidebarMenuButton
                   className={cn(
                     open
-                      ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-6 ring-0 transition-all duration-300 hover:border-blue-600 focus:ring-0 hover:focus:ring-0 dark:hover:border-[#2B365C] hover:dark:bg-[#141B2C]"
+                      ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-5 ring-0 transition-all duration-300 hover:border-blue-600 focus:ring-0 hover:focus:ring-0 dark:hover:border-[#2B365C] hover:dark:bg-[#141B2C]"
                       : "",
                     pathname === item.url &&
                       "border-blue-600 bg-gray-100 dark:border-[#2B365C] dark:bg-[#141A2C]",

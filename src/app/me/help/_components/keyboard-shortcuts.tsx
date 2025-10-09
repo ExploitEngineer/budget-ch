@@ -22,14 +22,17 @@ export function KeyboardShortcuts() {
 
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
-          <Badge variant="outline" className="rounded-full px-3 py-2">
+          <Badge
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue rounded-full px-3 py-2"
+          >
             {t("badge")}
           </Badge>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent>
           <ul className="list-disc ps-4">
             {shortcuts.map((key, idx: number) => (

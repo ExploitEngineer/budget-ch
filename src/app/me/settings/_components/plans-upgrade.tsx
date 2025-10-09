@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import { usePlansData } from "./data";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function PlansUpgrade() {
   const t = useTranslations(
@@ -21,11 +22,11 @@ export function PlansUpgrade() {
 
   return (
     <section className="space-y-4">
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
           <ToggleGroup
-            className="inline-flex flex-none items-center gap-1 rounded-lg border"
+            className="bg-dark-blue-background dark:border-border-blue inline-flex flex-none items-center gap-1 rounded-lg border"
             type="single"
             aria-label="view"
           >
@@ -50,12 +51,12 @@ export function PlansUpgrade() {
             </ToggleGroupItem>
           </ToggleGroup>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {cards.map((card, idx) => (
             <Card
               key={idx}
-              className="bg-blue-background flex flex-col justify-between gap-3 dark:border-[#1A2441]"
+              className="bg-blue-background dark:border-border-blue flex flex-col justify-between gap-3"
             >
               <CardHeader className="mb-5 flex flex-wrap items-center justify-between gap-2">
                 <CardTitle>{card.title}</CardTitle>
@@ -75,13 +76,25 @@ export function PlansUpgrade() {
                 </ul>
               </CardContent>
               <CardFooter className="flex justify-end">
-                <Button variant="outline">{card.button}</Button>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    idx === 0
+                      ? "!bg-dark-blue-background dark:border-border-blue"
+                      : "btn-gradient",
+                  )}
+                >
+                  {card.button}
+                </Button>
               </CardFooter>
             </Card>
           ))}
         </CardContent>
         <CardFooter className="mt-3 flex justify-end">
-          <Button variant="outline" className="cursor-pointer">
+          <Button
+            variant="outline"
+            className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+          >
             {t("plans-cards.stripe-portal-button")}
           </Button>
         </CardFooter>

@@ -39,24 +39,37 @@ export function RecentTransactionsTableSection({
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
-      <Card className="bg-blue-background col-span-full dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue col-span-full">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("upcoming-cards.title")}</CardTitle>
-          <Badge variant="outline">{t("upcoming-cards.button")}</Badge>
+          <Badge
+            variant="outline"
+            className="bg-badge-background rounded-full px-2 py-1"
+          >
+            {t("upcoming-cards.button")}
+          </Badge>
         </CardHeader>
-        <Separator className="dark:bg-[#1A2441]" />
+        <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
           <Table className="min-w-[600px]">
             <TableHeader>
-              <TableRow>
+              <TableRow className="dark:border-border-blue">
                 {recentTransactionsTableHeadings.map((heading) => (
-                  <TableHead key={heading}>{heading}</TableHead>
+                  <TableHead
+                    className="font-bold text-gray-500 dark:text-gray-400/80"
+                    key={heading}
+                  >
+                    {heading}
+                  </TableHead>
                 ))}
               </TableRow>
             </TableHeader>
             <TableBody>
               {recentTranasactionsTables.map((data) => (
-                <TableRow key={data.recipient}>
+                <TableRow
+                  className="dark:border-border-blue"
+                  key={data.recipient}
+                >
                   <TableCell>25.9.2025</TableCell>
                   <TableCell>{data.recipient}</TableCell>
                   <TableCell className="whitespace-nowrap">

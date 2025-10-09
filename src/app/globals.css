@@ -5,6 +5,9 @@
 
 @theme inline {
   --color-blue-background: var(--blue-background);
+  --color-dark-blue-background: var(--dark-blue-background);
+  --color-badge-background: var(--badge-background);
+  --color-border-blue: var(--border-blue);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -118,6 +121,21 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
   --blue-background: #121825;
+  --dark-blue-background: #0f1523;
+  --badge-background: #0d1b2a;
+  --border-blue: #1a2441;
+  --fancy-gradient:
+    radial-gradient(
+      1200px 600px at 75% -80px,
+      color-mix(in oklab, #6d7cff 10%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      800px 500px at -150px 70%,
+      color-mix(in oklab, #22d3ee 12%, transparent),
+      transparent 60%
+    ),
+    #0b0f19;
 }
 
 @layer base {
@@ -156,5 +174,9 @@
       var(--brand),
       color-mix(in oklab, var(--brand) 60%, var(--acc))
     );
+  }
+
+  .bg-fancy-gradient {
+    background: var(--fancy-gradient);
   }
 }

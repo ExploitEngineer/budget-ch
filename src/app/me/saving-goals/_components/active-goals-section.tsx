@@ -34,17 +34,20 @@ export function ActiveGoalsSection({
   );
   return (
     <section>
-      <Card className="bg-blue-background dark:border-[#1A2441]">
+      <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex min-w-0 flex-wrap items-center gap-2">
             <CardTitle className="truncate">{t("title")}</CardTitle>
-            <Badge variant="outline" className="rounded-full px-3 py-2">
+            <Badge
+              variant="outline"
+              className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+            >
               {t("badge")}
             </Badge>
           </div>
 
           <ToggleGroup
-            className="inline-flex flex-none items-center gap-1 rounded border"
+            className="dark:border-border-blue bg-dark-blue-background inline-flex flex-none items-center gap-1 rounded border"
             type="single"
             aria-label="view"
           >
@@ -82,20 +85,23 @@ export function ActiveGoalsSection({
 
             return (
               <Card
-                className="bg-blue-background dark:border-[#1A2441]"
+                className="bg-blue-background dark:border-border-blue"
                 key={idx}
               >
                 <CardHeader className="flex items-center justify-between">
                   <CardTitle>{data.title}</CardTitle>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline" className="rounded-full px-3 py-2">
+                    <Badge
+                      variant="outline"
+                      className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
+                    >
                       {data.badgeValue}%
                     </Badge>
                     <SavingGoalsDialog />
                   </div>
                 </CardHeader>
 
-                <Separator className="dark:bg-[#1A2441]" />
+                <Separator className="dark:bg-border-blue" />
 
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -120,14 +126,23 @@ export function ActiveGoalsSection({
                   <Progress value={data.progress} className="mt-2 mb-3" />
 
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline" className="rounded-full px-3 py-2">
+                    <Badge
+                      variant="outline"
+                      className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+                    >
                       {t("cards.tax-reserves.content.account.title")}:{" "}
                       {data.accountBadge}
                     </Badge>
-                    <Badge variant="outline" className="rounded-full px-3 py-2">
+                    <Badge
+                      variant="outline"
+                      className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+                    >
                       {t("cards.tax-reserves.content.auto")}: CHF 300.00
                     </Badge>
-                    <Badge variant="outline" className="rounded-full px-3 py-2">
+                    <Badge
+                      variant="outline"
+                      className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+                    >
                       {t("cards.tax-reserves.content.remaining")}:{" "}
                       {data.remainingBadgeDays}
                     </Badge>
@@ -137,7 +152,7 @@ export function ActiveGoalsSection({
                     <div className="flex items-center gap-3">
                       <Button
                         variant="outline"
-                        className="flex cursor-pointer items-center gap-3"
+                        className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-3"
                       >
                         <Plus />
                         <span>{t("cards.tax-reserves.content.button")}</span>
@@ -152,6 +167,7 @@ export function ActiveGoalsSection({
                               <FormControl>
                                 <Input
                                   type="number"
+                                  className="!bg-dark-blue-background dark:border-border-blue"
                                   placeholder={`${t(
                                     "cards.tax-reserves.content.placeholder",
                                   )} (CHF)`}
