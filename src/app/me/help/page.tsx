@@ -18,11 +18,11 @@ export default function Help() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <QuickAccess />
-        <section className="grid h-full w-full auto-rows-min grid-cols-6 gap-2">
-          <div className="lg:col-span-4 xl:col-span-5">
+        <section className="grid h-full w-full auto-rows-min gap-2 md:grid-cols-6">
+          <div className="md:col-span-4 xl:col-span-5">
             <FAQS FAQs={FAQs} />
           </div>
-          <div className="lg:col-span-2 xl:col-span-1">
+          <div className="md:col-span-2 xl:col-span-1">
             <Content />
           </div>
         </section>
