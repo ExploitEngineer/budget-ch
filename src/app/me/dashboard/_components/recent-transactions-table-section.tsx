@@ -41,7 +41,7 @@ export function RecentTransactionsTableSection({
     <section className="grid auto-rows-min grid-cols-6">
       <Card className="bg-blue-background dark:border-border-blue col-span-full">
         <CardHeader className="flex items-center justify-between">
-          <CardTitle>{t("upcoming-cards.title")}</CardTitle>
+          <CardTitle>{t("upcoming-cards.last-transaction")}</CardTitle>
           <Badge
             variant="outline"
             className="bg-badge-background rounded-full px-2 py-1"

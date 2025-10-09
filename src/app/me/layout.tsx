@@ -9,7 +9,7 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="bg-fancy-gradient">{children}</SidebarInset>
+      <SidebarInset className="bg-fancy-auto">{children}</SidebarInset>
     </SidebarProvider>
   );
 }

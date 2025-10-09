@@ -47,7 +47,7 @@
                 "transactions": "Transactions",
                 "budgets": "Budgets",
                 "savings": "Savings Goals",
-                "content": "Content",
+                "content": "Accounts",
                 "reports": "Reports",
                 "imp-exp": "Import / Export",
                 "settings": "Settings",
@@ -101,6 +101,33 @@
                 "buttons": {
                     "save": "Save as template",
                     "post": "Post"
+                }
+            },
+            "dashbaord-table-adjust-dialog": {
+                "button": "Adjust",
+                "dialog": {
+                    "title": "Adjust Recurring Payment",
+                    "close": "Close",
+                    "labels": {
+                        "date": "Date",
+                        "account": "Account",
+                        "name": "Name",
+                        "amount": "Amount (CHF)"
+                    },
+                    "placeholders": {
+                        "date": "09/25/2025",
+                        "account": "Choose an account",
+                        "name": "Enter name"
+                    },
+                    "options": {
+                        "giro": "Giro",
+                        "credit-card": "Credit Card",
+                        "sparen": "Savings"
+                    },
+                    "buttons": {
+                        "delete": "Delete",
+                        "save": "Save"
+                    }
                 }
             },
             "cards": {
@@ -164,6 +191,7 @@
             },
             "upcoming-cards": {
                 "title": "Upcoming Due (Recurring)",
+                "last-transaction": "Last Transactions",
                 "button": "Next 14 Days",
                 "table-data": {
                     "table-heading": {
@@ -265,6 +293,52 @@
             }
         },
         "transactions-page": {
+            "transaction-edit-dialog": {
+                "title-1": "Edit",
+                "title-2": "New Transaction",
+                "dialog": {
+                    "title": "Edit Transaction",
+                    "close": "Close",
+                    "labels": {
+                        "date": "Date",
+                        "account": "Account",
+                        "recipient": "Recipient / Source",
+                        "category": "Category",
+                        "amount": "Amount (CHF)",
+                        "note": "Note",
+                        "file": "Receipts (PDF/JPG/PNG)",
+                        "splitSum": "Split Transaction"
+                    },
+                    "placeholders": {
+                        "date": "09/21/2025",
+                        "account": "Choose an account",
+                        "recipient": "Enter recipient",
+                        "category": "Choose a category",
+                        "note": "Enter your note",
+                        "note-optional": "Note (optional)"
+                    },
+                    "options": {
+                        "giro": "Giro",
+                        "credit-card": "Credit Card",
+                        "sparen": "Savings",
+                        "bar": "Cash",
+                        "lebensmittel": "Groceries",
+                        "restaurant": "Restaurant & Café",
+                        "oev": "Public Transport & Mobility",
+                        "haushalt": "Household",
+                        "einnahmen": "Income"
+                    },
+                    "badges": {
+                        "row": "Row",
+                        "splitTotal": "Split Total: CHF 0.00"
+                    },
+                    "buttons": {
+                        "demo": "OCR (Demo)",
+                        "delete": "Delete",
+                        "save": "Save"
+                    }
+                }
+            },
             "labels": {
                 "from": "From",
                 "to": "To",

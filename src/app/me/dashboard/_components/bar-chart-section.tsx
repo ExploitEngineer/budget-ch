@@ -29,7 +29,7 @@ export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
           <CardContent key={card.title}>
             <Card
               key={card.title}
-              className="bg-blue-background dark:border-border-blue shadow-dark-blue-background w-full flex-1 py-4 shadow-2xl"
+              className="bg-blue-background dark:border-border-blue dark:shadow-dark-blue-background w-full flex-1 py-4 dark:shadow-2xl"
             >
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar

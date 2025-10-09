@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
 import type { Transaction } from "./data";
+import TransactionEditDialog from "./transactions-edit-dialog";
 
 interface DataTableProps {
   transactions: Transaction[];
@@ -46,6 +47,8 @@ export function DataTable({ transactions }: DataTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const title = t("transaction-edit-dialog.title-1");
 
   const columns: ColumnDef<Transaction>[] = [
     {
@@ -88,15 +91,7 @@ export function DataTable({ transactions }: DataTableProps) {
     {
       id: "action",
       header: t("data-table.headings.action"),
-      cell: () => (
-        <Button
-          className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-          size="sm"
-          variant="outline"
-        >
-          {t("data-table.action")}
-        </Button>
-      ),
+      cell: () => <TransactionEditDialog variant="outline" text={title} />,
     },
   ];
 
