@@ -10,13 +10,13 @@ import {
 import { Separator } from "@/components/ui/separator";
 import {
   Home,
-  Rows4,
+  ScrollText,
   ChartNoAxesCombined,
   CircleDotDashed,
-  Luggage,
+  UserRound,
   ChartSpline,
   Download,
-  LampWallUp,
+  Settings,
   CircleQuestionMark,
   LogOut,
 } from "lucide-react";
@@ -47,7 +47,7 @@ export function NavMain() {
     {
       title: t("sidebar.links.transactions"),
       url: "/me/transactions",
-      icon: Rows4,
+      icon: ScrollText,
     },
     {
       title: t("sidebar.links.budgets"),
@@ -61,8 +61,8 @@ export function NavMain() {
     },
     {
       title: t("sidebar.links.content"),
-      url: "/me/content",
-      icon: Luggage,
+      url: "/me/accounts",
+      icon: UserRound,
     },
     {
       title: t("sidebar.links.reports"),
@@ -77,7 +77,7 @@ export function NavMain() {
     {
       title: t("sidebar.links.settings"),
       url: "/me/settings",
-      icon: LampWallUp,
+      icon: Settings,
     },
     {
       title: t("sidebar.links.help"),

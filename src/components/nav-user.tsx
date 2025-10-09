@@ -21,17 +21,21 @@ export function NavUser() {
     <SidebarMenu>
       <SidebarMenuItem className="flex w-full items-center gap-4">
         {open ? (
-          <div className="flex w-full flex-col items-center justify-center gap-2">
-            <div className="flex w-full items-center justify-between">
+          <div className="flex w-full flex-col justify-center gap-2">
+            <div className="flex w-full items-center gap-3">
               <LangSwitcherDefault />
               <ThemeToggleDropdown />
               <div className="flex cursor-pointer items-center rounded-full border bg-gray-100 px-4 py-3 text-xs dark:bg-transparent">
                 Plan: <span className="ml-1 font-medium">Free</span>
               </div>
             </div>
-            <p className="flex items-center gap-1 text-xs text-gray-400">
+            <p className="flex items-center ps-1 text-xs text-gray-400">
               {t("content-1")}{" "}
-              <Heart size={10} fill="currentColor" className="text-red-600" />
+              <Heart
+                size={10}
+                fill="currentColor"
+                className="mx-1 text-red-600"
+              />
               {t("content-2")}
             </p>
           </div>

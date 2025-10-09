@@ -104,6 +104,33 @@
                     "post": "Buchen"
                 }
             },
+            "dashbaord-table-adjust-dialog": {
+                "button": "Anpassen",
+                "dialog": {
+                    "title": "Wiederkehrende Zahlung anpassen",
+                    "close": "Schließen",
+                    "labels": {
+                        "date": "Datum",
+                        "account": "Konto",
+                        "name": "Name",
+                        "amount": "Betrag (CHF)"
+                    },
+                    "placeholders": {
+                        "date": "25.09.2025",
+                        "account": "Konto auswählen",
+                        "name": "Name eingeben"
+                    },
+                    "options": {
+                        "giro": "Girokonto",
+                        "credit-card": "Kreditkarte",
+                        "sparen": "Sparkonto"
+                    },
+                    "buttons": {
+                        "delete": "Löschen",
+                        "save": "Speichern"
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Gesamtbudget (Monat)",
@@ -165,6 +192,7 @@
             },
             "upcoming-cards": {
                 "title": "Bevorstehende Fälligkeiten (Wiederkehrend)",
+                "last-transaction": "Letzte Transaktionen",
                 "button": "Nächste 14 Tage",
                 "table-data": {
                     "table-heading": {
@@ -266,6 +294,52 @@
             }
         },
         "transactions-page": {
+            "transaction-edit-dialog": {
+                "title-1": "Bearbeiten",
+                "title-2": "Neue Transaktion",
+                "dialog": {
+                    "title": "Transaktion bearbeiten",
+                    "close": "Schließen",
+                    "labels": {
+                        "date": "Datum",
+                        "account": "Konto",
+                        "recipient": "Empfänger / Quelle",
+                        "category": "Kategorie",
+                        "amount": "Betrag (CHF)",
+                        "note": "Notiz",
+                        "file": "Belege (PDF/JPG/PNG)",
+                        "splitSum": "Transaktion aufteilen"
+                    },
+                    "placeholders": {
+                        "date": "21.09.2025",
+                        "account": "Konto auswählen",
+                        "recipient": "Empfänger eingeben",
+                        "category": "Kategorie auswählen",
+                        "note": "Notiz eingeben",
+                        "note-optional": "Notiz (optional)"
+                    },
+                    "options": {
+                        "giro": "Girokonto",
+                        "credit-card": "Kreditkarte",
+                        "sparen": "Sparkonto",
+                        "bar": "Bargeld",
+                        "lebensmittel": "Lebensmittel",
+                        "restaurant": "Restaurant & Café",
+                        "oev": "Öffentlicher Verkehr & Mobilität",
+                        "haushalt": "Haushalt",
+                        "einnahmen": "Einnahmen"
+                    },
+                    "badges": {
+                        "row": "Zeile",
+                        "splitTotal": "Gesamtsumme Aufteilung: CHF 0.00"
+                    },
+                    "buttons": {
+                        "demo": "OCR (Demo)",
+                        "delete": "Löschen",
+                        "save": "Speichern"
+                    }
+                }
+            },
             "labels": {
                 "from": "Von",
                 "to": "Bis",
