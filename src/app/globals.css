@@ -83,6 +83,18 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --fancy-light-gradient:
+    radial-gradient(
+      1200px 600px at 75% -80px,
+      color-mix(in oklab, #2563eb 10%, transparent),
+      transparent 65%
+    ),
+    radial-gradient(
+      800px 500px at -150px 70%,
+      color-mix(in oklab, #10b981 12%, transparent),
+      transparent 60%
+    ),
+    #f7f9ff;
 }
 
 .dark {
@@ -176,7 +188,17 @@
     );
   }
 
-  .bg-fancy-gradient {
-    background: var(--fancy-gradient);
+  .progress-gradient {
+    background: linear-gradient(90deg, var(--brand), var(--acc));
+  }
+
+  @layer components {
+    .bg-fancy-auto {
+      background: var(--fancy-light-gradient);
+    }
+
+    .dark .bg-fancy-auto {
+      background: var(--fancy-gradient);
+    }
   }
 }

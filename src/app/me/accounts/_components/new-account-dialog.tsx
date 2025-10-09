@@ -34,8 +34,15 @@ import {
   NewAccountDialogValues,
 } from "@/lib/validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { cn } from "@/lib/utils";
 
-export default function NewAccountDialog() {
+export default function NewAccountDialog({
+  variant,
+  text,
+}: {
+  variant?: "gradient" | "outline";
+  text?: string;
+}) {
   const t = useTranslations(
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
@@ -59,11 +66,21 @@ export default function NewAccountDialog() {
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="btn-gradient flex items-center gap-2 dark:text-white"
-          variant="default"
+          className={cn(
+            variant === "gradient"
+              ? "btn-gradient dark:text-white"
+              : "dark:border-border-blue !bg-dark-blue-background cursor-pointer text-xs",
+          )}
+          variant={variant === "gradient" ? "default" : "outline"}
         >
-          <Plus className="h-5 w-5" />
-          <span className="text-sm">{t("title")}</span>
+          {variant === "gradient" ? (
+            <div className="flex items-center gap-2">
+              <Plus className="h-5 w-5" />
+              <span className="text-sm">{t("title")}</span>
+            </div>
+          ) : (
+            text
+          )}
         </Button>
       </DialogTrigger>
 

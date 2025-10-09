@@ -47,7 +47,7 @@ export function useBudgetData() {
       budget: "CHF 150.00",
       ist: "CHF 95.00",
       rest: "CHF 55.00",
-      value: 10,
+      value: 50,
       action: t("data-table.data.action"),
     },
     {
@@ -55,7 +55,7 @@ export function useBudgetData() {
       budget: "CHF 150.00",
       ist: "CHF 95.00",
       rest: "CHF 55.00",
-      value: 52,
+      value: 96,
       action: t("data-table.data.action"),
     },
     {
@@ -79,7 +79,7 @@ export function useBudgetData() {
       budget: "CHF 150.00",
       ist: "CHF 95.00",
       rest: "CHF 55.00",
-      value: 80,
+      value: 70,
       action: t("data-table.data.action"),
     },
     {
@@ -87,7 +87,7 @@ export function useBudgetData() {
       budget: "CHF 150.00",
       ist: "CHF 95.00",
       rest: "CHF 55.00",
-      value: 40,
+      value: 80,
       action: t("data-table.data.action"),
     },
   ];
