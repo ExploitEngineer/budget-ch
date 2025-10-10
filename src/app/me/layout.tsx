@@ -9,7 +9,10 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar />
-      <SidebarInset className="bg-fancy-auto">{children}</SidebarInset>
+      <SidebarInset className="bg-gray-100/55 dark:![background:var(--fancy-gradient)]">
+        {" "}
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }
