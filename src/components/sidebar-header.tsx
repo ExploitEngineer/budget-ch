@@ -67,7 +67,7 @@ export default function SidebarHeader() {
 
   return (
     <header className="relative mb-2 flex flex-col gap-2 px-2 pt-6">
-      <div className="flex w-full flex-wrap items-center px-4 sm:justify-between">
+      <div className="flex w-full flex-wrap items-center px-4 sm:justify-between sm:gap-2">
         <div className="flex shrink-0 items-center">
           <SidebarTrigger className="-ml-1 cursor-pointer lg:mt-0" />
           <Separator
