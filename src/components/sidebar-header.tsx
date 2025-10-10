@@ -66,8 +66,8 @@ export default function SidebarHeader() {
           className="mt-[11px] mr-2 data-[orientation=vertical]:h-4 lg:mt-0"
         />
 
-        <div className="flex w-full flex-col items-center gap-4 lg:flex-row">
-          <div className="relative w-full flex-1">
+        <div className="flex w-full flex-col flex-wrap items-center justify-center gap-4 md:flex-row">
+          <div className="relative w-full min-w-44 flex-1">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
             <Input
               type="search"
