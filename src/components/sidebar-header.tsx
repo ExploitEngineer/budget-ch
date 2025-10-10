@@ -67,7 +67,7 @@ export default function SidebarHeader() {
 
   return (
     <header className="relative mb-2 flex flex-col gap-2 px-2 pt-6">
-      <div className="flex w-full flex-wrap items-center gap-3 px-4 sm:justify-between">
+      <div className="flex w-full flex-wrap items-center px-4 sm:justify-between">
         <div className="flex shrink-0 items-center">
           <SidebarTrigger className="-ml-1 cursor-pointer lg:mt-0" />
           <Separator
@@ -82,7 +82,7 @@ export default function SidebarHeader() {
           }`}
         >
           <Search
-            className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 cursor-pointer"
+            className="text-muted-foreground absolute top-1/2 left-1 h-4 w-4 -translate-y-1/2 cursor-pointer sm:left-3"
             onClick={handleSearchFocus}
           />
           <Input
@@ -200,11 +200,11 @@ export default function SidebarHeader() {
       </div>
 
       <div className="flex w-full justify-center px-4 sm:hidden">
-        <div className="bg-blue-background flex w-full items-center justify-between gap-2 rounded-lg border py-1">
+        <div className="bg-blue-background flex w-full items-center justify-between gap-2 rounded-lg border">
           <Button variant="ghost" size="icon" onClick={goToPrevMonth}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="text-center text-sm font-medium whitespace-nowrap">
+          <span className="text-center text-xs font-medium whitespace-nowrap sm:text-sm">
             {monthNames[date.getMonth()]} {date.getFullYear()}
           </span>
           <Button variant="ghost" size="icon" onClick={goToNextMonth}>
