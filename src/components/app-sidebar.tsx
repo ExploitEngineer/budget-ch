@@ -40,13 +40,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     >
       <SidebarHeader
         className={cn(
-          "bg-blue-background flex items-center justify-start transition-all duration-300",
+          "dark:bg-blue-background flex items-center justify-start transition-all duration-300",
           open ? "pb-3" : "pb-0",
         )}
       >
         <div className="relative m-0 flex h-auto w-full items-center justify-start p-0">
           {open ? (
-            <div className="relative me-8 h-[50px] w-full">
+            <div className="relative me-9 h-[45px] w-full">
               <Image
                 src={
                   resolvedTheme === "dark"
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 }
                 alt="company logo"
                 fill
-                className="m-0 object-cover p-0"
+                className="m-0 object-cover p-1 pe-2"
                 priority
               />
             </div>
@@ -73,11 +73,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-blue-background">
+      <SidebarContent className="dark:bg-blue-background">
         <NavMain />
       </SidebarContent>
 
-      <SidebarFooter className="bg-blue-background">
+      <SidebarFooter className="dark:bg-blue-background">
         <NavUser />
       </SidebarFooter>
 

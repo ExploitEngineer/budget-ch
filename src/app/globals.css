@@ -191,14 +191,10 @@
   .progress-gradient {
     background: linear-gradient(90deg, var(--brand), var(--acc));
   }
+}
 
-  @layer components {
-    .bg-fancy-auto {
-      background: var(--fancy-light-gradient);
-    }
-
-    .dark .bg-fancy-auto {
-      background: var(--fancy-gradient);
-    }
+@layer utilities {
+  .bg-fancy-dark {
+    background: var(--fancy-gradient) !important;
   }
 }
