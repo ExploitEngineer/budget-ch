@@ -44,7 +44,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           open ? "pb-3" : "pb-0",
         )}
       >
-        <div className="relative m-0 flex h-auto w-full items-center justify-start p-0">
+        <div className="relative m-0 flex h-auto w-full items-center justify-start p-0 pt-1">
           {open ? (
             <div className="relative me-9 h-[45px] w-full">
               <Image
@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 }
                 alt="company logo"
                 fill
-                className="m-0 object-cover p-1 pe-2"
+                className="m-0 object-cover p-0 pe-10"
                 priority
               />
             </div>

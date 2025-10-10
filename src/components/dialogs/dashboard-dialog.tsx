@@ -59,14 +59,16 @@ export default function DashBoardDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger className="min-w-40 cursor-pointer" asChild>
+      <DialogTrigger className="cursor-pointer sm:min-w-40" asChild>
         <Button
           className="btn-gradient flex items-center gap-2 dark:text-white"
           variant="default"
           size="icon"
         >
           <Plus className="h-5 w-5" />
-          <span className="text-sm">{t("dialog-box.title")}</span>
+          <span className="hidden text-sm sm:block">
+            {t("dialog-box.title")}
+          </span>
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-3xl [&>button]:hidden">

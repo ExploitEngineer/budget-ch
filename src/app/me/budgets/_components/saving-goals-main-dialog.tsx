@@ -70,7 +70,7 @@ export default function SavingsGoalMainDialog() {
           variant="default"
         >
           <Plus className="h-5 w-5" />
-          <span className="text-sm">{t("title")}</span>
+          <span className="hidden text-sm sm:block">{t("title")}</span>
         </Button>
       </DialogTrigger>
 
