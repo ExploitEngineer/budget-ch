@@ -57,13 +57,13 @@ export default function TransferDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger className="min-w-40 cursor-pointer" asChild>
+      <DialogTrigger className="cursor-pointer sm:min-w-40" asChild>
         <Button
           className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2 dark:text-white"
           variant="outline"
         >
           <MoveHorizontal className="h-5 w-5" />
-          <span className="text-sm">{t("button")}</span>
+          <span className="hidden text-sm sm:block">{t("button")}</span>
         </Button>
       </DialogTrigger>
 

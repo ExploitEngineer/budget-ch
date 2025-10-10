@@ -67,16 +67,10 @@ export default function BudgetDialog({
           }
           variant={variant === "gradient" ? "default" : "outline"}
         >
-          <span className="text-sm">
-            {variant === "gradient" ? (
-              <div className="flex items-center gap-2">
-                <Plus className="h-5 w-5" />
-                {t("title")}
-              </div>
-            ) : (
-              text
-            )}
+          <span className="hidden text-sm sm:block">
+            {variant === "gradient" ? t("title") : text}
           </span>
+          <Plus className="h-5 w-5" />
         </Button>
       </DialogTrigger>
 

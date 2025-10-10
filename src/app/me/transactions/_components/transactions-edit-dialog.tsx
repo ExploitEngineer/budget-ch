@@ -104,13 +104,17 @@ export default function TransactionEditDialog({
       <DialogTrigger className="cursor-pointer" asChild>
         <Button
           className={cn(
+            "flex items-center gap-2",
             variant === "gradient"
               ? "btn-gradient hover:text-white"
               : "!bg-dark-blue-background dark:border-border-blue cursor-pointer",
           )}
           variant="outline"
         >
-          {variant === "gradient" ? t("title-2") : text}
+          <span className="hidden sm:block">
+            {variant === "gradient" ? t("title-2") : text}
+          </span>
+          <Plus className="block h-4 w-4 sm:hidden" />
         </Button>
       </DialogTrigger>
 

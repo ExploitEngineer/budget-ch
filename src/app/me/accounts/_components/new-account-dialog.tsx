@@ -74,13 +74,11 @@ export default function NewAccountDialog({
           variant={variant === "gradient" ? "default" : "outline"}
         >
           {variant === "gradient" ? (
-            <div className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
-              <span className="text-sm">{t("title")}</span>
-            </div>
+            <span className="hidden text-sm sm:block">{t("title")}</span>
           ) : (
             text
           )}
+          <Plus className="h-5 w-5" />
         </Button>
       </DialogTrigger>
 
