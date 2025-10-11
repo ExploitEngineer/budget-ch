@@ -61,7 +61,7 @@ export function Security() {
                               placeholder={t("labels.two-factor.options.off")}
                             />
                           </SelectTrigger>
-                          <SelectContent className="!bg-dark-blue-background">
+                          <SelectContent className="dark:!bg-dark-blue-background bg-white">
                             <SelectItem value="off">
                               {t("labels.two-factor.options.off")}
                             </SelectItem>

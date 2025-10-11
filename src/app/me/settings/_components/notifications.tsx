@@ -98,12 +98,12 @@ export function Notifications() {
                   </FormLabel>
                   <FormControl>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
+                      <SelectTrigger className="dark:border-border-blue !dark:bg-dark-blue-background w-full cursor-pointer">
                         <SelectValue
                           placeholder={t("labels.monthly-report.options.off")}
                         />
                       </SelectTrigger>
-                      <SelectContent className="!bg-dark-blue-background">
+                      <SelectContent className="!dark:bg-dark-blue-background bg-white">
                         <SelectItem value="off">
                           {t("labels.monthly-report.options.off")}
                         </SelectItem>

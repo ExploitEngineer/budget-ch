@@ -1146,31 +1146,14 @@
             "data-privacy-section": {
                 "title": "Données & Confidentialité",
                 "labels": {
-                    "anonymous": {
-                        "title": "Statistiques d'utilisation anonymes",
-                        "options": {
-                            "on": "Activé",
-                            "off": "Désactivé"
-                        }
-                    },
-                    "retention": {
-                        "title": "Conservation des données supprimées",
-                        "options": {
-                            "delete-im": "Supprimer immédiatement",
-                            "30-days": "30 jours",
-                            "90-days": "90 jours"
-                        }
-                    },
                     "data-export": {
                         "title": "Export de données",
                         "buttons": {
                             "json": "Exporter les données (JSON)",
-                            "local-data": "Supprimer les données locales",
                             "delete-account": "Supprimer le compte"
                         }
                     }
-                },
-                "content": "« Supprimer le compte » est local dans la démo – en production, géré côté serveur avec confirmation"
+                }
             },
             "billing-details-section": {
                 "title": "Détails de facturation (Demo)",

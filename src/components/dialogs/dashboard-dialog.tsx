@@ -63,7 +63,6 @@ export default function DashBoardDialog() {
         <Button
           className="btn-gradient flex items-center gap-2 dark:text-white"
           variant="default"
-          size="icon"
         >
           <Plus className="h-5 w-5" />
           <span className="hidden text-sm sm:block">
