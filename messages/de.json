@@ -32,7 +32,18 @@
         "forgot-pass": "Passwort vergessen?",
         "no-account-yet": "Noch kein Konto?",
         "dark-mode": "Dunkelmodus",
-        "light-mode": "Hellmodus"
+        "light-mode": "Hellmodus",
+        "verify-email": {
+            "title": "Bestätige deine E-Mail-Adresse",
+            "sub-heading": "Wir haben einen Bestätigungslink gesendet an:",
+            "buttons": {
+                "resend": "Erneut senden",
+                "change-email": "E-Mail ändern",
+                "signin": "Zurück zur Anmeldung"
+            },
+            "tip": "Tipp: Überprüfe Spam-/Werbeordner. Suche nach dem Betreff „BudgetHub – Verify your email“.",
+            "content": "Nachdem du auf den Link geklickt hast, melden wir dich automatisch an."
+        }
     },
     "main-dashboard": {
         "export": "Exportieren",

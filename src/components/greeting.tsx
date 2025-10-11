@@ -22,6 +22,9 @@ export default function Greeting() {
       <Link href="/forgot-password">
         <Button className="cursor-pointer">Forgot Password</Button>
       </Link>
+      <Link href="/verify-email">
+        <Button className="cursor-pointer">Verify Email</Button>
+      </Link>
     </div>
   );
 }
