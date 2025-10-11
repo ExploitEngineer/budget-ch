@@ -104,24 +104,23 @@ export default function TransactionEditDialog({
     <Dialog>
       <DialogTrigger className="cursor-pointer" asChild>
         <Button
-          className={cn(
-            "flex items-center gap-2",
+          className={
             variant === "gradient"
-              ? "btn-gradient hover:text-white"
-              : "!bg-dark-blue-background dark:border-border-blue cursor-pointer",
-          )}
-          variant="outline"
+              ? "btn-gradient flex items-center gap-2 dark:text-white"
+              : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+          }
+          variant={variant === "gradient" ? "default" : "outline"}
         >
-          <span className="hidden sm:block">
+          <span className="hidden text-sm sm:block">
             {variant === "gradient" ? t("title-2") : text}
           </span>
-          <Plus className="block h-4 w-4 sm:hidden" />
+          <Plus className="h-5 w-5" />
         </Button>
       </DialogTrigger>
 
       <DialogContent
         className={cn(
-          "fixed z-50 m-0 flex h-screen w-screen flex-col overflow-hidden p-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-3xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:overflow-hidden sm:rounded-lg [&>button]:hidden",
+          "fixed z-50 m-0 flex h-[80vh] w-screen flex-col overflow-hidden p-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-auto sm:max-h-[90vh] sm:w-full sm:max-w-3xl sm:-translate-x-1/2 sm:-translate-y-1/2 sm:overflow-hidden sm:rounded-lg [&>button]:hidden",
         )}
       >
         {/* Header */}

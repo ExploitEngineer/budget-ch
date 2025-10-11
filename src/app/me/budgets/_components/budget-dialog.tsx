@@ -58,7 +58,7 @@ export default function BudgetDialog({
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
+      <DialogTrigger className="cursor-pointer" asChild>
         <Button
           className={
             variant === "gradient"
