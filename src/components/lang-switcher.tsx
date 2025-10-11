@@ -29,10 +29,10 @@ export function LangSwitcher() {
 
   return (
     <Select value={currentLocale} onValueChange={handleLanguageChange}>
-      <SelectTrigger className="cursor-pointer bg-white px-3 py-1 text-center !text-xs dark:bg-zinc-900 [&>svg]:hidden">
+      <SelectTrigger className="dark:bg-dark-blue-background dark:border-border-blue cursor-pointer bg-white px-3 py-1 text-center !text-xs [&>svg]:hidden">
         <SelectValue>{currentLocale.toUpperCase()}</SelectValue>
       </SelectTrigger>
-      <SelectContent className="min-w-12">
+      <SelectContent className="dark:bg-dark-blue-background min-w-12 bg-white">
         {languages.map((language) => (
           <SelectItem
             className="cursor-pointer justify-center px-1 !text-xs [&_span]:hidden"

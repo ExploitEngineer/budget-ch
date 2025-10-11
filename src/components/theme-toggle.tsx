@@ -21,7 +21,7 @@ export function ModeToggle() {
 
   return (
     <div
-      className="flex cursor-pointer items-center justify-between gap-2 rounded-lg border bg-white px-3 py-1 dark:bg-zinc-900"
+      className="dark:bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center justify-between gap-2 rounded-lg border bg-white px-3 py-1"
       onClick={toggleTheme}
     >
       <span>🌓</span>

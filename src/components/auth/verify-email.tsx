@@ -20,13 +20,11 @@ export default function VerifyEmail() {
   }, [timer]);
 
   const handleResend = () => {
-    if (timer === 0) {
-      setTimer(30);
-    }
+    if (timer === 0) setTimer(30);
   };
 
   return (
-    <Card className="w-full flex-1 border-1 p-6 shadow-lg sm:max-w-lg">
+    <Card className="dark:border-border-blue dark:bg-blue-background h-full w-full flex-1 border-1 bg-white p-6 shadow-lg sm:max-w-lg">
       <h1 className="text-center text-xl font-semibold">{t("title")}</h1>
 
       <div className="mt-6 space-y-4">
@@ -42,7 +40,7 @@ export default function VerifyEmail() {
           <Button
             onClick={handleResend}
             disabled={timer > 0}
-            className={`w-1/2 cursor-pointer rounded-xl py-5 font-bold text-white dark:bg-blue-600 ${
+            className={`w-1/2 cursor-pointer rounded-xl bg-[#235FE3] py-5 font-bold text-white hover:bg-blue-600 dark:bg-[#6371FF] dark:hover:bg-[#6371FF]/80 ${
               timer > 0 ? "cursor-not-allowed opacity-50" : ""
             }`}
           >
@@ -54,13 +52,13 @@ export default function VerifyEmail() {
           <Button
             type="button"
             variant="outline"
-            className="w-1/2 cursor-pointer rounded-xl py-5 font-bold"
+            className="dark:border-border-blue !bg-dark-blue-background w-1/2 cursor-pointer rounded-xl py-5 font-bold"
           >
             <span className="underline">{t("buttons.change-email")}</span>
           </Button>
         </div>
 
-        <Separator className="my-4" />
+        <Separator className="dark:bg-border-blue my-4" />
 
         <div className="text-muted-foreground space-y-2 text-xs">
           <p>{t("tip")}</p>
@@ -70,7 +68,7 @@ export default function VerifyEmail() {
         <Link href="/signin" className="block">
           <Button
             variant="outline"
-            className="mt-4 w-full cursor-pointer rounded-xl py-5 font-bold"
+            className="dark:border-border-blue !bg-dark-blue-background mt-4 w-full cursor-pointer rounded-xl py-5 font-bold"
           >
             <span className="underline">{t("buttons.signin")}</span>
           </Button>
