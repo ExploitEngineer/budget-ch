@@ -12,7 +12,7 @@ export default function AuthLayout({
 }) {
   const { resolvedTheme } = useTheme();
   return (
-    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F6F8FF] dark:[background:var(--fancy-gradient)]">
+    <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F6F8FF] px-4 dark:[background:var(--fancy-gradient)]">
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">
         <div className="flex items-center gap-2">
           <Image
