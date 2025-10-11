@@ -34,7 +34,7 @@ interface Items {
 }
 
 export function NavMain() {
-  const { open } = useSidebar();
+  const { open, setOpenMobile } = useSidebar();
   const t = useTranslations("main-dashboard");
   const pathname = usePathname();
 
@@ -98,7 +98,7 @@ export function NavMain() {
       </SidebarGroupLabel>
       <SidebarMenu className={cn(open ? "flex" : "")}>
         {items.map((item) => (
-          <div key={item.title}>
+          <div key={item.title} onClick={() => setOpenMobile(false)}>
             <Link key={item.title} href={item.url}>
               <SidebarMenuItem>
                 <SidebarMenuButton

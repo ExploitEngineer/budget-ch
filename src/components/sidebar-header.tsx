@@ -82,7 +82,7 @@ export default function SidebarHeader() {
           }`}
         >
           <Search
-            className="text-muted-foreground absolute top-1/2 left-1 h-4 w-4 -translate-y-1/2 cursor-pointer sm:left-3"
+            className="text-muted-foreground absolute top-1/2 left-1 h-[18px] w-[18px] -translate-y-1/2 cursor-pointer sm:left-3"
             onClick={handleSearchFocus}
           />
           <Input
