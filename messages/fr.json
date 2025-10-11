@@ -32,7 +32,18 @@
         "forgot-pass": "Mot de passe oublié ?",
         "no-account-yet": "Pas encore de compte ?",
         "dark-mode": "Mode sombre",
-        "light-mode": "Mode clair"
+        "light-mode": "Mode clair",
+        "verify-email": {
+            "title": "Vérifiez votre e-mail",
+            "sub-heading": "Nous avons envoyé un lien de vérification à :",
+            "buttons": {
+                "resend": "Renvoyer",
+                "change-email": "Changer d’adresse e-mail",
+                "signin": "Retour à la connexion"
+            },
+            "tip": "Astuce : vérifiez les dossiers Spam/Promotions. Recherchez l’objet « BudgetHub – Verify your email ».",
+            "content": "Une fois que vous aurez cliqué sur le lien, nous vous connecterons automatiquement."
+        }
     },
     "main-dashboard": {
         "export": "Exporter",

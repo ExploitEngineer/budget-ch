@@ -31,7 +31,18 @@
         "forgot-pass": "Forgot password?",
         "no-account-yet": "No account yet?",
         "dark-mode": "Dark mode",
-        "light-mode": "Light mode"
+        "light-mode": "Light mode",
+        "verify-email": {
+            "title": "Verify your email",
+            "sub-heading": "We sent a verification link to:",
+            "buttons": {
+                "resend": "Resend",
+                "change-email": "Change email",
+                "signin": "Back to sign in"
+            },
+            "tip": "Tip: Check Spam/Promotions. Search subject “BudgetHub – Verify your email”.",
+            "content": "After you click the link, we’ll sign you in automatically."
+        }
     },
     "main-dashboard": {
         "export": "Export",
