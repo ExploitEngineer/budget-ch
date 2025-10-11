@@ -1145,31 +1145,14 @@
             "data-privacy-section": {
                 "title": "Data & Privacy",
                 "labels": {
-                    "anonymous": {
-                        "title": "Anonymous usage statistics",
-                        "options": {
-                            "on": "On",
-                            "off": "Off"
-                        }
-                    },
-                    "retention": {
-                        "title": "Retention of Deleted Data",
-                        "options": {
-                            "delete-im": "Delete Immediately",
-                            "30-days": "30 Days",
-                            "90-days": "90 Days"
-                        }
-                    },
                     "data-export": {
                         "title": "Data Export",
                         "buttons": {
                             "json": "Export Data (JSON)",
-                            "local-data": "Delete Local Demo Data",
                             "delete-account": "Delete Account"
                         }
                     }
-                },
-                "content": "“Delete Account” is local in the demo – in production handled server-side with confirmation"
+                }
             },
             "billing-details-section": {
                 "title": "Billing Details (Demo)",

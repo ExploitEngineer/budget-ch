@@ -1124,31 +1124,14 @@
             "data-privacy-section": {
                 "title": "Daten & Datenschutz",
                 "labels": {
-                    "anonymous": {
-                        "title": "Anonyme Nutzungsstatistik",
-                        "options": {
-                            "on": "An",
-                            "off": "Aus"
-                        }
-                    },
-                    "retention": {
-                        "title": "Aufbewahrung gelöschter Daten",
-                        "options": {
-                            "delete-im": "Sofort löschen",
-                            "30-days": "30 Tage",
-                            "90-days": "90 Tage"
-                        }
-                    },
                     "data-export": {
                         "title": "Datenauszug",
                         "buttons": {
                             "json": "Daten exportieren (JSON)",
-                            "local-data": "Lokale Demo-Daten löschen",
                             "delete-account": "Konto löschen"
                         }
                     }
-                },
-                "content": "„Konto löschen“ ist in der Demo lokal – produktiv serverseitig mit Bestätigung."
+                }
             },
             "billing-details-section": {
                 "title": "Rechnungsdetails (Demo)",
