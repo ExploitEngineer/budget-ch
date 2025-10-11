@@ -331,9 +331,6 @@ export default function TransactionEditDialog({
                         onChange={(e) => field.onChange(e.target.files?.[0])}
                       />
                     </FormControl>
-                    <Button variant="outline" className="w-40">
-                      {t("dialog.buttons.demo")}
-                    </Button>
                     <FormMessage />
                   </FormItem>
                 )}
