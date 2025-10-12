@@ -27,9 +27,9 @@ export default function Help() {
           </div>
         </section>
         <ContactSupport />
-        <KeyboardShortcuts />
-        <Privacy />
-        <ReleaseNotes />
+        {/* <KeyboardShortcuts /> */}
+        {/* <Privacy /> */}
+        {/* <ReleaseNotes /> */}
       </div>
     </section>
   );

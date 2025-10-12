@@ -133,10 +133,10 @@ export function LocalizationAppearance() {
             </div>
 
             {/* Content / Description */}
-            <p className="text-muted-foreground text-sm">{t("content")}</p>
+            {/* <p className="text-muted-foreground text-sm">{t("content")}</p> */}
 
             {/* Second Row: First Day, Density, Rounding */}
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               <FormField
                 control={form.control}
                 name="firstDay"
@@ -214,7 +214,7 @@ export function LocalizationAppearance() {
                   </FormItem>
                 )}
               />
-            </div>
+            </div> */}
           </form>
         </Form>
       </CardContent>
