@@ -24,17 +24,20 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { authClient } from "@/lib/auth/auth-client";
 
 interface Items {
   title: string;
-  url: string;
+  url?: string;
   icon: LucideIcon;
+  onClick?: () => Promise<void>;
 }
 
 export function NavMain() {
   const { open, setOpenMobile } = useSidebar();
+  const router = useRouter();
   const t = useTranslations("main-dashboard");
   const pathname = usePathname();
 
@@ -86,8 +89,11 @@ export function NavMain() {
     },
     {
       title: t("sidebar.links.logout"),
-      url: "#",
       icon: LogOut,
+      onClick: async () => {
+        await authClient.signOut();
+        router.push("/signin");
+      },
     },
   ];
 
@@ -98,8 +104,16 @@ export function NavMain() {
       </SidebarGroupLabel>
       <SidebarMenu className={cn(open ? "flex" : "")}>
         {items.map((item) => (
-          <div key={item.title} onClick={() => setOpenMobile(false)}>
-            <Link key={item.title} href={item.url}>
+          <div
+            key={item.title}
+            onClick={async () => {
+              setOpenMobile(false);
+              if (item.onClick) {
+                await item.onClick();
+              }
+            }}
+          >
+            <Link key={item.title} href={item.url || ""}>
               <SidebarMenuItem>
                 <SidebarMenuButton
                   className={cn(

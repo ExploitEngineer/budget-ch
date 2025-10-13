@@ -19,6 +19,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { authClient } from "@/lib/auth/auth-client";
+import { toast } from "sonner";
 
 export default function SignIn() {
   const form = useForm<UserSignInValues>({
@@ -31,8 +33,31 @@ export default function SignIn() {
 
   const t = useTranslations("authpages");
 
-  function onSubmit(values: UserSignInValues) {
-    console.log("Submitted:", values);
+  async function onSubmit(values: UserSignInValues) {
+    const { data, error } = await authClient.signIn.email({
+      email: values.email, // required
+      password: values.password, // required
+      rememberMe: true,
+      callbackURL: "/me/dashboard",
+    });
+    if (error) {
+      console.error(error);
+
+      if (error.code === "EMAIL_NOT_VERIFIED") {
+        toast.error(
+          `Email not verified, please check your email for the verification link.`,
+        );
+        const res = await authClient.sendVerificationEmail({
+          email: values.email,
+        });
+        console.log("[email verification] sent verification email", res);
+      } else {
+        toast.error(`Could not sign in: ${error.message}`);
+      }
+    }
+    if (data) {
+      toast.success(`Signed in successfully!`);
+    }
   }
 
   return (

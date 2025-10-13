@@ -19,6 +19,8 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { authClient } from "@/lib/auth/auth-client";
+import { toast } from "sonner";
 
 export default function SignUp() {
   const form = useForm<UserSignUpValues>({
@@ -32,8 +34,21 @@ export default function SignUp() {
 
   const t = useTranslations("authpages");
 
-  function onSubmit(values: UserSignUpValues) {
-    console.log("Submitted:", values);
+  async function onSubmit(values: UserSignUpValues) {
+    const { data, error } = await authClient.signUp.email({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      // image: "https://example.com/image.png",
+      callbackURL: "/signin",
+    });
+    if (error) {
+      console.error(error);
+      toast.error(`Could not sign up: ${error.message}`)
+    }
+    if (data) {
+      toast.success(`Signed up successfully!`)
+    }
   }
 
   return (
