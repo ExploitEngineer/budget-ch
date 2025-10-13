@@ -20,9 +20,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { authClient } from "@/lib/auth/auth-client";
+import { useState } from "react";
+import { redirect } from "next/navigation";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SignIn() {
+  const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
   const form = useForm<UserSignInValues>({
     resolver: zodResolver(userSignInSchema),
     defaultValues: {
@@ -34,29 +38,37 @@ export default function SignIn() {
   const t = useTranslations("authpages");
 
   async function onSubmit(values: UserSignInValues) {
-    const { data, error } = await authClient.signIn.email({
-      email: values.email, // required
-      password: values.password, // required
-      rememberMe: true,
-      callbackURL: "/me/dashboard",
-    });
-    if (error) {
-      console.error(error);
+    setIsSigningIn(true);
+    try {
+      const { data, error } = await authClient.signIn.email({
+        email: values.email, // required
+        password: values.password, // required
+        rememberMe: true,
+        callbackURL: "/me/dashboard",
+      });
+      if (error) {
+        console.error(error);
 
-      if (error.code === "EMAIL_NOT_VERIFIED") {
-        toast.error(
-          `Email not verified, please check your email for the verification link.`,
-        );
-        const res = await authClient.sendVerificationEmail({
-          email: values.email,
-        });
-        console.log("[email verification] sent verification email", res);
-      } else {
-        toast.error(`Could not sign in: ${error.message}`);
+        if (error.code === "EMAIL_NOT_VERIFIED") {
+          toast.error(
+            `Email not verified, please check your email for the verification link.`,
+          );
+          const res = await authClient.sendVerificationEmail({
+            email: values.email,
+          });
+          console.log("[email verification] sent verification email", res);
+        } else {
+          toast.error(`Could not sign in: ${error.message}`);
+        }
       }
-    }
-    if (data) {
-      toast.success(`Signed in successfully!`);
+      if (data) {
+        toast.success(`Signed in successfully!`);
+        redirect("/me/dashboard");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSigningIn(false);
     }
   }
 
@@ -123,9 +135,10 @@ export default function SignIn() {
           {/* Submit */}
           <Button
             type="submit"
+            disabled={isSigningIn}
             className="w-full cursor-pointer rounded-xl bg-[#235FE3] py-5 font-bold text-white hover:bg-blue-600 dark:bg-[#6371FF] dark:hover:bg-[#6371FF]/80"
           >
-            {t("signin")}
+            {isSigningIn ? <Spinner /> : t("signin")}
           </Button>
 
           {/* Google sign-in */}
