@@ -55,7 +55,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 }
                 alt="company logo"
                 fill
-                className="m-0 object-cover p-0 pe-10"
+                className={cn(
+                  "m-0 object-cover p-0",
+                  resolvedTheme === "dark" ? "pe-10" : "pe-0",
+                )}
                 priority
               />
             </div>

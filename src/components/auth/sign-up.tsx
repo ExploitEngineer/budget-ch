@@ -20,9 +20,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { authClient } from "@/lib/auth/auth-client";
+import { useState } from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import { redirect } from "next/navigation";
+import { signInWithGoogle } from "@/lib/auth/auth-client";
 
 export default function SignUp() {
+  const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
   const form = useForm<UserSignUpValues>({
     resolver: zodResolver(userSignUpSchema),
     defaultValues: {
@@ -35,21 +40,36 @@ export default function SignUp() {
   const t = useTranslations("authpages");
 
   async function onSubmit(values: UserSignUpValues) {
-    const { data, error } = await authClient.signUp.email({
-      name: values.name,
-      email: values.email,
-      password: values.password,
-      // image: "https://example.com/image.png",
-      callbackURL: "/signin",
-    });
-    if (error) {
-      console.error(error);
-      toast.error(`Could not sign up: ${error.message}`)
-    }
-    if (data) {
-      toast.success(`Signed up successfully!`)
+    setIsSigningUp(true);
+    try {
+      const { data, error } = await authClient.signUp.email({
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        // image: "https://example.com/image.png",
+        callbackURL: "/signin",
+      });
+      if (error) {
+        console.error(error);
+        toast.error(`Could not sign up: ${error.message}`);
+      }
+      if (data) {
+        toast.success(`Signed up successfully!`);
+        redirect("/signin");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSigningUp(false);
     }
   }
+
+  const handleGoogleSignUp = async () => {
+    const result = await signInWithGoogle();
+    if (result.status === "error") {
+      toast.error("Error signing up with Google");
+    }
+  };
 
   return (
     <Card className="dark:border-border-blue dark:bg-blue-background h-full w-full flex-1 border-1 bg-white p-6 shadow-lg sm:max-w-lg">
@@ -157,14 +177,16 @@ export default function SignUp() {
           {/* Submit */}
           <Button
             type="submit"
+            disabled={isSigningUp}
             className="w-full cursor-pointer rounded-xl bg-[#235FE3] py-5 font-bold text-white hover:bg-blue-600 dark:bg-[#6371FF] dark:hover:bg-[#6371FF]/80"
           >
-            {t("buttons.create-account")}
+            {isSigningUp ? <Spinner /> : t("buttons.create-account")}
           </Button>
 
           {/* Google sign-in */}
           <Button
             type="button"
+            onClick={handleGoogleSignUp}
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background flex w-full cursor-pointer items-center gap-3 rounded-xl py-5 font-bold"
           >

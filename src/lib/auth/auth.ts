@@ -21,7 +21,14 @@ export const auth = betterAuth({
   emailVerification: {
     // TODO: Add the email verification page
     sendVerificationEmail: async ({ user, url, token }, request) => {
-      console.log(`EmailVerification: ${user.email} ${url} ${token}`)
+      console.log(`EmailVerification: ${user.email} ${url} ${token}`);
+    },
+  },
+  socialProviders: {
+    google: {
+      prompt: "select_account",
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
 });
