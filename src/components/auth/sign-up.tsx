@@ -24,6 +24,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 import { redirect } from "next/navigation";
+import { signInWithGoogle } from "@/lib/auth/auth-client";
 
 export default function SignUp() {
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
@@ -62,6 +63,13 @@ export default function SignUp() {
       setIsSigningUp(false);
     }
   }
+
+  const handleGoogleSignUp = async () => {
+    const result = await signInWithGoogle();
+    if (result.status === "error") {
+      toast.error("Error signing up with Google");
+    }
+  };
 
   return (
     <Card className="dark:border-border-blue dark:bg-blue-background h-full w-full flex-1 border-1 bg-white p-6 shadow-lg sm:max-w-lg">
@@ -178,6 +186,7 @@ export default function SignUp() {
           {/* Google sign-in */}
           <Button
             type="button"
+            onClick={handleGoogleSignUp}
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background flex w-full cursor-pointer items-center gap-3 rounded-xl py-5 font-bold"
           >
