@@ -1,0 +1,1 @@
+ALTER TABLE "hub_members" ALTER COLUMN "access_role" SET DEFAULT 'member';

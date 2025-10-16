@@ -1,0 +1,1 @@
+ALTER TABLE "hub_members" ALTER COLUMN "hub_id" SET DATA TYPE uuid;

@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "@/db/db";
+import { CreateHub } from "@/lib/services/hub";
 import * as schema from "@/db/schema";
+import { CreateHubMember } from "../services/hub-member";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -14,6 +16,37 @@ export const auth = betterAuth({
       verifications: schema.verifications,
     },
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            const result = await CreateHub(user.id, user.name);
+            if (result.status === "error") {
+              console.error(result.msg);
+              return;
+            }
+
+            const { msg, status } = await CreateHubMember(
+              user.id,
+              result.hubId!,
+              "admin",
+              true,
+              user.name,
+            );
+
+            if (status === "error") {
+              console.error(msg);
+            }
+          } catch (err) {
+            if (err instanceof Error) {
+              console.error(`Error: ${err.message}`);
+            }
+          }
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     // requireEmailVerification: true,

@@ -1,4 +1,14 @@
-import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  primaryKey,
+  timestamp,
+  boolean,
+  uuid,
+  pgEnum,
+} from "drizzle-orm/pg-core";
+
+export const AccessRole = pgEnum("access_role", ["admin", "member"]);
 
 /* AUTH SCHEMAS */
 
@@ -14,6 +24,38 @@ export const users = pgTable("users", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const hubs = pgTable("hubs", {
+  id: uuid().notNull().primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const hub_members = pgTable(
+  "hub_members",
+  {
+    hubId: uuid("hub_id")
+      .notNull()
+      .references(() => hubs.id),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id),
+    accessRole: AccessRole().notNull().default("admin"),
+    isOwner: boolean("is_owner").default(true).notNull(),
+    joinedAt: timestamp()
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.hubId] })],
+);
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),

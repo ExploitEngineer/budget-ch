@@ -19,4 +19,3 @@ export const signInWithGoogle = async () => {
     return { status: "error", message: (err as Error).message };
   }
 };
-

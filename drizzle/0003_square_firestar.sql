@@ -1,0 +1,1 @@
+ALTER TABLE "hub_members" ADD COLUMN "is_owner" boolean DEFAULT true NOT NULL;

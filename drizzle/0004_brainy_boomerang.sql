@@ -1,0 +1,1 @@
+ALTER TABLE "hub_members" RENAME COLUMN "access_role" TO "accessRole";
