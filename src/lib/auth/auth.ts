@@ -23,20 +23,20 @@ export const auth = betterAuth({
           try {
             const result = await CreateHub(user.id, user.name);
             if (result.status === "error") {
-              console.error(result.msg);
+              console.error(result.message);
               return;
             }
 
-            const { msg, status } = await CreateHubMember(
-              user.id,
-              result.hubId!,
-              "admin",
-              true,
-              user.name,
-            );
+            const { message, status } = await CreateHubMember({
+              userId: user.id,
+              hubId: result.hubId!,
+              accessRole: "member",
+              isOwner: true,
+              userName: user.name,
+            });
 
             if (status === "error") {
-              console.error(msg);
+              console.error(message);
             }
           } catch (err) {
             if (err instanceof Error) {
