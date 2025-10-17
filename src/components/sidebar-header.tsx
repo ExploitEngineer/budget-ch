@@ -14,7 +14,7 @@ import {
   MessageSquare,
   Check,
 } from "lucide-react";
-import DashBoardDialog from "./dialogs/dashboard-dialog";
+import TransactionDialog from "./dialogs/transaction-dialog";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
@@ -119,7 +119,7 @@ export default function SidebarHeader() {
             isSearchExpanded ? "hidden sm:flex" : "flex"
           }`}
         >
-          {route === "dashboard" && <DashBoardDialog />}
+          {route === "dashboard" && <TransactionDialog />}
 
           {route === "transactions" && (
             <TransactionEditDialog variant="gradient" />

@@ -69,6 +69,7 @@ export function useContentData() {
       balance: "CHF 8’200.00",
       action: t("data-table.data.action"),
     },
+    /*
     {
       name: t("data-table.data.name.pillar"),
       type: t("data-table.data.name.pillar"),
@@ -76,6 +77,7 @@ export function useContentData() {
       balance: "CHF 5’000.00",
       action: t("data-table.data.action"),
     },
+    */
   ];
   return { cards, tableData };
 }

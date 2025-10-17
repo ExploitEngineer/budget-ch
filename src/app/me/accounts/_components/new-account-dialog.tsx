@@ -35,6 +35,10 @@ import {
 } from "@/lib/validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { CreateFinancialAccount } from "@/lib/services/financial-account";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function NewAccountDialog({
   variant,
@@ -47,29 +51,59 @@ export default function NewAccountDialog({
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const form = useForm<NewAccountDialogValues>({
     resolver: zodResolver(NewAccountDialogSchema) as any,
     defaultValues: {
       name: "",
-      type: "",
+      type: "checking",
       balance: 0,
       iban: "",
       note: "",
     },
   });
 
-  function onSubmit(values: NewAccountDialogValues) {
-    console.log("New account submitted:", values);
+  async function onSubmit(values: NewAccountDialogValues) {
+    setLoading(true);
+
+    try {
+      const result = await CreateFinancialAccount({
+        name: values.name,
+        type: values.type.toLowerCase(),
+        initialBalance: values.balance,
+        iban: values.iban,
+        note: values.note,
+      });
+
+      if (!result.success) {
+        toast.error(`${result.message} Something went wrong`);
+        throw new Error(result.message || "Something went wrong");
+      }
+
+      toast.success("Account created Successfully");
+      console.log(result.account);
+
+      form.reset();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(`Failed to create account: ${err.message}`);
+    } finally {
+      setLoading(false);
+      setIsOpen(false);
+    }
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           className={cn(
+            "cursor-pointer",
             variant === "gradient"
               ? "btn-gradient dark:text-white"
-              : "dark:border-border-blue !bg-dark-blue-background cursor-pointer text-xs",
+              : "dark:border-border-blue !bg-dark-blue-background text-xs",
           )}
           variant={variant === "gradient" ? "default" : "outline"}
         >
@@ -147,9 +181,11 @@ export default function NewAccountDialog({
                           <SelectItem value="cash">
                             {t("labels.type.options.cash")}
                           </SelectItem>
+                          {/*
                           <SelectItem value="retirement-3a">
                             {t("labels.type.options.retirement-3a")}
                           </SelectItem>
+                          */}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -217,7 +253,13 @@ export default function NewAccountDialog({
 
             {/* Footer */}
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="submit">{t("save")}</Button>
+              <Button
+                type="submit"
+                disabled={loading}
+                className="cursor-pointer"
+              >
+                {loading ? <Spinner /> : t("save")}
+              </Button>
             </div>
           </form>
         </Form>
