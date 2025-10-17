@@ -47,7 +47,7 @@ export const hub_members = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => users.id),
-    accessRole: AccessRole().notNull().default("admin"),
+    accessRole: AccessRole().notNull().default("member"),
     isOwner: boolean("is_owner").default(true).notNull(),
     joinedAt: timestamp()
       .defaultNow()

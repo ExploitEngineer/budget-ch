@@ -1,8 +1,14 @@
-// Define all db related queries here
 import db from "./db";
 import { hubs, hub_members } from "./schema";
 
-export type AccessRole = "admin" | "member";
+type AccessRole = "admin" | "member";
+export type createHubMemberArgs = {
+  userId: string;
+  hubId: string;
+  accessRole: AccessRole;
+  isOwner: boolean;
+  userName?: string;
+};
 
 export async function createHub(userId: string, userName: string) {
   try {
@@ -10,7 +16,7 @@ export async function createHub(userId: string, userName: string) {
       .insert(hubs)
       .values({
         userId,
-        name: userName + " " + "hub",
+        name: `${userName}'s Hub`,
       })
       .returning({ id: hubs.id });
 
@@ -21,12 +27,12 @@ export async function createHub(userId: string, userName: string) {
   }
 }
 
-export async function createHubMember(
-  userId: string,
-  hubId: string,
-  accessRole: AccessRole,
-  isOwner: boolean,
-) {
+export async function createHubMember({
+  userId,
+  hubId,
+  accessRole,
+  isOwner,
+}: createHubMemberArgs) {
   try {
     await db.insert(hub_members).values({
       userId,
