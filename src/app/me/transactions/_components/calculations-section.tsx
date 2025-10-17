@@ -31,17 +31,21 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MainFormValues, mainFormSchema } from "@/lib/validations";
+import {
+  CalculationFormValues,
+  calculationFormSchema,
+} from "@/lib/validations/calculation-section-validations";
 
 export function CalculationSection() {
   const t = useTranslations("main-dashboard.transactions-page");
 
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
+  const form = useForm<CalculationFormValues>({
+    resolver: zodResolver(calculationFormSchema) as any,
     defaultValues: {
       dateFrom: undefined,
       dateTo: undefined,
-      select: "",
+      select1: "savings",
+      select2: "restaurant",
       amountMax: 0,
       amountMin: 0,
       text: "",

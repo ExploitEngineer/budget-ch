@@ -33,39 +33,16 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, File, Plus, X } from "lucide-react";
+import { CalendarIcon, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { z } from "zod";
+import {
+  TransactionEditValues,
+  transactionEditSchema,
+} from "@/lib/validations/transaction-edit-dialog-validations";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-
-const splitRowSchema = z.object({
-  category: z.string().min(1, { message: "Category is required" }),
-  amount: z.coerce.number().min(0),
-  description: z.string().optional(),
-});
-
-const transactionEditSchema = z.object({
-  date: z.coerce
-    .date()
-    .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
-  account: z.string().min(1, { message: "Account is required" }),
-  recipient: z.string().min(1, { message: "Recipient / Source is required" }),
-  category: z.string().min(1, { message: "Category is required" }),
-  amount: z.coerce.number(),
-  note: z.string().optional(),
-  file: z
-    .any()
-    .refine((f) => f instanceof File || f === undefined, {
-      message: "Invalid file",
-    })
-    .optional(),
-  splits: z.array(splitRowSchema).optional(),
-});
-
-type TransactionEditValues = z.infer<typeof transactionEditSchema>;
 
 export default function TransactionEditDialog({
   variant,
@@ -82,9 +59,9 @@ export default function TransactionEditDialog({
     resolver: zodResolver(transactionEditSchema) as any,
     defaultValues: {
       date: new Date(),
-      account: "",
+      account: "giro",
       recipient: "",
-      category: "",
+      category: "oev",
       amount: 0,
       note: "",
       splits: [],
@@ -437,7 +414,7 @@ export default function TransactionEditDialog({
                     className="flex cursor-pointer items-center gap-1"
                     onClick={() =>
                       append({
-                        category: "",
+                        category: "oev",
                         amount: 0,
                         description: "",
                       })

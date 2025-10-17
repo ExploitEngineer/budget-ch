@@ -28,7 +28,10 @@ import { Input } from "@/components/ui/input";
 import { CalendarIcon, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { mainFormSchema, MainFormValues } from "@/lib/validations";
+import {
+  TransactionDialogValues,
+  TransactionDialogSchema,
+} from "@/lib/validations/transaction-dialog-validations";
 import {
   Dialog,
   DialogTrigger,
@@ -37,23 +40,21 @@ import {
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function DashBoardDialog() {
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
+export default function TransactionDialog() {
+  const form = useForm<TransactionDialogValues>({
+    resolver: zodResolver(TransactionDialogSchema) as any,
     defaultValues: {
-      date: undefined,
-      account: "",
+      date: new Date(),
+      account: "checking",
       text: "",
-      select: "",
+      select: "groceries",
       amount: 0,
-      file: undefined,
-      entries: [],
     },
   });
 
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  function onSubmit(values: MainFormValues) {
+  function onSubmit(values: TransactionDialogValues) {
     console.log(values);
   }
 

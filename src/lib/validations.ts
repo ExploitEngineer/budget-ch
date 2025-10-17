@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const accountType = ["checking", "savings", "credit-card", "cash"] as const;
+
 export const userSignUpSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
@@ -161,19 +163,7 @@ export type SavingsGoalDialogValues = z.infer<typeof SavingsGoalDialogSchema>;
 // Content Dialog Schema
 export const NewAccountDialogSchema = z.object({
   name: z.string().min(1, { message: "Name is required" }),
-  type: z
-    .string()
-    .refine(
-      (val) =>
-        [
-          "checking",
-          "savings",
-          "credit-card",
-          "cash",
-          "retirement-3a",
-        ].includes(val),
-      { message: "Please select a valid account type" },
-    ),
+  type: z.enum(accountType, { message: "Type is required" }),
   balance: z.coerce.number().min(0, { message: "Must be 0 or more" }),
   iban: z.string().optional(),
   note: z.string().optional(),
