@@ -85,12 +85,12 @@
                         "options": {
                             "checking": "Checking",
                             "credit-card": "Credit card",
-                            "save": "Save",
+                            "save": "Savings",
                             "cash": "Cash"
                         }
                     },
                     "quelle": {
-                        "title": "Quelle",
+                        "title": "Recipient",
                         "placeholder": "e.g. Coop, employer…"
                     },
                     "category": {

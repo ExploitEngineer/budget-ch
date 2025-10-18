@@ -6,14 +6,15 @@ export async function CreateHub(userId: string, userName: string) {
   try {
     const hubId = await createHub(userId, userName);
     return {
-      message: `Hub created for user:${userName} successfully`,
       status: "success",
-      hubId,
+      message: `Hub created successfully for ${userName}`,
+      data: { hubId },
     };
-  } catch (err) {
+  } catch (err: any) {
+    console.error("[Service] CreateHub failed:", err);
     return {
-      message: `Error creating Hub for user:${userName}, ${err} `,
       status: "error",
+      message: err.message || "Unexpected error creating hub",
     };
   }
 }

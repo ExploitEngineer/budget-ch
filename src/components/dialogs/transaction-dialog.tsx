@@ -39,23 +39,50 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { CreateTransaction } from "@/lib/services/transaction";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 export default function TransactionDialog() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<TransactionDialogValues>({
     resolver: zodResolver(TransactionDialogSchema) as any,
     defaultValues: {
       date: new Date(),
       account: "checking",
-      text: "",
+      recipient: "",
       select: "groceries",
       amount: 0,
+      note: "",
     },
   });
 
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  function onSubmit(values: TransactionDialogValues) {
-    console.log(values);
+  async function onSubmit(values: TransactionDialogValues) {
+    setIsLoading(true);
+    try {
+      const result = await CreateTransaction({
+        categoryName: values.select,
+        amount: values.amount,
+        note: values.note,
+      });
+
+      if (result?.reason === "NO_ACCOUNT") {
+        toast.error("You need to create a financial account first!");
+        return;
+      }
+
+      toast.success("Transaction added successfully");
+
+      form.reset();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -148,11 +175,11 @@ export default function TransactionDialog() {
                           <SelectItem value="checking">
                             {t("dialog-box.labels.account.options.checking")}
                           </SelectItem>
-                          <SelectItem value="card">
-                            {t("dialog-box.labels.account.options.credit-card")}
-                          </SelectItem>
-                          <SelectItem value="save">
+                          <SelectItem value="savings">
                             {t("dialog-box.labels.account.options.save")}
+                          </SelectItem>
+                          <SelectItem value="credit-card">
+                            {t("dialog-box.labels.account.options.credit-card")}
                           </SelectItem>
                           <SelectItem value="cash">
                             {t("dialog-box.labels.account.options.cash")}
@@ -169,7 +196,7 @@ export default function TransactionDialog() {
             {/* Row 2 */}
             <FormField
               control={form.control}
-              name="text"
+              name="recipient"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("dialog-box.labels.quelle.title")}</FormLabel>
@@ -251,7 +278,7 @@ export default function TransactionDialog() {
             {/* Row 4 */}
             <FormField
               control={form.control}
-              name="text"
+              name="note"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>{t("dialog-box.labels.note.title")}</FormLabel>
@@ -271,7 +298,9 @@ export default function TransactionDialog() {
               <Button type="button" variant="outline">
                 {t("dialog-box.buttons.save")}
               </Button>
-              <Button type="submit">{t("dialog-box.buttons.post")}</Button>
+              <Button className="cursor-pointer" type="submit">
+                {isLoading ? <Spinner /> : t("dialog-box.buttons.post")}
+              </Button>
             </div>
           </form>
         </Form>

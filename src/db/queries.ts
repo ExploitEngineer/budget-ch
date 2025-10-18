@@ -2,6 +2,7 @@ import db from "./db";
 import {
   hubs,
   hub_members,
+  transactions,
   transaction_categories,
   financial_accounts,
 } from "./schema";
@@ -26,6 +27,17 @@ export type financialAccountArgs = {
   note?: string;
 };
 
+export type createTransactionArgs = {
+  financialAccountId: string;
+  hubId: string;
+  userId: string;
+  transactionCategoryId: string;
+  amount: number;
+  note?: string;
+  categoryName: string;
+};
+
+// create Hub
 export async function createHub(userId: string, userName: string) {
   try {
     const [hub] = await db
@@ -36,10 +48,11 @@ export async function createHub(userId: string, userName: string) {
     return hub.id;
   } catch (err) {
     console.error("Error creating Hub: ", err);
-    return null;
+    throw new Error("Failed to create hub");
   }
 }
 
+// create Hub Member
 export async function createHubMember({
   userId,
   hubId,
@@ -55,9 +68,11 @@ export async function createHubMember({
     });
   } catch (err) {
     console.error("Error creating Hub Member: ", err);
+    throw Error("Failed to create Hub Member");
   }
 }
 
+// create Financial Account
 export async function createFinancialAccount({
   userId,
   hubId,
@@ -88,14 +103,42 @@ export async function createFinancialAccount({
   }
 }
 
-export async function createTransactionCategory(name: string) {
+// create Transaction
+export async function createTransaction({
+  financialAccountId,
+  hubId,
+  userId,
+  transactionCategoryId,
+  amount,
+  note,
+}: Omit<createTransactionArgs, "categoryName">) {
   try {
-    await db.insert(transaction_categories).values({
-      name,
+    await db.insert(transactions).values({
+      financialAccountId,
+      hubId,
+      userId,
+      transactionCategoryId,
+      amount,
+      note,
     });
   } catch (err) {
-    console.error("Error creating Transaction category ", err);
+    console.error("Error creating Transaction ", err);
   }
 }
 
-export async function createTransaction() {}
+// create Transaction Category
+export async function createTransactionCategory(name: string) {
+  try {
+    const [category] = await db
+      .insert(transaction_categories)
+      .values({
+        name,
+      })
+      .returning();
+
+    return category;
+  } catch (err) {
+    console.error("Error creating Transaction category ", err);
+    throw err;
+  }
+}

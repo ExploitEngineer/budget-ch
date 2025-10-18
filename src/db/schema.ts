@@ -2,7 +2,6 @@ import {
   pgTable,
   text,
   varchar,
-  numeric,
   doublePrecision,
   primaryKey,
   timestamp,
@@ -100,37 +99,30 @@ export const financial_accounts = pgTable("financial_accounts", {
   note: text("note"),
 });
 
-export const transactions = pgTable(
-  "transactions",
-  {
-    financialAccountId: uuid("financial_account_id")
-      .notNull()
-      .references(() => financial_accounts.id),
-    hubId: uuid("hub_id")
-      .notNull()
-      .references(() => hubs.id, { onDelete: "cascade" }),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    transactionCategoryId: uuid("transaction_category_id")
-      .notNull()
-      .references(() => transaction_categories.id, { onDelete: "cascade" }),
-    amount: numeric("amount", { precision: 12, scale: 2 })
-      .notNull()
-      .default("0.00"),
-    type: transactionType().notNull().default("income"),
-    source: text("source").notNull(),
-    addedAt: timestamp("transaction_added_at"),
-    note: text("note").notNull(),
-  },
-  (table) => [
-    primaryKey({ columns: [table.userId, table.transactionCategoryId] }),
-  ],
-);
-
 export const transaction_categories = pgTable("transaction_categories", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   name: text("name").notNull(),
+});
+
+export const transactions = pgTable("transactions", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  financialAccountId: uuid("financial_account_id")
+    .notNull()
+    .references(() => financial_accounts.id, { onDelete: "cascade" }),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  transactionCategoryId: uuid("transaction_category_id")
+    .notNull()
+    .references(() => transaction_categories.id, { onDelete: "cascade" }),
+  amount: doublePrecision("amount").notNull().default(0),
+  type: transactionType().notNull().default("income"),
+  source: text("source"),
+  addedAt: timestamp("transaction_added_at"),
+  note: text("note"),
 });
 
 export const accounts = pgTable("accounts", {

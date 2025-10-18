@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-const accountType = ["checking", "card", "save", "cash"] as const;
+const accountType = ["checking", "savings", "credit-card", "cash"] as const;
 const categoryType = [
   "groceries",
   "restaurant",
@@ -14,7 +14,7 @@ export const TransactionDialogSchema = z.object({
     .date()
     .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
   account: z.enum(accountType, { message: "Account is required" }),
-  text: z.string().min(1, { message: "Text is required" }),
+  recipient: z.string().min(1, { message: "Text is required" }),
   select: z.enum(categoryType, { message: "Category is required" }),
   amount: z.coerce.number().min(0, { message: "Amount must be 0 or more" }),
   note: z.string().optional(),

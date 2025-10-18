@@ -71,19 +71,18 @@ export default function NewAccountDialog({
     try {
       const result = await CreateFinancialAccount({
         name: values.name,
-        type: values.type.toLowerCase(),
+        type: values.type,
         initialBalance: values.balance,
         iban: values.iban,
         note: values.note,
       });
 
-      if (!result.success) {
+      if (!result.status) {
         toast.error(`${result.message} Something went wrong`);
-        throw new Error(result.message || "Something went wrong");
+        return;
       }
 
-      toast.success("Account created Successfully");
-      console.log(result.account);
+      toast.success(result.message);
 
       form.reset();
     } catch (err: any) {

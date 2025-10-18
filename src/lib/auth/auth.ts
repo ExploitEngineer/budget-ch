@@ -29,7 +29,7 @@ export const auth = betterAuth({
 
             const { message, status } = await CreateHubMember({
               userId: user.id,
-              hubId: result.hubId!,
+              hubId: result.data?.hubId!,
               accessRole: "member",
               isOwner: true,
               userName: user.name,
