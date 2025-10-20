@@ -101,6 +101,9 @@ export const financial_accounts = pgTable("financial_accounts", {
 
 export const transaction_categories = pgTable("transaction_categories", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
 });
 

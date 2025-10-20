@@ -15,7 +15,7 @@ export const TransactionDialogSchema = z.object({
     .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
   account: z.enum(accountType, { message: "Account is required" }),
   recipient: z.string().min(1, { message: "Text is required" }),
-  select: z.enum(categoryType, { message: "Category is required" }),
+  select: z.union([z.enum(categoryType), z.string().min(1)]),
   amount: z.coerce.number().min(0, { message: "Amount must be 0 or more" }),
   note: z.string().optional(),
 });

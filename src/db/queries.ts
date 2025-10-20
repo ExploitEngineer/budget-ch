@@ -127,12 +127,29 @@ export async function createTransaction({
 }
 
 // create Transaction Category
-export async function createTransactionCategory(name: string) {
+export async function createTransactionCategory(name: string, hubId: string) {
   try {
+    const normalized = name.trim().toLowerCase();
+
+    // Check if category already exists (case-insensitive)
+    const existingCategory = await db.query.transaction_categories.findFirst({
+      where: (categories, { and, eq, sql }) =>
+        and(
+          sql`LOWER(${categories.name}) = ${normalized}`,
+          eq(categories.hubId, hubId),
+        ),
+    });
+
+    if (existingCategory) {
+      throw new Error(`Category "${name}" already exists in this hub`);
+    }
+
+    // Create new category
     const [category] = await db
       .insert(transaction_categories)
       .values({
-        name,
+        name: normalized, // store normalized name
+        hubId,
       })
       .returning();
 

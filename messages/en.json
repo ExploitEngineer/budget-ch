@@ -95,6 +95,7 @@
                     },
                     "category": {
                         "title": "Category",
+                        "category-name": "Category Name",
                         "options": {
                             "groceries": "Groceries",
                             "restaurant": "Restaurant & Café",
@@ -109,9 +110,13 @@
                         "placeholder": "Optional"
                     }
                 },
+                "no-categories-yet": "No categories yet",
                 "buttons": {
                     "save": "Save as template",
-                    "post": "Post"
+                    "post": "Post",
+                    "add": "Add",
+                    "add-category": "Add Category",
+                    "new-category": "New category"
                 }
             },
             "dashbaord-table-adjust-dialog": {
