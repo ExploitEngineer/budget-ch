@@ -88,10 +88,10 @@ export default function TransactionEditDialog({
           }
           variant={variant === "gradient" ? "default" : "outline"}
         >
+          <Plus className="h-5 w-5" />
           <span className="hidden text-sm sm:block">
             {variant === "gradient" ? t("title-2") : text}
           </span>
-          <Plus className="h-5 w-5" />
         </Button>
       </DialogTrigger>
 

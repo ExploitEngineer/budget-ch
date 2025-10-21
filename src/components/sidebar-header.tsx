@@ -20,7 +20,7 @@ import { usePathname } from "next/navigation";
 import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
 import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
-import SavingsGoalMainDialog from "@/app/me/budgets/_components/saving-goals-main-dialog";
+import SavingGoalDialog from "@/app/me/saving-goals/_components/saving-goal-dialog";
 import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
 import TransactionEditDialog from "@/app/me/transactions/_components/transactions-edit-dialog";
 
@@ -127,7 +127,7 @@ export default function SidebarHeader() {
 
           {route === "budgets" && <BudgetDialog />}
 
-          {route === "saving-goals" && <SavingsGoalMainDialog />}
+          {route === "saving-goals" && <SavingGoalDialog />}
 
           {route === "accounts" && (
             <div className="flex items-center gap-2">
