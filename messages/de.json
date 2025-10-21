@@ -96,6 +96,7 @@
                     },
                     "category": {
                         "title": "Kategorie",
+                        "category-name": "Kategoriename",
                         "options": {
                             "groceries": "Lebensmittel",
                             "restaurant": "Restaurant & Café",
@@ -110,9 +111,13 @@
                         "placeholder": "Optional"
                     }
                 },
+                "no-categories-yet": "Noch keine Kategorien",
                 "buttons": {
                     "save": "Als Vorlage speichern",
-                    "post": "Buchen"
+                    "post": "Veröffentlichen",
+                    "add": "Hinzufügen",
+                    "add-category": "Kategorie hinzufügen",
+                    "new-category": "Neue Kategorie"
                 }
             },
             "dashbaord-table-adjust-dialog": {
@@ -549,50 +554,32 @@
                     "title": "Neues Ziel",
                     "subtitle": "Neues Sparziel",
                     "button": "Schließen",
+                    "delete": "Löschen",
+                    "edit-dialog": "Sparziel bearbeiten",
+                    "edit": "Bearbeiten",
                     "labels": {
                         "name": {
                             "title": "Name",
-                            "placeholder": "z. B. Notgroschen, Ferien, Steuern"
+                            "placeholder": "z. B. Notgroschen, Urlaub, Steuern"
                         },
                         "goal-amount": "Zielbetrag (CHF)",
                         "saved-amount": "Bereits gespart (CHF)",
                         "due-date": {
-                            "title": "Fällig am",
-                            "placeholder": "mm/dd/yyyy"
+                            "title": "Fälligkeitsdatum",
+                            "placeholder": "TT/MM/JJJJ"
                         },
                         "account": {
                             "title": "Konto",
                             "options": {
-                                "save": "Sparen",
-                                "checking": "Giro",
-                                "cash": "Bar"
+                                "save": "Sparkonto",
+                                "checking": "Girokonto",
+                                "cash": "Bargeld",
+                                "credit-card": "Kreditkarte"
                             }
                         },
                         "monthly-allocation": "Monatliche Zuweisung (CHF)"
                     },
                     "save": "Speichern"
-                }
-            },
-            "dialog": {
-                "title": "Sparziel bearbeiten",
-                "button": "Schließen",
-                "edit": "Bearbeiten",
-                "labels": {
-                    "name": "Name",
-                    "target-amount": "Zielbetrag (CHF)",
-                    "already-saved": "Bereits gespart (CHF)",
-                    "due-on": "Fällig am",
-                    "account": "Konto",
-                    "monthly-allocation": "Monatliche Zuweisung (CHF)"
-                },
-                "buttons": {
-                    "delete": "Löschen",
-                    "save": "Speichern"
-                },
-                "account-options": {
-                    "checking": "Girokonto",
-                    "savings": "Sparkonto",
-                    "cash": "Bargeld"
                 }
             },
             "cards": {

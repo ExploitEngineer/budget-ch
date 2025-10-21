@@ -96,6 +96,7 @@
                     },
                     "category": {
                         "title": "Categoria",
+                        "category-name": "Nome categoria",
                         "options": {
                             "groceries": "Spesa",
                             "restaurant": "Ristorante & Café",
@@ -110,9 +111,13 @@
                         "placeholder": "Opzionale"
                     }
                 },
+                "no-categories-yet": "Nessuna categoria ancora",
                 "buttons": {
                     "save": "Salva come modello",
-                    "post": "Registra"
+                    "post": "Pubblica",
+                    "add": "Aggiungi",
+                    "add-category": "Aggiungi categoria",
+                    "new-category": "Nuova categoria"
                 }
             },
             "dashbaord-table-adjust-dialog": {
@@ -549,50 +554,32 @@
                     "title": "Nuovo obiettivo",
                     "subtitle": "Nuovo obiettivo di risparmio",
                     "button": "Chiudi",
+                    "delete": "Elimina",
+                    "edit-dialog": "Modifica obiettivo di risparmio",
+                    "edit": "Modifica",
                     "labels": {
                         "name": {
                             "title": "Nome",
-                            "placeholder": "es. fondo emergenze, vacanze, tasse"
+                            "placeholder": "es. Fondo d’emergenza, Vacanze, Tasse"
                         },
                         "goal-amount": "Importo obiettivo (CHF)",
                         "saved-amount": "Già risparmiato (CHF)",
                         "due-date": {
-                            "title": "Scadenza",
-                            "placeholder": "mm/dd/yyyy"
+                            "title": "Data di scadenza",
+                            "placeholder": "gg/mm/aaaa"
                         },
                         "account": {
                             "title": "Conto",
                             "options": {
                                 "save": "Risparmio",
                                 "checking": "Conto corrente",
-                                "cash": "Contanti"
+                                "cash": "Contanti",
+                                "credit-card": "Carta di credito"
                             }
                         },
                         "monthly-allocation": "Assegnazione mensile (CHF)"
                     },
                     "save": "Salva"
-                }
-            },
-            "dialog": {
-                "title": "Modifica obiettivo di risparmio",
-                "button": "Chiudi",
-                "edit": "Modifica",
-                "labels": {
-                    "name": "Nome",
-                    "target-amount": "Importo target (CHF)",
-                    "already-saved": "Già risparmiato (CHF)",
-                    "due-on": "Scadenza il",
-                    "account": "Conto",
-                    "monthly-allocation": "Assegnazione mensile (CHF)"
-                },
-                "buttons": {
-                    "delete": "Elimina",
-                    "save": "Salva"
-                },
-                "account-options": {
-                    "checking": "Conto corrente",
-                    "savings": "Risparmio",
-                    "cash": "Contanti"
                 }
             },
             "cards": {

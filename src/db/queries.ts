@@ -5,7 +5,12 @@ import {
   transactions,
   transaction_categories,
   financial_accounts,
+  budgets,
+  saving_goals,
+  quick_tasks,
 } from "./schema";
+import { eq, sql } from "drizzle-orm";
+import type { QuickTask } from "./schema";
 
 type AccessRole = "admin" | "member";
 export type createHubMemberArgs = {
@@ -37,7 +42,37 @@ export type createTransactionArgs = {
   categoryName: string;
 };
 
-// create Hub
+export type budgetArgs = {
+  financialAccountId: string;
+  hubId: string;
+  userId: string;
+  transactionCategoryId: string;
+  categoryName: string;
+  allocatedAmount: number;
+  spentAmount: number;
+  warningPercentage: number;
+  markerColor: string;
+};
+
+export type savingGoalArgs = {
+  financialAccountId: string;
+  hubId: string;
+  userId: string;
+  name: string;
+  goalAmount: number;
+  amountSaved: number;
+  monthlyAllocation: number;
+  accountType: AccountType;
+};
+
+export type quickTasksArgs = {
+  userId: string;
+  hubId: string;
+  name: string;
+  checked: boolean;
+};
+
+// CREATE Hub
 export async function createHub(userId: string, userName: string) {
   try {
     const [hub] = await db
@@ -52,7 +87,7 @@ export async function createHub(userId: string, userName: string) {
   }
 }
 
-// create Hub Member
+// CREATE Hub Member
 export async function createHubMember({
   userId,
   hubId,
@@ -72,7 +107,7 @@ export async function createHubMember({
   }
 }
 
-// create Financial Account
+// CREATE Financial Account
 export async function createFinancialAccount({
   userId,
   hubId,
@@ -103,7 +138,7 @@ export async function createFinancialAccount({
   }
 }
 
-// create Transaction
+// CREATE Transaction
 export async function createTransaction({
   financialAccountId,
   hubId,
@@ -126,12 +161,11 @@ export async function createTransaction({
   }
 }
 
-// create Transaction Category
+// CREATE Transaction Category
 export async function createTransactionCategory(name: string, hubId: string) {
   try {
     const normalized = name.trim().toLowerCase();
 
-    // Check if category already exists (case-insensitive)
     const existingCategory = await db.query.transaction_categories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
@@ -144,11 +178,10 @@ export async function createTransactionCategory(name: string, hubId: string) {
       throw new Error(`Category "${name}" already exists in this hub`);
     }
 
-    // Create new category
     const [category] = await db
       .insert(transaction_categories)
       .values({
-        name: normalized, // store normalized name
+        name: normalized,
         hubId,
       })
       .returning();
@@ -157,5 +190,223 @@ export async function createTransactionCategory(name: string, hubId: string) {
   } catch (err) {
     console.error("Error creating Transaction category ", err);
     throw err;
+  }
+}
+
+// CREATE Budget
+export async function createBudget({
+  financialAccountId,
+  hubId,
+  userId,
+  categoryName,
+  allocatedAmount,
+  spentAmount,
+  warningPercentage,
+  markerColor,
+}: {
+  financialAccountId: string;
+  hubId: string;
+  userId: string;
+  categoryName: string;
+  allocatedAmount: number;
+  spentAmount: number;
+  warningPercentage: number;
+  markerColor: string;
+}) {
+  try {
+    const normalizedName = categoryName.trim().toLowerCase();
+
+    const existingCategory = await db.query.transaction_categories.findFirst({
+      where: (categories, { and, eq, sql }) =>
+        and(
+          sql`LOWER(${categories.name}) = ${normalizedName}`,
+          eq(categories.hubId, hubId),
+        ),
+    });
+
+    if (existingCategory) {
+      throw new Error(`Category "${normalizedName}" already exists`);
+    }
+
+    const totalSpentResult = await db
+      .select({
+        total: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
+      })
+      .from(transactions)
+      .where(eq(transactions.financialAccountId, financialAccountId));
+
+    console.log("totalSpentResult: ", totalSpentResult);
+    const totalSpent = totalSpentResult[0]?.total ?? 0;
+    console.log("totalSpent: ", totalSpent);
+
+    if (spentAmount > totalSpent) {
+      throw new Error(
+        `Spent amount (${spentAmount}) cannot exceed total transactions (${totalSpent})`,
+      );
+    }
+
+    const [category] = await db
+      .insert(transaction_categories)
+      .values({
+        name: normalizedName,
+        hubId,
+      })
+      .returning();
+
+    await db.insert(budgets).values({
+      financialAccountId,
+      hubId,
+      userId,
+      transactionCategoryId: category.id,
+      allocatedAmount,
+      spentAmount,
+      warningPercentage,
+      markerColor,
+    });
+
+    return { success: true, message: "Budget created successfully" };
+  } catch (err: any) {
+    console.error("Error creating Budget:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to create budget",
+    };
+  }
+}
+
+// CREATE Saving Goal
+export async function createSavingGoal({
+  financialAccountId,
+  hubId,
+  userId,
+  name,
+  goalAmount,
+  amountSaved,
+  monthlyAllocation,
+  accountType,
+}: savingGoalArgs) {
+  try {
+    await db.insert(saving_goals).values({
+      financialAccountId,
+      hubId,
+      userId,
+      name,
+      goalAmount,
+      amountSaved,
+      monthlyAllocation,
+      accountType,
+    });
+
+    return { success: true, message: "Saving goal created successfully" };
+  } catch (err: any) {
+    console.error("Error creating saving goal:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to create saving goal",
+    };
+  }
+}
+
+// READ Transactions
+export async function getAllTransactions(hubId: string) {
+  try {
+    const allTransactions = await db.query.transactions.findMany({
+      where: eq(transactions.hubId, hubId),
+      orderBy: (t, { desc }) => [desc(t.addedAt)],
+    });
+
+    return {
+      success: true,
+      data: allTransactions,
+    };
+  } catch (err: any) {
+    console.error("Error fetching transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch transactions",
+    };
+  }
+}
+
+// CREATE Task
+export async function createTask({
+  userId,
+  hubId,
+  name,
+  checked = false,
+}: {
+  userId: string;
+  hubId: string;
+  name: string;
+  checked?: boolean;
+}) {
+  try {
+    await db.insert(quick_tasks).values({
+      userId,
+      hubId,
+      name,
+      checked,
+    });
+    return { success: true, message: "Task created successfully" };
+  } catch (err: any) {
+    console.error("Error creating task", err);
+    return { success: false, message: err.message || "Failed to create task" };
+  }
+}
+
+// READ Tasks
+export async function getTasksByHub(hubId: string): Promise<{
+  success: boolean;
+  data?: QuickTask[];
+  message?: string;
+}> {
+  try {
+    const tasks = await db
+      .select()
+      .from(quick_tasks)
+      .where(eq(quick_tasks.hubId, hubId))
+      .orderBy(quick_tasks.name);
+
+    return { success: true, data: tasks };
+  } catch (err: any) {
+    console.error("Error fetching tasks", err);
+    return { success: false, message: err.message || "Failed to fetch tasks" };
+  }
+}
+
+// UPDATE Task
+export async function updateTask({
+  taskId,
+  name,
+  checked,
+}: {
+  taskId: string;
+  name?: string;
+  checked?: boolean;
+}) {
+  try {
+    await db
+      .update(quick_tasks)
+      .set({
+        ...(name !== undefined ? { name } : {}),
+        ...(checked !== undefined ? { checked } : {}),
+      })
+      .where(eq(quick_tasks.id, taskId));
+
+    return { success: true, message: "Task updated successfully" };
+  } catch (err: any) {
+    console.error("Error updating task", err);
+    return { success: false, message: err.message || "Failed to update task" };
+  }
+}
+
+// DELETE Task
+export async function deleteTask(taskId: string) {
+  try {
+    await db.delete(quick_tasks).where(eq(quick_tasks.id, taskId));
+    return { success: true, message: "Task deleted successfully" };
+  } catch (err: any) {
+    console.error("Error deleting task", err);
+    return { success: false, message: err.message || "Failed to delete task" };
   }
 }

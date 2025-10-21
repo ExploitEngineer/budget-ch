@@ -203,7 +203,8 @@
             "todos": {
                 "title": "Quick Tasks",
                 "button": "quick done",
-                "placeholder": "Add Task…"
+                "placeholder": "Add Task…",
+                "no-tasks": "No tasks yet.."
             },
             "upcoming-cards": {
                 "title": "Upcoming Due (Recurring)",
@@ -553,6 +554,9 @@
                     "title": "New Goal",
                     "subtitle": "New Savings Goal",
                     "button": "Close",
+                    "delete": "Delete",
+                    "edit-dialog": "Edit savings goal",
+                    "edit": "Edit",
                     "labels": {
                         "name": {
                             "title": "Name",
@@ -569,34 +573,13 @@
                             "options": {
                                 "save": "Savings",
                                 "checking": "Checking",
-                                "cash": "Cash"
+                                "cash": "Cash",
+                                "credit-card": "Credit Card"
                             }
                         },
                         "monthly-allocation": "Monthly Allocation (CHF)"
                     },
                     "save": "Save"
-                }
-            },
-            "dialog": {
-                "title": "Edit savings goal",
-                "button": "Close",
-                "edit": "Edit",
-                "labels": {
-                    "name": "Name",
-                    "target-amount": "Target Amount (CHF)",
-                    "already-saved": "Already Saved (CHF)",
-                    "due-on": "Due on",
-                    "account": "Account",
-                    "monthly-allocation": "Monthly Allocation (CHF)"
-                },
-                "buttons": {
-                    "delete": "Delete",
-                    "save": "Save"
-                },
-                "account-options": {
-                    "checking": "Checking",
-                    "savings": "Savings",
-                    "cash": "Cash"
                 }
             },
             "cards": {

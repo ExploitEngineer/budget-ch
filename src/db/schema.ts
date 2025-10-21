@@ -8,7 +8,9 @@ import {
   boolean,
   uuid,
   pgEnum,
+  integer,
 } from "drizzle-orm/pg-core";
+import { InferModel } from "drizzle-orm";
 
 export const accessRole = pgEnum("access_role", ["admin", "member"]);
 export const accountType = pgEnum("account_type", [
@@ -21,6 +23,13 @@ export const transactionType = pgEnum("transaction_type", [
   "income",
   "expense",
 ]);
+export const BudgetColorMakerType = pgEnum("budgets_type", [
+  "standard",
+  "green",
+  "orange",
+  "red",
+]);
+export type QuickTask = InferModel<typeof quick_tasks>;
 
 /* AUTH SCHEMAS */
 
@@ -126,6 +135,57 @@ export const transactions = pgTable("transactions", {
   source: text("source"),
   addedAt: timestamp("transaction_added_at"),
   note: text("note"),
+});
+
+export const budgets = pgTable("budgets", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  financialAccountId: uuid("financial_account_id")
+    .notNull()
+    .references(() => financial_accounts.id, { onDelete: "cascade" }),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  transactionCategoryId: uuid("transaction_category_id")
+    .notNull()
+    .references(() => transaction_categories.id, { onDelete: "cascade" }),
+  allocatedAmount: doublePrecision("allocated_amount").notNull().default(0),
+  spentAmount: doublePrecision("spent_amount").notNull().default(0),
+  warningPercentage: integer("warning_percentage").notNull(),
+  markerColor: text("marker_color").notNull().default(""),
+});
+
+export const saving_goals = pgTable("saving_goals", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  financialAccountId: uuid("financial_account_id")
+    .notNull()
+    .references(() => financial_accounts.id, { onDelete: "cascade" }),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("saving_goal_name").notNull(),
+  goalAmount: doublePrecision("goal_amount").notNull().default(0),
+  amountSaved: doublePrecision("amount_saved").notNull().default(0),
+  monthlyAllocation: doublePrecision("monthly_allocation").notNull().default(0),
+  accountType: accountType().notNull().default("cash"),
+  dueDate: timestamp("due_date"),
+});
+
+export const quick_tasks = pgTable("quick_taks", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  checked: boolean().default(false),
 });
 
 export const accounts = pgTable("accounts", {

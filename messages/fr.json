@@ -96,6 +96,7 @@
                     },
                     "category": {
                         "title": "Catégorie",
+                        "category-name": "Nom de la catégorie",
                         "options": {
                             "groceries": "Courses",
                             "restaurant": "Restaurant & Café",
@@ -110,9 +111,13 @@
                         "placeholder": "Optionnel"
                     }
                 },
+                "no-categories-yet": "Aucune catégorie pour le moment",
                 "buttons": {
                     "save": "Enregistrer comme modèle",
-                    "post": "Valider"
+                    "post": "Publier",
+                    "add": "Ajouter",
+                    "add-category": "Ajouter une catégorie",
+                    "new-category": "Nouvelle catégorie"
                 }
             },
             "dashbaord-table-adjust-dialog": {
@@ -547,52 +552,34 @@
             "sidebar-header": {
                 "dialog": {
                     "title": "Nouvel objectif",
-                    "subtitle": "Nouvel objectif d'épargne",
+                    "subtitle": "Nouvel objectif d’épargne",
                     "button": "Fermer",
+                    "delete": "Supprimer",
+                    "edit-dialog": "Modifier l’objectif d’épargne",
+                    "edit": "Modifier",
                     "labels": {
                         "name": {
                             "title": "Nom",
-                            "placeholder": "ex. fonds d'urgence, vacances, impôts"
+                            "placeholder": "ex. Fonds d’urgence, Vacances, Impôts"
                         },
                         "goal-amount": "Montant cible (CHF)",
-                        "saved-amount": "Déjà épargné (CHF)",
+                        "saved-amount": "Déjà économisé (CHF)",
                         "due-date": {
-                            "title": "Date d'échéance",
-                            "placeholder": "mm/dd/yyyy"
+                            "title": "Date d’échéance",
+                            "placeholder": "jj/mm/aaaa"
                         },
                         "account": {
                             "title": "Compte",
                             "options": {
                                 "save": "Épargne",
                                 "checking": "Compte courant",
-                                "cash": "Espèces"
+                                "cash": "Espèces",
+                                "credit-card": "Carte de crédit"
                             }
                         },
                         "monthly-allocation": "Allocation mensuelle (CHF)"
                     },
                     "save": "Enregistrer"
-                }
-            },
-            "dialog": {
-                "title": "Modifier l'objectif d'épargne",
-                "button": "Fermer",
-                "edit": "Modifier",
-                "labels": {
-                    "name": "Nom",
-                    "target-amount": "Montant cible (CHF)",
-                    "already-saved": "Déjà économisé (CHF)",
-                    "due-on": "Échéance le",
-                    "account": "Compte",
-                    "monthly-allocation": "Allocation mensuelle (CHF)"
-                },
-                "buttons": {
-                    "delete": "Supprimer",
-                    "save": "Enregistrer"
-                },
-                "account-options": {
-                    "checking": "Compte courant",
-                    "savings": "Compte d'épargne",
-                    "cash": "Espèces"
                 }
             },
             "cards": {

@@ -3,7 +3,7 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
-import SavingGoalsDialog from "@/components/dialogs/saving-goals-dialog";
+import SavingGoalEditDialog from "./saving-goal-edit-dialog";
 import { Separator } from "@/components/ui/separator";
 import { ActiveGoalsData } from "./data";
 import { Button } from "@/components/ui/button";
@@ -97,7 +97,7 @@ export function ActiveGoalsSection({
                     >
                       {data.badgeValue}%
                     </Badge>
-                    <SavingGoalsDialog />
+                    <SavingGoalEditDialog />
                   </div>
                 </CardHeader>
 

@@ -35,13 +35,18 @@ import {
 import { CalendarIcon, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import {
   SavingsGoalDialogSchema,
   SavingsGoalDialogValues,
-} from "@/lib/validations";
+} from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { toast } from "sonner";
+import { CreateSavingGoal } from "@/lib/services/saving-goal";
+import { Spinner } from "@/components/ui/spinner";
 
-export default function SavingsGoalMainDialog() {
+export default function SavingGoalDialog() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
@@ -53,20 +58,42 @@ export default function SavingsGoalMainDialog() {
       goalAmount: 0,
       savedAmount: 0,
       dueDate: undefined,
-      account: "",
+      account: "savings",
       monthlyAllocation: 0,
     },
   });
 
-  function onSubmit(values: SavingsGoalDialogValues) {
-    console.log("Savings goal submitted:", values);
+  async function onSubmit(values: SavingsGoalDialogValues) {
+    setIsLoading(true);
+    try {
+      const result = await CreateSavingGoal({
+        name: values.name,
+        goalAmount: values.goalAmount,
+        amountSaved: values.savedAmount,
+        monthlyAllocation: values.monthlyAllocation,
+        accountType: values.account,
+      });
+
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+
+      toast.success("Saving goal created successfully");
+      form.reset();
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong while creating the Saving goal");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          className="btn-gradient flex items-center gap-2 dark:text-white"
+          className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white"
           variant="default"
         >
           <Plus className="h-5 w-5" />
@@ -80,7 +107,11 @@ export default function SavingsGoalMainDialog() {
             {t("subtitle")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="border">
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
               {t("button")}
             </Button>
           </DialogClose>
@@ -204,11 +235,14 @@ export default function SavingsGoalMainDialog() {
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="save">
-                            {t("labels.account.options.save")}
-                          </SelectItem>
                           <SelectItem value="checking">
                             {t("labels.account.options.checking")}
+                          </SelectItem>
+                          <SelectItem value="savings">
+                            {t("labels.account.options.save")}
+                          </SelectItem>
+                          <SelectItem value="credit-card">
+                            {t("labels.account.options.credit-card")}
                           </SelectItem>
                           <SelectItem value="cash">
                             {t("labels.account.options.cash")}
@@ -245,7 +279,13 @@ export default function SavingsGoalMainDialog() {
 
             {/* Footer Buttons */}
             <div className="flex justify-end pt-4">
-              <Button type="submit">{t("save")}</Button>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="cursor-pointer"
+              >
+                {isLoading ? <Spinner /> : t("save")}
+              </Button>
             </div>
           </form>
         </Form>
