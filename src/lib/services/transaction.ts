@@ -1,6 +1,10 @@
 "use server";
 
-import { createTransaction, createTransactionCategory } from "@/db/queries";
+import {
+  createTransaction,
+  createTransactionCategory,
+  getAllTransactions,
+} from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
@@ -22,7 +26,6 @@ export async function CreateTransaction({
 
     const normalizedName = categoryName.trim().toLowerCase();
 
-    // 1️⃣ Check if category already exists
     const existingCategory = await db.query.transaction_categories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
@@ -32,7 +35,6 @@ export async function CreateTransaction({
     });
 
     if (existingCategory) {
-      // 🚫 Stop: category already exists → don't create transaction or category
       return {
         success: false,
         reason: "CATEGORY_ALREADY_EXISTS",
@@ -40,7 +42,6 @@ export async function CreateTransaction({
       };
     }
 
-    // 2️⃣ Create category first
     const [newCategory] = await db
       .insert(transaction_categories)
       .values({
@@ -49,7 +50,6 @@ export async function CreateTransaction({
       })
       .returning({ id: transaction_categories.id });
 
-    // 3️⃣ Create transaction linked to new category
     await createTransaction({
       financialAccountId,
       hubId,
@@ -83,5 +83,23 @@ export async function CreateTransactionCategory(categoryName: string) {
     }
     console.error(err);
     return { success: false, message: "Failed to create category" };
+  }
+}
+
+export async function GetAllTransactions() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    if (!hubId) throw new Error("Hub not found");
+
+    const result = await getAllTransactions(hubId);
+
+    const data = result.data;
+
+    return { success: true, data };
+  } catch (err) {
+    console.error(err);
+    return { success: false, message: "Failed to fetch transactions" };
   }
 }
