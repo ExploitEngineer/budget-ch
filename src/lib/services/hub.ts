@@ -1,10 +1,10 @@
 "use server";
 
-import { createHub } from "@/db/queries";
+import { createHubDB } from "@/db/queries";
 
-export async function CreateHub(userId: string, userName: string) {
+export async function createHub(userId: string, userName: string) {
   try {
-    const hubId = await createHub(userId, userName);
+    const hubId = await createHubDB(userId, userName);
     return {
       status: "success",
       message: `Hub created successfully for ${userName}`,

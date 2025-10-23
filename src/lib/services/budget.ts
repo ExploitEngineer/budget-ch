@@ -1,10 +1,10 @@
 "use server";
 
-import { createBudget } from "@/db/queries";
+import { createBudgetDB } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 
-export default async function CreateBudget({
+export async function createBudget({
   categoryName,
   allocatedAmount,
   spentAmount,
@@ -25,8 +25,7 @@ export default async function CreateBudget({
       return { success: false, message: "No financial account found" };
     }
 
-    const result = await createBudget({
-      financialAccountId,
+    const result = await createBudgetDB({
       hubId,
       userId,
       categoryName,

@@ -52,7 +52,7 @@ export default function SavingGoalsDialog() {
       goalAmount: 0,
       savedAmount: 0,
       dueDate: undefined,
-      account: "saving",
+      account: "savings",
       monthlyAllocation: 0,
     },
   });

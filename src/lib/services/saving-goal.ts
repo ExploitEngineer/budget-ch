@@ -1,11 +1,11 @@
 "use server";
 
 import type { savingGoalArgs } from "@/db/queries";
-import { createSavingGoal } from "@/db/queries";
+import { createSavingGoalDB } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 
-export async function CreateSavingGoal({
+export async function createSavingGoal({
   name,
   goalAmount,
   amountSaved,
@@ -20,8 +20,7 @@ export async function CreateSavingGoal({
       return { success: false, message: "No financial account found" };
     }
 
-    const result = await createSavingGoal({
-      financialAccountId,
+    const result = await createSavingGoalDB({
       hubId,
       userId,
       name,

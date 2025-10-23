@@ -39,7 +39,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { CreateTransaction } from "@/lib/services/transaction";
+import { createTransaction } from "@/lib/services/transaction";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
@@ -68,7 +68,7 @@ export default function TransactionDialog() {
   async function onSubmit(values: TransactionDialogValues) {
     setIsLoading(true);
     try {
-      const result = await CreateTransaction({
+      const result = await createTransaction({
         categoryName: values.select.trim(),
         amount: values.amount,
         note: values.note,

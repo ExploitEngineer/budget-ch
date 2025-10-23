@@ -9,7 +9,7 @@ import {
   saving_goals,
   quick_tasks,
 } from "./schema";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 
 type AccessRole = "admin" | "member";
@@ -43,7 +43,6 @@ export type createTransactionArgs = {
 };
 
 export type budgetArgs = {
-  financialAccountId: string;
   hubId: string;
   userId: string;
   transactionCategoryId: string;
@@ -55,7 +54,6 @@ export type budgetArgs = {
 };
 
 export type savingGoalArgs = {
-  financialAccountId: string;
   hubId: string;
   userId: string;
   name: string;
@@ -73,7 +71,7 @@ export type quickTasksArgs = {
 };
 
 // CREATE Hub
-export async function createHub(userId: string, userName: string) {
+export async function createHubDB(userId: string, userName: string) {
   try {
     const [hub] = await db
       .insert(hubs)
@@ -88,7 +86,7 @@ export async function createHub(userId: string, userName: string) {
 }
 
 // CREATE Hub Member
-export async function createHubMember({
+export async function createHubMemberDB({
   userId,
   hubId,
   accessRole,
@@ -108,7 +106,7 @@ export async function createHubMember({
 }
 
 // CREATE Financial Account
-export async function createFinancialAccount({
+export async function createFinancialAccountDB({
   userId,
   hubId,
   name,
@@ -139,7 +137,7 @@ export async function createFinancialAccount({
 }
 
 // CREATE Transaction
-export async function createTransaction({
+export async function createTransactionDB({
   financialAccountId,
   hubId,
   userId,
@@ -162,7 +160,7 @@ export async function createTransaction({
 }
 
 // CREATE Transaction Category
-export async function createTransactionCategory(name: string, hubId: string) {
+export async function createTransactionCategoryDB(name: string, hubId: string) {
   try {
     const normalized = name.trim().toLowerCase();
 
@@ -194,8 +192,7 @@ export async function createTransactionCategory(name: string, hubId: string) {
 }
 
 // CREATE Budget
-export async function createBudget({
-  financialAccountId,
+export async function createBudgetDB({
   hubId,
   userId,
   categoryName,
@@ -204,7 +201,6 @@ export async function createBudget({
   warningPercentage,
   markerColor,
 }: {
-  financialAccountId: string;
   hubId: string;
   userId: string;
   categoryName: string;
@@ -228,23 +224,6 @@ export async function createBudget({
       throw new Error(`Category "${normalizedName}" already exists`);
     }
 
-    const totalSpentResult = await db
-      .select({
-        total: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
-      })
-      .from(transactions)
-      .where(eq(transactions.financialAccountId, financialAccountId));
-
-    console.log("totalSpentResult: ", totalSpentResult);
-    const totalSpent = totalSpentResult[0]?.total ?? 0;
-    console.log("totalSpent: ", totalSpent);
-
-    if (spentAmount > totalSpent) {
-      throw new Error(
-        `Spent amount (${spentAmount}) cannot exceed total transactions (${totalSpent})`,
-      );
-    }
-
     const [category] = await db
       .insert(transaction_categories)
       .values({
@@ -254,7 +233,6 @@ export async function createBudget({
       .returning();
 
     await db.insert(budgets).values({
-      financialAccountId,
       hubId,
       userId,
       transactionCategoryId: category.id,
@@ -275,8 +253,7 @@ export async function createBudget({
 }
 
 // CREATE Saving Goal
-export async function createSavingGoal({
-  financialAccountId,
+export async function createSavingGoalDB({
   hubId,
   userId,
   name,
@@ -287,7 +264,6 @@ export async function createSavingGoal({
 }: savingGoalArgs) {
   try {
     await db.insert(saving_goals).values({
-      financialAccountId,
       hubId,
       userId,
       name,
@@ -308,7 +284,7 @@ export async function createSavingGoal({
 }
 
 // READ Transactions
-export async function getAllTransactions(hubId: string) {
+export async function getAllTransactionsDB(hubId: string) {
   try {
     const allTransactions = await db.query.transactions.findMany({
       where: eq(transactions.hubId, hubId),
@@ -329,7 +305,7 @@ export async function getAllTransactions(hubId: string) {
 }
 
 // CREATE Task
-export async function createTask({
+export async function createTaskDB({
   userId,
   hubId,
   name,
@@ -355,7 +331,7 @@ export async function createTask({
 }
 
 // READ Tasks
-export async function getTasksByHub(hubId: string): Promise<{
+export async function getTasksByHubDB(hubId: string): Promise<{
   success: boolean;
   data?: QuickTask[];
   message?: string;
@@ -375,7 +351,7 @@ export async function getTasksByHub(hubId: string): Promise<{
 }
 
 // UPDATE Task
-export async function updateTask({
+export async function updateTaskDB({
   taskId,
   name,
   checked,
@@ -401,7 +377,7 @@ export async function updateTask({
 }
 
 // DELETE Task
-export async function deleteTask(taskId: string) {
+export async function deleteTaskDB(taskId: string) {
   try {
     await db.delete(quick_tasks).where(eq(quick_tasks.id, taskId));
     return { success: true, message: "Task deleted successfully" };

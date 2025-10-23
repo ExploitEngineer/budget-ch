@@ -1,11 +1,11 @@
 "use server";
 
-import { createFinancialAccount } from "@/db/queries";
+import { createFinancialAccountDB } from "@/db/queries";
 import type { financialAccountArgs } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 
-export async function CreateFinancialAccount({
+export async function createFinancialAccount({
   name,
   type,
   initialBalance,
@@ -20,7 +20,7 @@ export async function CreateFinancialAccount({
     console.log(`UserId: ${userId}`);
     console.log(`HubId: ${hubId}`);
 
-    await createFinancialAccount({
+    await createFinancialAccountDB({
       userId,
       hubId,
       name,

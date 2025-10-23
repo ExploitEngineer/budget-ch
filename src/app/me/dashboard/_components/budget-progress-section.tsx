@@ -11,10 +11,10 @@ import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import {
-  CreateTask,
-  GetTasks,
-  UpdateTask,
-  DeleteTask,
+  createTask,
+  getTasks,
+  updateTask,
+  deleteTask,
 } from "@/lib/services/tasks";
 import { toast } from "sonner";
 import { QuickTask } from "@/db/schema";
@@ -41,7 +41,7 @@ export function BudgetProgressSection({
   // 🔹 Load tasks on mount
   useEffect(() => {
     (async () => {
-      const res = await GetTasks();
+      const res = await getTasks();
       if (res.success && res.data) setTasks(res.data);
     })();
   }, []);
@@ -51,14 +51,14 @@ export function BudgetProgressSection({
     if (!newTask.trim()) return;
     setIsLoading(true);
 
-    const result = await CreateTask({ name: newTask, checked: false });
+    const result = await createTask({ name: newTask, checked: false });
     if (!result.success) {
       toast.error(result.message);
       setIsLoading(false);
       return;
     }
 
-    const updated = await GetTasks();
+    const updated = await getTasks();
     if (updated.success && updated.data) setTasks(updated.data);
     setNewTask("");
     setIsLoading(false);
@@ -67,7 +67,7 @@ export function BudgetProgressSection({
 
   // 🔹 Toggle checkbox
   async function handleToggle(task: QuickTask) {
-    const result = await UpdateTask({
+    const result = await updateTask({
       taskId: task.id,
       checked: !task.checked,
     });
@@ -85,7 +85,7 @@ export function BudgetProgressSection({
 
   // 🔹 Delete task
   async function handleDelete(id: string) {
-    const result = await DeleteTask(id);
+    const result = await deleteTask(id);
     if (!result.success) {
       toast.error(result.message);
       return;

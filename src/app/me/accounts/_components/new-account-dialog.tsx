@@ -36,7 +36,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { CreateFinancialAccount } from "@/lib/services/financial-account";
+import { createFinancialAccount } from "@/lib/services/financial-account";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -69,7 +69,7 @@ export default function NewAccountDialog({
     setLoading(true);
 
     try {
-      const result = await CreateFinancialAccount({
+      const result = await createFinancialAccount({
         name: values.name,
         type: values.type,
         initialBalance: values.balance,

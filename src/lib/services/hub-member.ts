@@ -1,9 +1,9 @@
 "use server";
 
-import { createHubMember } from "@/db/queries";
+import { createHubMemberDB } from "@/db/queries";
 import type { createHubMemberArgs } from "@/db/queries";
 
-export async function CreateHubMember({
+export async function createHubMember({
   userId,
   hubId,
   accessRole,
@@ -11,7 +11,7 @@ export async function CreateHubMember({
   userName,
 }: createHubMemberArgs) {
   try {
-    await createHubMember({ userId, hubId, accessRole, isOwner });
+    await createHubMemberDB({ userId, hubId, accessRole, isOwner });
     return {
       message: `user:${userName} successfully added into Hub Member`,
       status: "success",

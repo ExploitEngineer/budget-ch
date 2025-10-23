@@ -32,7 +32,7 @@ import {
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import CreateBudget from "@/lib/services/budget";
+import { createBudget } from "@/lib/services/budget";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -63,7 +63,7 @@ export default function BudgetDialog({
   async function onSubmit(values: BudgetDialogValues) {
     setIsLoading(true);
     try {
-      const result = await CreateBudget({
+      const result = await createBudget({
         categoryName: values.category,
         allocatedAmount: values.budgetChf,
         spentAmount: values.istChf,

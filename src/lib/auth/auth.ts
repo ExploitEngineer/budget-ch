@@ -1,9 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "@/db/db";
-import { CreateHub } from "@/lib/services/hub";
+import { createHub } from "@/lib/services/hub";
 import * as schema from "@/db/schema";
-import { CreateHubMember } from "../services/hub-member";
+import { createHubMember } from "../services/hub-member";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -21,13 +21,13 @@ export const auth = betterAuth({
       create: {
         after: async (user) => {
           try {
-            const result = await CreateHub(user.id, user.name);
+            const result = await createHub(user.id, user.name);
             if (result.status === "error") {
               console.error(result.message);
               return;
             }
 
-            const { message, status } = await CreateHubMember({
+            const { message, status } = await createHubMember({
               userId: user.id,
               hubId: result.data?.hubId!,
               accessRole: "member",

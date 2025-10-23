@@ -42,7 +42,7 @@ import {
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
-import { CreateSavingGoal } from "@/lib/services/saving-goal";
+import { createSavingGoal } from "@/lib/services/saving-goal";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function SavingGoalDialog() {
@@ -66,7 +66,7 @@ export default function SavingGoalDialog() {
   async function onSubmit(values: SavingsGoalDialogValues) {
     setIsLoading(true);
     try {
-      const result = await CreateSavingGoal({
+      const result = await createSavingGoal({
         name: values.name,
         goalAmount: values.goalAmount,
         amountSaved: values.savedAmount,

@@ -70,10 +70,7 @@ export const hub_members = pgTable(
       .references(() => users.id, { onDelete: "cascade" }),
     accessRole: accessRole().notNull().default("member"),
     isOwner: boolean("is_owner").default(true).notNull(),
-    joinedAt: timestamp()
-      .defaultNow()
-      .$onUpdate(() => new Date())
-      .notNull(),
+    joinedAt: timestamp(),
   },
   (table) => [primaryKey({ columns: [table.userId, table.hubId] })],
 );
@@ -139,9 +136,6 @@ export const transactions = pgTable("transactions", {
 
 export const budgets = pgTable("budgets", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
-  financialAccountId: uuid("financial_account_id")
-    .notNull()
-    .references(() => financial_accounts.id, { onDelete: "cascade" }),
   hubId: uuid("hub_id")
     .notNull()
     .references(() => hubs.id, { onDelete: "cascade" }),
@@ -159,9 +153,6 @@ export const budgets = pgTable("budgets", {
 
 export const saving_goals = pgTable("saving_goals", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
-  financialAccountId: uuid("financial_account_id")
-    .notNull()
-    .references(() => financial_accounts.id, { onDelete: "cascade" }),
   hubId: uuid("hub_id")
     .notNull()
     .references(() => hubs.id, { onDelete: "cascade" }),

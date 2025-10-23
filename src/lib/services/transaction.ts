@@ -1,9 +1,9 @@
 "use server";
 
 import {
-  createTransaction,
-  createTransactionCategory,
-  getAllTransactions,
+  createTransactionDB,
+  createTransactionCategoryDB,
+  getAllTransactionsDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -11,7 +11,7 @@ import { getContext } from "../auth/actions";
 import { transaction_categories } from "@/db/schema";
 import db from "@/db/db";
 
-export async function CreateTransaction({
+export async function createTransaction({
   categoryName,
   amount,
   note,
@@ -50,7 +50,7 @@ export async function CreateTransaction({
       })
       .returning({ id: transaction_categories.id });
 
-    await createTransaction({
+    await createTransactionDB({
       financialAccountId,
       hubId,
       userId,
@@ -66,7 +66,7 @@ export async function CreateTransaction({
   }
 }
 
-export async function CreateTransactionCategory(categoryName: string) {
+export async function createTransactionCategory(categoryName: string) {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, true);
@@ -74,7 +74,7 @@ export async function CreateTransactionCategory(categoryName: string) {
     if (!hubId) throw new Error("Hub not found");
 
     const normalized = categoryName.trim().toLowerCase();
-    const category = await createTransactionCategory(normalized, hubId);
+    const category = await createTransactionCategoryDB(normalized, hubId);
 
     return { success: true, category };
   } catch (err: any) {
@@ -86,14 +86,14 @@ export async function CreateTransactionCategory(categoryName: string) {
   }
 }
 
-export async function GetAllTransactions() {
+export async function getAllTransactions() {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, true);
 
     if (!hubId) throw new Error("Hub not found");
 
-    const result = await getAllTransactions(hubId);
+    const result = await getAllTransactionsDB(hubId);
 
     const data = result.data;
 

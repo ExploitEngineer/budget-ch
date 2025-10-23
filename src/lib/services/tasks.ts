@@ -3,14 +3,14 @@
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 import {
-  createTask,
-  getTasksByHub,
-  updateTask,
-  deleteTask,
+  createTaskDB,
+  getTasksByHubDB,
+  updateTaskDB,
+  deleteTaskDB,
 } from "@/db/queries";
 
 // CREATE Task
-export async function CreateTask({
+export async function createTask({
   name,
   checked,
 }: {
@@ -22,21 +22,21 @@ export async function CreateTask({
 
   if (!hubId) return { success: false, message: "No hubId found" };
 
-  return await createTask({ userId, hubId, name, checked });
+  return await createTaskDB({ userId, hubId, name, checked });
 }
 
 // READ Task
-export async function GetTasks() {
+export async function getTasks() {
   const hdrs = await headers();
   const { hubId } = await getContext(hdrs, true);
 
   if (!hubId) return { success: false, message: "No hubId found" };
 
-  return await getTasksByHub(hubId);
+  return await getTasksByHubDB(hubId);
 }
 
 // UPDATE Task
-export async function UpdateTask({
+export async function updateTask({
   taskId,
   name,
   checked,
@@ -45,10 +45,10 @@ export async function UpdateTask({
   name?: string;
   checked?: boolean;
 }) {
-  return await updateTask({ taskId, name, checked });
+  return await updateTaskDB({ taskId, name, checked });
 }
 
 // DELETE Task
-export async function DeleteTask(taskId: string) {
-  return await deleteTask(taskId);
+export async function deleteTask(taskId: string) {
+  return await deleteTaskDB(taskId);
 }
