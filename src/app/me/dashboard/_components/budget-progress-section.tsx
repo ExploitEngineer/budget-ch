@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   createTask,
   getTasks,
@@ -38,7 +38,13 @@ export function BudgetProgressSection({
   const [newTask, setNewTask] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  // 🔹 Load tasks on mount
+  // Inline edit states
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [isEditingSave, setIsEditingSave] = useState(false);
+  const editInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Load tasks on mount
   useEffect(() => {
     (async () => {
       const res = await getTasks();
@@ -46,7 +52,7 @@ export function BudgetProgressSection({
     })();
   }, []);
 
-  // 🔹 Create new task
+  // Create new task
   async function handleAddTask() {
     if (!newTask.trim()) return;
     setIsLoading(true);
@@ -65,7 +71,7 @@ export function BudgetProgressSection({
     toast.success(t("todos.created"));
   }
 
-  // 🔹 Toggle checkbox
+  // Toggle checkbox
   async function handleToggle(task: QuickTask) {
     const result = await updateTask({
       taskId: task.id,
@@ -94,6 +100,56 @@ export function BudgetProgressSection({
     setTasks((prev) => prev.filter((t) => t.id !== id));
     toast.success(t("todos.deleted"));
   }
+
+  // Start editing on double click
+  function startEditing(task: QuickTask) {
+    setEditingId(task.id);
+    setEditingText(task.name);
+    // focus next tick
+    setTimeout(() => editInputRef.current?.focus(), 0);
+  }
+
+  // Save edited title
+  async function saveEdit(taskId: string) {
+    const trimmed = editingText.trim();
+    if (!trimmed) {
+      // don't save empty title, cancel instead
+      setEditingId(null);
+      setEditingText("");
+      return;
+    }
+
+    // If nothing changed just close
+    const current = tasks.find((t) => t.id === taskId);
+    if (!current || current.name === trimmed) {
+      setEditingId(null);
+      setEditingText("");
+      return;
+    }
+
+    setIsEditingSave(true);
+    const result = await updateTask({ taskId, name: trimmed });
+    setIsEditingSave(false);
+
+    if (!result.success) {
+      toast.error(result.message);
+      return;
+    }
+
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, name: trimmed } : t)),
+    );
+    setEditingId(null);
+    setEditingText("");
+    toast.success(t("todos.updated") ?? "Updated");
+  }
+
+  // Cancel editing (do not persist)
+  function cancelEdit() {
+    setEditingId(null);
+    setEditingText("");
+  }
+
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
       <Card className="bg-blue-background dark:border-border-blue lg:col-span-3">
@@ -148,16 +204,34 @@ export function BudgetProgressSection({
                 >
                   <div className="flex items-center gap-2">
                     <Checkbox
+                      className="cursor-pointer"
                       checked={task.checked ?? false}
                       onCheckedChange={() => handleToggle(task)}
                     />
-                    <h3
-                      className={`text-sm ${
-                        task.checked ? "line-through opacity-70" : ""
-                      }`}
-                    >
-                      {task.name}
-                    </h3>
+                    {editingId === task.id ? (
+                      <Input
+                        ref={editInputRef}
+                        value={editingText}
+                        onChange={(e) => setEditingText(e.target.value)}
+                        onBlur={() => saveEdit(task.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") saveEdit(task.id);
+                          if (e.key === "Escape") cancelEdit();
+                        }}
+                        disabled={isEditingSave}
+                        className="!bg-dark-blue-background dark:border-border-blue w-[220px] text-sm"
+                      />
+                    ) : (
+                      <h3
+                        className={`text-sm ${
+                          task.checked ? "line-through opacity-70" : ""
+                        }`}
+                        onDoubleClick={() => startEditing(task)}
+                        title="Double click to edit"
+                      >
+                        {task.name}
+                      </h3>
+                    )}
                   </div>
                   <Button
                     size="icon"

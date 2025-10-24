@@ -203,8 +203,12 @@
             },
             "todos": {
                 "title": "Attività rapide",
-                "button": "fatto subito",
-                "placeholder": "Aggiungi attività…"
+                "button": "Fatto rapidamente",
+                "placeholder": "Aggiungi attività…",
+                "no-tasks": "Nessuna attività ancora..",
+                "created": "Attività creata con successo!",
+                "updated": "Attività aggiornata con successo!",
+                "deleted": "Attività eliminata con successo!"
             },
             "upcoming-cards": {
                 "title": "Scadenze imminenti (Ricorrenti)",

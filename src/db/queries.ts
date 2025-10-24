@@ -386,3 +386,29 @@ export async function deleteTaskDB(taskId: string) {
     return { success: false, message: err.message || "Failed to delete task" };
   }
 }
+
+// GET Budgets Allocated & Spent Amount
+export async function getBudgetsAmountsDB(hubId: string) {
+  try {
+    const results = await db
+      .select({
+        id: budgets.id,
+        allocatedAmount: budgets.allocatedAmount,
+        spentAmount: budgets.spentAmount,
+      })
+      .from(budgets)
+      .where(eq(budgets.hubId, hubId));
+
+    return {
+      success: true,
+      message: "Susscessfully got budget amounts",
+      data: results,
+    };
+  } catch (err: any) {
+    console.error("Error getting allocated or spent amount", err);
+    return {
+      success: false,
+      message: err.message || "Failed to get budget amounts",
+    };
+  }
+}

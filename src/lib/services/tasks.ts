@@ -18,9 +18,7 @@ export async function createTask({
   checked: boolean;
 }) {
   const hdrs = await headers();
-  const { userId, hubId } = await getContext(hdrs, true);
-
-  if (!hubId) return { success: false, message: "No hubId found" };
+  const { userId, hubId } = await getContext(hdrs, false);
 
   return await createTaskDB({ userId, hubId, name, checked });
 }
@@ -28,9 +26,7 @@ export async function createTask({
 // READ Task
 export async function getTasks() {
   const hdrs = await headers();
-  const { hubId } = await getContext(hdrs, true);
-
-  if (!hubId) return { success: false, message: "No hubId found" };
+  const { hubId } = await getContext(hdrs, false);
 
   return await getTasksByHubDB(hubId);
 }

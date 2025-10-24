@@ -204,7 +204,10 @@
                 "title": "Quick Tasks",
                 "button": "quick done",
                 "placeholder": "Add Task…",
-                "no-tasks": "No tasks yet.."
+                "no-tasks": "No tasks yet..",
+                "created": "Task created successfully!",
+                "updated": "Task updated successfully!",
+                "deleted": "Task deleted successfully!"
             },
             "upcoming-cards": {
                 "title": "Upcoming Due (Recurring)",

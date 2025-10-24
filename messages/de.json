@@ -202,9 +202,13 @@
                 }
             },
             "todos": {
-                "title": "Schnellaufgaben",
-                "button": "schnell erledigt",
-                "placeholder": "Aufgabe hinzufügen…"
+                "title": "Schnelle Aufgaben",
+                "button": "Schnell erledigt",
+                "placeholder": "Aufgabe hinzufügen…",
+                "no-tasks": "Noch keine Aufgaben..",
+                "created": "Aufgabe wurde erfolgreich erstellt!",
+                "updated": "Aufgabe wurde erfolgreich aktualisiert!",
+                "deleted": "Aufgabe wurde erfolgreich gelöscht!"
             },
             "upcoming-cards": {
                 "title": "Bevorstehende Fälligkeiten (Wiederkehrend)",

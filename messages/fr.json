@@ -203,8 +203,12 @@
             },
             "todos": {
                 "title": "Tâches rapides",
-                "button": "fait rapidement",
-                "placeholder": "Ajouter une tâche…"
+                "button": "Terminé rapidement",
+                "placeholder": "Ajouter une tâche…",
+                "no-tasks": "Aucune tâche pour le moment..",
+                "created": "Tâche créée avec succès !",
+                "updated": "Tâche mise à jour avec succès !",
+                "deleted": "Tâche supprimée avec succès !"
             },
             "upcoming-cards": {
                 "title": "Échéances à venir (Répétitif)",
