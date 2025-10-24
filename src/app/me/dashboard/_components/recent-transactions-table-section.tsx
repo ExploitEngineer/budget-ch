@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { getRecentTransactions } from "@/lib/services/transaction";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +15,9 @@ import {
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
 
-interface RecentTransactionsTables {
+interface Transaction {
+  id: string;
+  date: string;
   recipient: string;
   account: string;
   category: string;
@@ -19,16 +25,36 @@ interface RecentTransactionsTables {
   amount: string;
 }
 
-interface RecentTransactionsTableSectionProps {
-  recentTranasactionsTables: RecentTransactionsTables[];
-}
-
-export function RecentTransactionsTableSection({
-  recentTranasactionsTables,
-}: RecentTransactionsTableSectionProps) {
+export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  const recentTransactionsTableHeadings: string[] = [
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchTransactions() {
+      try {
+        const res = await getRecentTransactions();
+
+        if (!res.success) {
+          setError(res.message || "Failed to fetch transactions.");
+          return;
+        }
+
+        setTransactions(res.data || []);
+      } catch (err: any) {
+        console.error("Error fetching transactions:", err);
+        setError("Unexpected error fetching transactions.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchTransactions();
+  }, []);
+
+  const headings = [
     t("recent-transactions-table.table-headings.date"),
     t("recent-transactions-table.table-headings.recipient.title"),
     t("recent-transactions-table.table-headings.account.title"),
@@ -51,37 +77,51 @@ export function RecentTransactionsTableSection({
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
-          <Table className="min-w-[600px]">
-            <TableHeader>
-              <TableRow className="dark:border-border-blue">
-                {recentTransactionsTableHeadings.map((heading) => (
-                  <TableHead
-                    className="font-bold text-gray-500 dark:text-gray-400/80"
-                    key={heading}
-                  >
-                    {heading}
-                  </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentTranasactionsTables.map((data) => (
-                <TableRow
-                  className="dark:border-border-blue"
-                  key={data.recipient}
-                >
-                  <TableCell>25.9.2025</TableCell>
-                  <TableCell>{data.recipient}</TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    {data.account}
-                  </TableCell>
-                  <TableCell>{data.category}</TableCell>
-                  <TableCell>{data.note}</TableCell>
-                  <TableCell className="self-end">{data.amount}</TableCell>
+          {loading ? (
+            <p className="py-4 text-center text-gray-500">Loading...</p>
+          ) : error ? (
+            <p className="py-4 text-center text-red-500">{error}</p>
+          ) : (
+            <Table className="min-w-[600px]">
+              <TableHeader>
+                <TableRow className="dark:border-border-blue">
+                  {headings.map((heading) => (
+                    <TableHead
+                      className="font-bold text-gray-500 dark:text-gray-400/80"
+                      key={heading}
+                    >
+                      {heading}
+                    </TableHead>
+                  ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {transactions.length > 0 ? (
+                  transactions.map((tx) => (
+                    <TableRow className="dark:border-border-blue" key={tx.id}>
+                      <TableCell>{tx.date}</TableCell>
+                      <TableCell>{tx.recipient}</TableCell>
+                      <TableCell className="whitespace-nowrap">
+                        {tx.account}
+                      </TableCell>
+                      <TableCell>{tx.category}</TableCell>
+                      <TableCell>{tx.note}</TableCell>
+                      <TableCell>{`CHF ${tx.amount}`}</TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell
+                      colSpan={6}
+                      className="text-center text-gray-500"
+                    >
+                      No recent transactions
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </section>

@@ -15,7 +15,6 @@ export default function Dashboard() {
     upComingTables,
     warningCards,
     healthCards,
-    recentTransactionsTables,
   } = useDashboardData();
   return (
     <section>
@@ -31,9 +30,7 @@ export default function Dashboard() {
           warningCards={warningCards}
           upComingTables={upComingTables}
         />
-        <RecentTransactionsTableSection
-          recentTranasactionsTables={recentTransactionsTables}
-        />
+        <RecentTransactionsTableSection />
         <BudgetHealthSection cards={healthCards} />
       </div>
     </section>

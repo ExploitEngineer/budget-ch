@@ -146,69 +146,6 @@ export function useDashboardData() {
     },
   ];
 
-  const recentTransactionsTables: RecentTransactionsTables[] = [
-    {
-      recipient: t(
-        "dashboard-page.recent-transactions-table.table-headings.recipient.data.coop",
-      ),
-      account: t(
-        "dashboard-page.recent-transactions-table.table-headings.account.data.current-account",
-      ),
-      category: t(
-        "dashboard-page.recent-transactions-table.table-headings.category.data.groceries",
-      ),
-      note: t(
-        "dashboard-page.recent-transactions-table.table-headings.note.data.shopping",
-      ),
-      amount: "− CHF 132.40",
-    },
-    {
-      recipient: t(
-        "dashboard-page.recent-transactions-table.table-headings.recipient.data.sbb",
-      ),
-      account: t(
-        "dashboard-page.recent-transactions-table.table-headings.account.data.credit-card",
-      ),
-      category: t(
-        "dashboard-page.recent-transactions-table.table-headings.category.data.transportation",
-      ),
-      note: t(
-        "dashboard-page.recent-transactions-table.table-headings.note.data.ga",
-      ),
-      amount: "− CHF 79.00",
-    },
-    {
-      recipient: t(
-        "dashboard-page.recent-transactions-table.table-headings.recipient.data.cafe",
-      ),
-      account: t(
-        "dashboard-page.recent-transactions-table.table-headings.account.data.current-account",
-      ),
-      category: t(
-        "dashboard-page.recent-transactions-table.table-headings.category.data.restaurant",
-      ),
-      note: t(
-        "dashboard-page.recent-transactions-table.table-headings.note.data.lunch",
-      ),
-      amount: "− CHF 18.50",
-    },
-    {
-      recipient: t(
-        "dashboard-page.recent-transactions-table.table-headings.recipient.data.employer",
-      ),
-      account: t(
-        "dashboard-page.recent-transactions-table.table-headings.account.data.current-account",
-      ),
-      category: t(
-        "dashboard-page.recent-transactions-table.table-headings.category.data.income",
-      ),
-      note: t(
-        "dashboard-page.recent-transactions-table.table-headings.note.data.salary",
-      ),
-      amount: "+ CHF 5’200.00",
-    },
-  ];
-
   return {
     cards,
     circleProgressCards,
@@ -216,6 +153,5 @@ export function useDashboardData() {
     progressCards,
     upComingTables,
     warningCards,
-    recentTransactionsTables,
   };
 }

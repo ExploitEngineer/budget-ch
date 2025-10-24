@@ -130,7 +130,9 @@ export const transactions = pgTable("transactions", {
   amount: doublePrecision("amount").notNull().default(0),
   type: transactionType().notNull().default("income"),
   source: text("source"),
-  addedAt: timestamp("transaction_added_at"),
+  addedAt: timestamp("transaction_added_at", { withTimezone: true })
+    .defaultNow()
+    .notNull(),
   note: text("note"),
 });
 

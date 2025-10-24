@@ -1,6 +1,7 @@
 import db from "./db";
 import {
   hubs,
+  users,
   hub_members,
   transactions,
   transaction_categories,
@@ -9,7 +10,7 @@ import {
   saving_goals,
   quick_tasks,
 } from "./schema";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 
 type AccessRole = "admin" | "member";
@@ -39,6 +40,7 @@ export type createTransactionArgs = {
   transactionCategoryId: string;
   amount: number;
   note?: string;
+  source: string;
   categoryName: string;
 };
 
@@ -143,6 +145,7 @@ export async function createTransactionDB({
   userId,
   transactionCategoryId,
   amount,
+  source,
   note,
 }: Omit<createTransactionArgs, "categoryName">) {
   try {
@@ -152,6 +155,7 @@ export async function createTransactionDB({
       userId,
       transactionCategoryId,
       amount,
+      source,
       note,
     });
   } catch (err) {
@@ -409,6 +413,50 @@ export async function getBudgetsAmountsDB(hubId: string) {
     return {
       success: false,
       message: err.message || "Failed to get budget amounts",
+    };
+  }
+}
+
+// GET Latest Transaction on Limit
+export async function getRecentTransactionsDB(hubId: string, limit = 4) {
+  try {
+    const data = await db
+      .select({
+        id: transactions.id,
+        amount: transactions.amount,
+        type: transactions.type,
+        note: transactions.note,
+        addedAt: transactions.addedAt,
+        categoryName: transaction_categories.name,
+        accountName: transactions.type,
+        recipientName: transactions.source,
+      })
+      .from(transactions)
+      .leftJoin(
+        transaction_categories,
+        eq(transactions.transactionCategoryId, transaction_categories.id),
+      )
+      .leftJoin(
+        financial_accounts,
+        eq(transactions.financialAccountId, financial_accounts.id),
+      )
+      .leftJoin(users, eq(transactions.userId, users.id))
+      .where(eq(transactions.hubId, hubId))
+      .orderBy(desc(transactions.addedAt))
+      .limit(limit);
+
+    console.log("DB DATA: ", data);
+
+    return {
+      success: true,
+      message: "Successfully fetched recent transactions.",
+      data,
+    };
+  } catch (err: any) {
+    console.error("Error fetching recent transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to get recent transactions.",
     };
   }
 }

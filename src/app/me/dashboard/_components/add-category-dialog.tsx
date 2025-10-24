@@ -52,15 +52,18 @@ export default function AddCategory({
     if (!newCategory) return;
 
     setIsLoading(true);
+
     try {
-      onCategoryAddedAction(newCategory);
-      toast.success(`Category "${newCategory}" added locally!`);
-      onOpenChangeAction(false);
-      form.reset();
+      setTimeout(() => {
+        onCategoryAddedAction(newCategory);
+        toast.success(`Category "${newCategory}" added `);
+        onOpenChangeAction(false);
+        form.reset();
+        setIsLoading(false);
+      }, 1500);
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while adding category.");
-    } finally {
       setIsLoading(false);
     }
   }

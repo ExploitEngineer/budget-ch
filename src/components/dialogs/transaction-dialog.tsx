@@ -46,6 +46,7 @@ import { Spinner } from "../ui/spinner";
 import AddCategory from "@/app/me/dashboard/_components/add-category-dialog";
 
 export default function TransactionDialog() {
+  const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
@@ -72,6 +73,7 @@ export default function TransactionDialog() {
         categoryName: values.select.trim(),
         amount: values.amount,
         note: values.note,
+        source: values.recipient,
       });
 
       if (!result.success) {
@@ -87,6 +89,10 @@ export default function TransactionDialog() {
 
       toast.success("Transaction and category created successfully!");
       form.reset();
+      setSelectedCategory(null);
+      setCategories([]);
+
+      setOpen(false);
     } catch (err: any) {
       console.error(err);
       toast.error("Something went wrong while creating the transaction.");
@@ -108,7 +114,7 @@ export default function TransactionDialog() {
         onCategoryAddedAction={handleCategoryAdded}
       />
 
-      <Dialog>
+      <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer sm:min-w-40" asChild>
           <Button
             className="btn-gradient flex items-center gap-2 dark:text-white"

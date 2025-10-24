@@ -4,6 +4,7 @@ import {
   createTransactionDB,
   createTransactionCategoryDB,
   getAllTransactionsDB,
+  getRecentTransactionsDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -15,7 +16,8 @@ export async function createTransaction({
   categoryName,
   amount,
   note,
-}: Pick<createTransactionArgs, "categoryName" | "amount" | "note">) {
+  source,
+}: Pick<createTransactionArgs, "categoryName" | "amount" | "note" | "source">) {
   try {
     const hdrs = await headers();
     const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
@@ -56,6 +58,7 @@ export async function createTransaction({
       userId,
       transactionCategoryId: newCategory.id,
       amount,
+      source,
       note,
     });
 
@@ -70,8 +73,6 @@ export async function createTransactionCategory(categoryName: string) {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, true);
-
-    if (!hubId) throw new Error("Hub not found");
 
     const normalized = categoryName.trim().toLowerCase();
     const category = await createTransactionCategoryDB(normalized, hubId);
@@ -91,8 +92,6 @@ export async function getAllTransactions() {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, true);
 
-    if (!hubId) throw new Error("Hub not found");
-
     const result = await getAllTransactionsDB(hubId);
 
     const data = result.data;
@@ -101,5 +100,41 @@ export async function getAllTransactions() {
   } catch (err) {
     console.error(err);
     return { success: false, message: "Failed to fetch transactions" };
+  }
+}
+
+export async function getRecentTransactions() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    const res = await getRecentTransactionsDB(hubId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to fetch recent transactions",
+      };
+    }
+
+    console.log("SERVER ACTION RESPONSE: ", res.data);
+
+    const transactions = (res.data ?? []).map((tx) => ({
+      id: tx.id,
+      date: tx.addedAt ? new Date(tx.addedAt).toLocaleDateString() : "—",
+      recipient: tx.recipientName || "Unknown",
+      account: tx.accountName || "—",
+      category: tx.categoryName || "—",
+      note: tx.note || "—",
+      amount: `${tx.amount ?? 0}`,
+    }));
+
+    return { success: true, data: transactions };
+  } catch (err: any) {
+    console.error("Server action error in getRecentTransactions:", err);
+    return {
+      success: false,
+      message: err?.message || "Unexpected server error.",
+    };
   }
 }
