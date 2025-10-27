@@ -57,8 +57,9 @@ export default function TransactionDialog() {
     defaultValues: {
       date: new Date(),
       account: "checking",
+      transactionType: "income",
       recipient: "",
-      select: "",
+      category: "",
       amount: 0,
       note: "",
     },
@@ -70,10 +71,12 @@ export default function TransactionDialog() {
     setIsLoading(true);
     try {
       const result = await createTransaction({
-        categoryName: values.select.trim(),
+        categoryName: values.category.trim(),
         amount: values.amount,
         note: values.note,
         source: values.recipient,
+        transactionType: values.transactionType,
+        accountType: values.account,
       });
 
       if (!result.success) {
@@ -104,7 +107,7 @@ export default function TransactionDialog() {
   function handleCategoryAdded(newCategory: string) {
     setCategories((prev) => [...prev, newCategory]);
     setSelectedCategory(newCategory);
-    form.setValue("select", newCategory);
+    form.setValue("category", newCategory);
   }
   return (
     <>
@@ -224,28 +227,73 @@ export default function TransactionDialog() {
               </div>
 
               {/* Row 2 */}
-              <FormField
-                control={form.control}
-                name="recipient"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("dialog-box.labels.quelle.title")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder={t("dialog-box.labels.quelle.placeholder")}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex items-center justify-between gap-3">
+                <FormField
+                  control={form.control}
+                  name="recipient"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {t("dialog-box.labels.quelle.title")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder={t(
+                            "dialog-box.labels.quelle.placeholder",
+                          )}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="transactionType"
+                  render={({ field }) => (
+                    <FormItem className="flex !flex-1 flex-col">
+                      <FormLabel>
+                        {t("dialog-box.labels.transactionType.title")}
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue
+                              placeholder={t(
+                                "dialog-box.labels.transactionType.options.income",
+                              )}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="income">
+                              {t(
+                                "dialog-box.labels.transactionType.options.income",
+                              )}
+                            </SelectItem>
+                            <SelectItem value="expense">
+                              {t(
+                                "dialog-box.labels.transactionType.options.expense",
+                              )}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               {/* Row 3 */}
               <div className="flex items-center justify-between gap-3">
                 <FormField
                   control={form.control}
-                  name="select"
+                  name="category"
                   render={({ field }) => (
                     <FormItem className="flex flex-1 flex-col">
                       <FormLabel>

@@ -36,39 +36,27 @@ import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Plus, X } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import {
-  TransactionDialogSchema,
-  TransactionDialogValues,
-} from "@/lib/validations/transaction-dialog-validations";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
-import { toast } from "sonner";
-import {
-  createTransaction,
-  updateTransaction,
-} from "@/lib/services/transaction";
 import AddCategory from "../../dashboard/_components/add-category-dialog";
-import type { Transaction } from "./data-table";
-import { useEffect } from "react";
-import { parse } from "date-fns";
+import { useState } from "react";
+import {
+  TransactionDialogValues,
+  TransactionDialogSchema,
+} from "@/lib/validations/transaction-dialog-validations";
+import { createTransaction } from "@/lib/services/transaction";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
 
-interface TransactionEditDialogProps {
+export default function CreateTransactionDialog({
+  variant,
+  text,
+}: {
   variant?: "outline" | "default" | "gradient";
   text?: string;
-  transaction?: Transaction;
-}
-
-export default function TransactionEditDialog({
-  variant = "default",
-  text = "Add Transaction",
-  transaction,
-}: TransactionEditDialogProps) {
+}) {
   const [open, setOpen] = useState<boolean>(false);
-  const isEditMode = !!transaction;
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
@@ -81,84 +69,48 @@ export default function TransactionEditDialog({
   const form = useForm<TransactionDialogValues>({
     resolver: zodResolver(TransactionDialogSchema) as any,
     defaultValues: {
-      date: transaction
-        ? parse(transaction.date, "dd/MM/yyyy", new Date())
-        : new Date(),
-      account: transaction?.accountType || "savings",
-      recipient: transaction?.source || "",
-      category: transaction?.category || "",
-      amount: transaction?.amount || 0,
-      note: transaction?.note || "",
+      date: new Date(),
+      account: "savings",
+      recipient: "",
+      category: "",
+      amount: 0,
+      note: "",
       splits: [],
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "splits",
-  });
-
-  useEffect(() => {
-    if (transaction?.category) {
-      setSelectedCategory(transaction.category);
-      setCategories((prev) =>
-        prev.includes(transaction.category)
-          ? prev
-          : [...prev, transaction.category],
-      );
-    }
-  }, [transaction]);
-
   async function onSubmit(values: TransactionDialogValues) {
     setIsLoading(true);
     try {
-      let result;
+      const result = await createTransaction({
+        categoryName: values.category.trim(),
+        amount: values.amount,
+        note: values.note,
+        source: values.recipient,
+        transactionType: values.transactionType,
+        accountType: values.account,
+      });
 
-      if (isEditMode) {
-        const fd = new FormData();
-        fd.append("source", values.recipient);
-        fd.append("amount", values.amount.toString());
-        fd.append("note", values.note || "");
-        fd.append("addedAt", values.date.toISOString());
-        fd.append("accountType", values.account);
-        fd.append("categoryName", selectedCategory || values.category);
-
-        result = await updateTransaction(transaction!.id, fd);
-      } else {
-        result = await createTransaction({
-          categoryName: selectedCategory || values.category.trim(),
-          amount: values.amount,
-          note: values.note,
-          source: values.recipient,
-          transactionType: values.transactionType,
-          accountType: values.account,
-        });
-
-        if (!result.success) {
-          if (result.reason === "CATEGORY_ALREADY_EXISTS") {
-            toast.error(
-              "This category already exists. Transaction not created!",
-            );
-          } else if (result.reason === "NO_ACCOUNT") {
-            toast.error("Please create a financial account first!");
-          } else {
-            toast.error(result.message || "Failed to create transaction.");
-          }
-          return;
+      if (!result.success) {
+        if (result.reason === "CATEGORY_ALREADY_EXISTS") {
+          toast.error("This category already exists. Transaction not created!");
+        } else if (result.reason === "NO_ACCOUNT") {
+          toast.error("Please create a financial account first!");
+        } else {
+          toast.error(result.message || "Failed to create transaction.");
         }
-
-        toast.success("Transaction created successfully!");
+        return;
       }
 
+      toast.success("Transaction and category created successfully!");
       form.reset();
       setSelectedCategory(null);
       setCategories([]);
+
       setOpen(false);
     } catch (err: any) {
       console.error(err);
-      toast.error(
-        err.message || "Something went wrong while saving transaction.",
-      );
+      toast.error("Something went wrong while creating the transaction.");
     } finally {
       setIsLoading(false);
     }
@@ -169,6 +121,12 @@ export default function TransactionEditDialog({
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
   }
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "splits",
+  });
+
   return (
     <>
       <AddCategory
@@ -176,7 +134,6 @@ export default function TransactionEditDialog({
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
       />
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer" asChild>
           <Button
@@ -203,7 +160,7 @@ export default function TransactionEditDialog({
           <div className="flex-1 overflow-auto">
             <div className="flex items-center justify-between pb-3">
               <DialogTitle className="text-lg font-semibold">
-                {t("dialog.title")}
+                {t("title-2")}
               </DialogTitle>
               <DialogClose asChild>
                 <Button
@@ -270,7 +227,7 @@ export default function TransactionEditDialog({
                             onValueChange={field.onChange}
                             value={field.value}
                           >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full cursor-pointer">
                               <SelectValue
                                 placeholder={t("dialog.placeholders.account")}
                               />
@@ -417,7 +374,7 @@ export default function TransactionEditDialog({
                           <Input
                             type="number"
                             step={0.5}
-                            placeholder="0.00"
+                            placeholder="-132.40"
                             {...field}
                           />
                         </FormControl>
@@ -445,7 +402,7 @@ export default function TransactionEditDialog({
                   )}
                 />
 
-                {/* 5️⃣ File Upload */}
+                {/* File Upload */}
                 <FormField
                   control={form.control}
                   name="file"
@@ -591,7 +548,11 @@ export default function TransactionEditDialog({
                   >
                     {t("dialog.buttons.delete")}
                   </Button>
-                  <Button type="submit" className="cursor-pointer">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="cursor-pointer"
+                  >
                     {isLoading ? <Spinner /> : t("dialog.buttons.save")}
                   </Button>
                 </div>
