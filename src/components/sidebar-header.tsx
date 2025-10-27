@@ -22,7 +22,7 @@ import FilterDialog from "@/app/me/reports/_components/filter-dialog";
 import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
 import SavingGoalDialog from "@/app/me/saving-goals/_components/saving-goal-dialog";
 import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
-import TransactionEditDialog from "@/app/me/transactions/_components/transactions-edit-dialog";
+import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
 
 const monthNames: string[] = [
   "January",
@@ -122,7 +122,7 @@ export default function SidebarHeader() {
           {route === "dashboard" && <TransactionDialog />}
 
           {route === "transactions" && (
-            <TransactionEditDialog variant="gradient" />
+            <CreateTransactionDialog variant="gradient" />
           )}
 
           {route === "budgets" && <BudgetDialog />}
