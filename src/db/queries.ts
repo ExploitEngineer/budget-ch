@@ -10,7 +10,7 @@ import {
   saving_goals,
   quick_tasks,
 } from "./schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 
 type AccessRole = "admin" | "member";
@@ -518,6 +518,50 @@ export async function deleteTaskDB(taskId: string) {
   } catch (err: any) {
     console.error("Error deleting task", err);
     return { success: false, message: err.message || "Failed to delete task" };
+  }
+}
+
+// GET Budgets
+export async function getBudgetsDB(hubId: string) {
+  try {
+    const data = await db
+      .select({
+        id: budgets.id,
+        category: transaction_categories.name,
+        allocated: budgets.allocatedAmount,
+        spent: sql<number>`COALESCE(SUM(${transactions.amount}),0)`.as("spent"),
+      })
+      .from(budgets)
+      .leftJoin(
+        transaction_categories,
+        eq(transaction_categories.id, budgets.transactionCategoryId),
+      )
+      .leftJoin(
+        transactions,
+        eq(transactions.transactionCategoryId, budgets.transactionCategoryId),
+      )
+      .where(eq(budgets.hubId, hubId))
+      .groupBy(budgets.id, transaction_categories.name);
+
+    const formatted = data.map((b) => ({
+      id: b.id,
+      category: b.category,
+      allocated: Number(b.allocated),
+      spent: Math.abs(Number(b.spent)),
+      remaining: Number(b.allocated) - Math.abs(Number(b.spent)),
+      progress:
+        b.allocated > 0
+          ? Math.min((Math.abs(b.spent) / Number(b.allocated)) * 100, 100)
+          : 0,
+    }));
+
+    return { success: true, data: formatted };
+  } catch (err: any) {
+    console.error("Error fetching budgets table:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch budgets",
+    };
   }
 }
 

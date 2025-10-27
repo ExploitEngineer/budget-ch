@@ -4,6 +4,16 @@ import { createBudgetDB } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 import { getBudgetsAmountsDB } from "@/db/queries";
+import { getBudgetsDB } from "@/db/queries";
+
+export type BudgetRow = {
+  id: string;
+  category: string;
+  allocated: number;
+  spent: number;
+  remaining: number;
+  progress: number;
+};
 
 export interface BudgetsAmountsResponse {
   success: boolean;
@@ -100,6 +110,43 @@ export async function getBudgetsAmounts(): Promise<BudgetsAmountsResponse> {
     return {
       success: false,
       message: err?.message || "Unexpected server error.",
+    };
+  }
+}
+
+export async function getBudgets() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    const res = await getBudgetsDB(hubId);
+
+    if (!res.success || !res.data) {
+      return { success: false, message: res.message || "No budgets found" };
+    }
+
+    const budgetsArray = res.data;
+
+    const formattedBudgets: BudgetRow[] = budgetsArray.map((b) => ({
+      id: b.id,
+      category: b.category || "",
+      allocated: b.allocated,
+      spent: b.spent,
+      remaining: b.allocated - b.spent,
+      progress:
+        b.allocated > 0 ? Math.min((b.spent / b.allocated) * 100, 100) : 0,
+    }));
+
+    return {
+      success: true,
+      message: "Successfully fetched budgets table",
+      data: formattedBudgets,
+    };
+  } catch (err: any) {
+    console.error("Server action error in getBudgetsTableAction:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error",
     };
   }
 }

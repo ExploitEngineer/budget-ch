@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardHeader,
@@ -20,22 +22,27 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
 import BudgetDialog from "./budget-dialog";
+import { useEffect, useState } from "react";
+import { getBudgets, BudgetRow } from "@/lib/services/budget";
 
-interface TableData {
-  category: string;
-  budget: string;
-  ist: string;
-  rest: string;
-  value: number;
-  action: string;
-}
+interface BudgetDataTableProps {}
 
-interface BudgetDataTableProps {
-  tableData: TableData[];
-}
-
-export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
+export function BudgetDataTable({}: BudgetDataTableProps) {
   const t = useTranslations("main-dashboard.budgets-page");
+  const [tableData, setTableData] = useState<BudgetRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBudgets() {
+      setLoading(true);
+      const res = await getBudgets();
+      if (res.success && res.data) {
+        setTableData(res.data);
+      }
+      setLoading(false);
+    }
+    fetchBudgets();
+  }, []);
 
   const budgetDataTableHeadings: string[] = [
     t("data-table.headings.category"),
@@ -51,7 +58,7 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle>{t("data-table.title")}</CardTitle>{" "}
+            <CardTitle>{t("data-table.title")}</CardTitle>
             <Badge
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
               variant="outline"
@@ -80,8 +87,8 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
               <TableRow className="dark:border-border-blue">
                 {budgetDataTableHeadings.map((heading) => (
                   <TableHead
-                    className="font-bold text-gray-500 dark:text-gray-400/80"
                     key={heading}
+                    className="font-bold text-gray-500 dark:text-gray-400/80"
                   >
                     {heading}
                   </TableHead>
@@ -89,23 +96,28 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableData.map((data) => (
-                <TableRow
-                  className="dark:border-border-blue"
-                  key={data.category}
-                >
-                  <TableCell>{data.category}</TableCell>
-                  <TableCell>{data.budget}</TableCell>
-                  <TableCell>{data.ist}</TableCell>
-                  <TableCell>{data.rest}</TableCell>
-                  <TableCell>
-                    <Progress value={data.value} />
-                  </TableCell>
-                  <TableCell>
-                    <BudgetDialog variant="outline" text={data.action} />
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    Loading...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                tableData.map((data) => (
+                  <TableRow key={data.id} className="dark:border-border-blue">
+                    <TableCell>{data.category}</TableCell>
+                    <TableCell>{data.allocated}</TableCell>
+                    <TableCell>{data.spent}</TableCell>
+                    <TableCell>{data.remaining}</TableCell>
+                    <TableCell>
+                      <Progress value={data.progress} />
+                    </TableCell>
+                    <TableCell>
+                      <BudgetDialog variant="outline" text="Edit" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
           <Separator className="bg-border-blue mt-2" />
