@@ -13,16 +13,18 @@ import {
 import { InferModel } from "drizzle-orm";
 
 export const accessRole = pgEnum("access_role", ["admin", "member"]);
+
+export const transactionType = pgEnum("transaction_type", [
+  "income",
+  "expense",
+]);
 export const accountType = pgEnum("account_type", [
   "checking",
   "savings",
   "credit-card",
   "cash",
 ]);
-export const transactionType = pgEnum("transaction_type", [
-  "income",
-  "expense",
-]);
+
 export const BudgetColorMakerType = pgEnum("budgets_type", [
   "standard",
   "green",
@@ -127,12 +129,13 @@ export const transactions = pgTable("transactions", {
   transactionCategoryId: uuid("transaction_category_id")
     .notNull()
     .references(() => transaction_categories.id, { onDelete: "cascade" }),
-  amount: doublePrecision("amount").notNull().default(0),
-  type: transactionType().notNull().default("income"),
-  source: text("source"),
   addedAt: timestamp("transaction_added_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
+  accountType: accountType().notNull().default("cash"),
+  type: transactionType().notNull().default("income"),
+  source: text("source"),
+  amount: doublePrecision("amount").notNull().default(0),
   note: text("note"),
 });
 

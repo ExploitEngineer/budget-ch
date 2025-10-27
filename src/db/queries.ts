@@ -14,6 +14,7 @@ import { eq, desc } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 
 type AccessRole = "admin" | "member";
+
 export type createHubMemberArgs = {
   userId: string;
   hubId: string;
@@ -22,7 +23,7 @@ export type createHubMemberArgs = {
   userName?: string;
 };
 
-type AccountType = "checking" | "savings" | "credit-card" | "cash";
+export type AccountType = "checking" | "savings" | "credit-card" | "cash";
 export type financialAccountArgs = {
   userId: string;
   hubId: string;
@@ -42,6 +43,23 @@ export type createTransactionArgs = {
   note?: string;
   source: string;
   categoryName: string;
+  transactionType: "income" | "expense";
+  accountType: AccountType;
+};
+
+export type updateTransactionArgs = {
+  hubId: string;
+  transactionId: string;
+  updatedData: {
+    source?: string;
+    amount?: number;
+    note?: string | null;
+    addedAt?: Date | string;
+    transactionCategoryId?: string | null;
+    financialAccountId?: string | null;
+    accountType?: AccountType;
+    transactionType?: "income" | "expense";
+  };
 };
 
 export type budgetArgs = {
@@ -147,6 +165,8 @@ export async function createTransactionDB({
   amount,
   source,
   note,
+  transactionType,
+  accountType,
 }: Omit<createTransactionArgs, "categoryName">) {
   try {
     await db.insert(transactions).values({
@@ -157,9 +177,140 @@ export async function createTransactionDB({
       amount,
       source,
       note,
+      type: transactionType,
+      accountType,
     });
+
+    return { success: true, message: "Transaction created successfully" };
   } catch (err) {
     console.error("Error creating Transaction ", err);
+    return { success: false, message: "Failed to create transaction" };
+  }
+}
+
+// GET Transactions
+export async function getTransactionsDB(hubId: string) {
+  try {
+    const transactionsList = await db
+      .select({
+        id: transactions.id,
+        date: transactions.addedAt,
+        recipient: transactions.source,
+        accountType: transactions.accountType,
+        category: transaction_categories.name,
+        note: transactions.note,
+        amount: transactions.amount,
+      })
+      .from(transactions)
+      .leftJoin(
+        transaction_categories,
+        eq(transactions.transactionCategoryId, transaction_categories.id),
+      )
+      .leftJoin(
+        financial_accounts,
+        eq(transactions.financialAccountId, financial_accounts.id),
+      )
+      .leftJoin(users, eq(transactions.userId, users.id))
+      .where(eq(transactions.hubId, hubId))
+      .orderBy(desc(transactions.addedAt));
+
+    return { success: true, data: transactionsList };
+  } catch (err: any) {
+    console.error("Error fetching transactions for table:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch transactions.",
+    };
+  }
+}
+
+// UPDATE Transaction
+export async function updateTransactionDB({
+  hubId,
+  transactionId,
+  updatedData,
+}: updateTransactionArgs) {
+  try {
+    const tx = await db.query.transactions.findFirst({
+      where: (tx) => eq(tx.id, transactionId),
+      columns: { hubId: true },
+    });
+
+    if (!tx) return { success: false, message: "Transaction not found" };
+    if (tx.hubId !== hubId) return { success: false, message: "Access denied" };
+
+    const normalized = {
+      source: updatedData.source,
+      amount: updatedData.amount,
+      note: updatedData.note,
+      addedAt:
+        typeof updatedData.addedAt === "string"
+          ? new Date(updatedData.addedAt)
+          : updatedData.addedAt,
+      transactionCategoryId: updatedData.transactionCategoryId,
+      financialAccountId: updatedData.financialAccountId,
+      accountType: updatedData.accountType,
+    };
+
+    const cleanData = Object.fromEntries(
+      Object.entries(normalized).filter(([_, value]) => value !== undefined),
+    );
+
+    const [updatedTx] = await db
+      .update(transactions)
+      .set(cleanData)
+      .where(eq(transactions.id, transactionId))
+      .returning();
+
+    return { success: true, data: updatedTx };
+  } catch (err: any) {
+    console.error("Error updating transaction:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update transaction",
+    };
+  }
+}
+
+// GET Recent Transactions on Limit
+export async function getRecentTransactionsDB(hubId: string, limit = 4) {
+  try {
+    const data = await db
+      .select({
+        id: transactions.id,
+        amount: transactions.amount,
+        note: transactions.note,
+        addedAt: transactions.addedAt,
+        categoryName: transaction_categories.name,
+        accountName: financial_accounts.name,
+        recipientName: transactions.source,
+        accountType: transactions.accountType,
+      })
+      .from(transactions)
+      .leftJoin(
+        transaction_categories,
+        eq(transactions.transactionCategoryId, transaction_categories.id),
+      )
+      .leftJoin(
+        financial_accounts,
+        eq(transactions.financialAccountId, financial_accounts.id),
+      )
+      .leftJoin(users, eq(transactions.userId, users.id))
+      .where(eq(transactions.hubId, hubId))
+      .orderBy(desc(transactions.addedAt))
+      .limit(limit);
+
+    return {
+      success: true,
+      message: "Successfully fetched recent transactions.",
+      data,
+    };
+  } catch (err: any) {
+    console.error("Error fetching recent transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to get recent transactions.",
+    };
   }
 }
 
@@ -287,27 +438,6 @@ export async function createSavingGoalDB({
   }
 }
 
-// READ Transactions
-export async function getAllTransactionsDB(hubId: string) {
-  try {
-    const allTransactions = await db.query.transactions.findMany({
-      where: eq(transactions.hubId, hubId),
-      orderBy: (t, { desc }) => [desc(t.addedAt)],
-    });
-
-    return {
-      success: true,
-      data: allTransactions,
-    };
-  } catch (err: any) {
-    console.error("Error fetching transactions:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to fetch transactions",
-    };
-  }
-}
-
 // CREATE Task
 export async function createTaskDB({
   userId,
@@ -413,50 +543,6 @@ export async function getBudgetsAmountsDB(hubId: string) {
     return {
       success: false,
       message: err.message || "Failed to get budget amounts",
-    };
-  }
-}
-
-// GET Latest Transaction on Limit
-export async function getRecentTransactionsDB(hubId: string, limit = 4) {
-  try {
-    const data = await db
-      .select({
-        id: transactions.id,
-        amount: transactions.amount,
-        type: transactions.type,
-        note: transactions.note,
-        addedAt: transactions.addedAt,
-        categoryName: transaction_categories.name,
-        accountName: transactions.type,
-        recipientName: transactions.source,
-      })
-      .from(transactions)
-      .leftJoin(
-        transaction_categories,
-        eq(transactions.transactionCategoryId, transaction_categories.id),
-      )
-      .leftJoin(
-        financial_accounts,
-        eq(transactions.financialAccountId, financial_accounts.id),
-      )
-      .leftJoin(users, eq(transactions.userId, users.id))
-      .where(eq(transactions.hubId, hubId))
-      .orderBy(desc(transactions.addedAt))
-      .limit(limit);
-
-    console.log("DB DATA: ", data);
-
-    return {
-      success: true,
-      message: "Successfully fetched recent transactions.",
-      data,
-    };
-  } catch (err: any) {
-    console.error("Error fetching recent transactions:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to get recent transactions.",
     };
   }
 }
