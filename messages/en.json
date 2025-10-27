@@ -89,6 +89,13 @@
                             "cash": "Cash"
                         }
                     },
+                    "transactionType": {
+                        "title": "Transaction Type",
+                        "options": {
+                            "income": "income",
+                            "expense": "expense"
+                        }
+                    },
                     "quelle": {
                         "title": "Recipient",
                         "placeholder": "e.g. Coop, employer…"
@@ -319,6 +326,8 @@
                 "dialog": {
                     "title": "Edit Transaction",
                     "close": "Close",
+                    "new-category": "New category",
+                    "no-category": "No categories yet",
                     "labels": {
                         "date": "Date",
                         "account": "Account",
@@ -327,7 +336,14 @@
                         "amount": "Amount (CHF)",
                         "note": "Note",
                         "file": "Receipts (PDF/JPG/PNG)",
-                        "splitSum": "Split Transaction"
+                        "splitSum": "Split Transaction",
+                        "transactionType": {
+                            "title": "Transaction Type",
+                            "options": {
+                                "income": "income",
+                                "expense": "expense"
+                            }
+                        }
                     },
                     "placeholders": {
                         "date": "09/21/2025",
@@ -338,10 +354,10 @@
                         "note-optional": "Note (optional)"
                     },
                     "options": {
-                        "giro": "Giro",
+                        "checking": "Checking",
                         "credit-card": "Credit Card",
-                        "sparen": "Savings",
-                        "bar": "Cash",
+                        "savings": "Savings",
+                        "cash": "Cash",
                         "lebensmittel": "Groceries",
                         "restaurant": "Restaurant & Café",
                         "oev": "Public Transport & Mobility",

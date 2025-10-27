@@ -90,6 +90,13 @@
                             "cash": "Contanti"
                         }
                     },
+                    "transactionType": {
+                        "title": "Tipo di transazione",
+                        "options": {
+                            "income": "entrata",
+                            "expense": "uscita"
+                        }
+                    },
                     "quelle": {
                         "title": "Fonte",
                         "placeholder": "es. Coop, datore di lavoro…"
@@ -320,6 +327,8 @@
                 "dialog": {
                     "title": "Modifica transazione",
                     "close": "Chiudi",
+                    "new-category": "Nuova categoria",
+                    "no-category": "Nessuna categoria ancora",
                     "labels": {
                         "date": "Data",
                         "account": "Conto",
@@ -328,7 +337,14 @@
                         "amount": "Importo (CHF)",
                         "note": "Nota",
                         "file": "Ricevute (PDF/JPG/PNG)",
-                        "splitSum": "Dividi transazione"
+                        "splitSum": "Dividi transazione",
+                        "transactionType": {
+                            "title": "Tipo di transazione",
+                            "options": {
+                                "income": "entrata",
+                                "expense": "uscita"
+                            }
+                        }
                     },
                     "placeholders": {
                         "date": "21/09/2025",
@@ -339,10 +355,10 @@
                         "note-optional": "Nota (facoltativa)"
                     },
                     "options": {
-                        "giro": "Conto corrente",
+                        "checking": "Conto corrente",
                         "credit-card": "Carta di credito",
-                        "sparen": "Conto risparmio",
-                        "bar": "Contanti",
+                        "savings": "Conto risparmio",
+                        "cash": "Contanti",
                         "lebensmittel": "Spesa",
                         "restaurant": "Ristorante & Caffè",
                         "oev": "Trasporto pubblico & mobilità",

@@ -90,6 +90,13 @@
                             "cash": "Bargeld"
                         }
                     },
+                    "transactionType": {
+                        "title": "Transaktionstyp",
+                        "options": {
+                            "income": "Einnahme",
+                            "expense": "Ausgabe"
+                        }
+                    },
                     "quelle": {
                         "title": "Quelle",
                         "placeholder": "z. B. Coop, Arbeitgeber…"
@@ -320,6 +327,8 @@
                 "dialog": {
                     "title": "Transaktion bearbeiten",
                     "close": "Schließen",
+                    "new-category": "Neue Kategorie",
+                    "no-category": "Noch keine Kategorien",
                     "labels": {
                         "date": "Datum",
                         "account": "Konto",
@@ -328,7 +337,14 @@
                         "amount": "Betrag (CHF)",
                         "note": "Notiz",
                         "file": "Belege (PDF/JPG/PNG)",
-                        "splitSum": "Transaktion aufteilen"
+                        "splitSum": "Transaktion aufteilen",
+                        "transactionType": {
+                            "title": "Transaktionstyp",
+                            "options": {
+                                "income": "Einnahme",
+                                "expense": "Ausgabe"
+                            }
+                        }
                     },
                     "placeholders": {
                         "date": "21.09.2025",
@@ -339,10 +355,10 @@
                         "note-optional": "Notiz (optional)"
                     },
                     "options": {
-                        "giro": "Girokonto",
+                        "checking": "Checking",
                         "credit-card": "Kreditkarte",
-                        "sparen": "Sparkonto",
-                        "bar": "Bargeld",
+                        "savings": "Sparkonto",
+                        "cash": "Bargeld",
                         "lebensmittel": "Lebensmittel",
                         "restaurant": "Restaurant & Café",
                         "oev": "Öffentlicher Verkehr & Mobilität",

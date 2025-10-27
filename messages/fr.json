@@ -90,6 +90,13 @@
                             "cash": "Espèces"
                         }
                     },
+                    "transactionType": {
+                        "title": "Type de transaction",
+                        "options": {
+                            "income": "revenu",
+                            "expense": "dépense"
+                        }
+                    },
                     "quelle": {
                         "title": "Source",
                         "placeholder": "p. ex. Coop, employeur…"
@@ -320,6 +327,8 @@
                 "dialog": {
                     "title": "Modifier la transaction",
                     "close": "Fermer",
+                    "new-category": "Nouvelle catégorie",
+                    "no-category": "Aucune catégorie pour le moment",
                     "labels": {
                         "date": "Date",
                         "account": "Compte",
@@ -328,7 +337,14 @@
                         "amount": "Montant (CHF)",
                         "note": "Remarque",
                         "file": "Reçus (PDF/JPG/PNG)",
-                        "splitSum": "Diviser la transaction"
+                        "splitSum": "Diviser la transaction",
+                        "transactionType": {
+                            "title": "Type de transaction",
+                            "options": {
+                                "income": "revenu",
+                                "expense": "dépense"
+                            }
+                        }
                     },
                     "placeholders": {
                         "date": "21/09/2025",
@@ -339,10 +355,10 @@
                         "note-optional": "Remarque (optionnelle)"
                     },
                     "options": {
-                        "giro": "Compte courant",
+                        "checking": "Compte courant",
                         "credit-card": "Carte de crédit",
-                        "sparen": "Compte épargne",
-                        "bar": "Espèces",
+                        "savings": "Compte épargne",
+                        "cash": "Espèces",
                         "lebensmittel": "Courses",
                         "restaurant": "Restaurant & Café",
                         "oev": "Transports publics & mobilité",
