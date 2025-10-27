@@ -36,7 +36,12 @@ import {
   calculationFormSchema,
 } from "@/lib/validations/calculation-section-validations";
 
-export function CalculationSection() {
+interface CalculationSectionProps {
+  onFilter: (filters: CalculationFormValues) => void;
+  onReset?: () => void;
+}
+
+export function CalculationSection({ onFilter, onReset }: CalculationSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
 
   const form = useForm<CalculationFormValues>({
@@ -52,12 +57,22 @@ export function CalculationSection() {
     },
   });
 
+  const handleApply = () => {
+    onFilter(form.getValues());
+  };
+
+  const handleReset = () => {
+    form.reset();
+    onReset?.();
+  };
+
   return (
     <section>
       <FormProvider {...form}>
         <Card className="bg-blue-background dark:border-border-blue">
           <CardContent>
             <Form {...form}>
+              {/* Top Row */}
               <div className="flex flex-col flex-wrap gap-4 md:flex-row">
                 <FormField
                   control={form.control}
@@ -74,7 +89,7 @@ export function CalculationSection() {
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
-                                ? format(field.value, "PPP")
+                                ? format(field.value, "dd/MM/yyyy")
                                 : "Pick a date"}
                             </Button>
                           </PopoverTrigger>
@@ -87,7 +102,6 @@ export function CalculationSection() {
                           </PopoverContent>
                         </Popover>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -107,7 +121,7 @@ export function CalculationSection() {
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
-                                ? format(field.value, "PPP")
+                                ? format(field.value, "dd/MM/yyyy")
                                 : "Pick a date"}
                             </Button>
                           </PopoverTrigger>
@@ -120,7 +134,6 @@ export function CalculationSection() {
                           </PopoverContent>
                         </Popover>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -139,7 +152,7 @@ export function CalculationSection() {
                           <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
                             <SelectValue
                               placeholder={t(
-                                "labels.account.data.current-account",
+                                "labels.account.data.current-account"
                               )}
                             />
                           </SelectTrigger>
@@ -159,7 +172,6 @@ export function CalculationSection() {
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -181,9 +193,6 @@ export function CalculationSection() {
                             />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="categories">
-                              {t("labels.category.data.categories")}
-                            </SelectItem>
                             <SelectItem value="groceries">
                               {t("labels.category.data.groceries")}
                             </SelectItem>
@@ -196,16 +205,16 @@ export function CalculationSection() {
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
 
+              {/* Second Row */}
               <div className="mt-4 flex flex-col flex-wrap gap-4 md:flex-row">
                 <FormField
                   control={form.control}
-                  name="amountMax"
+                  name="amountMin"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Min (CHF)</FormLabel>
@@ -218,14 +227,13 @@ export function CalculationSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
                   control={form.control}
-                  name="amountMin"
+                  name="amountMax"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Max (CHF)</FormLabel>
@@ -238,7 +246,6 @@ export function CalculationSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -257,55 +264,47 @@ export function CalculationSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
             </Form>
           </CardContent>
+
+          {/* Footer */}
           <CardFooter className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-                asChild
-              >
+              <Badge variant="outline" className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2">
                 <label className="flex items-center gap-2">
                   <Checkbox />
                   <span>{t("checkboxes.receipt")}</span>
                 </label>
               </Badge>
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-                asChild
-              >
+              <Badge variant="outline" className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2">
                 <label className="flex items-center gap-2">
                   <Checkbox />
                   <span>{t("checkboxes.recurring")}</span>
                 </label>
               </Badge>
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-                asChild
-              >
+              <Badge variant="outline" className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2">
                 <label className="flex items-center gap-2">
                   <Checkbox />
                   <span>{t("checkboxes.transfers")}</span>
                 </label>
               </Badge>
             </div>
+
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
+                onClick={handleReset}
                 className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
               >
                 {t("buttons.reset")}
               </Button>
               <Button
                 variant="outline"
+                onClick={handleApply}
                 className="btn-gradient cursor-pointer border-transparent"
               >
                 {t("buttons.apply")}
