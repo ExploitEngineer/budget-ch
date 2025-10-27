@@ -591,7 +591,11 @@ export default function TransactionEditDialog({
                   >
                     {t("dialog.buttons.delete")}
                   </Button>
-                  <Button type="submit" className="cursor-pointer">
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="cursor-pointer"
+                  >
                     {isLoading ? <Spinner /> : t("dialog.buttons.save")}
                   </Button>
                 </div>
