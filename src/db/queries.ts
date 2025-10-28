@@ -192,7 +192,7 @@ export async function createTransactionDB({
   }
 }
 
-// GET Transactions
+// READ Transactions
 export async function getTransactionsDB(hubId: string) {
   try {
     const transactionsList = await db
@@ -276,7 +276,7 @@ export async function updateTransactionDB({
   }
 }
 
-// GET Recent Transactions on Limit
+// READ Recent Transactions on Limit
 export async function getRecentTransactionsDB(hubId: string, limit = 4) {
   try {
     const data = await db
@@ -434,6 +434,44 @@ export async function createSavingGoalDB({
   }
 }
 
+// READ Savings Goals Summary
+export async function getSavingGoalsSummaryDB(hubId: string) {
+  try {
+    const goals = await db.query.saving_goals.findMany({
+      where: (goal) => eq(goal.hubId, hubId),
+      columns: {
+        goalAmount: true,
+        monthlyAllocation: true,
+      },
+    });
+
+    const totalGoals = goals.length;
+
+    const totalTarget = goals.reduce((sum, g) => sum + (g.goalAmount || 0), 0);
+    const totalSaved = goals.reduce(
+      (sum, g) => sum + (g.monthlyAllocation || 0),
+      0,
+    );
+    const remainingToSave = Math.max(totalTarget - totalSaved, 0);
+
+    return {
+      success: true,
+      data: {
+        totalTarget,
+        totalSaved,
+        remainingToSave,
+        totalGoals,
+      },
+    };
+  } catch (err: any) {
+    console.error("Error fetching saving goals summary:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch saving goals summary",
+    };
+  }
+}
+
 // CREATE Task
 export async function createTaskDB({
   userId,
@@ -517,7 +555,7 @@ export async function deleteTaskDB(taskId: string) {
   }
 }
 
-// GET Budgets
+// READ Budgets
 export async function getBudgetsDB(hubId: string) {
   try {
     const data = await db
@@ -569,7 +607,7 @@ export async function getBudgetsDB(hubId: string) {
   }
 }
 
-// GET Budgets Allocated & Spent Amount
+// READ Budgets Allocated & Spent Amount
 export async function getBudgetsAmountsDB(hubId: string) {
   try {
     const results = await db

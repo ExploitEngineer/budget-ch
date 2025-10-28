@@ -21,22 +21,22 @@ export function useSavingGoalsData() {
   const cards: CardsContent[] = [
     {
       title: t("cards.card-1.title"),
-      content: t("cards.card-1.content"),
+      content: "—",
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: t("cards.card-2.content"),
+      content: "—",
       badge: t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),
-      content: t("cards.card-3.content"),
+      content: "—",
       badge: t("cards.card-3.badge"),
     },
     {
       title: t("cards.card-4.title"),
-      content: t("cards.card-4.content"),
+      content: "—",
       badge: t("cards.card-4.badge"),
     },
   ];

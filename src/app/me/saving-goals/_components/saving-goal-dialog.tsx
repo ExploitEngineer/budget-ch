@@ -46,10 +46,12 @@ import { createSavingGoal } from "@/lib/services/saving-goal";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function SavingGoalDialog() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
@@ -90,7 +92,7 @@ export default function SavingGoalDialog() {
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
           className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white"
