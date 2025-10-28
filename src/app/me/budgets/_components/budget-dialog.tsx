@@ -44,10 +44,12 @@ export default function BudgetDialog({
   variant?: "gradient" | "outline";
   text?: string;
 }) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const t = useTranslations(
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<BudgetDialogValues>({
     resolver: zodResolver(BudgetDialogSchema) as any,
@@ -78,6 +80,7 @@ export default function BudgetDialog({
 
       toast.success("Budget created successfully");
       form.reset();
+      setOpen(false);
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while creating the budget");
@@ -87,7 +90,7 @@ export default function BudgetDialog({
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="cursor-pointer" asChild>
         <Button
           className={

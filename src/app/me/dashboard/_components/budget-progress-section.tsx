@@ -18,6 +18,7 @@ import {
 } from "@/lib/services/tasks";
 import { toast } from "sonner";
 import { QuickTask } from "@/db/schema";
+import { getTopCategories } from "@/lib/services/budget";
 
 interface ProgressCards {
   title: string;
@@ -25,18 +26,14 @@ interface ProgressCards {
   value: number;
 }
 
-interface BudgetProgressSectionProps {
-  progressCards: ProgressCards[];
-}
-
-export function BudgetProgressSection({
-  progressCards,
-}: BudgetProgressSectionProps) {
+export function BudgetProgressSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
 
+  const [categories, setCategories] = useState<ProgressCards[]>([]);
   const [tasks, setTasks] = useState<QuickTask[]>([]);
-  const [newTask, setNewTask] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [newTask, setNewTask] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // Inline edit states
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -47,8 +44,23 @@ export function BudgetProgressSection({
   // Load tasks on mount
   useEffect(() => {
     (async () => {
-      const res = await getTasks();
-      if (res.success && res.data) setTasks(res.data);
+      try {
+        setLoading(true);
+        const [taskRes, categoriesRes] = await Promise.all([
+          getTasks(),
+          getTopCategories(),
+        ]);
+
+        if (taskRes.success && taskRes.data) setTasks(taskRes.data);
+
+        if (categoriesRes.success && categoriesRes.data) {
+          setCategories(categoriesRes.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch top categories:", err);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -152,7 +164,7 @@ export function BudgetProgressSection({
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
-      <Card className="bg-blue-background dark:border-border-blue lg:col-span-3">
+      <Card className="bg-blue-background dark:border-border-blue relative lg:col-span-3">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("line-progress-cards.title")}</CardTitle>
           <Button
@@ -164,15 +176,25 @@ export function BudgetProgressSection({
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <div className="grid grid-cols-2 gap-4 pb-10">
-          {progressCards.map((card) => (
-            <CardContent key={card.title} className="flex flex-col">
-              <div className="mb-3 flex flex-wrap items-center justify-between sm:mb-1">
-                <h3 className="text-sm sm:text-base">{card.title}</h3>
-                <h3 className="text-sm sm:text-base">{card.content}</h3>
-              </div>
-              <Progress value={card.value} />
-            </CardContent>
-          ))}
+          {loading ? (
+            <p className="text-muted-foreground absolute left-1/2 -translate-x-1/2 text-center text-sm">
+              Loading ...
+            </p>
+          ) : categories.length === 0 ? (
+            <p className="text-muted-foreground absolute left-1/2 -translate-x-1/2 text-center text-sm">
+              No categories found
+            </p>
+          ) : (
+            categories.map((card) => (
+              <CardContent key={card.title} className="flex flex-col">
+                <div className="mb-3 flex flex-wrap items-center justify-between sm:mb-1">
+                  <h3 className="text-sm sm:text-base">{card.title}</h3>
+                  <h3 className="text-sm sm:text-base">{card.content}</h3>
+                </div>
+                <Progress value={card.value} />
+              </CardContent>
+            ))
+          )}
         </div>
       </Card>
       <Card className="bg-blue-background dark:border-border-blue flex flex-col justify-between lg:col-span-2">

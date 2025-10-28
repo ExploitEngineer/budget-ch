@@ -599,9 +599,9 @@ export async function deleteTaskDB(taskId: string) {
 }
 
 // READ Budgets
-export async function getBudgetsDB(hubId: string) {
+export async function getBudgetsDB(hubId: string, limit?: number) {
   try {
-    const data = await db
+    const query = db
       .select({
         id: budgets.id,
         category: transaction_categories.name,
@@ -621,7 +621,12 @@ export async function getBudgetsDB(hubId: string) {
         ),
       )
       .where(eq(budgets.hubId, hubId))
-      .groupBy(budgets.id, transaction_categories.name);
+      .groupBy(budgets.id, transaction_categories.name)
+      .orderBy(desc(budgets.createdAt));
+
+    if (limit) query.limit(limit);
+
+    const data = await query;
 
     const formatted = data.map((b) => {
       const allocated = Number(b.allocated) || 0;
@@ -633,10 +638,11 @@ export async function getBudgetsDB(hubId: string) {
       return {
         id: b.id,
         category: b.category || "Uncategorized",
+        content: `CHF ${spent.toLocaleString()} / ${allocated.toLocaleString()}`,
+        value: Math.round(progress),
+        remaining,
         allocated,
         spent,
-        remaining,
-        progress,
       };
     });
 

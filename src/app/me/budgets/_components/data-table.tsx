@@ -137,6 +137,12 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
                     Loading...
                   </TableCell>
                 </TableRow>
+              ) : tableData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-gray-400">
+                    No Budgets Yet
+                  </TableCell>
+                </TableRow>
               ) : (
                 tableData.map((data) => (
                   <TableRow key={data.id} className="dark:border-border-blue">

@@ -154,6 +154,10 @@ export const budgets = pgTable("budgets", {
   spentAmount: doublePrecision("spent_amount").notNull().default(0),
   warningPercentage: integer("warning_percentage").notNull(),
   markerColor: text("marker_color").notNull().default(""),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const saving_goals = pgTable("saving_goals", {

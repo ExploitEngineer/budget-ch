@@ -161,6 +161,35 @@ export async function getBudgets(): Promise<BudgetResponse<BudgetRow[]>> {
   }
 }
 
+// GET Top Categories
+export async function getTopCategories() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    const res = await getBudgetsDB(hubId, 4);
+
+    if (!res.success || !res.data) {
+      return { success: false, message: res.message || "No budgets found" };
+    }
+
+    const topCategories = res.data.map((b) => ({
+      title: b.category,
+      content: `CHF ${b.spent.toLocaleString()} / ${b.allocated.toLocaleString()}`,
+      value: b.value,
+      remaining: b.remaining,
+    }));
+
+    return { success: true, data: topCategories };
+  } catch (err: any) {
+    console.error("Server action error in getTopCategories:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error",
+    };
+  }
+}
+
 // UPDATE Budget [Action]
 export async function updateBudget({
   budgetId,
