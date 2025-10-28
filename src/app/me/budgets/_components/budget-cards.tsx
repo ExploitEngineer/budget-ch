@@ -10,10 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
-import {
-  getBudgetsAmounts,
-  BudgetsAmountsResponse,
-} from "@/lib/services/budget";
+import { getBudgetsAmounts } from "@/lib/services/budget";
 import { getCategoriesCount } from "@/lib/services/category";
 
 interface CardsContent {
@@ -37,8 +34,10 @@ export function BudgetCardsSection({ cards }: BudgetCardsSectionProps) {
   useEffect(() => {
     async function fetchBudgetData() {
       try {
-        const [budgetRes, categoryRes]: [BudgetsAmountsResponse, any] =
-          await Promise.all([getBudgetsAmounts(), getCategoriesCount()]);
+        const [budgetRes, categoryRes] = await Promise.all([
+          getBudgetsAmounts(),
+          getCategoriesCount(),
+        ]);
 
         if (!budgetRes.success) {
           setError(budgetRes.message || "Failed to fetch budgets");

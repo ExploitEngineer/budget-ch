@@ -23,14 +23,45 @@ import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
 import BudgetEditDialog from "./budget-edit-dialog";
 import { useEffect, useState } from "react";
-import { getBudgets, BudgetRow } from "@/lib/services/budget";
+import {
+  getBudgets,
+  BudgetRow,
+  getBudgetsAmounts,
+} from "@/lib/services/budget";
 
 interface BudgetDataTableProps {}
 
 export function BudgetDataTable({}: BudgetDataTableProps) {
   const t = useTranslations("main-dashboard.budgets-page");
+
   const [tableData, setTableData] = useState<BudgetRow[]>([]);
+  const [allocated, setAllocated] = useState<number | null>(null);
+  const [available, setAvailable] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchBudgetData() {
+      try {
+        const budgetRes = await getBudgetsAmounts();
+
+        if (!budgetRes.success) {
+          return;
+        }
+
+        const totalAllocated = budgetRes.data?.totalAllocated ?? 0;
+        const totalSpent = budgetRes.data?.totalSpent ?? 0;
+
+        setAllocated(totalAllocated);
+        setAvailable(totalAllocated - totalSpent);
+      } catch (err: any) {
+        console.error("Error fetching budgets/categories:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchBudgetData();
+  }, []);
 
   async function fetchBudgets() {
     setLoading(true);
@@ -65,7 +96,9 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
               variant="outline"
             >
-              {t("data-table.badge")}
+              {t("data-table.total-budget")}
+              {allocated ?? "..."} • {t("data-table.rest-budget")}
+              {available ?? "..."}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
