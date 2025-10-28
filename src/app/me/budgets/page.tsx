@@ -6,7 +6,7 @@ import { WarningSection } from "./_components/warning-section";
 import { Settings } from "./_components/settings";
 
 export default function Transactions() {
-  const { cards, tableData } = useBudgetData();
+  const { cards } = useBudgetData();
   return (
     <section>
       <div>
@@ -15,7 +15,7 @@ export default function Transactions() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <BudgetCardsSection cards={cards} />
-        <BudgetDataTable tableData={tableData} />
+        <BudgetDataTable />
         <WarningSection />
         <Settings />
       </div>
