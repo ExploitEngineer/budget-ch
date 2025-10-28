@@ -10,8 +10,12 @@ import {
   saving_goals,
   quick_tasks,
 } from "./schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { eq, desc, and } from "drizzle-orm";
 import type { QuickTask } from "./schema";
+import type {
+  CreateBudgetInput,
+  UpdateBudgetInput,
+} from "@/lib/services/budget";
 
 type AccessRole = "admin" | "member";
 
@@ -355,15 +359,7 @@ export async function createBudgetDB({
   spentAmount,
   warningPercentage,
   markerColor,
-}: {
-  hubId: string;
-  userId: string;
-  categoryName: string;
-  allocatedAmount: number;
-  spentAmount: number;
-  warningPercentage: number;
-  markerColor: string;
-}) {
+}: CreateBudgetInput) {
   try {
     const normalizedName = categoryName.trim().toLowerCase();
 
@@ -529,7 +525,7 @@ export async function getBudgetsDB(hubId: string) {
         id: budgets.id,
         category: transaction_categories.name,
         allocated: budgets.allocatedAmount,
-        spent: sql<number>`COALESCE(SUM(${transactions.amount}),0)`.as("spent"),
+        spent: budgets.spentAmount,
       })
       .from(budgets)
       .leftJoin(
@@ -538,22 +534,30 @@ export async function getBudgetsDB(hubId: string) {
       )
       .leftJoin(
         transactions,
-        eq(transactions.transactionCategoryId, budgets.transactionCategoryId),
+        and(
+          eq(transactions.transactionCategoryId, budgets.transactionCategoryId),
+          eq(transactions.hubId, budgets.hubId),
+        ),
       )
       .where(eq(budgets.hubId, hubId))
       .groupBy(budgets.id, transaction_categories.name);
 
-    const formatted = data.map((b) => ({
-      id: b.id,
-      category: b.category,
-      allocated: Number(b.allocated),
-      spent: Math.abs(Number(b.spent)),
-      remaining: Number(b.allocated) - Math.abs(Number(b.spent)),
-      progress:
-        b.allocated > 0
-          ? Math.min((Math.abs(b.spent) / Number(b.allocated)) * 100, 100)
-          : 0,
-    }));
+    const formatted = data.map((b) => {
+      const allocated = Number(b.allocated) || 0;
+      const spent = Number(b.spent) || 0;
+      const remaining = allocated - spent;
+      const progress =
+        allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0;
+
+      return {
+        id: b.id,
+        category: b.category || "Uncategorized",
+        allocated,
+        spent,
+        remaining,
+        progress,
+      };
+    });
 
     return { success: true, data: formatted };
   } catch (err: any) {
@@ -587,6 +591,99 @@ export async function getBudgetsAmountsDB(hubId: string) {
     return {
       success: false,
       message: err.message || "Failed to get budget amounts",
+    };
+  }
+}
+
+// UPDATE Budget
+export async function updateBudgetDB({
+  hubId,
+  budgetId,
+  updatedData,
+}: UpdateBudgetInput) {
+  try {
+    const budget = await db.query.budgets.findFirst({
+      where: (b) => eq(b.id, budgetId),
+      columns: {
+        id: true,
+        hubId: true,
+        transactionCategoryId: true,
+      },
+    });
+
+    if (!budget) {
+      return { success: false, message: "Budget not found." };
+    }
+
+    if (budget.hubId !== hubId) {
+      return { success: false, message: "Access denied." };
+    }
+
+    let transactionCategoryId = budget.transactionCategoryId;
+
+    if (updatedData.categoryName) {
+      const newName = updatedData.categoryName.trim();
+
+      const currentCategory = await db.query.transaction_categories.findFirst({
+        where: (cat) => eq(cat.id, budget.transactionCategoryId),
+      });
+
+      if (!currentCategory) {
+        return {
+          success: false,
+          message: "Current category not found.",
+        };
+      }
+
+      if (currentCategory.name === newName) {
+        transactionCategoryId = currentCategory.id;
+      } else {
+        const existingCategory =
+          await db.query.transaction_categories.findFirst({
+            where: (cat) => and(eq(cat.hubId, hubId), eq(cat.name, newName)),
+          });
+
+        if (existingCategory) {
+          return {
+            success: false,
+            message: "A category with this name already exists in your hub.",
+          };
+        }
+
+        await db
+          .update(transaction_categories)
+          .set({ name: newName })
+          .where(eq(transaction_categories.id, currentCategory.id));
+
+        transactionCategoryId = currentCategory.id;
+      }
+    }
+    const cleanData = Object.fromEntries(
+      Object.entries({
+        allocatedAmount: updatedData.allocatedAmount,
+        spentAmount: updatedData.spentAmount,
+        warningPercentage: updatedData.warningPercentage,
+        markerColor: updatedData.markerColor,
+        transactionCategoryId,
+      }).filter(([_, v]) => v !== undefined && v !== null),
+    );
+
+    const [updatedBudget] = await db
+      .update(budgets)
+      .set(cleanData)
+      .where(eq(budgets.id, budgetId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Budget updated successfully.",
+      data: updatedBudget,
+    };
+  } catch (err: any) {
+    console.error("Error updating budget:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update budget.",
     };
   }
 }

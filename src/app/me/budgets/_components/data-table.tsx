@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
-import BudgetDialog from "./budget-dialog";
+import BudgetEditDialog from "./budget-edit-dialog";
 import { useEffect, useState } from "react";
 import { getBudgets, BudgetRow } from "@/lib/services/budget";
 
@@ -32,15 +32,17 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
   const [tableData, setTableData] = useState<BudgetRow[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    async function fetchBudgets() {
-      setLoading(true);
-      const res = await getBudgets();
-      if (res.success && res.data) {
-        setTableData(res.data);
-      }
-      setLoading(false);
+  async function fetchBudgets() {
+    setLoading(true);
+    const res = await getBudgets();
+
+    if (res.success && res.data) {
+      setTableData(res.data);
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchBudgets();
   }, []);
 
@@ -113,7 +115,12 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
                       <Progress value={data.progress} />
                     </TableCell>
                     <TableCell>
-                      <BudgetDialog variant="outline" text="Edit" />
+                      <BudgetEditDialog
+                        variant="outline"
+                        text="Edit"
+                        budget={data}
+                        onUpdated={() => fetchBudgets()}
+                      />
                     </TableCell>
                   </TableRow>
                 ))

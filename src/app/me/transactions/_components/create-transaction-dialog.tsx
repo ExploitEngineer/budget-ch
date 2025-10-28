@@ -255,24 +255,6 @@ export default function CreateTransactionDialog({
                 </div>
 
                 <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
-                  {/* 2️⃣ Recipient */}
-                  <FormField
-                    control={form.control}
-                    name="recipient"
-                    render={({ field }) => (
-                      <FormItem className="flex-1">
-                        <FormLabel>{t("dialog.labels.recipient")}</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder={t("dialog.placeholders.recipient")}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
                   <FormField
                     control={form.control}
                     name="transactionType"
@@ -306,6 +288,24 @@ export default function CreateTransactionDialog({
                               </SelectItem>
                             </SelectContent>
                           </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* 2️⃣ Recipient */}
+                  <FormField
+                    control={form.control}
+                    name="recipient"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>{t("dialog.labels.recipient")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={t("dialog.placeholders.recipient")}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -395,26 +395,6 @@ export default function CreateTransactionDialog({
                         <Textarea
                           {...field}
                           placeholder={t("dialog.placeholders.note")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* File Upload */}
-                <FormField
-                  control={form.control}
-                  name="file"
-                  render={({ field }) => (
-                    <FormItem className="w-1/2 cursor-pointer">
-                      <FormLabel>{t("dialog.labels.file")}</FormLabel>
-                      <FormControl className="cursor-pointer border bg-gray-100/70 py-1 shadow-none">
-                        <Input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          className="cursor-pointer !text-xs text-gray-500/80"
-                          onChange={(e) => field.onChange(e.target.files?.[0])}
                         />
                       </FormControl>
                       <FormMessage />

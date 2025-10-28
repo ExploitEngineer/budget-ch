@@ -185,7 +185,6 @@ export async function getRecentTransactions() {
 }
 
 // UPDATE Transaction
-// UPDATE Transaction
 export async function updateTransaction(
   transactionId: string,
   formData: FormData,
@@ -195,7 +194,10 @@ export async function updateTransaction(
     const { hubId, financialAccountId } = await getContext(hdrs, true);
 
     if (!financialAccountId) {
-      return { success: false, message: "No financial account found in context" };
+      return {
+        success: false,
+        message: "No financial account found in context",
+      };
     }
 
     const source = formData.get("source")?.toString().trim() || "";
@@ -205,7 +207,8 @@ export async function updateTransaction(
     const addedAt = addedAtStr ? new Date(addedAtStr) : new Date();
     const accountType = formData.get("accountType")?.toString() || null;
 
-    const categoryName = formData.get("categoryName")?.toString().trim().toLowerCase() || null;
+    const categoryName =
+      formData.get("categoryName")?.toString().trim().toLowerCase() || null;
 
     let transactionCategoryId: string | null = null;
 
@@ -242,8 +245,8 @@ export async function updateTransaction(
         note,
         addedAt,
         accountType: accountType as any,
-        financialAccountId, 
-        transactionCategoryId, 
+        financialAccountId,
+        transactionCategoryId,
       },
     });
 

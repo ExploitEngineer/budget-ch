@@ -472,6 +472,7 @@
             "sidebar-header": {
                 "dialog": {
                     "title": "Neues Budget",
+                    "edit-budget": "Budget bearbeiten",
                     "button": "Schließen",
                     "labels": {
                         "category": {

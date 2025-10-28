@@ -230,27 +230,6 @@ export default function TransactionDialog() {
               <div className="flex items-center justify-between gap-3">
                 <FormField
                   control={form.control}
-                  name="recipient"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        {t("dialog-box.labels.quelle.title")}
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          placeholder={t(
-                            "dialog-box.labels.quelle.placeholder",
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="transactionType"
                   render={({ field }) => (
                     <FormItem className="flex !flex-1 flex-col">
@@ -282,6 +261,28 @@ export default function TransactionDialog() {
                             </SelectItem>
                           </SelectContent>
                         </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* 2️⃣ Recipient */}
+                <FormField
+                  control={form.control}
+                  name="recipient"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>
+                        {t("dialog-box.labels.quelle.title")}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder={t(
+                            "dialog-box.labels.quelle.placeholder",
+                          )}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

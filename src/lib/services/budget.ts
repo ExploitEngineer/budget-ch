@@ -3,40 +3,50 @@
 import { createBudgetDB } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
-import { getBudgetsAmountsDB } from "@/db/queries";
-import { getBudgetsDB } from "@/db/queries";
+import {
+  getBudgetsAmountsDB,
+  getBudgetsDB,
+  updateBudgetDB,
+} from "@/db/queries";
 
-export type BudgetRow = {
+export interface BaseBudgetFields {
+  categoryName: string;
+  allocatedAmount: number;
+  spentAmount: number;
+  warningPercentage: number;
+  markerColor: string;
+}
+
+export interface CreateBudgetInput extends BaseBudgetFields {
+  hubId: string;
+  userId: string;
+}
+
+export interface UpdateBudgetInput {
+  hubId: string;
+  budgetId: string;
+  updatedData: Partial<BaseBudgetFields>;
+}
+
+export interface BudgetRow {
   id: string;
   category: string;
   allocated: number;
   spent: number;
   remaining: number;
   progress: number;
-};
-
-export interface BudgetsAmountsResponse {
-  success: boolean;
-  message?: string;
-  data?: {
-    totalAllocated: number;
-    totalSpent: number;
-  };
 }
 
-export async function createBudget({
-  categoryName,
-  allocatedAmount,
-  spentAmount,
-  warningPercentage,
-  markerColor,
-}: {
-  categoryName: string;
-  allocatedAmount: number;
-  spentAmount: number;
-  warningPercentage: number;
-  markerColor: string;
-}) {
+export interface BudgetResponse<T = unknown> {
+  success: boolean;
+  message: string;
+  data?: T;
+}
+
+// CREATE Budget [Action]
+export async function createBudget(
+  input: Omit<CreateBudgetInput, "hubId" | "userId">,
+): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
     const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
@@ -46,13 +56,9 @@ export async function createBudget({
     }
 
     const result = await createBudgetDB({
+      ...input,
       hubId,
       userId,
-      categoryName,
-      allocatedAmount,
-      spentAmount,
-      warningPercentage,
-      markerColor,
     });
 
     return result;
@@ -65,7 +71,10 @@ export async function createBudget({
   }
 }
 
-export async function getBudgetsAmounts(): Promise<BudgetsAmountsResponse> {
+// GET Budgets Allocated & Spent Amount [Action]
+export async function getBudgetsAmounts(): Promise<
+  BudgetResponse<{ totalAllocated: number; totalSpent: number }>
+> {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
@@ -89,11 +98,11 @@ export async function getBudgetsAmounts(): Promise<BudgetsAmountsResponse> {
     const budgetsArray = data.data ?? [];
 
     const totalAllocated = budgetsArray.reduce(
-      (acc, item) => acc + (item.allocatedAmount || 0),
+      (acc: number, item): number => acc + (item.allocatedAmount || 0),
       0,
     );
     const totalSpent = budgetsArray.reduce(
-      (acc, item) => acc + (item.spentAmount || 0),
+      (acc: number, item): number => acc + (item.spentAmount || 0),
       0,
     );
 
@@ -114,7 +123,8 @@ export async function getBudgetsAmounts(): Promise<BudgetsAmountsResponse> {
   }
 }
 
-export async function getBudgets() {
+// GET Budgets [Action]
+export async function getBudgets(): Promise<BudgetResponse<BudgetRow[]>> {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
@@ -147,6 +157,31 @@ export async function getBudgets() {
     return {
       success: false,
       message: err.message || "Unexpected server error",
+    };
+  }
+}
+
+// UPDATE Budget [Action]
+export async function updateBudget({
+  budgetId,
+  updatedData,
+}: Omit<UpdateBudgetInput, "hubId">): Promise<BudgetResponse> {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    const result = await updateBudgetDB({
+      hubId,
+      budgetId,
+      updatedData,
+    });
+
+    return result;
+  } catch (err: any) {
+    console.error("Error in updateBudget action:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while updating budget.",
     };
   }
 }
