@@ -1,20 +1,46 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { HighlightedBarChart } from "@/components/ui/highlighted-bar-chart";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
+import { getLatestSavingGoals } from "@/lib/services/saving-goal";
 
 interface CircleProgressCards {
   title: string;
   value: number;
 }
 
-interface BarChartSectionProps {
-  circleProgressCards: CircleProgressCards[];
-}
-
-export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
+export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const [circleProgressCards, setCircleProgressCards] = useState<
+    CircleProgressCards[]
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchLatestGoals() {
+      try {
+        const res = await getLatestSavingGoals();
+        if (!res.success) {
+          setError(res.message || "Failed to fetch saving goals");
+          return;
+        }
+        setCircleProgressCards(res.data || []);
+      } catch (err: any) {
+        console.error("Error fetching latest saving goals:", err);
+        setError("Unexpected error fetching saving goals");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchLatestGoals();
+  }, []);
+
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
       <div className="lg:col-span-3">
@@ -25,18 +51,24 @@ export function BarChartSection({ circleProgressCards }: BarChartSectionProps) {
           <CardTitle>{t("progress-cards.title")}</CardTitle>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
+
+        {loading && <p className="p-4 text-sm">Loading...</p>}
+        {error && !loading && (
+          <p className="p-4 text-sm text-red-500">{error}</p>
+        )}
+
+        {!loading && !error && circleProgressCards.length === 0 && (
+          <p className="text-muted-foreground p-4 text-sm">
+            No saving goals yet.
+          </p>
+        )}
+
         {circleProgressCards.map((card) => (
           <CardContent key={card.title}>
-            <Card
-              key={card.title}
-              className="bg-blue-background dark:border-border-blue dark:shadow-dark-blue-background w-full flex-1 py-4 dark:shadow-2xl"
-            >
+            <Card className="bg-blue-background dark:border-border-blue dark:shadow-dark-blue-background w-full flex-1 py-4 dark:shadow-2xl">
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar
                   className="h-16 w-16"
-                  // Below two props don't exist in the component
-                  // gaugePrimaryColor="gray"
-                  // gaugeSecondaryColor="blue"
                   value={card.value}
                 />
                 <div className="flex flex-col">

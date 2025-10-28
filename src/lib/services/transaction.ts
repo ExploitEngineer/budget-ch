@@ -124,8 +124,6 @@ export async function getTransactions(): Promise<{
       };
     }
 
-    console.log("Transaction DB result:", res.data[0]);
-
     const transactions = res.data.map((tx: any) => ({
       id: tx.id,
       date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
@@ -162,13 +160,11 @@ export async function getRecentTransactions() {
       };
     }
 
-    console.log("SERVER ACTION RESPONSE: ", res.data);
-
     const transactions = (res.data ?? []).map((tx) => ({
       id: tx.id,
       date: tx.addedAt ? new Date(tx.addedAt).toLocaleDateString() : "—",
       recipient: tx.recipientName || "Unknown",
-      account: tx.accountName || "—",
+      account: tx.accountType || "—",
       category: tx.categoryName || "—",
       note: tx.note || "—",
       amount: `${tx.amount ?? 0}`,

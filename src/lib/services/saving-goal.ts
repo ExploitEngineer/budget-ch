@@ -1,7 +1,7 @@
 "use server";
 
 import type { savingGoalArgs } from "@/db/queries";
-import { createSavingGoalDB, getSavingGoalsSummaryDB } from "@/db/queries";
+import { createSavingGoalDB, getSavingGoalsSummaryDB, getLatestSavingGoalsDB } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 
@@ -52,6 +52,27 @@ export async function getSavingGoalsSummary() {
     }
 
     const result = await getSavingGoalsSummaryDB(hubId);
+    return result;
+  } catch (err: any) {
+    console.error("Server action error:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error",
+    };
+  }
+}
+
+// READ Latest Saving Goals
+export async function getLatestSavingGoals() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    if (!hubId) {
+      return { success: false, message: "Hub not found" };
+    }
+
+    const result = await getLatestSavingGoalsDB(hubId);
     return result;
   } catch (err: any) {
     console.error("Server action error:", err);

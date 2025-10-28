@@ -83,6 +83,7 @@ export default function SavingGoalDialog() {
 
       toast.success("Saving goal created successfully");
       form.reset();
+      setOpen(false);
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while creating the Saving goal");

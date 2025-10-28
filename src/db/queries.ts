@@ -472,6 +472,49 @@ export async function getSavingGoalsSummaryDB(hubId: string) {
   }
 }
 
+// READ Latest Savings Goals
+export async function getLatestSavingGoalsDB(hubId: string) {
+  try {
+    const goals = await db.query.saving_goals.findMany({
+      where: (goal) => eq(goal.hubId, hubId),
+      orderBy: (goal, { desc }) => [desc(goal.dueDate)],
+      limit: 3,
+      columns: {
+        name: true,
+        goalAmount: true,
+        amountSaved: true,
+      },
+    });
+
+    console.log("RAW Goals:", goals);
+
+    const formatted = goals.map((g) => {
+      const progress =
+        g.goalAmount > 0
+          ? Math.min((g.amountSaved / g.goalAmount) * 100, 100)
+          : 0;
+
+      return {
+        title: g.name,
+        value: Math.round(progress),
+      };
+    });
+
+    console.log("Formatted goals:", formatted);
+
+    return {
+      success: true,
+      data: formatted,
+    };
+  } catch (err: any) {
+    console.error("Error fetching latest saving goals:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch latest saving goals",
+    };
+  }
+}
+
 // CREATE Task
 export async function createTaskDB({
   userId,
