@@ -520,7 +520,8 @@
             },
             "data-table": {
                 "title": "Alle Kategorien",
-                "badge": "Gesamtbudget: CHF 2’900.00 • Rest: CHF 985.00",
+                "total-budget": "Gesamtbudget: ",
+                "rest-budget": "Verbleibend: ",
                 "buttons": {
                     "export": "CSV exportieren",
                     "reset": "Zurücksetzen (Demo)"
