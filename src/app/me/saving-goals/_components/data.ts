@@ -41,38 +41,5 @@ export function useSavingGoalsData() {
     },
   ];
 
-  const activeGoalsData: ActiveGoalsData[] = [
-    {
-      title: t("active-goals-section.cards.tax-reserves.header.title"),
-      badgeValue: 65,
-      button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 60,
-      accountBadge: t(
-        "active-goals-section.cards.tax-reserves.content.account.save",
-      ),
-      remainingBadgeDays: 91,
-    },
-    {
-      title: t("active-goals-section.cards.tax-reserves.header.title"),
-      badgeValue: 22,
-      button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 40,
-      accountBadge: t(
-        "active-goals-section.cards.tax-reserves.content.checking-account",
-      ),
-      remainingBadgeDays: 91,
-    },
-    {
-      title: t("active-goals-section.cards.tax-reserves.header.title"),
-      badgeValue: 47,
-      button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 55,
-      accountBadge: t(
-        "active-goals-section.cards.tax-reserves.content.account.save",
-      ),
-      remainingBadgeDays: 91,
-    },
-  ];
-
-  return { cards, activeGoalsData };
+  return { cards };
 }

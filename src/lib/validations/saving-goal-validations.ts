@@ -10,6 +10,7 @@ export const SavingsGoalDialogSchema = z.object({
     .date()
     .refine((d) => !isNaN(d.getTime()), { message: "Due date is required" }),
   account: z.enum(AccountType, { message: "Account is required" }),
+  amount: z.coerce.number().min(1, { message: "Must be 1 or more" }),
   monthlyAllocation: z.coerce.number().min(0, { message: "Must be 0 or more" }),
 });
 

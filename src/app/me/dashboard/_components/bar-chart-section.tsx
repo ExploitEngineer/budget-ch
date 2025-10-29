@@ -6,7 +6,7 @@ import { HighlightedBarChart } from "@/components/ui/highlighted-bar-chart";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { getLatestSavingGoals } from "@/lib/services/saving-goal";
+import { getSavingGoals } from "@/lib/services/saving-goal";
 
 interface CircleProgressCards {
   title: string;
@@ -24,7 +24,7 @@ export function BarChartSection() {
   useEffect(() => {
     async function fetchLatestGoals() {
       try {
-        const res = await getLatestSavingGoals();
+        const res = await getSavingGoals(3);
         if (!res.success) {
           setError(res.message || "Failed to fetch saving goals");
           return;

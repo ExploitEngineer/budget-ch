@@ -87,12 +87,34 @@ export type savingGoalArgs = {
   accountType: AccountType;
 };
 
+export interface SavingGoal {
+  title: string;
+  goalAmount: number;
+  amountSaved: number;
+  remaining: number;
+  value: number;
+  accountType: string | null;
+  dueDate: Date | null;
+}
+
+export interface SavingGoalsSummary {
+  totalTarget: number;
+  totalSaved: number;
+  remainingToSave: number;
+  totalGoals: number;
+}
+
 export type quickTasksArgs = {
   userId: string;
   hubId: string;
   name: string;
   checked: boolean;
 };
+
+interface GetSavingGoalsOptions {
+  summaryOnly?: boolean;
+  limit?: number;
+}
 
 // CREATE Hub
 export async function createHubDB(userId: string, userName: string) {
@@ -466,61 +488,58 @@ export async function createSavingGoalDB({
   }
 }
 
-// READ Savings Goals Summary
-export async function getSavingGoalsSummaryDB(hubId: string) {
+// READ  Savings Goals
+export async function getSavingGoalsDB(
+  hubId: string,
+  options: GetSavingGoalsOptions = {},
+): Promise<{
+  success: boolean;
+  data?: SavingGoal[] | SavingGoalsSummary;
+  message?: string;
+}> {
   try {
-    const goals = await db.query.saving_goals.findMany({
-      where: (goal) => eq(goal.hubId, hubId),
-      columns: {
-        goalAmount: true,
-        monthlyAllocation: true,
-      },
-    });
+    const { summaryOnly = false, limit } = options;
 
-    const totalGoals = goals.length;
+    let query = db
+      .select({
+        name: saving_goals.name,
+        goalAmount: saving_goals.goalAmount,
+        amountSaved: saving_goals.amountSaved,
+        monthlyAllocation: saving_goals.monthlyAllocation,
+        accountType: saving_goals.accountType,
+        dueDate: saving_goals.dueDate,
+      })
+      .from(saving_goals)
+      .where(eq(saving_goals.hubId, hubId))
+      .orderBy(desc(saving_goals.dueDate));
 
-    const totalTarget = goals.reduce((sum, g) => sum + (g.goalAmount || 0), 0);
-    const totalSaved = goals.reduce(
-      (sum, g) => sum + (g.monthlyAllocation || 0),
-      0,
-    );
-    const remainingToSave = Math.max(totalTarget - totalSaved, 0);
+    if (limit) query.limit(limit);
 
-    return {
-      success: true,
-      data: {
-        totalTarget,
-        totalSaved,
-        remainingToSave,
-        totalGoals,
-      },
-    };
-  } catch (err: any) {
-    console.error("Error fetching saving goals summary:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to fetch saving goals summary",
-    };
-  }
-}
+    const goals = await query;
 
-// READ Latest Savings Goals
-export async function getLatestSavingGoalsDB(hubId: string) {
-  try {
-    const goals = await db.query.saving_goals.findMany({
-      where: (goal) => eq(goal.hubId, hubId),
-      orderBy: (goal, { desc }) => [desc(goal.dueDate)],
-      limit: 3,
-      columns: {
-        name: true,
-        goalAmount: true,
-        amountSaved: true,
-      },
-    });
+    if (summaryOnly) {
+      const totalTarget = goals.reduce(
+        (sum, g) => sum + (g.goalAmount ?? 0),
+        0,
+      );
+      const totalSaved = goals.reduce(
+        (sum, g) => sum + (g.amountSaved ?? 0),
+        0,
+      );
+      const remainingToSave = totalTarget - totalSaved;
 
-    console.log("RAW Goals:", goals);
+      return {
+        success: true,
+        data: {
+          totalTarget,
+          totalSaved,
+          remainingToSave,
+          totalGoals: goals.length,
+        },
+      };
+    }
 
-    const formatted = goals.map((g) => {
+    const formatted: SavingGoal[] = goals.map((g) => {
       const progress =
         g.goalAmount > 0
           ? Math.min((g.amountSaved / g.goalAmount) * 100, 100)
@@ -528,21 +547,21 @@ export async function getLatestSavingGoalsDB(hubId: string) {
 
       return {
         title: g.name,
+        goalAmount: g.goalAmount,
+        amountSaved: g.amountSaved,
+        remaining: g.goalAmount - g.amountSaved,
         value: Math.round(progress),
+        accountType: g.accountType,
+        dueDate: g.dueDate,
       };
     });
 
-    console.log("Formatted goals:", formatted);
-
-    return {
-      success: true,
-      data: formatted,
-    };
+    return { success: true, data: formatted };
   } catch (err: any) {
-    console.error("Error fetching latest saving goals:", err);
+    console.error("Error fetching saving goals:", err);
     return {
       success: false,
-      message: err.message || "Failed to fetch latest saving goals",
+      message: err.message || "Failed to fetch saving goals",
     };
   }
 }

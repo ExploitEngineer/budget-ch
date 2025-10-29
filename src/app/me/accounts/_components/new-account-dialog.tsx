@@ -122,7 +122,7 @@ export default function NewAccountDialog({
             {t("subtitle")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="border">
+            <Button type="button" variant="ghost" className="border cursor-pointer">
               {t("button")}
             </Button>
           </DialogClose>

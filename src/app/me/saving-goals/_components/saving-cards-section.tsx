@@ -31,27 +31,29 @@ export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    async function fetchSavingGoalsData() {
+    const fetchSavingGoalsData = async () => {
       try {
         const res = await getSavingGoalsSummary();
 
-        if (!res.success) {
+        if (!res.success || !res.data) {
           setError(res.message || "Failed to fetch saving goals summary");
           return;
         }
 
-        const data = res.data;
-        setTotalTarget(data?.totalTarget ?? 0);
-        setTotalSaved(data?.totalSaved ?? 0);
-        setRemainingToSave(data?.remainingToSave ?? 0);
-        setTotalGoals(data?.totalGoals ?? 0);
-      } catch (err: any) {
+        const { totalTarget, totalSaved, remainingToSave, totalGoals } =
+          res.data;
+
+        setTotalTarget(totalTarget);
+        setTotalSaved(totalSaved);
+        setRemainingToSave(remainingToSave);
+        setTotalGoals(totalGoals);
+      } catch (err: unknown) {
         console.error("Error fetching saving goals summary:", err);
         setError("Unexpected error fetching saving goals");
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     fetchSavingGoalsData();
   }, []);

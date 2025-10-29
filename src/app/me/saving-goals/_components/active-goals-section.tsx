@@ -1,37 +1,25 @@
-"use client";
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import SavingGoalEditDialog from "./saving-goal-edit-dialog";
 import { Separator } from "@/components/ui/separator";
-import { ActiveGoalsData } from "./data";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Plus } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { mainFormSchema, MainFormValues } from "@/lib/validations";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Form,
-  FormField,
-  FormControl,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { AllocateForm } from "./allocate-form";
+import { getTranslations } from "next-intl/server";
 
-interface ActiveGoalsSectionProps {
-  activeGoalsData: ActiveGoalsData[];
-}
-
-export function ActiveGoalsSection({
-  activeGoalsData,
-}: ActiveGoalsSectionProps) {
-  const t = useTranslations(
+export async function ActiveGoalsSection() {
+  const t = await getTranslations(
     "main-dashboard.saving-goals-page.active-goals-section",
   );
+
+  const res = await getSavingGoals();
+
+  const activeGoalsData =
+    res.success && Array.isArray(res.data) ? res.data : [];
+
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
@@ -76,11 +64,23 @@ export function ActiveGoalsSection({
           </ToggleGroup>
         </CardHeader>
 
+        {/* ✅ Show cards dynamically */}
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
-          {activeGoalsData.map((data, idx) => {
-            const form = useForm<MainFormValues>({
-              resolver: zodResolver(mainFormSchema) as any,
-              defaultValues: { amount: undefined },
+          {activeGoalsData.length === 0 && (
+            <p className="text-muted-foreground p-4 text-sm">
+              {t("no-goals", { defaultValue: "No saving goals found." })}
+            </p>
+          )}
+
+          {activeGoalsData.map((goal, idx) => {
+            const remainingCHF = goal.remaining?.toLocaleString("de-CH", {
+              minimumFractionDigits: 2,
+            });
+            const goalAmountCHF = goal.goalAmount?.toLocaleString("de-CH", {
+              minimumFractionDigits: 2,
+            });
+            const savedCHF = goal.amountSaved?.toLocaleString("de-CH", {
+              minimumFractionDigits: 2,
             });
 
             return (
@@ -89,13 +89,13 @@ export function ActiveGoalsSection({
                 key={idx}
               >
                 <CardHeader className="flex items-center justify-between">
-                  <CardTitle>{data.title}</CardTitle>
+                  <CardTitle>{goal.title}</CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="outline"
                       className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
                     >
-                      {data.badgeValue}%
+                      {goal.value}%
                     </Badge>
                     <SavingGoalEditDialog />
                   </div>
@@ -104,26 +104,22 @@ export function ActiveGoalsSection({
                 <Separator className="dark:bg-border-blue" />
 
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-4 text-sm">
                     <div>
                       <h3>{t("cards.tax-reserves.content.goal")}</h3>
-                      <p>CHF 5’000.00</p>
+                      <p>CHF {goalAmountCHF}</p>
                     </div>
                     <div>
-                      <h3>{t("cards.tax-reserves.content.goal")}</h3>
-                      <p>CHF 5’000.00</p>
+                      <h3>{t("cards.tax-reserves.content.saved")}</h3>
+                      <p>CHF {savedCHF}</p>
                     </div>
                     <div>
-                      <h3>{t("cards.tax-reserves.content.goal")}</h3>
-                      <p>CHF 5’000.00</p>
-                    </div>
-                    <div>
-                      <h3>{t("cards.tax-reserves.content.goal")}</h3>
-                      <p>CHF 5’000.00</p>
+                      <h3>{t("cards.tax-reserves.content.remaining")}</h3>
+                      <p>CHF {remainingCHF}</p>
                     </div>
                   </div>
 
-                  <Progress value={data.progress} className="mt-2 mb-3" />
+                  <Progress value={goal.value} className="mt-2 mb-3" />
 
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge
@@ -131,20 +127,27 @@ export function ActiveGoalsSection({
                       className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                     >
                       {t("cards.tax-reserves.content.account.title")}:{" "}
-                      {data.accountBadge}
+                      {goal.accountType || "—"}
                     </Badge>
+
                     <Badge
                       variant="outline"
                       className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                     >
-                      {t("cards.tax-reserves.content.auto")}: CHF 300.00
+                      {t("cards.tax-reserves.content.auto")}: CHF{" "}
+                      {goal.goalAmount?.toLocaleString("de-CH", {
+                        minimumFractionDigits: 2,
+                      }) ?? "0.00"}
                     </Badge>
+
                     <Badge
                       variant="outline"
                       className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                     >
-                      {t("cards.tax-reserves.content.remaining")}:{" "}
-                      {data.remainingBadgeDays}
+                      {t("cards.tax-reserves.content.remaining")}: CHF{" "}
+                      {goal.remaining?.toLocaleString("de-CH", {
+                        minimumFractionDigits: 2,
+                      }) ?? "0.00"}
                     </Badge>
                   </div>
 
@@ -157,34 +160,12 @@ export function ActiveGoalsSection({
                         <Plus />
                         <span>{t("cards.tax-reserves.content.button")}</span>
                       </Button>
-
-                      <Form {...form}>
-                        <FormField
-                          control={form.control}
-                          name="amount"
-                          render={({ field }) => (
-                            <FormItem className="max-w-38">
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  className="!bg-dark-blue-background dark:border-border-blue"
-                                  placeholder={`${t(
-                                    "cards.tax-reserves.content.placeholder",
-                                  )} (CHF)`}
-                                  step={0.5}
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </Form>
+                      <AllocateForm />
                     </div>
 
                     <p className="text-sm">
                       {t("cards.tax-reserves.content.new-balance")}:{" "}
-                      <span className="font-bold">CHF 660.00</span>
+                      <span className="font-bold">CHF {savedCHF ?? "—"}</span>
                     </p>
                   </div>
                 </CardContent>
