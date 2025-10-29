@@ -42,7 +42,7 @@ import {
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { toast } from "sonner";
-import { updateSavingGoal } from "@/lib/services/saving-goal";
+import { updateSavingGoal, deleteSavingGoal } from "@/lib/services/saving-goal";
 import { Spinner } from "@/components/ui/spinner";
 import type { SavingGoal } from "@/db/queries";
 
@@ -55,7 +55,8 @@ export default function SavingGoalEditDialog({
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
 
   const form = useForm<SavingsGoalDialogValues>({
@@ -98,6 +99,24 @@ export default function SavingGoalEditDialog({
       toast.error("Something went wrong while updating the saving goal");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    setIsDeleting(true);
+    try {
+      const result = await deleteSavingGoal(goalData.id);
+      if (!result.success) {
+        toast.error(result.message || "Failed to delete saving goal");
+        return;
+      }
+      toast.success("Saving goal deleted successfully");
+      setOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Error deleting saving goal");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -275,8 +294,10 @@ export default function SavingGoalEditDialog({
                 type="button"
                 className="cursor-pointer"
                 variant="outline"
+                onClick={handleDelete}
+                disabled={isDeleting}
               >
-                {t("delete")}
+                {isDeleting ? <Spinner /> : t("delete")}
               </Button>
               <Button
                 type="submit"

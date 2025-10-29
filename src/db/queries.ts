@@ -634,6 +634,43 @@ export async function updateSavingGoalDB({
   }
 }
 
+// DELETE Saving Goal
+export async function deleteSavingGoalDB({
+  hubId,
+  goalId,
+}: {
+  hubId: string;
+  goalId: string;
+}) {
+  try {
+    const goal = await db.query.saving_goals.findFirst({
+      where: (g) => eq(g.id, goalId),
+      columns: { hubId: true },
+    });
+
+    if (!goal) return { success: false, message: "Saving goal not found." };
+    if (goal.hubId !== hubId)
+      return { success: false, message: "Access denied." };
+
+    const deleted = await db
+      .delete(saving_goals)
+      .where(eq(saving_goals.id, goalId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Saving goal deleted successfully.",
+      data: deleted[0],
+    };
+  } catch (err: any) {
+    console.error("Error deleting saving goal:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete saving goal.",
+    };
+  }
+}
+
 // CREATE Task
 export async function createTaskDB({
   userId,

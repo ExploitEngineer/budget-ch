@@ -5,6 +5,7 @@ import {
   createSavingGoalDB,
   getSavingGoalsDB,
   updateSavingGoalDB,
+  deleteSavingGoalDB
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
@@ -164,6 +165,34 @@ export async function updateSavingGoal({
     return {
       success: false,
       message: err.message || "Unexpected server error",
+    };
+  }
+}
+
+// DELETE Saving Goal
+export async function deleteSavingGoal(goalId: string) {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    const result = await deleteSavingGoalDB({ hubId, goalId });
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message || "Failed to delete saving goal.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Saving goal deleted successfully.",
+    };
+  } catch (err: any) {
+    console.error("Error in deleteSavingGoal:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while deleting saving goal.",
     };
   }
 }
