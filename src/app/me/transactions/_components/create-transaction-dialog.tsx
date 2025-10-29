@@ -525,8 +525,9 @@ export default function CreateTransactionDialog({
                     variant="outline"
                     className="cursor-pointer"
                     type="button"
+                    onClick={() => setOpen(false)}
                   >
-                    {t("dialog.buttons.delete")}
+                    {t("dialog.buttons.cancel")}
                   </Button>
                   <Button
                     type="submit"

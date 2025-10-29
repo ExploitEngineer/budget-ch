@@ -6,6 +6,7 @@ import {
   getTransactionsDB,
   getRecentTransactionsDB,
   updateTransactionDB,
+  deleteTransactionDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -265,6 +266,34 @@ export async function updateTransaction(
     return {
       success: false,
       message: err.message || "Unexpected error while updating transaction.",
+    };
+  }
+}
+
+// DELETE Transaction
+export async function deleteTransaction(transactionId: string) {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    const res = await deleteTransactionDB({ hubId, transactionId });
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to delete transaction.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Transaction deleted successfully!",
+    };
+  } catch (err: any) {
+    console.error("Error in deleteTransaction:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while deleting transaction.",
     };
   }
 }

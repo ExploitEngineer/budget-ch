@@ -371,6 +371,7 @@
                     "buttons": {
                         "demo": "OCR (Demo)",
                         "delete": "Delete",
+                        "cancel": "Cancel",
                         "save": "Save"
                     }
                 }

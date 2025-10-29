@@ -371,6 +371,7 @@
                     },
                     "buttons": {
                         "demo": "OCR (Demo)",
+                        "cancel": "Abbrechen",
                         "delete": "Löschen",
                         "save": "Speichern"
                     }

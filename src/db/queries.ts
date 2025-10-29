@@ -276,6 +276,38 @@ export async function updateTransactionDB({
   }
 }
 
+// DELETE Transaction
+export async function deleteTransactionDB({
+  hubId,
+  transactionId,
+}: {
+  hubId: string;
+  transactionId: string;
+}) {
+  try {
+    const tx = await db.query.transactions.findFirst({
+      where: (tx) => eq(tx.id, transactionId),
+      columns: { hubId: true },
+    });
+
+    if (!tx) return { success: false, message: "Transaction not found" };
+    if (tx.hubId !== hubId) return { success: false, message: "Access denied" };
+
+    const deleted = await db
+      .delete(transactions)
+      .where(eq(transactions.id, transactionId))
+      .returning();
+
+    return { success: true, data: deleted[0] };
+  } catch (err: any) {
+    console.error("Error deleting transaction:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete transaction",
+    };
+  }
+}
+
 // READ Recent Transactions on Limit
 export async function getRecentTransactionsDB(hubId: string, limit = 4) {
   try {

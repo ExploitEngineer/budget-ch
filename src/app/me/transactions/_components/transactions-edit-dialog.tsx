@@ -49,6 +49,7 @@ import { toast } from "sonner";
 import {
   createTransaction,
   updateTransaction,
+  deleteTransaction,
 } from "@/lib/services/transaction";
 import AddCategory from "../../dashboard/_components/add-category-dialog";
 import type { Transaction } from "./data-table";
@@ -70,6 +71,7 @@ export default function TransactionEditDialog({
   const isEditMode = !!transaction;
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -161,6 +163,28 @@ export default function TransactionEditDialog({
       );
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!transaction) return;
+
+    setIsDeleting(true);
+    try {
+      const result = await deleteTransaction(transaction.id);
+      if (!result.success) {
+        toast.error(result.message || "Failed to delete transaction.");
+        return;
+      }
+
+      toast.success("Transaction deleted successfully!");
+      setOpen(false);
+      form.reset();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Something went wrong while deleting.");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -568,8 +592,10 @@ export default function TransactionEditDialog({
                     variant="outline"
                     className="cursor-pointer"
                     type="button"
+                    disabled={isDeleting}
+                    onClick={handleDelete}
                   >
-                    {t("dialog.buttons.delete")}
+                    {isDeleting ? <Spinner /> : t("dialog.buttons.delete")}
                   </Button>
                   <Button
                     type="submit"
