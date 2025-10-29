@@ -2,8 +2,8 @@
 
 import { useForm } from "react-hook-form";
 import {
-  SavingsGoalDialogSchema,
-  SavingsGoalDialogValues,
+  AllocateAmountSchema,
+  AllocateAmountValues,
 } from "@/lib/validations/saving-goal-validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -21,9 +21,9 @@ export function AllocateForm() {
     "main-dashboard.saving-goals-page.active-goals-section",
   );
 
-  const form = useForm<SavingsGoalDialogValues>({
-    resolver: zodResolver(SavingsGoalDialogSchema) as any,
-    defaultValues: { amount: undefined },
+  const form = useForm<AllocateAmountValues>({
+    resolver: zodResolver(AllocateAmountSchema) as any,
+    defaultValues: { amount: 0 },
   });
 
   return (
