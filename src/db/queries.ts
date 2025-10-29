@@ -88,13 +88,15 @@ export type savingGoalArgs = {
 };
 
 export interface SavingGoal {
-  title: string;
+  id: string;
+  name: string;
   goalAmount: number;
   amountSaved: number;
-  remaining: number;
+  monthlyAllocation?: number;
   value: number;
-  accountType: string | null;
-  dueDate: Date | null;
+  accountType: AccountType;
+  dueDate?: Date | null;
+  remaining?: number;
 }
 
 export interface SavingGoalsSummary {
@@ -114,6 +116,19 @@ export type quickTasksArgs = {
 interface GetSavingGoalsOptions {
   summaryOnly?: boolean;
   limit?: number;
+}
+
+interface UpdateSavingGoalArgs {
+  hubId: string;
+  goalId: string;
+  updatedData: {
+    name?: string;
+    goalAmount?: number;
+    amountSaved?: number;
+    monthlyAllocation?: number;
+    accountType?: string;
+    dueDate?: Date | null;
+  };
 }
 
 // CREATE Hub
@@ -488,7 +503,7 @@ export async function createSavingGoalDB({
   }
 }
 
-// READ  Savings Goals
+// READ Savings Goals
 export async function getSavingGoalsDB(
   hubId: string,
   options: GetSavingGoalsOptions = {},
@@ -502,6 +517,7 @@ export async function getSavingGoalsDB(
 
     let query = db
       .select({
+        id: saving_goals.id,
         name: saving_goals.name,
         goalAmount: saving_goals.goalAmount,
         amountSaved: saving_goals.amountSaved,
@@ -546,10 +562,11 @@ export async function getSavingGoalsDB(
           : 0;
 
       return {
-        title: g.name,
+        id: g.id,
+        name: g.name,
         goalAmount: g.goalAmount,
         amountSaved: g.amountSaved,
-        remaining: g.goalAmount - g.amountSaved,
+        monthlyAllocation: g.monthlyAllocation,
         value: Math.round(progress),
         accountType: g.accountType,
         dueDate: g.dueDate,
@@ -562,6 +579,57 @@ export async function getSavingGoalsDB(
     return {
       success: false,
       message: err.message || "Failed to fetch saving goals",
+    };
+  }
+}
+
+// UPDATE Saving Goal
+export async function updateSavingGoalDB({
+  hubId,
+  goalId,
+  updatedData,
+}: UpdateSavingGoalArgs) {
+  try {
+    const goal = await db.query.saving_goals.findFirst({
+      where: (g) => eq(g.id, goalId),
+      columns: { id: true, hubId: true },
+    });
+
+    if (!goal) {
+      return { success: false, message: "Saving goal not found." };
+    }
+
+    if (goal.hubId !== hubId) {
+      return { success: false, message: "Access denied." };
+    }
+
+    const cleanData = Object.fromEntries(
+      Object.entries({
+        name: updatedData.name,
+        goalAmount: updatedData.goalAmount,
+        amountSaved: updatedData.amountSaved,
+        monthlyAllocation: updatedData.monthlyAllocation,
+        accountType: updatedData.accountType,
+        dueDate: updatedData.dueDate ?? null,
+      }).filter(([_, v]) => v !== undefined),
+    );
+
+    const [updatedGoal] = await db
+      .update(saving_goals)
+      .set(cleanData)
+      .where(eq(saving_goals.id, goalId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Saving goal updated successfully.",
+      data: updatedGoal,
+    };
+  } catch (err: any) {
+    console.error("Error updating saving goal:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update saving goal.",
     };
   }
 }

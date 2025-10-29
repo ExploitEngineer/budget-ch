@@ -645,6 +645,7 @@
                         "content": {
                             "goal": "Objectif",
                             "saved": "Économisé",
+                            "monthly-allocated": "Alloué",
                             "rest": "Reste",
                             "due": "Échéance",
                             "account": {

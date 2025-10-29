@@ -3,9 +3,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import SavingGoalEditDialog from "./saving-goal-edit-dialog";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { Plus } from "lucide-react";
 import { getSavingGoals } from "@/lib/services/saving-goal";
 import { AllocateForm } from "./allocate-form";
 import { getTranslations } from "next-intl/server";
@@ -64,7 +62,6 @@ export async function ActiveGoalsSection() {
           </ToggleGroup>
         </CardHeader>
 
-        {/* ✅ Show cards dynamically */}
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
           {activeGoalsData.length === 0 && (
             <p className="text-muted-foreground p-4 text-sm">
@@ -73,13 +70,18 @@ export async function ActiveGoalsSection() {
           )}
 
           {activeGoalsData.map((goal, idx) => {
-            const remainingCHF = goal.remaining?.toLocaleString("de-CH", {
+            const remainingCHF = (
+              goal.goalAmount - goal.amountSaved
+            )?.toLocaleString("de-CH", {
               minimumFractionDigits: 2,
             });
             const goalAmountCHF = goal.goalAmount?.toLocaleString("de-CH", {
               minimumFractionDigits: 2,
             });
             const savedCHF = goal.amountSaved?.toLocaleString("de-CH", {
+              minimumFractionDigits: 2,
+            });
+            const monthlyCHF = goal.monthlyAllocation?.toLocaleString("de-CH", {
               minimumFractionDigits: 2,
             });
 
@@ -89,7 +91,7 @@ export async function ActiveGoalsSection() {
                 key={idx}
               >
                 <CardHeader className="flex items-center justify-between">
-                  <CardTitle>{goal.title}</CardTitle>
+                  <CardTitle>{goal.name}</CardTitle>
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="outline"
@@ -97,7 +99,7 @@ export async function ActiveGoalsSection() {
                     >
                       {goal.value}%
                     </Badge>
-                    <SavingGoalEditDialog />
+                    <SavingGoalEditDialog goalData={goal} />
                   </div>
                 </CardHeader>
 
@@ -116,6 +118,12 @@ export async function ActiveGoalsSection() {
                     <div>
                       <h3>{t("cards.tax-reserves.content.remaining")}</h3>
                       <p>CHF {remainingCHF}</p>
+                    </div>
+                    <div>
+                      <h3>
+                        {t("cards.tax-reserves.content.monthly-allocated")}
+                      </h3>
+                      <p>CHF {monthlyCHF}</p>
                     </div>
                   </div>
 
@@ -145,7 +153,7 @@ export async function ActiveGoalsSection() {
                       className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                     >
                       {t("cards.tax-reserves.content.remaining")}: CHF{" "}
-                      {goal.remaining?.toLocaleString("de-CH", {
+                      {goal.monthlyAllocation?.toLocaleString("de-CH", {
                         minimumFractionDigits: 2,
                       }) ?? "0.00"}
                     </Badge>
@@ -153,14 +161,10 @@ export async function ActiveGoalsSection() {
 
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <Button
-                        variant="outline"
-                        className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-3"
-                      >
-                        <Plus />
-                        <span>{t("cards.tax-reserves.content.button")}</span>
-                      </Button>
-                      <AllocateForm />
+                      <AllocateForm
+                        amountSaved={goal.amountSaved || 0}
+                        goalId={goal.id}
+                      />
                     </div>
 
                     <p className="text-sm">

@@ -1,7 +1,11 @@
 "use server";
 
 import type { savingGoalArgs } from "@/db/queries";
-import { createSavingGoalDB, getSavingGoalsDB } from "@/db/queries";
+import {
+  createSavingGoalDB,
+  getSavingGoalsDB,
+  updateSavingGoalDB,
+} from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 import type { SavingGoal } from "@/db/queries";
@@ -17,6 +21,17 @@ export interface ActionResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
+}
+export interface UpdateSavingGoalArgs {
+  goalId: string;
+  updatedData: {
+    name?: string;
+    goalAmount?: number;
+    amountSaved?: number;
+    monthlyAllocation?: number;
+    accountType?: string;
+    dueDate?: Date | null;
+  };
 }
 
 // CREATE Saving Goal [Action]
@@ -109,6 +124,43 @@ export async function getSavingGoals(
     return { success: true, data: result.data as SavingGoal[] };
   } catch (err: any) {
     console.error("Server action error (getSavingGoals):", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error",
+    };
+  }
+}
+
+// UPDATE Saving Goal
+export async function updateSavingGoal({
+  goalId,
+  updatedData,
+}: UpdateSavingGoalArgs): Promise<ActionResponse> {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    if (!hubId) {
+      return { success: false, message: "Hub not found" };
+    }
+
+    const result = await updateSavingGoalDB({
+      hubId,
+      goalId,
+      updatedData,
+    });
+
+    if (!result.success) {
+      return { success: false, message: result.message };
+    }
+
+    return {
+      success: true,
+      message: "Saving goal updated successfully.",
+      data: result.data,
+    };
+  } catch (err: any) {
+    console.error("Server action error (updateSavingGoal):", err);
     return {
       success: false,
       message: err.message || "Unexpected server error",

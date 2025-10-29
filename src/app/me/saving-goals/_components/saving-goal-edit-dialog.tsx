@@ -11,13 +11,6 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -27,69 +20,120 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import {
   SavingsGoalDialogSchema,
   SavingsGoalDialogValues,
 } from "@/lib/validations/saving-goal-validations";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { toast } from "sonner";
+import { updateSavingGoal } from "@/lib/services/saving-goal";
+import { Spinner } from "@/components/ui/spinner";
+import type { SavingGoal } from "@/db/queries";
 
-export default function SavingGoalsDialog() {
+export default function SavingGoalEditDialog({
+  goalData,
+}: {
+  goalData: SavingGoal;
+}) {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
     defaultValues: {
-      name: "",
-      goalAmount: 0,
-      savedAmount: 0,
-      dueDate: undefined,
-      account: "savings",
-      monthlyAllocation: 0,
+      name: goalData?.name ?? "",
+      goalAmount: goalData?.goalAmount ?? 0,
+      savedAmount: goalData?.amountSaved ?? 0,
+      dueDate: goalData?.dueDate ? new Date(goalData.dueDate) : new Date(),
+      account: goalData?.accountType ?? "savings",
+      monthlyAllocation: goalData?.monthlyAllocation ?? 0,
     },
   });
 
-  function onSubmit(values: SavingsGoalDialogValues) {
-    console.log("Savings goal submitted:", values);
+  async function onSubmit(values: SavingsGoalDialogValues) {
+    setIsLoading(true);
+    try {
+      const res = await updateSavingGoal({
+        goalId: goalData.id,
+        updatedData: {
+          name: values.name,
+          goalAmount: values.goalAmount,
+          amountSaved: values.savedAmount,
+          monthlyAllocation: values.monthlyAllocation,
+          accountType: values.account,
+          dueDate: values.dueDate ?? null,
+        },
+      });
+
+      if (!res.success) {
+        toast.error(res.message || "Failed to update saving goal");
+        return;
+      }
+
+      toast.success("Saving goal updated successfully");
+      setOpen(false);
+      form.reset(values);
+    } catch (err) {
+      console.error(err);
+      toast.error("Something went wrong while updating the saving goal");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
-    <Dialog>
-      <DialogTrigger className="cursor-pointer" asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="dark:border-border-blue !bg-dark-blue-background"
+          className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
         >
           {t("edit")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
-        <div className="flex items-center justify-between border-b pb-3">
+        <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
             {t("edit-dialog")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button className="cursor-pointer border" variant="ghost">
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
               {t("button")}
             </Button>
           </DialogClose>
-        </div>
+        </DialogHeader>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 pt-4"
           >
-            {/* Row 1: Name */}
+            {/* Name */}
             <FormField
               control={form.control}
               name="name"
@@ -107,22 +151,16 @@ export default function SavingGoalsDialog() {
               )}
             />
 
-            {/* Row 2: Target + Already Saved */}
+            {/* Goal + Saved */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="goalAmount"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.goal-amount")}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step={0.5}
-                        min={0}
-                        placeholder="0.00"
-                        {...field}
-                      />
+                      <Input type="number" step={0.5} min={0} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -132,16 +170,10 @@ export default function SavingGoalsDialog() {
                 control={form.control}
                 name="savedAmount"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.saved-amount")}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step={0.5}
-                        min={0}
-                        placeholder="0.00"
-                        {...field}
-                      />
+                      <Input type="number" step={0.5} min={0} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,13 +181,13 @@ export default function SavingGoalsDialog() {
               />
             </div>
 
-            {/* Row 3: Due Date + Account */}
+            {/* Due Date + Account */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="dueDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.due-date.title")}</FormLabel>
                     <FormControl>
                       <Popover>
@@ -188,7 +220,7 @@ export default function SavingGoalsDialog() {
                 control={form.control}
                 name="account"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.account.title")}</FormLabel>
                     <FormControl>
                       <Select
@@ -201,11 +233,14 @@ export default function SavingGoalsDialog() {
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="save">
-                            {t("labels.account.options.save")}
-                          </SelectItem>
                           <SelectItem value="checking">
                             {t("labels.account.options.checking")}
+                          </SelectItem>
+                          <SelectItem value="savings">
+                            {t("labels.account.options.save")}
+                          </SelectItem>
+                          <SelectItem value="credit-card">
+                            {t("labels.account.options.credit-card")}
                           </SelectItem>
                           <SelectItem value="cash">
                             {t("labels.account.options.cash")}
@@ -219,7 +254,7 @@ export default function SavingGoalsDialog() {
               />
             </div>
 
-            {/* Row 4: Monthly Allocation */}
+            {/* Monthly Allocation */}
             <FormField
               control={form.control}
               name="monthlyAllocation"
@@ -227,20 +262,14 @@ export default function SavingGoalsDialog() {
                 <FormItem className="w-1/2">
                   <FormLabel>{t("labels.monthly-allocation")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step={0.5}
-                      min={0}
-                      placeholder="0.00"
-                      {...field}
-                    />
+                    <Input type="number" step={0.5} min={0} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Footer Buttons */}
+            {/* Footer */}
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
@@ -249,8 +278,12 @@ export default function SavingGoalsDialog() {
               >
                 {t("delete")}
               </Button>
-              <Button type="submit" className="cursor-pointer">
-                {t("save")}
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={isLoading}
+              >
+                {isLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

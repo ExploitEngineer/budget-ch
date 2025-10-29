@@ -645,6 +645,7 @@
                         "content": {
                             "goal": "Ziel",
                             "saved": "Gespart",
+                            "monthly-allocated": "Zugewiesen",
                             "rest": "Rest",
                             "due": "Fällig",
                             "account": {

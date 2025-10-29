@@ -644,6 +644,7 @@
                         "content": {
                             "goal": "Goal",
                             "saved": "Saved",
+                            "monthly-allocated": "Allocated",
                             "rest": "Rest",
                             "due": "Due",
                             "account": {
