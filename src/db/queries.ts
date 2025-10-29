@@ -806,3 +806,40 @@ export async function updateBudgetDB({
     };
   }
 }
+
+// DELETE Budget
+export async function deleteBudgetDB({
+  hubId,
+  budgetId,
+}: {
+  hubId: string;
+  budgetId: string;
+}) {
+  try {
+    const budget = await db.query.budgets.findFirst({
+      where: (b) => eq(b.id, budgetId),
+      columns: { hubId: true },
+    });
+
+    if (!budget) return { success: false, message: "Budget not found." };
+    if (budget.hubId !== hubId)
+      return { success: false, message: "Access denied." };
+
+    const deleted = await db
+      .delete(budgets)
+      .where(eq(budgets.id, budgetId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Budget deleted successfully.",
+      data: deleted[0],
+    };
+  } catch (err: any) {
+    console.error("Error deleting budget:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete budget.",
+    };
+  }
+}

@@ -7,6 +7,7 @@ import {
   getBudgetsAmountsDB,
   getBudgetsDB,
   updateBudgetDB,
+  deleteBudgetDB,
 } from "@/db/queries";
 
 export interface BaseBudgetFields {
@@ -211,6 +212,34 @@ export async function updateBudget({
     return {
       success: false,
       message: err.message || "Unexpected error while updating budget.",
+    };
+  }
+}
+
+// DELETE Budget
+export async function deleteBudget(budgetId: string) {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    const result = await deleteBudgetDB({ hubId, budgetId });
+
+    if (!result.success) {
+      return {
+        success: false,
+        message: result.message || "Failed to delete budget.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Budget deleted successfully.",
+    };
+  } catch (err: any) {
+    console.error("Error in deleteBudget:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while deleting budget.",
     };
   }
 }

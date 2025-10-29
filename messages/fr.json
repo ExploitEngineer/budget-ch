@@ -494,6 +494,7 @@
                         }
                     },
                     "delete-btn": "Supprimer",
+                    "cancel": "Annuler",
                     "save": "Enregistrer"
                 }
             },

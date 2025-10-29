@@ -32,7 +32,11 @@ import {
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { createBudget, updateBudget } from "@/lib/services/budget";
+import {
+  createBudget,
+  updateBudget,
+  deleteBudget,
+} from "@/lib/services/budget";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -52,6 +56,7 @@ export default function BudgetEditDialog({
   onUpdated,
 }: BudgetEditDialogProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const t = useTranslations(
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
@@ -112,6 +117,27 @@ export default function BudgetEditDialog({
       toast.error("Something went wrong while saving the budget");
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!budget) return;
+
+    setIsDeleting(true);
+    try {
+      const result = await deleteBudget(budget.id);
+      if (!result.success) {
+        toast.error(result.message || "Failed to delete budget.");
+        return;
+      }
+
+      toast.success("Budget deleted successfully.");
+      onUpdated?.();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Something went wrong while deleting budget.");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
@@ -285,8 +311,10 @@ export default function BudgetEditDialog({
                 type="button"
                 className="cursor-pointer"
                 variant="outline"
+                disabled={isDeleting}
+                onClick={handleDelete}
               >
-                {t("delete-btn")}
+                {isDeleting ? <Spinner /> : t("delete-btn")}
               </Button>
               <Button
                 className="cursor-pointer"

@@ -255,8 +255,9 @@ export default function BudgetDialog({
                 type="button"
                 className="cursor-pointer"
                 variant="outline"
+                onClick={() => setOpen(false)}
               >
-                {t("delete-btn")}
+                {t("cancel")}
               </Button>
               <Button
                 className="cursor-pointer"

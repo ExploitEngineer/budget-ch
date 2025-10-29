@@ -493,6 +493,7 @@
                         }
                     },
                     "delete-btn": "Delete",
+                    "cancel": "Cancel",
                     "save": "Save"
                 }
             },
