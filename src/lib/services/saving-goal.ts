@@ -5,7 +5,7 @@ import {
   createSavingGoalDB,
   getSavingGoalsDB,
   updateSavingGoalDB,
-  deleteSavingGoalDB
+  deleteSavingGoalDB,
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";

@@ -7,17 +7,13 @@ import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-p
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import { getSavingGoals } from "@/lib/services/saving-goal";
-
-interface CircleProgressCards {
-  title: string;
-  value: number;
-}
+import type { SavingGoal } from "@/db/queries";
 
 export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
-  const [circleProgressCards, setCircleProgressCards] = useState<
-    CircleProgressCards[]
-  >([]);
+  const [circleProgressCards, setCircleProgressCards] = useState<SavingGoal[]>(
+    [],
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +60,7 @@ export function BarChartSection() {
         )}
 
         {circleProgressCards.map((card) => (
-          <CardContent key={card.title}>
+          <CardContent key={card.name}>
             <Card className="bg-blue-background dark:border-border-blue dark:shadow-dark-blue-background w-full flex-1 py-4 dark:shadow-2xl">
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar
@@ -73,7 +69,7 @@ export function BarChartSection() {
                 />
                 <div className="flex flex-col">
                   <CardTitle className="text-xs font-light uppercase">
-                    {card.title}
+                    {card.name}
                   </CardTitle>
                   <p className="text-lg font-bold">{card.value + "%"}</p>
                 </div>
