@@ -682,7 +682,8 @@
                 "button": "Transfer",
                 "new-account-dialog": {
                     "title": "New Account",
-                    "subtitle": "New Account",
+                    "edit-title": "Edit Account",
+                    "edit": "Edit",
                     "button": "Close",
                     "labels": {
                         "name": {
@@ -709,7 +710,8 @@
                             "placeholder": "optional"
                         }
                     },
-                    "save": "Save"
+                    "save": "Save",
+                    "delete": "Delete"
                 },
                 "dialog-box": {
                     "title": "Transfer between accounts",
@@ -770,6 +772,7 @@
                 }
             },
             "data-table": {
+                "loading": "Loading Data...",
                 "title": "All categories",
                 "badge": "5 Konten • Liquid CHF 2’620.00",
                 "buttons": {

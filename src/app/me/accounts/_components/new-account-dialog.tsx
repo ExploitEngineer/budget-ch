@@ -42,10 +42,8 @@ import { Spinner } from "@/components/ui/spinner";
 
 export default function NewAccountDialog({
   variant,
-  text,
 }: {
   variant?: "gradient" | "outline";
-  text?: string;
 }) {
   const t = useTranslations(
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
@@ -107,11 +105,7 @@ export default function NewAccountDialog({
           variant={variant === "gradient" ? "default" : "outline"}
         >
           <Plus className="h-5 w-5" />
-          {variant === "gradient" ? (
-            <span className="hidden text-sm sm:block">{t("title")}</span>
-          ) : (
-            text
-          )}
+          <span className="hidden text-sm sm:block">{t("title")}</span>
         </Button>
       </DialogTrigger>
 
@@ -119,10 +113,14 @@ export default function NewAccountDialog({
         {/* Header */}
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
-            {t("subtitle")}
+            {t("title")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="border cursor-pointer">
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
               {t("button")}
             </Button>
           </DialogClose>

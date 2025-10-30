@@ -683,7 +683,8 @@
                 "button": "Trasferisci",
                 "new-account-dialog": {
                     "title": "Nuovo conto",
-                    "subtitle": "Nuovo conto",
+                    "edit-title": "Modifica account",
+                    "edit": "Modifica",
                     "button": "Chiudi",
                     "labels": {
                         "name": {
@@ -710,7 +711,8 @@
                             "placeholder": "opzionale"
                         }
                     },
-                    "save": "Salva"
+                    "save": "Salva",
+                    "delete": "Elimina"
                 },
                 "dialog-box": {
                     "title": "Trasferimento tra conti",
@@ -771,6 +773,8 @@
                 }
             },
             "data-table": {
+
+                "loading": "Caricamento dei dati...",
                 "title": "Tutte le categorie",
                 "badge": "5 conti • Liquidità CHF 2’620.00",
                 "buttons": {

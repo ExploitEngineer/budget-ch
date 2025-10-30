@@ -28,14 +28,15 @@ export type createHubMemberArgs = {
 };
 
 export type AccountType = "checking" | "savings" | "credit-card" | "cash";
+
 export type financialAccountArgs = {
   userId: string;
   hubId: string;
   name: string;
   type: AccountType;
   initialBalance: number;
-  iban?: string;
-  note?: string;
+  iban?: string | null;
+  note?: string | null;
 };
 
 export type createTransactionArgs = {
@@ -194,6 +195,33 @@ export async function createFinancialAccountDB({
   } catch (err) {
     console.error("Error creating financial account:", err);
     throw err;
+  }
+}
+
+// READ Financial Account
+export async function getFinancialAccountsDB(userId: string, hubId: string) {
+  try {
+    const results = await db
+      .select()
+      .from(financial_accounts)
+      .where(
+        and(
+          eq(financial_accounts.userId, userId),
+          eq(financial_accounts.hubId, hubId),
+        ),
+      );
+
+    return results.map((acc) => ({
+      id: acc.id,
+      name: acc.name,
+      type: acc.type,
+      iban: acc.iban || "-",
+      balance: acc.initialBalance.toFixed(2),
+      note: acc.note || "",
+    }));
+  } catch (err) {
+    console.error("Error fetching financial accounts:", err);
+    return [];
   }
 }
 

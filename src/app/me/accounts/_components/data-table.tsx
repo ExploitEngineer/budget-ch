@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -10,22 +13,71 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import NewAccountDialog from "./new-account-dialog";
+import EditAccountDialog from "./edit-account-dialog";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
 
-interface TableData {
+interface AccountData {
   name: string;
   type: string;
   iban: string;
   balance: string;
-  action: string;
 }
 
-interface ContentDataTableProps {
-  tableData: TableData[];
-}
-
-export function ContentDataTable({ tableData }: ContentDataTableProps) {
+export function ContentDataTable() {
   const t = useTranslations("main-dashboard.content-page.data-table");
+
+  const [accounts, setAccounts] = useState<AccountData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const { tableData, status } = await getFinancialAccounts();
+
+        if (!status) throw new Error("Failed to fetch data");
+
+        setAccounts(tableData);
+      } catch (err) {
+        console.error("Error fetching accounts:", err);
+        setError("Failed to load financial account data.");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return (
+      <section className="grid auto-rows-min grid-cols-6">
+        <Card className="bg-blue-background dark:border-border-blue col-span-full">
+          <CardHeader>
+            <CardTitle className="text-gray-400">{t("loading")}</CardTitle>
+          </CardHeader>
+        </Card>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="grid auto-rows-min grid-cols-6">
+        <Card className="bg-blue-background dark:border-border-blue col-span-full">
+          <CardHeader>
+            <CardTitle className="text-red-500">
+              {t("errorMessage") ?? error}
+            </CardTitle>
+          </CardHeader>
+        </Card>
+      </section>
+    );
+  }
+
+  const totalBalance = accounts.reduce((sum, acc) => {
+    const amount = parseFloat(acc.balance.replace(/[^\d.-]/g, "")) || 0;
+    return sum + amount;
+  }, 0);
 
   const budgetDataTableHeadings: string[] = [
     t("headings.name"),
@@ -40,7 +92,7 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
       <Card className="bg-blue-background dark:border-border-blue col-span-full">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <CardTitle>{t("title")}</CardTitle>{" "}
+            <CardTitle>{t("title")}</CardTitle>
             <Badge
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
               variant="outline"
@@ -63,6 +115,7 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
             </Button>
           </div>
         </CardHeader>
+
         <CardContent className="overflow-x-auto">
           <Table className="min-w-[620px]">
             <TableHeader>
@@ -77,15 +130,16 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
                 ))}
               </TableRow>
             </TableHeader>
+
             <TableBody>
-              {tableData.map((data) => (
+              {accounts.map((data) => (
                 <TableRow className="dark:border-border-blue" key={data.name}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell>{data.type}</TableCell>
                   <TableCell>{data.iban}</TableCell>
                   <TableCell>{data.balance}</TableCell>
                   <TableCell>
-                    <NewAccountDialog variant="outline" text={data.action} />
+                    <EditAccountDialog variant="outline" />
                   </TableCell>
                 </TableRow>
               ))}
@@ -95,7 +149,10 @@ export function ContentDataTable({ tableData }: ContentDataTableProps) {
                 </TableCell>
                 <TableCell colSpan={2} />
                 <TableCell className="font-bold opacity-60">
-                  CHF 15’500.00
+                  CHF{" "}
+                  {totalBalance.toLocaleString("de-CH", {
+                    minimumFractionDigits: 2,
+                  })}
                 </TableCell>
               </TableRow>
             </TableBody>
