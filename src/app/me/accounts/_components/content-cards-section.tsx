@@ -12,18 +12,12 @@ import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
-
-interface TableData {
-  name: string;
-  type: string;
-  iban: string;
-  balance: string;
-}
+import type { AccountData } from "./data-table";
 
 export function ContentCardsSection() {
   const t = useTranslations("main-dashboard.content-page");
   const [loading, setLoading] = useState(true);
-  const [accounts, setAccounts] = useState<TableData[]>([]);
+  const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,7 +38,8 @@ export function ContentCardsSection() {
 
   const parsedAccounts = accounts.map((acc) => ({
     ...acc,
-    numericBalance: parseFloat(acc.balance.replace(/[^\d.-]/g, "")) || 0,
+    numericBalance:
+      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0,
   }));
 
   const totalBalance = parsedAccounts.reduce(

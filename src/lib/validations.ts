@@ -132,17 +132,6 @@ export const appearanceSchema = z.object({
 
 export type AppearanceValues = z.infer<typeof appearanceSchema>;
 
-// Content Dialog Schema
-export const NewAccountDialogSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  type: z.enum(accountType, { message: "Type is required" }),
-  balance: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  iban: z.string().optional(),
-  note: z.string().optional(),
-});
-
-export type NewAccountDialogValues = z.infer<typeof NewAccountDialogSchema>;
-
 // Main Transfer Dialog Schema
 export const transferDialogSchema = z.object({
   from: z.string().min(1, { message: "From account is required" }),

@@ -16,11 +16,14 @@ import { useTranslations } from "next-intl";
 import EditAccountDialog from "./edit-account-dialog";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
 
-interface AccountData {
+export interface AccountData {
+  id: string;
   name: string;
-  type: string;
+  type: "checking" | "savings" | "credit-card" | "cash";
+  balance: number;
+  formattedBalance: string;
   iban: string;
-  balance: string;
+  note?: string | null;
 }
 
 export function ContentDataTable() {
@@ -30,21 +33,22 @@ export function ContentDataTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const { tableData, status } = await getFinancialAccounts();
+  async function fetchData() {
+    try {
+      const { tableData, status } = await getFinancialAccounts();
 
-        if (!status) throw new Error("Failed to fetch data");
+      if (!status) throw new Error("Failed to fetch data");
 
-        setAccounts(tableData);
-      } catch (err) {
-        console.error("Error fetching accounts:", err);
-        setError("Failed to load financial account data.");
-      } finally {
-        setLoading(false);
-      }
+      setAccounts(tableData);
+    } catch (err) {
+      console.error("Error fetching accounts:", err);
+      setError("Failed to load financial account data.");
+    } finally {
+      setLoading(false);
     }
+  }
+
+  useEffect(() => {
     fetchData();
   }, []);
 
@@ -75,7 +79,8 @@ export function ContentDataTable() {
   }
 
   const totalBalance = accounts.reduce((sum, acc) => {
-    const amount = parseFloat(acc.balance.replace(/[^\d.-]/g, "")) || 0;
+    const amount =
+      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0;
     return sum + amount;
   }, 0);
 
@@ -137,9 +142,13 @@ export function ContentDataTable() {
                   <TableCell>{data.name}</TableCell>
                   <TableCell>{data.type}</TableCell>
                   <TableCell>{data.iban}</TableCell>
-                  <TableCell>{data.balance}</TableCell>
+                  <TableCell>{data.formattedBalance}</TableCell>
                   <TableCell>
-                    <EditAccountDialog variant="outline" />
+                    <EditAccountDialog
+                      variant="outline"
+                      accountData={data}
+                      fetchData={fetchData}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

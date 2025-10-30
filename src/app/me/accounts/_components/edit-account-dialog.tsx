@@ -24,96 +24,115 @@ import {
   Dialog,
   DialogTrigger,
   DialogContent,
-  DialogClose,
   DialogHeader,
+  DialogClose,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  updateFinancialAccount,
+  deleteFinancialAccount,
+} from "@/lib/services/financial-account";
 import {
   FinancialAccountDialogSchema,
   FinancialAccountDialogValues,
 } from "@/lib/validations/financial-account-dialog-validations";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
-import { createFinancialAccount } from "@/lib/services/financial-account";
-import { toast } from "sonner";
-import { Spinner } from "@/components/ui/spinner";
+import type { AccountData } from "./data-table";
 
-export default function NewAccountDialog({
-  variant,
-}: {
+interface EditAccountDialogProps {
+  accountData: AccountData;
+  fetchData: () => Promise<void>;
   variant?: "gradient" | "outline";
-}) {
+}
+
+export default function EditAccountDialog({
+  accountData,
+  fetchData,
+  variant,
+}: EditAccountDialogProps) {
   const t = useTranslations(
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
-  const [loading, setLoading] = useState<boolean>(false);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const form = useForm<FinancialAccountDialogValues>({
     resolver: zodResolver(FinancialAccountDialogSchema) as any,
     defaultValues: {
-      name: "",
-      type: "checking",
-      balance: 0,
-      iban: "",
-      note: "",
+      name: accountData.name ?? "",
+      type: accountData.type ?? "checking",
+      balance: accountData.balance ?? 0,
+      iban: accountData.iban ?? "",
+      note: accountData.note ?? "",
     },
   });
 
   async function onSubmit(values: FinancialAccountDialogValues) {
-    setLoading(true);
-
+    setIsLoading(true);
     try {
-      const result = await createFinancialAccount({
-        name: values.name,
-        type: values.type,
-        initialBalance: values.balance,
-        iban: values.iban,
-        note: values.note,
-      });
+      const result = await updateFinancialAccount(accountData.id, values);
 
       if (!result.status) {
-        toast.error(`${result.message} Something went wrong`);
+        toast.error(result.message || "Failed to update account");
         return;
       }
 
-      toast.success(result.message);
-
-      form.reset();
+      toast.success("Account updated successfully");
+      await fetchData();
+      setOpen(false);
     } catch (err: any) {
       console.error(err);
-      toast.error(`Failed to create account: ${err.message}`);
+      toast.error(err.message || "Something went wrong while updating account");
     } finally {
-      setLoading(false);
-      setIsOpen(false);
+      setIsLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    setIsDeleting(true);
+    try {
+      const result = await deleteFinancialAccount(accountData.id);
+      if (!result.status) {
+        toast.error(result.message || "Failed to delete account");
+        return;
+      }
+      toast.success("Account deleted successfully");
+      await fetchData();
+      setOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || "Error deleting account");
+    } finally {
+      setIsDeleting(false);
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
+          variant={variant === "gradient" ? "default" : "outline"}
           className={cn(
-            "cursor-pointer",
+            "cursor-pointer text-xs",
             variant === "gradient"
               ? "btn-gradient dark:text-white"
-              : "dark:border-border-blue !bg-dark-blue-background text-xs",
+              : "dark:border-border-blue !bg-dark-blue-background",
           )}
-          variant={variant === "gradient" ? "default" : "outline"}
         >
-          <Plus className="h-5 w-5" />
-          <span className="hidden text-sm sm:block">{t("title")}</span>
+          {t("edit")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
-        {/* Header */}
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
-            {t("title")}
+            {t("edit-title")}
           </DialogTitle>
           <DialogClose asChild>
             <Button
@@ -131,7 +150,7 @@ export default function NewAccountDialog({
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 pt-4"
           >
-            {/* Row 1: Name */}
+            {/* Name */}
             <FormField
               control={form.control}
               name="name"
@@ -149,13 +168,13 @@ export default function NewAccountDialog({
               )}
             />
 
-            {/* Row 2: Type + Balance */}
+            {/* Type + Balance */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.type.title")}</FormLabel>
                     <FormControl>
                       <Select
@@ -178,11 +197,6 @@ export default function NewAccountDialog({
                           <SelectItem value="cash">
                             {t("labels.type.options.cash")}
                           </SelectItem>
-                          {/*
-                          <SelectItem value="retirement-3a">
-                            {t("labels.type.options.retirement-3a")}
-                          </SelectItem>
-                          */}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -195,7 +209,7 @@ export default function NewAccountDialog({
                 control={form.control}
                 name="balance"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.balance")}</FormLabel>
                     <FormControl>
                       <Input
@@ -212,7 +226,7 @@ export default function NewAccountDialog({
               />
             </div>
 
-            {/* Row 3: IBAN */}
+            {/* IBAN */}
             <FormField
               control={form.control}
               name="iban"
@@ -230,7 +244,7 @@ export default function NewAccountDialog({
               )}
             />
 
-            {/* Row 4: Note */}
+            {/* Note */}
             <FormField
               control={form.control}
               name="note"
@@ -251,11 +265,20 @@ export default function NewAccountDialog({
             {/* Footer */}
             <div className="flex justify-end gap-3 pt-4">
               <Button
-                type="submit"
-                disabled={loading}
+                type="button"
+                variant="outline"
                 className="cursor-pointer"
+                onClick={handleDelete}
+                disabled={isDeleting}
               >
-                {loading ? <Spinner /> : t("save")}
+                {isDeleting ? <Spinner /> : t("delete")}
+              </Button>
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={isLoading}
+              >
+                {isLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

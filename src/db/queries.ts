@@ -39,6 +39,23 @@ export type financialAccountArgs = {
   note?: string | null;
 };
 
+export interface UpdateFinancialAccountArgs {
+  hubId: string;
+  accountId: string;
+  updatedData: {
+    name?: string;
+    type?: AccountType;
+    balance?: number;
+    iban?: string;
+    note?: string;
+  };
+}
+
+interface DeleteFinancialAccountArgs {
+  hubId: string;
+  accountId: string;
+}
+
 export type createTransactionArgs = {
   financialAccountId: string;
   hubId: string;
@@ -198,6 +215,94 @@ export async function createFinancialAccountDB({
   }
 }
 
+// UPDATE Financial Account
+export async function updateFinancialAccountDB({
+  hubId,
+  accountId,
+  updatedData,
+}: UpdateFinancialAccountArgs) {
+  try {
+    const account = await db.query.financial_accounts.findFirst({
+      where: (a) => eq(a.id, accountId),
+      columns: { id: true, hubId: true },
+    });
+
+    if (!account) {
+      return { success: false, message: "Financial account not found." };
+    }
+
+    if (account.hubId !== hubId) {
+      return { success: false, message: "Access denied." };
+    }
+
+    const cleanData = Object.fromEntries(
+      Object.entries({
+        name: updatedData.name,
+        type: updatedData.type,
+        balance: updatedData.balance,
+        iban: updatedData.iban,
+        note: updatedData.note,
+      }).filter(([_, v]) => v !== undefined),
+    );
+
+    const [updatedAccount] = await db
+      .update(financial_accounts)
+      .set(cleanData)
+      .where(eq(financial_accounts.id, accountId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Financial account updated successfully.",
+      data: updatedAccount,
+    };
+  } catch (err: any) {
+    console.error("Error updating financial account:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update financial account.",
+    };
+  }
+}
+
+// DELETE Financial Account
+export async function deleteFinancialAccountDB({
+  hubId,
+  accountId,
+}: DeleteFinancialAccountArgs) {
+  try {
+    const account = await db.query.financial_accounts.findFirst({
+      where: (a) => eq(a.id, accountId),
+      columns: { id: true, hubId: true },
+    });
+
+    if (!account) {
+      return { success: false, message: "Financial account not found." };
+    }
+
+    if (account.hubId !== hubId) {
+      return { success: false, message: "Access denied." };
+    }
+
+    const [deletedAccount] = await db
+      .delete(financial_accounts)
+      .where(eq(financial_accounts.id, accountId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Financial account deleted successfully.",
+      data: deletedAccount,
+    };
+  } catch (err: any) {
+    console.error("Error deleting financial account:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete financial account.",
+    };
+  }
+}
+
 // READ Financial Account
 export async function getFinancialAccountsDB(userId: string, hubId: string) {
   try {
@@ -216,7 +321,7 @@ export async function getFinancialAccountsDB(userId: string, hubId: string) {
       name: acc.name,
       type: acc.type,
       iban: acc.iban || "-",
-      balance: acc.initialBalance.toFixed(2),
+      balance: acc.initialBalance,
       note: acc.note || "",
     }));
   } catch (err) {
