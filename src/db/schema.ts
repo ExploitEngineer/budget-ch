@@ -73,6 +73,11 @@ export const hub_members = pgTable(
     accessRole: accessRole().notNull().default("member"),
     isOwner: boolean("is_owner").default(true).notNull(),
     joinedAt: timestamp(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [primaryKey({ columns: [table.userId, table.hubId] })],
 );
@@ -105,6 +110,11 @@ export const financial_accounts = pgTable("financial_accounts", {
   initialBalance: doublePrecision("initial_balance").notNull().default(0),
   iban: varchar("iban", { length: 34 }),
   note: text("note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const transaction_categories = pgTable("transaction_categories", {
@@ -113,6 +123,11 @@ export const transaction_categories = pgTable("transaction_categories", {
     .notNull()
     .references(() => hubs.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const transactions = pgTable("transactions", {
@@ -137,6 +152,11 @@ export const transactions = pgTable("transactions", {
   source: text("source"),
   amount: doublePrecision("amount").notNull().default(0),
   note: text("note"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const budgets = pgTable("budgets", {
@@ -174,6 +194,11 @@ export const saving_goals = pgTable("saving_goals", {
   monthlyAllocation: doublePrecision("monthly_allocation").notNull().default(0),
   accountType: accountType().notNull().default("cash"),
   dueDate: timestamp("due_date"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const quick_tasks = pgTable("quick_taks", {
@@ -186,6 +211,11 @@ export const quick_tasks = pgTable("quick_taks", {
     .references(() => hubs.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   checked: boolean().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
 });
 
 export const accounts = pgTable("accounts", {
@@ -213,6 +243,22 @@ export const verifications = pgTable("verifications", {
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export const lastest_transfers = pgTable("latest_transfers", {
+  id: text("id").primaryKey(),
+  financialAccountId: uuid("financial_account_id")
+    .notNull()
+    .references(() => financial_accounts.id, { onDelete: "cascade" }),
+  sourceAccount: accountType().notNull(),
+  destinationAccount: accountType().notNull(),
+  note: text("note"),
+  transfer_amount: doublePrecision("transfer_amount").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
