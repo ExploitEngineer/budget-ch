@@ -22,17 +22,6 @@ export const TransactionDialogSchema = z.object({
   category: z.string().min(1, { message: "Category is required" }),
   amount: z.coerce.number({ message: "Amount must be 0 or more" }),
   note: z.string().optional(),
-  file: z
-    .instanceof(File)
-    .optional()
-    .refine(
-      (file) =>
-        !file ||
-        ["image/png", "image/jpeg", "application/pdf"].includes(file.type),
-      {
-        message: "Only .png, .jpg, .jpeg, or .pdf files are allowed",
-      },
-    ),
   splits: z.array(splitSchema).optional(),
 });
 

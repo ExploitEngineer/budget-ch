@@ -23,9 +23,6 @@ export async function createFinancialAccount({
 
     const { userId, hubId } = await getContext(hdrs, false);
 
-    console.log(`UserId: ${userId}`);
-    console.log(`HubId: ${hubId}`);
-
     await createFinancialAccountDB({
       userId,
       hubId,
@@ -78,6 +75,8 @@ export async function updateFinancialAccount(
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
+
+    console.log("UPDATED DATA: ", updatedData);
 
     const result = await updateFinancialAccountDB({
       hubId,

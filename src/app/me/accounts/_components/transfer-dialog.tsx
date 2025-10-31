@@ -28,7 +28,10 @@ import { Input } from "@/components/ui/input";
 import { CalendarIcon, MoveHorizontal } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { transferDialogSchema, TransferDialogValues } from "@/lib/validations";
+import {
+  transferDialogSchema,
+  TransferDialogValues,
+} from "@/lib/validations/transfer-dialog-validations";
 import {
   Dialog,
   DialogTrigger,
@@ -36,27 +39,64 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { createLatestTransfer } from "@/lib/services/latest-trnasfers";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function TransferDialog() {
+  const [isTransferringAmount, setIsTransferringAmount] =
+    useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
   const form = useForm<TransferDialogValues>({
     resolver: zodResolver(transferDialogSchema) as any,
     defaultValues: {
-      from: "",
-      to: "",
+      from: "cash",
+      to: "cash",
       amount: 0,
-      date: undefined,
       text: "",
     },
   });
 
   const t = useTranslations("main-dashboard.content-page.sidebar-header");
 
-  function onSubmit(values: TransferDialogValues) {
-    console.log(values);
+  async function onSubmit(values: TransferDialogValues) {
+    if (values.from === values.to) {
+      toast.error("Cannot transfer to the same account.");
+      return;
+    }
+    if (!values.amount || Number(values.amount) <= 0) {
+      toast.error("Enter a valid amount greater than 0.");
+      return;
+    }
+
+    setIsTransferringAmount(true);
+    try {
+      const res = await createLatestTransfer({
+        fromAccountType: values.from,
+        toAccountType: values.to,
+        amount: Number(values.amount),
+        note: values.text,
+      });
+
+      if (!res.success) {
+        toast.error(res.message || "Transfer failed.");
+        return;
+      }
+
+      setIsOpen(false);
+      toast.success("Transfer successful.");
+    } catch (e) {
+      console.error(e);
+      toast.error("An unexpected error occurred.");
+    } finally {
+      setIsTransferringAmount(false);
+    }
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="cursor-pointer sm:min-w-40" asChild>
         <Button
           className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2 dark:text-white"
@@ -101,20 +141,17 @@ export default function TransferDialog() {
                           <SelectValue placeholder="Choose" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="giro">
+                          <SelectItem value="checking">
                             {t("dialog-box.labels.from.options.giro")}
                           </SelectItem>
-                          <SelectItem value="sparen">
+                          <SelectItem value="savings">
                             {t("dialog-box.labels.from.options.sparen")}
                           </SelectItem>
-                          <SelectItem value="kreditkarte">
+                          <SelectItem value="credit-card">
                             {t("dialog-box.labels.from.options.kreditkarte")}
                           </SelectItem>
-                          <SelectItem value="bar">
+                          <SelectItem value="cash">
                             {t("dialog-box.labels.from.options.bar")}
-                          </SelectItem>
-                          <SelectItem value="vorsorge">
-                            {t("dialog-box.labels.from.options.vorsorge")}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -140,20 +177,17 @@ export default function TransferDialog() {
                           <SelectValue placeholder="Choose" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="giro">
+                          <SelectItem value="checking">
                             {t("dialog-box.labels.to.options.giro")}
                           </SelectItem>
-                          <SelectItem value="sparen">
+                          <SelectItem value="savings">
                             {t("dialog-box.labels.to.options.sparen")}
                           </SelectItem>
-                          <SelectItem value="kreditkarte">
+                          <SelectItem value="credit-card">
                             {t("dialog-box.labels.to.options.kreditkarte")}
                           </SelectItem>
-                          <SelectItem value="bar">
+                          <SelectItem value="cash">
                             {t("dialog-box.labels.to.options.bar")}
-                          </SelectItem>
-                          <SelectItem value="vorsorge">
-                            {t("dialog-box.labels.to.options.vorsorge")}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -239,7 +273,17 @@ export default function TransferDialog() {
 
             {/* Submit */}
             <div className="flex justify-end pt-4">
-              <Button type="submit">{t("dialog-box.buttons.post")}</Button>
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={isTransferringAmount}
+              >
+                {isTransferringAmount ? (
+                  <Spinner />
+                ) : (
+                  t("dialog-box.buttons.post")
+                )}
+              </Button>
             </div>
           </form>
         </Form>

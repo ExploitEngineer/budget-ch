@@ -113,7 +113,7 @@ export async function getTransactions(): Promise<{
 }> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId } = await getContext(hdrs, false);
 
     const res = await getTransactionsDB(hubId);
 

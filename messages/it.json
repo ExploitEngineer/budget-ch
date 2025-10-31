@@ -631,6 +631,7 @@
             "active-goals-section": {
                 "title": "Obiettivi attivi",
                 "badge": "3 obiettivi • Assegnazione automatica: CHF 700.00",
+                "no-goals": "Nessun obiettivo di risparmio trovato.",
                 "buttons": {
                     "due": "Scadenza",
                     "progress": "Progresso",

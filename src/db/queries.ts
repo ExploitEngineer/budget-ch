@@ -9,6 +9,7 @@ import {
   budgets,
   saving_goals,
   quick_tasks,
+  latest_transfers,
 } from "./schema";
 import { eq, desc, and } from "drizzle-orm";
 import type { QuickTask } from "./schema";
@@ -149,6 +150,15 @@ interface UpdateSavingGoalArgs {
   };
 }
 
+export type LatestTransferArgs = {
+  financialAccountId: string;
+  fromAccountType: AccountType;
+  toAccountType: AccountType;
+  hubId: string;
+  amount: number;
+  note?: string;
+};
+
 // CREATE Hub
 export async function createHubDB(userId: string, userName: string) {
   try {
@@ -201,9 +211,7 @@ export async function createFinancialAccountDB({
     });
 
     if (existing) {
-      throw new Error(
-        `An account of type "${type}" already exists in this hub.`,
-      );
+      throw new Error(`An account of type ${type} already exists in this hub.`);
     }
 
     const [account] = await db
@@ -246,15 +254,19 @@ export async function updateFinancialAccountDB({
       return { success: false, message: "Access denied." };
     }
 
+    console.log("Accont: ", account);
+
     const cleanData = Object.fromEntries(
       Object.entries({
         name: updatedData.name,
         type: updatedData.type,
-        balance: updatedData.balance,
+        initialBalance: updatedData.balance,
         iban: updatedData.iban,
         note: updatedData.note,
       }).filter(([_, v]) => v !== undefined),
     );
+
+    console.log("Clean Account: ", cleanData);
 
     const [updatedAccount] = await db
       .update(financial_accounts)
@@ -262,6 +274,7 @@ export async function updateFinancialAccountDB({
       .where(eq(financial_accounts.id, accountId))
       .returning();
 
+    console.log("Updated Account DB:", updatedAccount);
     return {
       success: true,
       message: "Financial account updated successfully.",
@@ -331,7 +344,7 @@ export async function getFinancialAccountsDB(userId: string, hubId: string) {
       id: acc.id,
       name: acc.name,
       type: acc.type,
-      iban: acc.iban || "-",
+      iban: acc.iban || "",
       balance: acc.initialBalance,
       note: acc.note || "",
     }));
@@ -1108,6 +1121,92 @@ export async function deleteBudgetDB({
     return {
       success: false,
       message: err.message || "Failed to delete budget.",
+    };
+  }
+}
+
+// CREATE Latest Transfer
+export async function createLatestTransferDB({
+  financialAccountId,
+  fromAccountType,
+  toAccountType,
+  hubId,
+  amount,
+  note,
+}: LatestTransferArgs) {
+  try {
+    const from = await db.query.financial_accounts.findFirst({
+      where: (a) => and(eq(a.type, fromAccountType), eq(a.hubId, hubId)),
+      columns: {
+        id: true,
+        hubId: true,
+        initialBalance: true,
+        name: true,
+        type: true,
+      },
+    });
+
+    const to = await db.query.financial_accounts.findFirst({
+      where: (a) => and(eq(a.type, toAccountType), eq(a.hubId, hubId)),
+      columns: {
+        id: true,
+        hubId: true,
+        initialBalance: true,
+        name: true,
+        type: true,
+      },
+    });
+
+    if (!from) return { success: false, message: "Source account not found." };
+    if (!to)
+      return { success: false, message: "Destination account not found." };
+
+    if (from.hubId !== hubId || to.hubId !== hubId)
+      return { success: false, message: "Access denied." };
+
+    if (from.id === to.id)
+      return {
+        success: false,
+        message: "Cannot transfer to the same account.",
+      };
+
+    const fromBalance = Number(from.initialBalance ?? 0);
+    if (fromBalance < amount)
+      return {
+        success: false,
+        message: "Insufficient funds in source account.",
+      };
+
+    const newFromBalance = fromBalance - amount;
+    const newToBalance = Number(to.initialBalance ?? 0) + amount;
+
+    await db
+      .update(financial_accounts)
+      .set({ initialBalance: newFromBalance })
+      .where(eq(financial_accounts.id, from.id));
+
+    await db
+      .update(financial_accounts)
+      .set({ initialBalance: newToBalance })
+      .where(eq(financial_accounts.id, to.id));
+
+    const [transfer] = await db
+      .insert(latest_transfers)
+      .values({
+        financialAccountId,
+        sourceAccount: from.type,
+        destinationAccount: to.type,
+        note,
+        transferAmount: amount,
+      })
+      .returning();
+
+    return { success: true, data: transfer };
+  } catch (err: any) {
+    console.error("Error creating latest transfer:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to create transfer",
     };
   }
 }

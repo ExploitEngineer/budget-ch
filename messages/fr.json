@@ -631,6 +631,7 @@
             "active-goals-section": {
                 "title": "Objectifs actifs",
                 "badge": "3 objectifs • Allocation automatique : CHF 700.00",
+                "no-goals": "Aucun objectif d’épargne trouvé.",
                 "buttons": {
                     "due": "Échéance",
                     "progress": "Progression",

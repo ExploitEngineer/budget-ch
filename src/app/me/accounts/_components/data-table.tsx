@@ -141,7 +141,7 @@ export function ContentDataTable() {
                 <TableRow className="dark:border-border-blue" key={data.name}>
                   <TableCell>{data.name}</TableCell>
                   <TableCell>{data.type}</TableCell>
-                  <TableCell>{data.iban}</TableCell>
+                  <TableCell>{data.iban || data.note}</TableCell>
                   <TableCell>{data.formattedBalance}</TableCell>
                   <TableCell>
                     <EditAccountDialog

@@ -250,15 +250,15 @@ export const verifications = pgTable("verifications", {
     .notNull(),
 });
 
-export const lastest_transfers = pgTable("latest_transfers", {
-  id: text("id").primaryKey(),
+export const latest_transfers = pgTable("latest_transfers", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
   financialAccountId: uuid("financial_account_id")
     .notNull()
     .references(() => financial_accounts.id, { onDelete: "cascade" }),
   sourceAccount: accountType().notNull(),
   destinationAccount: accountType().notNull(),
   note: text("note"),
-  transfer_amount: doublePrecision("transfer_amount").notNull().default(0),
+  transferAmount: doublePrecision("transfer_amount").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

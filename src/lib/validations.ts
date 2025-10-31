@@ -132,19 +132,6 @@ export const appearanceSchema = z.object({
 
 export type AppearanceValues = z.infer<typeof appearanceSchema>;
 
-// Main Transfer Dialog Schema
-export const transferDialogSchema = z.object({
-  from: z.string().min(1, { message: "From account is required" }),
-  to: z.string().min(1, { message: "To account is required" }),
-  amount: z.coerce.number().min(0, { message: "Amount is required" }),
-  date: z.coerce
-    .date()
-    .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
-  text: z.string().optional(),
-});
-
-export type TransferDialogValues = z.infer<typeof transferDialogSchema>;
-
 // Filter Dialog Schema
 export const filterDialogSchema = z.object({
   from: z.coerce

@@ -630,6 +630,7 @@
             "active-goals-section": {
                 "title": "Active Goals",
                 "badge": "3 Goals • Auto Allocation: CHF 700.00",
+                "no-goals": "No saving goals found.",
                 "buttons": {
                     "due": "Due",
                     "progress": "Progress",

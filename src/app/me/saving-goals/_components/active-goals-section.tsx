@@ -64,9 +64,7 @@ export async function ActiveGoalsSection() {
 
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
           {activeGoalsData.length === 0 && (
-            <p className="text-muted-foreground p-4 text-sm">
-              {t("no-goals", { defaultValue: "No saving goals found." })}
-            </p>
+            <p className="text-muted-foreground p-4 text-sm">{t("no-goals")}</p>
           )}
 
           {activeGoalsData.map((goal, idx) => {
