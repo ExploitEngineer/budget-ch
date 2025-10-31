@@ -1,11 +1,5 @@
 import { useTranslations } from "next-intl";
 
-interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
-
 interface HealthCards {
   title: string;
   value: string;
@@ -24,29 +18,6 @@ interface WarningCards {
 
 export function useDashboardData() {
   const t = useTranslations("main-dashboard");
-
-  const cards: CardsContent[] = [
-    {
-      title: t("dashboard-page.cards.card-1.title"),
-      content: t("dashboard-page.cards.card-1.content"),
-      badge: t("dashboard-page.cards.card-1.badge"),
-    },
-    {
-      title: t("dashboard-page.cards.card-2.title"),
-      content: t("dashboard-page.cards.card-2.content"),
-      badge: t("dashboard-page.cards.card-2.badge"),
-    },
-    {
-      title: t("dashboard-page.cards.card-3.title"),
-      content: t("dashboard-page.cards.card-3.content"),
-      badge: t("dashboard-page.cards.card-3.badge"),
-    },
-    {
-      title: t("dashboard-page.cards.card-4.title"),
-      content: t("dashboard-page.cards.card-4.content"),
-      badge: t("dashboard-page.cards.card-4.badge"),
-    },
-  ];
 
   const healthCards: HealthCards[] = [
     { title: t("dashboard-page.cards.card-1.title"), value: "CHF 4’703" },
@@ -99,7 +70,6 @@ export function useDashboardData() {
   ];
 
   return {
-    cards,
     healthCards,
     upComingTables,
     warningCards,
