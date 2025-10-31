@@ -11,7 +11,7 @@ import {
   quick_tasks,
   latest_transfers,
 } from "./schema";
-import { eq, desc, and } from "drizzle-orm";
+import { eq, desc, and, or } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 import type {
   CreateBudgetInput,
@@ -1207,6 +1207,47 @@ export async function createLatestTransferDB({
     return {
       success: false,
       message: err.message || "Failed to create transfer",
+    };
+  }
+}
+
+// READ Latest Transfers
+export async function getLatestTransactionsDB(financialAccountId: string) {
+  try {
+    const account = await db.query.financial_accounts.findFirst({
+      where: eq(financial_accounts.id, financialAccountId),
+      columns: { type: true },
+    });
+
+    if (!account) {
+      return { status: false, message: "Account not found.", data: [] };
+    }
+    const results = await db
+      .select()
+      .from(latest_transfers)
+      .where(
+        or(
+          eq(latest_transfers.sourceAccount, account.type),
+          eq(latest_transfers.destinationAccount, account.type),
+        ),
+      )
+      .orderBy(desc(latest_transfers.updatedAt));
+
+    const formatted = results.map((tx) => ({
+      date: tx.updatedAt,
+      source: tx.sourceAccount,
+      destination: tx.destinationAccount,
+      amount: Number(tx.transferAmount),
+      note: tx.note || "",
+    }));
+
+    return { status: true, data: formatted };
+  } catch (err: any) {
+    console.error("Error fetching latest transfers:", err);
+    return {
+      status: false,
+      message: err.message || "Failed to fetch latest transfers",
+      data: [],
     };
   }
 }

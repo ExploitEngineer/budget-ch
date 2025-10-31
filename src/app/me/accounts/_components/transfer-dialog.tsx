@@ -39,7 +39,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { createLatestTransfer } from "@/lib/services/latest-trnasfers";
+import { createLatestTransfer } from "@/lib/services/latest-transfers";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
