@@ -178,11 +178,6 @@ export default function NewAccountDialog({
                           <SelectItem value="cash">
                             {t("labels.type.options.cash")}
                           </SelectItem>
-                          {/*
-                          <SelectItem value="retirement-3a">
-                            {t("labels.type.options.retirement-3a")}
-                          </SelectItem>
-                          */}
                         </SelectContent>
                       </Select>
                     </FormControl>

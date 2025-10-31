@@ -59,8 +59,8 @@ export function BarChartSection() {
           </p>
         )}
 
-        {circleProgressCards.map((card) => (
-          <CardContent key={card.name}>
+        {circleProgressCards.map((card, idx: number) => (
+          <CardContent key={idx}>
             <Card className="bg-blue-background dark:border-border-blue dark:shadow-dark-blue-background w-full flex-1 py-4 dark:shadow-2xl">
               <CardContent className="flex items-center gap-3">
                 <AnimatedCircularProgressBar
