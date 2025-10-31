@@ -395,6 +395,7 @@ export async function getTransactionsDB(hubId: string) {
         date: transactions.addedAt,
         recipient: transactions.source,
         accountType: transactions.accountType,
+        type: transactions.type,
         category: transaction_categories.name,
         note: transactions.note,
         amount: transactions.amount,

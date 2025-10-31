@@ -32,22 +32,22 @@ export function LatestTransfers() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-async function fetchTransfers() {
-  try {
-    const result = await getLatestTransactions();
+  async function fetchTransfers() {
+    try {
+      const result = await getLatestTransactions();
 
-    if (!result || !result.status) {
-      throw new Error(result?.message || "Unknown error");
+      if (!result || !result.status) {
+        throw new Error(result?.message || "Unknown error");
+      }
+
+      setTransfers((result.data as TransferData[]) || []);
+    } catch (err: any) {
+      console.error("Error fetching transfers:", err);
+      setError("Failed to load transfers");
+    } finally {
+      setLoading(false);
     }
-
-    setTransfers((result.data as TransferData[]) || []);
-  } catch (err: any) {
-    console.error("Error fetching transfers:", err);
-    setError("Failed to load transfers");
-  } finally {
-    setLoading(false);
   }
-}
 
   useEffect(() => {
     fetchTransfers();
@@ -65,7 +65,7 @@ async function fetchTransfers() {
     return (
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
-          <CardTitle>{t("loading")}</CardTitle>
+          <CardTitle>Loading Data...</CardTitle>
         </CardHeader>
       </Card>
     );

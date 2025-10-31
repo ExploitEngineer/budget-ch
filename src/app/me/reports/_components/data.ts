@@ -1,11 +1,5 @@
 import { useTranslations } from "next-intl";
 
-export interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
-
 export interface TableData {
   month: string;
   income: string;
@@ -15,29 +9,6 @@ export interface TableData {
 
 export function useReportData() {
   const t = useTranslations("main-dashboard.report-page");
-
-  const cards: CardsContent[] = [
-    {
-      title: t("cards.card-1.title"),
-      content: t("cards.card-1.content"),
-      badge: t("cards.card-1.badge"),
-    },
-    {
-      title: t("cards.card-2.title"),
-      content: t("cards.card-2.content"),
-      badge: t("cards.card-2.badge"),
-    },
-    {
-      title: t("cards.card-3.title"),
-      content: t("cards.card-3.content"),
-      badge: t("cards.card-3.badge"),
-    },
-    {
-      title: t("cards.card-4.title"),
-      content: t("cards.card-4.content"),
-      badge: t("cards.card-4.badge"),
-    },
-  ];
 
   const tableData: TableData[] = [
     {
@@ -122,5 +93,5 @@ export function useReportData() {
     t("detailed-table.data-table.data.category.leisure"),
   ];
 
-  return { cards, tableData, detailedTableData };
+  return { tableData, detailedTableData };
 }

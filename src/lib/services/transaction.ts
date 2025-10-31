@@ -14,7 +14,20 @@ import { getContext } from "../auth/actions";
 import { transaction_categories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import db from "@/db/db";
-import { Transaction } from "@/app/me/transactions/_components/data-table";
+import type { AccountType } from "@/db/queries";
+
+type TransactionType = "income" | "expense";
+
+export interface Transaction {
+  id: string;
+  date: string;
+  source: string;
+  accountType: AccountType;
+  type: TransactionType;
+  category: string;
+  note: string | null;
+  amount: number;
+}
 
 // CREATE Transaction
 export async function createTransaction({
@@ -130,6 +143,7 @@ export async function getTransactions(): Promise<{
       date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
       source: tx.recipient || "—",
       accountType: tx.accountType || "—",
+      type: tx.type,
       category: tx.category || "—",
       note: tx.note ?? null,
       amount: tx.amount ?? 0,
