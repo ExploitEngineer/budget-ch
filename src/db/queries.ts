@@ -386,20 +386,38 @@ export async function createTransactionDB({
   }
 }
 
-// READ Transactions
-export async function getTransactionsDB(hubId: string) {
+// GET Transactions
+export async function getTransactionsDB(
+  hubId: string,
+  fields: Record<string, boolean>,
+  limit?: number,
+) {
   try {
-    const transactionsList = await db
-      .select({
-        id: transactions.id,
-        date: transactions.addedAt,
-        recipient: transactions.source,
-        accountType: transactions.accountType,
-        type: transactions.type,
-        category: transaction_categories.name,
-        note: transactions.note,
-        amount: transactions.amount,
-      })
+    const allFields = {
+      id: transactions.id,
+      date: transactions.addedAt,
+      recipient: transactions.source,
+      accountType: transactions.accountType,
+      type: transactions.type,
+      category: transaction_categories.name,
+      note: transactions.note,
+      amount: transactions.amount,
+      accountName: financial_accounts.name,
+      userName: users.name,
+    };
+
+    const selectObj: Record<string, any> = {};
+    for (const [key, enabled] of Object.entries(fields)) {
+      if (enabled && allFields[key as keyof typeof allFields]) {
+        selectObj[key] = allFields[key as keyof typeof allFields];
+      }
+    }
+
+    if (Object.keys(selectObj).length === 0)
+      throw new Error("No valid fields requested");
+
+    let query = db
+      .select(selectObj)
       .from(transactions)
       .leftJoin(
         transaction_categories,
@@ -413,12 +431,16 @@ export async function getTransactionsDB(hubId: string) {
       .where(eq(transactions.hubId, hubId))
       .orderBy(desc(transactions.addedAt));
 
-    return { success: true, data: transactionsList };
+    if (limit) query.limit(limit);
+
+    const results = await query;
+
+    return { success: true, data: results };
   } catch (err: any) {
-    console.error("Error fetching transactions for table:", err);
+    console.error("Error fetching transactions:", err);
     return {
       success: false,
-      message: err.message || "Failed to fetch transactions.",
+      message: err.message || "Failed to fetch transactions",
     };
   }
 }
@@ -499,48 +521,6 @@ export async function deleteTransactionDB({
     return {
       success: false,
       message: err.message || "Failed to delete transaction",
-    };
-  }
-}
-
-// READ Recent Transactions on Limit
-export async function getRecentTransactionsDB(hubId: string, limit = 4) {
-  try {
-    const data = await db
-      .select({
-        id: transactions.id,
-        amount: transactions.amount,
-        note: transactions.note,
-        addedAt: transactions.addedAt,
-        categoryName: transaction_categories.name,
-        accountName: financial_accounts.name,
-        recipientName: transactions.source,
-        accountType: transactions.accountType,
-      })
-      .from(transactions)
-      .leftJoin(
-        transaction_categories,
-        eq(transactions.transactionCategoryId, transaction_categories.id),
-      )
-      .leftJoin(
-        financial_accounts,
-        eq(transactions.financialAccountId, financial_accounts.id),
-      )
-      .leftJoin(users, eq(transactions.userId, users.id))
-      .where(eq(transactions.hubId, hubId))
-      .orderBy(desc(transactions.addedAt))
-      .limit(limit);
-
-    return {
-      success: true,
-      message: "Successfully fetched recent transactions.",
-      data,
-    };
-  } catch (err: any) {
-    console.error("Error fetching recent transactions:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to get recent transactions.",
     };
   }
 }

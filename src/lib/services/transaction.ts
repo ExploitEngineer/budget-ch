@@ -4,7 +4,6 @@ import {
   createTransactionDB,
   createTransactionCategoryDB,
   getTransactionsDB,
-  getRecentTransactionsDB,
   updateTransactionDB,
   deleteTransactionDB,
 } from "@/db/queries";
@@ -13,21 +12,8 @@ import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 import { transaction_categories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
+import type { Transaction } from "../types/dashboard-types";
 import db from "@/db/db";
-import type { AccountType } from "@/db/queries";
-
-type TransactionType = "income" | "expense";
-
-export interface Transaction {
-  id: string;
-  date: string;
-  source: string;
-  accountType: AccountType;
-  type: TransactionType;
-  category: string;
-  note: string | null;
-  amount: number;
-}
 
 // CREATE Transaction
 export async function createTransaction({
@@ -128,7 +114,16 @@ export async function getTransactions(): Promise<{
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
 
-    const res = await getTransactionsDB(hubId);
+    const res = await getTransactionsDB(hubId, {
+      id: true,
+      date: true,
+      recipient: true,
+      accountType: true,
+      type: true,
+      category: true,
+      note: true,
+      amount: true,
+    });
 
     if (!res.success || !res.data) {
       return {
@@ -141,7 +136,7 @@ export async function getTransactions(): Promise<{
     const transactions = res.data.map((tx: any) => ({
       id: tx.id,
       date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
-      source: tx.recipient || "—",
+      recipient: tx.recipient || "—",
       accountType: tx.accountType || "—",
       type: tx.type,
       category: tx.category || "—",
@@ -166,24 +161,40 @@ export async function getRecentTransactions() {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
 
-    const res = await getRecentTransactionsDB(hubId);
+    const res = await getTransactionsDB(
+      hubId,
+      {
+        id: true,
+        date: true,
+        recipient: true,
+        accountType: true,
+        category: true,
+        note: true,
+        amount: true,
+      },
+      4,
+    );
 
-    if (!res.success) {
+    if (!res.success || !res.data) {
       return {
         success: false,
         message: res.message || "Failed to fetch recent transactions",
       };
     }
 
-    const transactions = (res.data ?? []).map((tx) => ({
+    console.log("data which i'm getting in server action:", res.data);
+
+    const transactions = res.data.map((tx: any) => ({
       id: tx.id,
-      date: tx.addedAt ? new Date(tx.addedAt).toLocaleDateString() : "—",
-      recipient: tx.recipientName || "Unknown",
-      account: tx.accountType || "—",
-      category: tx.categoryName || "—",
-      note: tx.note || "—",
-      amount: `${tx.amount ?? 0}`,
+      date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
+      recipient: tx.recipient || "—",
+      accountType: tx.accountType || "—",
+      category: tx.category || "—",
+      note: tx.note ?? null,
+      amount: tx.amount ?? 0,
     }));
+
+    console.log("Data after filtration:", transactions);
 
     return { success: true, data: transactions };
   } catch (err: any) {

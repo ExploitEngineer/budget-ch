@@ -23,3 +23,16 @@ export type DashboardSavingsGoals = {
   dueDate?: Date | null;
   remaining?: number;
 };
+
+type TransactionType = "income" | "expense";
+
+export type Transaction = {
+  id: string;
+  date: string;
+  recipient: string;
+  accountType: AccountType;
+  type: TransactionType;
+  category: string;
+  note: string;
+  amount: number;
+};

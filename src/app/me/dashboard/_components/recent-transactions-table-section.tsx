@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getRecentTransactions } from "@/lib/services/transaction";
+import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -14,43 +13,19 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-
-interface Transaction {
-  id: string;
-  date: string;
-  recipient: string;
-  account: string;
-  category: string;
-  note: string;
-  amount: string;
-}
+import { useDashboardStore } from "@/store/dashboard-store";
 
 export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    transactions,
+    transactionError,
+    transactionLoading,
+    fetchTransactions,
+  } = useDashboardStore();
 
   useEffect(() => {
-    async function fetchTransactions() {
-      try {
-        const res = await getRecentTransactions();
-
-        if (!res.success) {
-          setError(res.message || "Failed to fetch transactions.");
-          return;
-        }
-
-        setTransactions(res.data || []);
-      } catch (err: any) {
-        console.error("Error fetching transactions:", err);
-        setError("Unexpected error fetching transactions.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchTransactions();
   }, []);
 
@@ -77,10 +52,12 @@ export function RecentTransactionsTableSection() {
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
-          {loading ? (
-            <p className="py-4 text-center text-gray-500">Loading...</p>
-          ) : error ? (
-            <p className="py-4 text-center text-red-500">{error}</p>
+          {transactionError ? (
+            <p className="px-6 text-sm text-red-500">{transactionError}</p>
+          ) : transactions === null || transactionLoading ? (
+            <p className="text-muted-foreground px-6 text-sm">
+              {t("upcoming-cards.loading")}
+            </p>
           ) : (
             <Table className="min-w-[600px]">
               <TableHeader>
@@ -102,7 +79,7 @@ export function RecentTransactionsTableSection() {
                       <TableCell>{tx.date}</TableCell>
                       <TableCell>{tx.recipient}</TableCell>
                       <TableCell className="whitespace-nowrap">
-                        {tx.account}
+                        {tx.accountType}
                       </TableCell>
                       <TableCell>{tx.category}</TableCell>
                       <TableCell>{tx.note}</TableCell>
@@ -115,7 +92,7 @@ export function RecentTransactionsTableSection() {
                       colSpan={6}
                       className="text-center text-gray-500"
                     >
-                      No recent transactions
+                      {t("upcoming-cards.no-transactions")}
                     </TableCell>
                   </TableRow>
                 )}

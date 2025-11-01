@@ -10,9 +10,11 @@ import type { QuickTask } from "@/db/schema";
 import type {
   DashboardSavingsGoalsCards,
   DashboardSavingsGoals,
+  Transaction,
 } from "@/lib/types/dashboard-types";
 import { toast } from "sonner";
 import { getSavingGoals } from "@/lib/services/saving-goal";
+import { getRecentTransactions } from "@/lib/services/transaction";
 
 interface DashboardState {
   // Budgets totals
@@ -37,6 +39,11 @@ interface DashboardState {
   goalsLoading: boolean;
   goalsError: string | null;
 
+  // Last Transactions
+  transactions: Partial<Transaction>[] | null;
+  transactionLoading: boolean;
+  transactionError: string | null;
+
   // Actions
   fetchBudgets: () => Promise<void>;
   refreshBudgets: () => Promise<void>;
@@ -51,6 +58,10 @@ interface DashboardState {
   refreshTopCategories: () => Promise<void>;
 
   fetchSavingsGoals: () => Promise<void>;
+  refreshSavingsGoals: () => Promise<void>;
+
+  fetchTransactions: () => Promise<void>;
+  refreshTransactions: () => Promise<void>;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -218,5 +229,38 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     } finally {
       set({ goalsLoading: false });
     }
+  },
+
+  refreshSavingsGoals: async () => {
+    await get().fetchSavingsGoals();
+  },
+
+  // Transactions
+  transactions: [],
+  transactionLoading: true,
+  transactionError: null,
+
+  fetchTransactions: async () => {
+    try {
+      set({ transactionLoading: true });
+      const res = await getRecentTransactions();
+
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+
+      set({ transactions: res.data ?? [] });
+    } catch (err: any) {
+      console.error("Error fetching recent transactions:", err);
+      set({
+        transactionError: "Unexpected error fetching recent transactions.",
+      });
+    } finally {
+      set({ transactionLoading: false });
+    }
+  },
+
+  refreshTransactions: async () => {
+    await get().fetchTransactions();
   },
 }));

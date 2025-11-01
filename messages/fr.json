@@ -200,6 +200,8 @@
                 "title": "Échéances à venir (Répétitif)",
                 "last-transaction": "Dernières transactions",
                 "button": "Prochains 14 jours",
+                "loading": "Chargement...",
+                "no-transactions": "Aucune transaction récente",
                 "table-data": {
                     "table-heading": {
                         "date": "DATE",

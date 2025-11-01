@@ -44,6 +44,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import AddCategory from "@/app/me/dashboard/_components/add-category-dialog";
+import { useDashboardStore } from "@/store/dashboard-store";
 
 export default function TransactionDialog() {
   const [open, setOpen] = useState<boolean>(false);
@@ -51,6 +52,8 @@ export default function TransactionDialog() {
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { refreshTransactions } = useDashboardStore();
 
   const form = useForm<TransactionDialogValues>({
     resolver: zodResolver(TransactionDialogSchema) as any,
@@ -94,6 +97,7 @@ export default function TransactionDialog() {
       form.reset();
       setSelectedCategory(null);
       setCategories([]);
+      refreshTransactions()
 
       setOpen(false);
     } catch (err: any) {

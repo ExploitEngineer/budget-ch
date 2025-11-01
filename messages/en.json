@@ -199,6 +199,8 @@
                 "title": "Upcoming Due (Recurring)",
                 "last-transaction": "Last Transactions",
                 "button": "Next 14 Days",
+                "loading": "loading...",
+                "no-transactions": "No recent transactions",
                 "table-data": {
                     "table-heading": {
                         "date": "DATE",

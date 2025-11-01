@@ -200,6 +200,8 @@
                 "title": "Scadenze imminenti (Ricorrenti)",
                 "last-transaction": "Ultime transazioni",
                 "button": "Prossimi 14 giorni",
+                "loading": "Caricamento...",
+                "no-transactions": "Nessuna transazione recente",
                 "table-data": {
                     "table-heading": {
                         "date": "DATA",

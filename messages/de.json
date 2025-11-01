@@ -200,6 +200,8 @@
                 "title": "Bevorstehende Fälligkeiten (Wiederkehrend)",
                 "last-transaction": "Letzte Transaktionen",
                 "button": "Nächste 14 Tage",
+                "loading": "Wird geladen...",
+                "no-transactions": "Keine aktuellen Transaktionen",
                 "table-data": {
                     "table-heading": {
                         "date": "DATUM",

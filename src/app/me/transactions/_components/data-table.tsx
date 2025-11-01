@@ -32,17 +32,7 @@ import {
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
 import TransactionEditDialog from "./transactions-edit-dialog";
-import type { AccountType } from "@/db/queries";
-
-export interface Transaction {
-  id: string;
-  date: string;
-  source: string;
-  accountType: AccountType;
-  category: string;
-  note: string | null;
-  amount: number;
-}
+import type { Transaction } from "@/lib/types/dashboard-types";
 
 interface DataTableProps {
   transactions: Transaction[];
@@ -88,7 +78,7 @@ export function DataTable({ transactions }: DataTableProps) {
     {
       accessorKey: "source",
       header: t("data-table.headings.recipient"),
-      cell: ({ row }) => row.original.source || "—",
+      cell: ({ row }) => row.original.recipient || "—",
     },
     {
       accessorKey: "accountType",
@@ -143,7 +133,7 @@ export function DataTable({ transactions }: DataTableProps) {
             transaction={{
               id: transaction.id,
               date: transaction.date,
-              source: transaction.source,
+              source: transaction.recipient,
               accountType: transaction.accountType,
               category: transaction.category,
               note: transaction.note || "",
