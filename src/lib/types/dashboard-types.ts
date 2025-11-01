@@ -3,3 +3,9 @@ export type DashboardCards = {
   content: string;
   badge: string;
 };
+
+export type DashboardSavingsGoalsCards = {
+  title: string;
+  content: string;
+  value: number;
+};

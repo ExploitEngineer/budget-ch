@@ -156,17 +156,14 @@
             "cards": {
                 "card-1": {
                     "title": "Total Budget (Month)",
-                    "content": "CHF 4’703",
                     "badge": "Fixed + Variable • incl. CC & SERAFE"
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
-                    "content": "CHF 2’456",
                     "badge": "60% of the budget"
                 },
                 "card-3": {
                     "title": "Available",
-                    "content": "CHF 3’447",
                     "badge": "+40% Buffer"
                 },
                 "card-4": {
@@ -180,38 +177,18 @@
                 "secondary-title": "in CHF"
             },
             "progress-cards": {
-                "title": "Savings Goals",
-                "card-1": {
-                    "title": "Tax Reserves"
-                },
-                "card-2": {
-                    "title": "Emergency Fund"
-                },
-                "card-3": {
-                    "title": "Vacation"
-                }
+                "title": "Savings Goals"
             },
             "line-progress-cards": {
                 "title": "Top Categories (Month)",
                 "button": "All Budgets",
-                "card-1": {
-                    "title": "Groceries"
-                },
-                "card-2": {
-                    "title": "Restaurant & Cafe"
-                },
-                "card-3": {
-                    "title": "Transportation"
-                },
-                "card-4": {
-                    "title": "Household"
-                }
+                "loading": "loading...",
+                "no-categories-found": "No categories found"
             },
             "todos": {
                 "title": "Quick Tasks",
-                "button": "quick done",
                 "placeholder": "Add Task…",
-                "no-tasks": "No tasks yet..",
+                "no-tasks": "No tasks yet...",
                 "created": "Task created successfully!",
                 "updated": "Task updated successfully!",
                 "deleted": "Task deleted successfully!"
@@ -259,43 +236,20 @@
                 }
             },
             "recent-transactions-table": {
-                "title": "Recent Transactions",
                 "button": "Show all",
                 "table-headings": {
                     "date": "Date",
                     "recipient": {
-                        "title": "Recipient",
-                        "data": {
-                            "coop": "Cooperative",
-                            "sbb": "SBB",
-                            "cafe": "Cafe Rome",
-                            "employer": "Employer"
-                        }
+                        "title": "Recipient"
                     },
                     "account": {
-                        "title": "Account",
-                        "data": {
-                            "current-account": "Current account",
-                            "credit-card": "Credit card"
-                        }
+                        "title": "Account"
                     },
                     "category": {
-                        "title": "Category",
-                        "data": {
-                            "groceries": "Groceries",
-                            "transportation": "Transportation",
-                            "restaurant": "Restaurant",
-                            "income": "Income"
-                        }
+                        "title": "Category"
                     },
                     "note": {
-                        "title": "Note",
-                        "data": {
-                            "shopping": "Weekly shopping",
-                            "ga": "GA day pass",
-                            "lunch": "Lunch",
-                            "salary": "Salary"
-                        }
+                        "title": "Note"
                     },
                     "amount": "Amount"
                 }

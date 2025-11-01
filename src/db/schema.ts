@@ -31,6 +31,7 @@ export const BudgetColorMakerType = pgEnum("budgets_type", [
   "orange",
   "red",
 ]);
+
 export type QuickTask = InferModel<typeof quick_tasks>;
 
 /* AUTH SCHEMAS */

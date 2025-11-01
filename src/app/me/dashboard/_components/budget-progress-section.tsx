@@ -9,158 +9,66 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
-import {
-  createTask,
-  getTasks,
-  updateTask,
-  deleteTask,
-} from "@/lib/services/tasks";
-import { toast } from "sonner";
-import { QuickTask } from "@/db/schema";
-import { getTopCategories } from "@/lib/services/budget";
-
-interface ProgressCards {
-  title: string;
-  content: string;
-  value: number;
-}
+import { useDashboardStore } from "@/store/dashboard-store";
+import { useState, useRef, useEffect } from "react";
 
 export function BudgetProgressSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  const [categories, setCategories] = useState<ProgressCards[]>([]);
-  const [tasks, setTasks] = useState<QuickTask[]>([]);
-  const [newTask, setNewTask] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
+  const {
+    tasks,
+    tasksError,
+    tasksLoading,
+    fetchTasks,
+    createNewTask,
+    toggleTask,
+    deleteTaskById,
+    editTaskName,
+    topCategories,
+    fetchTopCategories,
+    categoriesLoading,
+    categoriesError,
+  } = useDashboardStore();
 
-  // Inline edit states
+  const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
-  const [isEditingSave, setIsEditingSave] = useState(false);
   const editInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Load tasks on mount
   useEffect(() => {
-    (async () => {
-      try {
-        setLoading(true);
-        const [taskRes, categoriesRes] = await Promise.all([
-          getTasks(),
-          getTopCategories(),
-        ]);
+    fetchTasks();
+    fetchTopCategories();
+  }, [fetchTasks, fetchTopCategories]);
 
-        if (taskRes.success && taskRes.data) setTasks(taskRes.data);
-
-        if (categoriesRes.success && categoriesRes.data) {
-          setCategories(categoriesRes.data);
-        }
-      } catch (err) {
-        console.error("Failed to fetch top categories:", err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
-
-  // Create new task
-  async function handleAddTask() {
-    if (!newTask.trim()) return;
-    setIsLoading(true);
-
-    const result = await createTask({ name: newTask, checked: false });
-    if (!result.success) {
-      toast.error(result.message);
-      setIsLoading(false);
-      return;
-    }
-
-    const updated = await getTasks();
-    if (updated.success && updated.data) setTasks(updated.data);
+  const handleAddTask = async () => {
+    await createNewTask(newTask);
     setNewTask("");
-    setIsLoading(false);
-    toast.success(t("todos.created"));
-  }
+  };
 
-  // Toggle checkbox
-  async function handleToggle(task: QuickTask) {
-    const result = await updateTask({
-      taskId: task.id,
-      checked: !task.checked,
-    });
-    if (!result.success) {
-      toast.error(result.message);
-      return;
-    }
+  const handleToggle = async (taskId: string, checked: boolean) => {
+    await toggleTask(taskId, checked);
+  };
 
-    setTasks((prev) =>
-      prev.map((t) =>
-        t.id === task.id ? { ...t, checked: !task.checked } : t,
-      ),
-    );
-  }
+  const handleDelete = async (taskId: string) => {
+    await deleteTaskById(taskId);
+  };
 
-  // 🔹 Delete task
-  async function handleDelete(id: string) {
-    const result = await deleteTask(id);
-    if (!result.success) {
-      toast.error(result.message);
-      return;
-    }
-
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-    toast.success(t("todos.deleted"));
-  }
-
-  // Start editing on double click
-  function startEditing(task: QuickTask) {
-    setEditingId(task.id);
-    setEditingText(task.name);
-    // focus next tick
+  const startEditing = (taskId: string, name: string) => {
+    setEditingId(taskId);
+    setEditingText(name);
     setTimeout(() => editInputRef.current?.focus(), 0);
-  }
+  };
 
-  // Save edited title
-  async function saveEdit(taskId: string) {
-    const trimmed = editingText.trim();
-    if (!trimmed) {
-      // don't save empty title, cancel instead
-      setEditingId(null);
-      setEditingText("");
-      return;
-    }
-
-    // If nothing changed just close
-    const current = tasks.find((t) => t.id === taskId);
-    if (!current || current.name === trimmed) {
-      setEditingId(null);
-      setEditingText("");
-      return;
-    }
-
-    setIsEditingSave(true);
-    const result = await updateTask({ taskId, name: trimmed });
-    setIsEditingSave(false);
-
-    if (!result.success) {
-      toast.error(result.message);
-      return;
-    }
-
-    setTasks((prev) =>
-      prev.map((t) => (t.id === taskId ? { ...t, name: trimmed } : t)),
-    );
+  const saveEdit = async (taskId: string) => {
+    await editTaskName(taskId, editingText);
     setEditingId(null);
     setEditingText("");
-    toast.success(t("todos.updated") ?? "Updated");
-  }
+  };
 
-  // Cancel editing (do not persist)
-  function cancelEdit() {
+  const cancelEdit = () => {
     setEditingId(null);
     setEditingText("");
-  }
+  };
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
@@ -176,16 +84,18 @@ export function BudgetProgressSection() {
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <div className="grid grid-cols-2 gap-4 pb-10">
-          {loading ? (
-            <p className="text-muted-foreground absolute left-1/2 -translate-x-1/2 text-center text-sm">
-              Loading ...
+          {categoriesError ? (
+            <p className="px-6 text-sm text-red-500">{categoriesError}</p>
+          ) : topCategories === null || categoriesLoading ? (
+            <p className="text-muted-foreground px-6 text-sm">
+              {t("line-progress-cards.loading")}
             </p>
-          ) : categories.length === 0 ? (
-            <p className="text-muted-foreground absolute left-1/2 -translate-x-1/2 text-center text-sm">
-              No categories found
+          ) : topCategories.length === 0 ? (
+            <p className="text-muted-foreground px-6 text-sm">
+              {t("line-progress-cards.no-categories-found")}
             </p>
           ) : (
-            categories.map((card) => (
+            topCategories.map((card) => (
               <CardContent key={card.title} className="flex flex-col">
                 <div className="mb-3 flex flex-wrap items-center justify-between sm:mb-1">
                   <h3 className="text-sm sm:text-base">{card.title}</h3>
@@ -199,14 +109,13 @@ export function BudgetProgressSection() {
       </Card>
       <Card className="bg-blue-background dark:border-border-blue flex flex-col justify-between lg:col-span-2">
         <div className="flex flex-col gap-4">
-          {/* Header */}
           <CardHeader className="flex items-center justify-between">
             <CardTitle>{t("todos.title")}</CardTitle>
             <Badge
               variant="outline"
               className="bg-badge-background dark:border-border-blue rounded-full px-2 py-1"
             >
-              {tasks.length}
+              {tasks?.length}
             </Badge>
           </CardHeader>
 
@@ -214,7 +123,13 @@ export function BudgetProgressSection() {
 
           {/* Task List */}
           <div className="flex flex-col gap-3 px-6 pb-4">
-            {tasks.length === 0 ? (
+            {tasksError ? (
+              <p className="text-sm text-red-500">{tasksError})</p>
+            ) : tasks === null || tasksLoading ? (
+              <p className="text-muted-foreground text-sm">
+                {t("line-progress-cards.loading")}
+              </p>
+            ) : tasks.length === 0 ? (
               <p className="text-muted-foreground text-sm">
                 {t("todos.no-tasks")}
               </p>
@@ -228,7 +143,11 @@ export function BudgetProgressSection() {
                     <Checkbox
                       className="cursor-pointer"
                       checked={task.checked ?? false}
-                      onCheckedChange={() => handleToggle(task)}
+                      onCheckedChange={() =>
+                        !editingId &&
+                        handleToggle(task.id, !(task.checked ?? false))
+                      }
+                      disabled={!!editingId}
                     />
                     {editingId === task.id ? (
                       <Input
@@ -240,7 +159,6 @@ export function BudgetProgressSection() {
                           if (e.key === "Enter") saveEdit(task.id);
                           if (e.key === "Escape") cancelEdit();
                         }}
-                        disabled={isEditingSave}
                         className="!bg-dark-blue-background dark:border-border-blue w-[220px] text-sm"
                       />
                     ) : (
@@ -248,7 +166,7 @@ export function BudgetProgressSection() {
                         className={`text-sm ${
                           task.checked ? "line-through opacity-70" : ""
                         }`}
-                        onDoubleClick={() => startEditing(task)}
+                        onDoubleClick={() => startEditing(task.id, task.name)}
                         title="Double click to edit"
                       >
                         {task.name}
@@ -276,13 +194,13 @@ export function BudgetProgressSection() {
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
-            disabled={isLoading}
+            disabled={tasksLoading}
             className="!bg-dark-blue-background dark:border-border-blue"
             placeholder={t("todos.placeholder")}
           />
           <Button
             onClick={handleAddTask}
-            disabled={isLoading}
+            disabled={tasksLoading}
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
           >

@@ -157,17 +157,14 @@
             "cards": {
                 "card-1": {
                     "title": "Budget totale (Mese)",
-                    "content": "4’703 franchi svizzeri",
                     "badge": "Fisso + Variabile • incl. CC & SERAFE"
                 },
                 "card-2": {
                     "title": "Spese (Attuali)",
-                    "content": "2’456 franchi svizzeri",
                     "badge": "60% del budget"
                 },
                 "card-3": {
                     "title": "Disponibile",
-                    "content": "3’447 franchi svizzeri",
                     "badge": "+40% margine"
                 },
                 "card-4": {
@@ -181,36 +178,16 @@
                 "secondary-title": "in CHF"
             },
             "progress-cards": {
-                "title": "Obiettivi di risparmio",
-                "card-1": {
-                    "title": "Riserva tasse"
-                },
-                "card-2": {
-                    "title": "Fondo di emergenza"
-                },
-                "card-3": {
-                    "title": "Vacanza"
-                }
+                "title": "Obiettivi di risparmio"
             },
             "line-progress-cards": {
                 "title": "Categorie principali (Mese)",
                 "button": "Tutti i budget",
-                "card-1": {
-                    "title": "Spesa"
-                },
-                "card-2": {
-                    "title": "Ristorante & Café"
-                },
-                "card-3": {
-                    "title": "Trasporti"
-                },
-                "card-4": {
-                    "title": "Casa"
-                }
+                "loading": "Caricamento...",
+                "no-categories-found": "Nessuna categoria trovata"
             },
             "todos": {
                 "title": "Attività rapide",
-                "button": "Fatto rapidamente",
                 "placeholder": "Aggiungi attività…",
                 "no-tasks": "Nessuna attività ancora..",
                 "created": "Attività creata con successo!",
@@ -265,38 +242,16 @@
                 "table-headings": {
                     "date": "Data",
                     "recipient": {
-                        "title": "Destinatario",
-                        "data": {
-                            "coop": "Cooperativa",
-                            "sbb": "SBB",
-                            "cafe": "Caffè Roma",
-                            "employer": "Datore di lavoro"
-                        }
+                        "title": "Destinatario"
                     },
                     "account": {
-                        "title": "Conto",
-                        "data": {
-                            "current-account": "Conto corrente",
-                            "credit-card": "Carta di credito"
-                        }
+                        "title": "Conto"
                     },
                     "category": {
-                        "title": "Categoria",
-                        "data": {
-                            "groceries": "Spesa",
-                            "transportation": "Trasporti",
-                            "restaurant": "Ristorante",
-                            "income": "Entrate"
-                        }
+                        "title": "Categoria"
                     },
                     "note": {
-                        "title": "Nota",
-                        "data": {
-                            "shopping": "Spesa settimanale",
-                            "ga": "Biglietto giornaliero GA",
-                            "lunch": "Pranzo",
-                            "salary": "Stipendio"
-                        }
+                        "title": "Nota"
                     },
                     "amount": "Importo"
                 }

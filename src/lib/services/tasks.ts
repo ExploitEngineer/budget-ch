@@ -23,7 +23,7 @@ export async function createTask({
   return await createTaskDB({ userId, hubId, name, checked });
 }
 
-// READ Task
+// GET Tasks
 export async function getTasks() {
   const hdrs = await headers();
   const { hubId } = await getContext(hdrs, false);

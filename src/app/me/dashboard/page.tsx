@@ -8,8 +8,7 @@ import { BudgetHealthSection } from "./_components/budget-health-section";
 import { useDashboardData } from "./_components/data";
 
 export default function Dashboard() {
-  const { cards, upComingTables, warningCards, healthCards } =
-    useDashboardData();
+  const { upComingTables, warningCards, healthCards } = useDashboardData();
   return (
     <section>
       <div>
@@ -17,7 +16,7 @@ export default function Dashboard() {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <BudgetCardsSection cards={cards} />
+        <BudgetCardsSection />
         <BarChartSection />
         <BudgetProgressSection />
         <WarningSection

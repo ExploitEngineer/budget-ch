@@ -855,7 +855,7 @@ export async function createTaskDB({
   }
 }
 
-// READ Tasks
+// GET Tasks
 export async function getTasksByHubDB(hubId: string): Promise<{
   success: boolean;
   data?: QuickTask[];
@@ -912,86 +912,51 @@ export async function deleteTaskDB(taskId: string) {
   }
 }
 
-// READ Budgets
-export async function getBudgetsDB(hubId: string, limit?: number) {
+// GET Budgets
+export async function getBudgetsDB(
+  hubId: string,
+  fields: Record<string, boolean>,
+  limit?: number,
+) {
   try {
-    const query = db
-      .select({
-        id: budgets.id,
-        category: transaction_categories.name,
-        allocated: budgets.allocatedAmount,
-        spent: budgets.spentAmount,
-      })
+    const allFields = {
+      id: budgets.id,
+      category: transaction_categories.name,
+      allocated: budgets.allocatedAmount,
+      spent: budgets.spentAmount,
+      createdAt: budgets.createdAt,
+    };
+
+    const selectObj: Record<string, any> = {};
+    for (const [key, enabled] of Object.entries(fields)) {
+      if (enabled && allFields[key as keyof typeof allFields]) {
+        selectObj[key] = allFields[key as keyof typeof allFields];
+      }
+    }
+
+    if (Object.keys(selectObj).length === 0)
+      throw new Error("No valid fields requested");
+
+    let query = db
+      .select(selectObj)
       .from(budgets)
       .leftJoin(
         transaction_categories,
         eq(transaction_categories.id, budgets.transactionCategoryId),
       )
-      .leftJoin(
-        transactions,
-        and(
-          eq(transactions.transactionCategoryId, budgets.transactionCategoryId),
-          eq(transactions.hubId, budgets.hubId),
-        ),
-      )
       .where(eq(budgets.hubId, hubId))
-      .groupBy(budgets.id, transaction_categories.name)
       .orderBy(desc(budgets.createdAt));
 
     if (limit) query.limit(limit);
 
-    const data = await query;
+    const results = await query;
 
-    const formatted = data.map((b) => {
-      const allocated = Number(b.allocated) || 0;
-      const spent = Number(b.spent) || 0;
-      const remaining = allocated - spent;
-      const progress =
-        allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0;
-
-      return {
-        id: b.id,
-        category: b.category || "Uncategorized",
-        content: `CHF ${spent.toLocaleString()} / ${allocated.toLocaleString()}`,
-        value: Math.round(progress),
-        remaining,
-        allocated,
-        spent,
-      };
-    });
-
-    return { success: true, data: formatted };
+    return { success: true, data: results };
   } catch (err: any) {
-    console.error("Error fetching budgets table:", err);
+    console.error("Error fetching budgets:", err);
     return {
       success: false,
       message: err.message || "Failed to fetch budgets",
-    };
-  }
-}
-
-// READ Budgets Allocated & Spent Amount
-export async function getBudgetsAmountsDB(hubId: string) {
-  try {
-    const results = await db
-      .select({
-        id: budgets.id,
-        allocatedAmount: budgets.allocatedAmount,
-        spentAmount: budgets.spentAmount,
-      })
-      .from(budgets)
-      .where(eq(budgets.hubId, hubId));
-
-    return {
-      success: true,
-      message: "Susscessfully got budget amounts",
-      data: results,
-    };
-  } catch (err: any) {
-    console.error("Error getting allocated or spent amount", err);
-    return {
-      success: false,
-      message: err.message || "Failed to get budget amounts",
     };
   }
 }

@@ -17,8 +17,14 @@ import type { DashboardCards } from "@/lib/types/dashboard-types";
 export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
 
-  const { allocated, spent, available, loading, error, fetchBudgets } =
-    useDashboardStore();
+  const {
+    allocated,
+    spent,
+    available,
+    budgetLoading,
+    budgetError,
+    fetchBudgets,
+  } = useDashboardStore();
 
   useEffect(() => {
     fetchBudgets();
@@ -60,7 +66,7 @@ export function BudgetCardsSection() {
             </CardHeader>
             <CardContent>
               <h1 className="text-2xl font-bold">
-                {loading ? "..." : error ? "—" : card.content}
+                {budgetLoading ? "..." : budgetError ? "—" : card.content}
               </h1>
             </CardContent>
             <CardFooter className="mt-2">

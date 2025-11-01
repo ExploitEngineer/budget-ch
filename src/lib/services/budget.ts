@@ -3,12 +3,7 @@
 import { createBudgetDB } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
-import {
-  getBudgetsAmountsDB,
-  getBudgetsDB,
-  updateBudgetDB,
-  deleteBudgetDB,
-} from "@/db/queries";
+import { getBudgetsDB, updateBudgetDB, deleteBudgetDB } from "@/db/queries";
 
 export interface BaseBudgetFields {
   categoryName: string;
@@ -81,45 +76,39 @@ export async function getBudgetsAmounts(): Promise<
     const { hubId } = await getContext(hdrs, false);
 
     if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const res = await getBudgetsDB(hubId, { allocated: true, spent: true });
+
+    if (!res.success || !res.data) {
       return {
         success: false,
-        message: "Missing hubId parameter.",
+        message: res.message || "Failed to fetch budgets.",
       };
     }
 
-    const data = await getBudgetsAmountsDB(hubId);
-
-    if (!data.success) {
-      return {
-        success: false,
-        message: data.message || "Failed to fetch budget amounts.",
-      };
-    }
-
-    const budgetsArray = data.data ?? [];
+    const budgetsArray = res.data;
 
     const totalAllocated = budgetsArray.reduce(
-      (acc: number, item): number => acc + (item.allocatedAmount || 0),
+      (acc, item) => acc + (item.allocated ?? 0),
       0,
     );
     const totalSpent = budgetsArray.reduce(
-      (acc: number, item): number => acc + (item.spentAmount || 0),
+      (acc, item) => acc + (item.spent ?? 0),
       0,
     );
 
     return {
       success: true,
       message: "Successfully got total budget amounts",
-      data: {
-        totalAllocated,
-        totalSpent,
-      },
+      data: { totalAllocated, totalSpent },
     };
   } catch (err: any) {
     console.error("Server action error in getBudgetsAmounts:", err);
     return {
       success: false,
-      message: err?.message || "Unexpected server error.",
+      message: err.message || "Unexpected server error.",
     };
   }
 }
@@ -130,58 +119,92 @@ export async function getBudgets(): Promise<BudgetResponse<BudgetRow[]>> {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
 
-    const res = await getBudgetsDB(hubId);
-
-    if (!res.success || !res.data) {
-      return { success: false, message: res.message || "No budgets found" };
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
     }
 
-    const budgetsArray = res.data;
+    const res = await getBudgetsDB(hubId, {
+      id: true,
+      category: true,
+      allocated: true,
+      spent: true,
+    });
 
-    const formattedBudgets: BudgetRow[] = budgetsArray.map((b) => ({
-      id: b.id,
-      category: b.category || "",
-      allocated: b.allocated,
-      spent: b.spent,
-      remaining: b.allocated - b.spent,
-      progress:
-        b.allocated > 0 ? Math.min((b.spent / b.allocated) * 100, 100) : 0,
-    }));
+    if (!res.success || !res.data) {
+      return {
+        success: false,
+        message: res.message || "Failed to fetch budgets.",
+      };
+    }
+
+    const formattedBudgets: BudgetRow[] = res.data.map((b) => {
+      const allocated = Number(b.allocated ?? 0);
+      const spent = Number(b.spent ?? 0);
+
+      return {
+        id: b.id,
+        category: b.category ?? "Uncategorized",
+        allocated,
+        spent,
+        remaining: allocated - spent,
+        progress: allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0,
+      };
+    });
 
     return {
       success: true,
-      message: "Successfully fetched budgets table",
+      message: "Successfully fetched budgets",
       data: formattedBudgets,
     };
   } catch (err: any) {
-    console.error("Server action error in getBudgetsTableAction:", err);
+    console.error("Server action error in getBudgets:", err);
     return {
       success: false,
-      message: err.message || "Unexpected server error",
+      message: err.message || "Unexpected server error.",
     };
   }
 }
 
 // GET Top Categories
-export async function getTopCategories() {
+export async function getTopCategories(): Promise<BudgetResponse<any[]>> {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
 
-    const res = await getBudgetsDB(hubId, 4);
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
 
-    if (!res.success || !res.data) {
+    const res = await getBudgetsDB(
+      hubId,
+      {
+        category: true,
+        allocated: true,
+        spent: true,
+      },
+      4,
+    );
+
+    if (!res.success || !res.data || res.data.length === 0) {
       return { success: false, message: res.message || "No budgets found" };
     }
 
-    const topCategories = res.data.map((b) => ({
-      title: b.category,
-      content: `CHF ${b.spent.toLocaleString()} / ${b.allocated.toLocaleString()}`,
-      value: b.value,
-      remaining: b.remaining,
-    }));
+    const topCategories = res.data.map((b) => {
+      const allocated = Number(b.allocated ?? 0);
+      const spent = Number(b.spent ?? 0);
 
-    return { success: true, data: topCategories };
+      return {
+        title: b.category ?? "Uncategorized",
+        content: `CHF ${spent.toLocaleString()} / ${allocated.toLocaleString()}`,
+        value: allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0,
+      };
+    });
+
+    return {
+      success: true,
+      message: "Top Categories fetched",
+      data: topCategories,
+    };
   } catch (err: any) {
     console.error("Server action error in getTopCategories:", err);
     return {
