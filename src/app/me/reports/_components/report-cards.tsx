@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { getTransactions } from "@/lib/services/transaction";
 import { useTranslations } from "next-intl";
-import type { Transaction } from "@/lib/services/transaction";
+import type { Transaction } from "@/lib/types/dashboard-types";
 
 export function ReportCardsSection() {
   const t = useTranslations("main-dashboard.report-page");

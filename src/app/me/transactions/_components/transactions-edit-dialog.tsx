@@ -52,14 +52,14 @@ import {
   deleteTransaction,
 } from "@/lib/services/transaction";
 import AddCategory from "../../dashboard/_components/add-category-dialog";
-import type { Transaction } from "./data-table";
+import type { Transaction } from "@/lib/types/dashboard-types";
 import { useEffect } from "react";
 import { parse } from "date-fns";
 
 interface TransactionEditDialogProps {
   variant?: "outline" | "default" | "gradient";
   text?: string;
-  transaction?: Transaction;
+  transaction?: Omit<Transaction, "type">;
 }
 
 export default function TransactionEditDialog({
@@ -87,7 +87,7 @@ export default function TransactionEditDialog({
         ? parse(transaction.date, "dd/MM/yyyy", new Date())
         : new Date(),
       account: transaction?.accountType || "savings",
-      recipient: transaction?.source || "",
+      recipient: transaction?.recipient || "",
       category: transaction?.category || "",
       amount: transaction?.amount || 0,
       note: transaction?.note || "",

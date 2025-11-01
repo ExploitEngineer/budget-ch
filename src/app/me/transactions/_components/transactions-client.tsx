@@ -4,7 +4,7 @@ import { useState } from "react";
 import SidebarHeader from "@/components/sidebar-header";
 import { CalculationSection } from "./calculations-section";
 import { DataTable } from "./data-table";
-import type { Transaction } from "./data-table";
+import type { Transaction } from "@/lib/types/dashboard-types";
 import type { CalculationFormValues } from "@/lib/validations/calculation-section-validations";
 
 type TransactionsClientProps = {
@@ -34,7 +34,7 @@ export default function TransactionsClient({
 
       const matchText =
         !filters.text ||
-        tx.source?.toLowerCase().includes(filters.text.toLowerCase()) ||
+        tx.recipient?.toLowerCase().includes(filters.text.toLowerCase()) ||
         tx.note?.toLowerCase().includes(filters.text.toLowerCase());
 
       return (

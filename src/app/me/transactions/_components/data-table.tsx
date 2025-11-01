@@ -51,7 +51,7 @@ export function DataTable({ transactions }: DataTableProps) {
 
   const title = t("transaction-edit-dialog.title-1");
 
-  const columns: ColumnDef<Transaction>[] = [
+  const columns: ColumnDef<Partial<Transaction>>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -131,13 +131,13 @@ export function DataTable({ transactions }: DataTableProps) {
             variant="outline"
             text={title}
             transaction={{
-              id: transaction.id,
-              date: transaction.date,
-              source: transaction.recipient,
-              accountType: transaction.accountType,
-              category: transaction.category,
-              note: transaction.note || "",
-              amount: transaction.amount,
+              id: transaction.id || "",
+              date: transaction.date || "-",
+              recipient: transaction.recipient || "-",
+              accountType: transaction.accountType || "cash",
+              category: transaction.category || "-",
+              note: transaction.note || "-",
+              amount: transaction.amount || 0,
             }}
           />
         );
