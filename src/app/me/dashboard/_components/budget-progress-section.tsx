@@ -124,7 +124,7 @@ export function BudgetProgressSection() {
           {/* Task List */}
           <div className="flex flex-col gap-3 px-6 pb-4">
             {tasksError ? (
-              <p className="text-sm text-red-500">{tasksError})</p>
+              <p className="text-sm text-red-500">{tasksError}</p>
             ) : tasks === null || tasksLoading ? (
               <p className="text-muted-foreground text-sm">
                 {t("line-progress-cards.loading")}

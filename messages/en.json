@@ -177,13 +177,15 @@
                 "secondary-title": "in CHF"
             },
             "progress-cards": {
-                "title": "Savings Goals"
+                "title": "Savings Goals",
+                "loading": "loading...",
+                "no-goals": "No savings goals yet..."
             },
             "line-progress-cards": {
                 "title": "Top Categories (Month)",
                 "button": "All Budgets",
                 "loading": "loading...",
-                "no-categories-found": "No categories found"
+                "no-categories-found": "No categories yet..."
             },
             "todos": {
                 "title": "Quick Tasks",

@@ -178,7 +178,9 @@
                 "secondary-title": "en CHF"
             },
             "progress-cards": {
-                "title": "Objectifs d’épargne"
+                "title": "Objectifs d’épargne",
+                "loading": "Chargement...",
+                "no-goals": "Aucun objectif d’épargne pour le moment..."
             },
             "line-progress-cards": {
                 "title": "Catégories principales (Mois)",

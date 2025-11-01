@@ -9,7 +9,7 @@ import {
   budgets,
   saving_goals,
   quick_tasks,
-  latest_transfers,
+  account_transfers,
 } from "./schema";
 import { eq, desc, and, or } from "drizzle-orm";
 import type { QuickTask } from "./schema";
@@ -150,7 +150,7 @@ interface UpdateSavingGoalArgs {
   };
 }
 
-export type LatestTransferArgs = {
+export type AccountTransferArgs = {
   financialAccountId: string;
   fromAccountType: AccountType;
   toAccountType: AccountType;
@@ -661,7 +661,7 @@ export async function createSavingGoalDB({
   }
 }
 
-// READ Savings Goals
+// GET Savings Goals
 export async function getSavingGoalsDB(
   hubId: string,
   options: GetSavingGoalsOptions = {},
@@ -1091,15 +1091,15 @@ export async function deleteBudgetDB({
   }
 }
 
-// CREATE Latest Transfer
-export async function createLatestTransferDB({
+// CREATE Account Transfer
+export async function createAccountTransferDB({
   financialAccountId,
   fromAccountType,
   toAccountType,
   hubId,
   amount,
   note,
-}: LatestTransferArgs) {
+}: AccountTransferArgs) {
   try {
     const from = await db.query.financial_accounts.findFirst({
       where: (a) => and(eq(a.type, fromAccountType), eq(a.hubId, hubId)),
@@ -1157,7 +1157,7 @@ export async function createLatestTransferDB({
       .where(eq(financial_accounts.id, to.id));
 
     const [transfer] = await db
-      .insert(latest_transfers)
+      .insert(account_transfers)
       .values({
         financialAccountId,
         sourceAccount: from.type,
@@ -1177,8 +1177,8 @@ export async function createLatestTransferDB({
   }
 }
 
-// READ Latest Transfers
-export async function getLatestTransactionsDB(financialAccountId: string) {
+// GET Account Transfers
+export async function getAccountTransfersDB(financialAccountId: string) {
   try {
     const account = await db.query.financial_accounts.findFirst({
       where: eq(financial_accounts.id, financialAccountId),
@@ -1190,14 +1190,14 @@ export async function getLatestTransactionsDB(financialAccountId: string) {
     }
     const results = await db
       .select()
-      .from(latest_transfers)
+      .from(account_transfers)
       .where(
         or(
-          eq(latest_transfers.sourceAccount, account.type),
-          eq(latest_transfers.destinationAccount, account.type),
+          eq(account_transfers.sourceAccount, account.type),
+          eq(account_transfers.destinationAccount, account.type),
         ),
       )
-      .orderBy(desc(latest_transfers.updatedAt));
+      .orderBy(desc(account_transfers.updatedAt));
 
     const formatted = results.map((tx) => ({
       date: tx.updatedAt,

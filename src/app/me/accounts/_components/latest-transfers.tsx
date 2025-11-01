@@ -13,7 +13,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import { getLatestTransactions } from "@/lib/services/latest-transfers";
+import { getAccountTransfers } from "@/lib/services/latest-transfers";
 
 interface TransferData {
   date: string;
@@ -34,7 +34,7 @@ export function LatestTransfers() {
 
   async function fetchTransfers() {
     try {
-      const result = await getLatestTransactions();
+      const result = await getAccountTransfers();
 
       if (!result || !result.status) {
         throw new Error(result?.message || "Unknown error");

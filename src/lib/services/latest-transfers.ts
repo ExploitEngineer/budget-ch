@@ -1,13 +1,13 @@
 "use server";
 
-import { createLatestTransferDB, getLatestTransactionsDB } from "@/db/queries";
-import type { LatestTransferArgs } from "@/db/queries";
+import { createAccountTransferDB, getAccountTransfersDB } from "@/db/queries";
+import type { AccountTransferArgs } from "@/db/queries";
 import { getContext } from "@/lib/auth/actions";
 import { headers } from "next/headers";
 
-// CREATE Latest Transfers [Action]
-export async function createLatestTransfer(
-  payload: Omit<LatestTransferArgs, "hubId" | "financialAccountId">,
+// CREATE Account Transfers [Action]
+export async function createAccountTransfer(
+  payload: Omit<AccountTransferArgs, "hubId" | "financialAccountId">,
 ) {
   const hdrs = await headers();
   const { financialAccountId, hubId } = await getContext(hdrs, true);
@@ -30,7 +30,7 @@ export async function createLatestTransfer(
   if (!payload.amount || payload.amount <= 0)
     return { success: false, message: "Amount must be greater than zero." };
 
-  const result = await createLatestTransferDB({
+  const result = await createAccountTransferDB({
     ...payload,
     financialAccountId,
     hubId,
@@ -39,8 +39,8 @@ export async function createLatestTransfer(
   return result;
 }
 
-// READ Latest Transfers [Action]
-export async function getLatestTransactions() {
+// GET Account Transfers [Action]
+export async function getAccountTransfers() {
   try {
     const hdrs = await headers();
     const { financialAccountId } = await getContext(hdrs, true);
@@ -53,7 +53,7 @@ export async function getLatestTransactions() {
       };
     }
 
-    const result = await getLatestTransactionsDB(financialAccountId);
+    const result = await getAccountTransfersDB(financialAccountId);
 
     return {
       status: result?.status ?? false,

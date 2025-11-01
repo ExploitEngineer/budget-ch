@@ -30,6 +30,9 @@ export function BudgetCardsSection() {
     fetchBudgets();
   }, []);
 
+  const isLoading =
+    budgetLoading || allocated === null || spent === null || available === null;
+
   const cards: DashboardCards[] = [
     {
       title: t("cards.card-1.title"),
@@ -66,7 +69,7 @@ export function BudgetCardsSection() {
             </CardHeader>
             <CardContent>
               <h1 className="text-2xl font-bold">
-                {budgetLoading ? "..." : budgetError ? "—" : card.content}
+                {isLoading ? "..." : budgetError ? "—" : card.content}
               </h1>
             </CardContent>
             <CardFooter className="mt-2">

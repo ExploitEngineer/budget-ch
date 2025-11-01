@@ -87,7 +87,7 @@ export function RecentTransactionsTableSection() {
                 <TableRow className="dark:border-border-blue">
                   {headings.map((heading) => (
                     <TableHead
-                      className="font-bold text-gray-500 dark:text-gray-400/80"
+                      className="font-bold text-gray-500 uppercase dark:text-gray-400/80"
                       key={heading}
                     >
                       {heading}

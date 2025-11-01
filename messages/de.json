@@ -178,7 +178,9 @@
                 "secondary-title": "in CHF"
             },
             "progress-cards": {
-                "title": "Sparziele"
+                "title": "Sparziele",
+                "loading": "Wird geladen...",
+                "no-goals": "Noch keine Sparziele..."
             },
             "line-progress-cards": {
                 "title": "Top Kategorien (Monat)",

@@ -71,7 +71,7 @@ export async function createSavingGoal({
   }
 }
 
-// READ Saving Goals Summary [Action]
+// READ Savings Goals Summary [Action]
 export async function getSavingGoalsSummary(): Promise<
   ActionResponse<SavingGoalsSummary>
 > {
@@ -101,7 +101,7 @@ export async function getSavingGoalsSummary(): Promise<
   }
 }
 
-// READ Saving Goals [Action]
+// GET Savings Goals [Action]
 export async function getSavingGoals(
   limit?: number,
 ): Promise<ActionResponse<SavingGoal[]>> {

@@ -7,8 +7,12 @@ import {
   deleteTask,
 } from "@/lib/services/tasks";
 import type { QuickTask } from "@/db/schema";
-import type { DashboardSavingsGoalsCards } from "@/lib/types/dashboard-types";
+import type {
+  DashboardSavingsGoalsCards,
+  DashboardSavingsGoals,
+} from "@/lib/types/dashboard-types";
 import { toast } from "sonner";
+import { getSavingGoals } from "@/lib/services/saving-goal";
 
 interface DashboardState {
   // Budgets totals
@@ -28,6 +32,11 @@ interface DashboardState {
   categoriesLoading: boolean;
   categoriesError: string | null;
 
+  // Savings Goals
+  savingGoals: DashboardSavingsGoals[] | null;
+  goalsLoading: boolean;
+  goalsError: string | null;
+
   // Actions
   fetchBudgets: () => Promise<void>;
   refreshBudgets: () => Promise<void>;
@@ -40,6 +49,8 @@ interface DashboardState {
 
   fetchTopCategories: () => Promise<void>;
   refreshTopCategories: () => Promise<void>;
+
+  fetchSavingsGoals: () => Promise<void>;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -185,5 +196,27 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   refreshTopCategories: async () => {
     await get().fetchTopCategories();
+  },
+
+  // Saving Goals
+  savingGoals: [],
+  goalsLoading: true,
+  goalsError: null,
+
+  fetchSavingsGoals: async () => {
+    try {
+      set({ goalsLoading: true, goalsError: null });
+      const res = await getSavingGoals(3);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch savings goals");
+      }
+
+      set({ savingGoals: res.data ?? [] });
+    } catch (err: any) {
+      console.error("Error fetching latest saving goals:", err);
+      set({ goalsError: "Failed to load Savings Goals" });
+    } finally {
+      set({ goalsLoading: false });
+    }
   },
 }));

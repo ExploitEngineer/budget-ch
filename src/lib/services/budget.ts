@@ -185,7 +185,7 @@ export async function getTopCategories(): Promise<BudgetResponse<any[]>> {
       4,
     );
 
-    if (!res.success || !res.data || res.data.length === 0) {
+    if (!res.success || !res.data) {
       return { success: false, message: res.message || "No budgets found" };
     }
 

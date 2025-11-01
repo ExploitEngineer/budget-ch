@@ -178,7 +178,9 @@
                 "secondary-title": "in CHF"
             },
             "progress-cards": {
-                "title": "Obiettivi di risparmio"
+                "title": "Obiettivi di risparmio",
+                "loading": "Caricamento...",
+                "no-goals": "Nessun obiettivo di risparmio ancora..."
             },
             "line-progress-cards": {
                 "title": "Categorie principali (Mese)",

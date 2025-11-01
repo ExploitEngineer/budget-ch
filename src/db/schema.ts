@@ -202,7 +202,7 @@ export const saving_goals = pgTable("saving_goals", {
     .notNull(),
 });
 
-export const quick_tasks = pgTable("quick_taks", {
+export const quick_tasks = pgTable("quick_tasks", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   userId: text("user_id")
     .notNull()
@@ -251,7 +251,7 @@ export const verifications = pgTable("verifications", {
     .notNull(),
 });
 
-export const latest_transfers = pgTable("latest_transfers", {
+export const account_transfers = pgTable("account_transfers", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   financialAccountId: uuid("financial_account_id")
     .notNull()

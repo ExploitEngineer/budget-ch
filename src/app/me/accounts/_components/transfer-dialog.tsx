@@ -39,7 +39,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { createLatestTransfer } from "@/lib/services/latest-transfers";
+import { createAccountTransfer } from "@/lib/services/latest-transfers";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
@@ -73,7 +73,7 @@ export default function TransferDialog() {
 
     setIsTransferringAmount(true);
     try {
-      const res = await createLatestTransfer({
+      const res = await createAccountTransfer({
         fromAccountType: values.from,
         toAccountType: values.to,
         amount: Number(values.amount),
