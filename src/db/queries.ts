@@ -380,9 +380,12 @@ export async function createTransactionDB({
     });
 
     return { success: true, message: "Transaction created successfully" };
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error creating Transaction ", err);
-    return { success: false, message: "Failed to create transaction" };
+    return {
+      success: false,
+      message: err.message || "Failed to create transaction",
+    };
   }
 }
 
@@ -504,16 +507,24 @@ export async function deleteTransactionDB({
   try {
     const tx = await db.query.transactions.findFirst({
       where: (tx) => eq(tx.id, transactionId),
-      columns: { hubId: true },
+      columns: { hubId: true, transactionCategoryId: true },
     });
 
     if (!tx) return { success: false, message: "Transaction not found" };
     if (tx.hubId !== hubId) return { success: false, message: "Access denied" };
 
+    const categoryId = tx.transactionCategoryId;
+
     const deleted = await db
       .delete(transactions)
       .where(eq(transactions.id, transactionId))
       .returning();
+
+    if (categoryId) {
+      await db
+        .delete(transaction_categories)
+        .where(eq(transaction_categories.id, categoryId));
+    }
 
     return { success: true, data: deleted[0] };
   } catch (err: any) {
@@ -1045,17 +1056,25 @@ export async function deleteBudgetDB({
   try {
     const budget = await db.query.budgets.findFirst({
       where: (b) => eq(b.id, budgetId),
-      columns: { hubId: true },
+      columns: { hubId: true, transactionCategoryId: true },
     });
 
     if (!budget) return { success: false, message: "Budget not found." };
     if (budget.hubId !== hubId)
       return { success: false, message: "Access denied." };
 
+    const categoryId = budget.transactionCategoryId;
+
     const deleted = await db
       .delete(budgets)
       .where(eq(budgets.id, budgetId))
       .returning();
+
+    if (categoryId) {
+      await db
+        .delete(transaction_categories)
+        .where(eq(transaction_categories.id, categoryId));
+    }
 
     return {
       success: true,

@@ -46,21 +46,19 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
       });
 
       if (!result.success) {
-        const errorMessage =
-          result.reason === "CATEGORY_ALREADY_EXISTS"
-            ? "This category already exists. Transaction not created!"
-            : result.reason === "NO_ACCOUNT"
-              ? "Please create a financial account first!"
-              : result.message || "Failed to create transaction.";
+        if (result.reason === "NO_ACCOUNT") {
+          toast.error("Please create a financial account first!");
+          throw new Error("Please create a financial account first!");
+        }
+        const errorMessage = result.message || "Failed to create transaction.";
         toast.error(errorMessage);
-        const error = new Error(errorMessage);
-        throw error;
+        throw new Error(errorMessage);
       }
 
       await useDashboardStore.getState().refreshTransactions();
       toast.success("Transaction created successfully!");
     } catch (err: any) {
-      if (!err.message?.includes("category already exists") &&
+      if (!err.message?.includes("already exists") &&
           !err.message?.includes("financial account") &&
           !err.message?.includes("Failed to create transaction")) {
         console.error("Error creating transaction:", err);

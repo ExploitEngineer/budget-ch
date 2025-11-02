@@ -45,17 +45,13 @@ export async function createTransaction({
     const existingCategory = await db.query.transaction_categories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
-          eq(categories.hubId, hubId),
           sql`LOWER(${categories.name}) = ${normalizedName}`,
+          eq(categories.hubId, hubId),
         ),
     });
 
     if (existingCategory) {
-      return {
-        success: false,
-        reason: "CATEGORY_ALREADY_EXISTS",
-        message: `Category "${normalizedName}" already exists. Transaction not created.`,
-      };
+      throw new Error(`Category "${normalizedName}" already exists`);
     }
 
     const [newCategory] = await db
@@ -79,9 +75,12 @@ export async function createTransaction({
     });
 
     return { success: true };
-  } catch (err) {
+  } catch (err: any) {
     console.error("Error in CreateTransaction:", err);
-    return { success: false, message: "Failed to create transaction" };
+    return {
+      success: false,
+      message: err.message || "Failed to create transaction",
+    };
   }
 }
 
