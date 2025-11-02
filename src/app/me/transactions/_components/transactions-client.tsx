@@ -1,23 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SidebarHeader from "@/components/sidebar-header";
 import { CalculationSection } from "./calculations-section";
 import { DataTable } from "./data-table";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import type { CalculationFormValues } from "@/lib/validations/calculation-section-validations";
+import { useDashboardStore } from "@/store/dashboard-store";
 
-type TransactionsClientProps = {
-  transactions: Transaction[];
-};
+export default function TransactionsClient() {
+  const {
+    transactions,
+    transactionLoading,
+    transactionError,
+    fetchTransactions,
+  } = useDashboardStore();
 
-export default function TransactionsClient({
-  transactions,
-}: TransactionsClientProps) {
-  const [filtered, setFiltered] = useState(transactions);
+  const [filtered, setFiltered] = useState<Omit<Transaction, "type">[]>([]);
+
+  useEffect(() => {
+    fetchTransactions?.();
+  }, [fetchTransactions]);
+
+  useEffect(() => {
+    const sanitized = (transactions ?? []).map(
+      ({ type, ...rest }) => rest,
+    ) as Omit<Transaction, "type">[];
+    setFiltered(sanitized);
+  }, [transactions]);
 
   const handleFilter = (filters: CalculationFormValues) => {
-    const filteredData = transactions.filter((tx) => {
+    const sanitized = (transactions ?? []).map(
+      ({ type, ...rest }) => rest,
+    ) as Omit<Transaction, "type">[];
+
+    const filteredData = sanitized.filter((tx) => {
       const matchDate =
         (!filters.dateFrom ||
           new Date(tx.date) >= new Date(filters.dateFrom)) &&
@@ -51,9 +68,20 @@ export default function TransactionsClient({
       <div className="flex flex-1 flex-col gap-4 p-4">
         <CalculationSection
           onFilter={handleFilter}
-          onReset={() => setFiltered(transactions)}
+          onReset={() =>
+            setFiltered(
+              (transactions ?? []).map(({ type, ...rest }) => rest) as Omit<
+                Transaction,
+                "type"
+              >[],
+            )
+          }
         />
-        <DataTable transactions={filtered} />
+        <DataTable
+          transactions={filtered}
+          loading={transactionLoading}
+          error={transactionError}
+        />
       </div>
     </section>
   );

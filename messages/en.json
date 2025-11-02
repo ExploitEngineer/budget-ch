@@ -278,6 +278,8 @@
             }
         },
         "transactions-page": {
+            "loading": "loading...",
+            "no-transactions": "No transactions yet",
             "transaction-edit-dialog": {
                 "title-1": "Edit",
                 "title-2": "New Transaction",

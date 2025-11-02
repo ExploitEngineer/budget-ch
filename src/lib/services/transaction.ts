@@ -182,8 +182,6 @@ export async function getRecentTransactions() {
       };
     }
 
-    console.log("data which i'm getting in server action:", res.data);
-
     const transactions = res.data.map((tx: any) => ({
       id: tx.id,
       date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
@@ -193,8 +191,6 @@ export async function getRecentTransactions() {
       note: tx.note ?? null,
       amount: tx.amount ?? 0,
     }));
-
-    console.log("Data after filtration:", transactions);
 
     return { success: true, data: transactions };
   } catch (err: any) {

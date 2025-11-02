@@ -45,9 +45,8 @@ import {
   TransactionDialogValues,
   TransactionDialogSchema,
 } from "@/lib/validations/transaction-dialog-validations";
-import { createTransaction } from "@/lib/services/transaction";
-import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
+import { useTransactionStore } from "@/store/transaction-store";
 
 export default function CreateTransactionDialog({
   variant,
@@ -57,10 +56,11 @@ export default function CreateTransactionDialog({
   text?: string;
 }) {
   const [open, setOpen] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  const { createTransactionAndSync, createLoading } = useTransactionStore();
 
   const t = useTranslations(
     "main-dashboard.transactions-page.transaction-edit-dialog",
@@ -80,10 +80,9 @@ export default function CreateTransactionDialog({
   });
 
   async function onSubmit(values: TransactionDialogValues) {
-    setIsLoading(true);
     try {
-      const result = await createTransaction({
-        categoryName: values.category.trim(),
+      await createTransactionAndSync({
+        category: values.category.trim(),
         amount: values.amount,
         note: values.note,
         source: values.recipient,
@@ -91,28 +90,12 @@ export default function CreateTransactionDialog({
         accountType: values.account,
       });
 
-      if (!result.success) {
-        if (result.reason === "CATEGORY_ALREADY_EXISTS") {
-          toast.error("This category already exists. Transaction not created!");
-        } else if (result.reason === "NO_ACCOUNT") {
-          toast.error("Please create a financial account first!");
-        } else {
-          toast.error(result.message || "Failed to create transaction.");
-        }
-        return;
-      }
-
-      toast.success("Transaction and category created successfully!");
       form.reset();
       setSelectedCategory(null);
       setCategories([]);
-
       setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error("Something went wrong while creating the transaction.");
-    } finally {
-      setIsLoading(false);
+      console.error("Error submitting form:", err);
     }
   }
 
@@ -531,10 +514,10 @@ export default function CreateTransactionDialog({
                   </Button>
                   <Button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={createLoading}
                     className="cursor-pointer"
                   >
-                    {isLoading ? <Spinner /> : t("dialog.buttons.save")}
+                    {createLoading ? <Spinner /> : t("dialog.buttons.save")}
                   </Button>
                 </div>
               </form>

@@ -35,10 +35,12 @@ import TransactionEditDialog from "./transactions-edit-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
 
 interface DataTableProps {
-  transactions: Transaction[];
+  transactions: Omit<Transaction, "type">[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-export function DataTable({ transactions }: DataTableProps) {
+export function DataTable({ transactions, loading, error }: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
@@ -51,7 +53,7 @@ export function DataTable({ transactions }: DataTableProps) {
 
   const title = t("transaction-edit-dialog.title-1");
 
-  const columns: ColumnDef<Partial<Transaction>>[] = [
+  const columns: ColumnDef<Omit<Transaction, "type">>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -162,6 +164,32 @@ export function DataTable({ transactions }: DataTableProps) {
     onRowSelectionChange: setRowSelection,
     state: { sorting, columnFilters, columnVisibility, rowSelection },
   });
+
+  if (loading) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
+        <p className="text-gray-500 dark:text-gray-400">{t("loading")}</p>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
+        <p className="text-red-500">{error}</p>
+      </Card>
+    );
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
+        <p className="text-gray-500 dark:text-gray-400">
+          {t("no-transactions")}
+        </p>
+      </Card>
+    );
+  }
 
   return (
     <section className="grid auto-rows-min grid-cols-6">

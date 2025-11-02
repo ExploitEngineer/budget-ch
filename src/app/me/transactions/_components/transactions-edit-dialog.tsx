@@ -46,15 +46,11 @@ import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import {
-  createTransaction,
-  updateTransaction,
-  deleteTransaction,
-} from "@/lib/services/transaction";
 import AddCategory from "../../dashboard/_components/add-category-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import { useEffect } from "react";
 import { parse } from "date-fns";
+import { useTransactionStore } from "@/store/transaction-store";
 
 interface TransactionEditDialogProps {
   variant?: "outline" | "default" | "gradient";
@@ -67,11 +63,18 @@ export default function TransactionEditDialog({
   text = "Add Transaction",
   transaction,
 }: TransactionEditDialogProps) {
+  const {
+    createTransactionAndSync,
+    updateTransactionAndSync,
+    deleteTransactionAndSync,
+    createLoading,
+    updateLoading,
+    deleteLoading,
+  } = useTransactionStore();
+
   const [open, setOpen] = useState<boolean>(false);
   const isEditMode = !!transaction;
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -112,44 +115,27 @@ export default function TransactionEditDialog({
   }, [transaction]);
 
   async function onSubmit(values: TransactionDialogValues) {
-    setIsLoading(true);
-    try {
-      let result;
+    const payload = {
+      category: selectedCategory || values.category.trim(),
+      amount: values.amount,
+      note: values.note,
+      source: values.recipient,
+      transactionType: values.transactionType,
+      accountType: values.account,
+    };
 
+    try {
       if (isEditMode) {
         const fd = new FormData();
-        fd.append("source", values.recipient);
-        fd.append("amount", values.amount.toString());
-        fd.append("note", values.note || "");
-        fd.append("addedAt", values.date.toISOString());
-        fd.append("accountType", values.account);
-        fd.append("categoryName", selectedCategory || values.category);
+        Object.entries({
+          ...payload,
+          addedAt: values.date.toISOString(),
+          categoryName: payload.category,
+        }).forEach(([k, v]) => fd.append(k, String(v)));
 
-        result = await updateTransaction(transaction!.id, fd);
+        await updateTransactionAndSync(transaction!.id, fd);
       } else {
-        result = await createTransaction({
-          categoryName: selectedCategory || values.category.trim(),
-          amount: values.amount,
-          note: values.note,
-          source: values.recipient,
-          transactionType: values.transactionType,
-          accountType: values.account,
-        });
-
-        if (!result.success) {
-          if (result.reason === "CATEGORY_ALREADY_EXISTS") {
-            toast.error(
-              "This category already exists. Transaction not created!",
-            );
-          } else if (result.reason === "NO_ACCOUNT") {
-            toast.error("Please create a financial account first!");
-          } else {
-            toast.error(result.message || "Failed to create transaction.");
-          }
-          return;
-        }
-
-        toast.success("Transaction created successfully!");
+        await createTransactionAndSync(payload);
       }
 
       form.reset();
@@ -157,34 +143,20 @@ export default function TransactionEditDialog({
       setCategories([]);
       setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(
-        err.message || "Something went wrong while saving transaction.",
-      );
-    } finally {
-      setIsLoading(false);
+      console.error("Error submitting form:", err);
     }
   }
 
   async function handleDelete() {
-    if (!transaction) return;
-
-    setIsDeleting(true);
+    if (!transaction || !isEditMode) return;
     try {
-      const result = await deleteTransaction(transaction.id);
-      if (!result.success) {
-        toast.error(result.message || "Failed to delete transaction.");
-        return;
-      }
-
-      toast.success("Transaction deleted successfully!");
-      setOpen(false);
+      await deleteTransactionAndSync(transaction.id);
       form.reset();
+      setSelectedCategory(null);
+      setCategories([]);
+      setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Something went wrong while deleting.");
-    } finally {
-      setIsDeleting(false);
+      console.error("Error deleting transaction:", err);
     }
   }
 
@@ -588,21 +560,31 @@ export default function TransactionEditDialog({
 
                 {/* 7️⃣ Buttons */}
                 <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    className="cursor-pointer"
-                    type="button"
-                    disabled={isDeleting}
-                    onClick={handleDelete}
-                  >
-                    {isDeleting ? <Spinner /> : t("dialog.buttons.delete")}
-                  </Button>
+                  {isEditMode && (
+                    <Button
+                      variant="outline"
+                      className="cursor-pointer"
+                      type="button"
+                      disabled={deleteLoading}
+                      onClick={handleDelete}
+                    >
+                      {deleteLoading ? (
+                        <Spinner />
+                      ) : (
+                        t("dialog.buttons.delete")
+                      )}
+                    </Button>
+                  )}
                   <Button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isEditMode ? updateLoading : createLoading}
                     className="cursor-pointer"
                   >
-                    {isLoading ? <Spinner /> : t("dialog.buttons.save")}
+                    {(isEditMode ? updateLoading : createLoading) ? (
+                      <Spinner />
+                    ) : (
+                      t("dialog.buttons.save")
+                    )}
                   </Button>
                 </div>
               </form>

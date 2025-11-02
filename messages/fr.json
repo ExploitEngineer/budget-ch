@@ -280,6 +280,8 @@
             }
         },
         "transactions-page": {
+            "loading": "Chargement...",
+            "no-transactions": "Aucune transaction pour le moment",
             "transaction-edit-dialog": {
                 "title-1": "Modifier",
                 "title-2": "Nouvelle transaction",
