@@ -11,7 +11,7 @@ import {
   quick_tasks,
   account_transfers,
 } from "./schema";
-import { eq, desc, and, or } from "drizzle-orm";
+import { eq, desc, sql, and, or } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 import type {
   CreateBudgetInput,
@@ -1225,6 +1225,78 @@ export async function getAccountTransfersDB(financialAccountId: string) {
       status: false,
       message: err.message || "Failed to fetch latest transfers",
       data: [],
+    };
+  }
+}
+
+export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
+  try {
+    const transactionTotals = db
+      .select({
+        categoryId: transactions.transactionCategoryId,
+        transactionTotal:
+          sql<number>`COALESCE(SUM(${transactions.amount}), 0)`.as(
+            "transactionTotal",
+          ),
+      })
+      .from(transactions)
+      .where(eq(transactions.hubId, hubId))
+      .groupBy(transactions.transactionCategoryId)
+      .as("transactionTotals");
+
+    const budgetTotals = db
+      .select({
+        categoryId: budgets.transactionCategoryId,
+        budgetTotal:
+          sql<number>`COALESCE(SUM(${budgets.allocatedAmount}), 0)`.as(
+            "budgetTotal",
+          ),
+      })
+      .from(budgets)
+      .where(eq(budgets.hubId, hubId))
+      .groupBy(budgets.transactionCategoryId)
+      .as("budgetTotals");
+
+    const result = await db
+      .select({
+        id: transaction_categories.id,
+        name: transaction_categories.name,
+        transactionAmount:
+          sql<number>`COALESCE(${transactionTotals.transactionTotal}, 0)`.as(
+            "transactionAmount",
+          ),
+        budgetAmount: sql<number>`COALESCE(${budgetTotals.budgetTotal}, 0)`.as(
+          "budgetAmount",
+        ),
+        totalAmount: sql<number>`
+          COALESCE(${transactionTotals.transactionTotal}, 0)
+          + COALESCE(${budgetTotals.budgetTotal}, 0)
+        `.as("totalAmount"),
+      })
+      .from(transaction_categories)
+      .leftJoin(
+        transactionTotals,
+        eq(transactionTotals.categoryId, transaction_categories.id),
+      )
+      .leftJoin(
+        budgetTotals,
+        eq(budgetTotals.categoryId, transaction_categories.id),
+      )
+      .where(eq(transaction_categories.hubId, hubId));
+
+    return {
+      success: true,
+      message: "Fetched transaction categories with combined totals",
+      data: result,
+    };
+  } catch (err: any) {
+    console.error(
+      "DB Error: getTransactionCategoriesWithAmountsDB Error:",
+      err,
+    );
+    return {
+      success: false,
+      message: "Failed to fetch transaction categories with amounts",
     };
   }
 }

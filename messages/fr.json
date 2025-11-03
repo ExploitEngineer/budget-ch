@@ -854,6 +854,7 @@
             },
             "detailed-table": {
                 "title": "Tableau détaillé",
+                "loading": "Chargement...",
                 "buttons": {
                     "categories-csv": "CSV catégories",
                     "trend-csv": "CSV tendances"

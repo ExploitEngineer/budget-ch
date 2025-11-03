@@ -1,6 +1,13 @@
 import { create } from "zustand";
 import { getTransactions } from "@/lib/services/transaction";
+import { getDetailedCategories } from "@/lib/services/report";
 import type { Transaction } from "@/lib/types/dashboard-types";
+
+interface CategoryDetail {
+  id: string;
+  name: string;
+  totalAmount: number;
+}
 
 interface ReportState {
   transactions: Transaction[] | null;
@@ -12,8 +19,14 @@ interface ReportState {
   balance: number;
   savingRate: number;
 
+  categories: CategoryDetail[] | null;
+  categoriesTotal: number;
+
   fetchTransactions: () => Promise<void>;
   refreshTransactions: () => Promise<void>;
+
+  fetchCategories: () => Promise<void>;
+  refreshCategories: () => Promise<void>;
 }
 
 export const useReportStore = create<ReportState>((set, get) => ({
@@ -26,15 +39,16 @@ export const useReportStore = create<ReportState>((set, get) => ({
   balance: 0,
   savingRate: 0,
 
+  categories: null,
+  categoriesTotal: 0,
+
   fetchTransactions: async () => {
     try {
       set({ loading: true, error: null });
 
       const res = await getTransactions();
-
-      if (!res.success || !res.data) {
+      if (!res.success || !res.data)
         throw new Error(res.message || "Failed to fetch transactions");
-      }
 
       const transactions = res.data as Transaction[];
 
@@ -66,5 +80,33 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
   refreshTransactions: async () => {
     await get().fetchTransactions();
+  },
+
+  fetchCategories: async () => {
+    try {
+      set({ loading: true, error: null });
+
+      const res = await getDetailedCategories();
+      if (!res.success || !res.data)
+        throw new Error(res.message || "Failed to fetch categories.");
+
+      const total = res.data.reduce(
+        (acc: number, c: CategoryDetail) => acc + c.totalAmount,
+        0,
+      );
+
+      console.log("Data i am returning from store\n", res.data);
+
+      set({ categories: res.data, categoriesTotal: total });
+    } catch (err: any) {
+      console.error("Error fetching categories:", err);
+      set({ error: "Failed to load category data" });
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  refreshCategories: async () => {
+    await get().fetchCategories();
   },
 }));

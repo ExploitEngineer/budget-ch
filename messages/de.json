@@ -832,6 +832,7 @@
             },
             "detailed-table": {
                 "title": "Detaillierte Tabelle",
+                "loading": "Wird geladen...",
                 "buttons": {
                     "categories-csv": "Kategorien CSV",
                     "trend-csv": "Trend CSV"

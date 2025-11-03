@@ -27,7 +27,7 @@ interface TransactionState {
   deleteTransactionAndSync: (id: string) => Promise<void>;
 }
 
-export const useTransactionStore = create<TransactionState>((set, get) => ({
+export const useTransactionStore = create<TransactionState>((set) => ({
   createLoading: false,
   updateLoading: false,
   deleteLoading: false,
@@ -58,9 +58,11 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
       await useDashboardStore.getState().refreshTransactions();
       toast.success("Transaction created successfully!");
     } catch (err: any) {
-      if (!err.message?.includes("already exists") &&
-          !err.message?.includes("financial account") &&
-          !err.message?.includes("Failed to create transaction")) {
+      if (
+        !err.message?.includes("already exists") &&
+        !err.message?.includes("financial account") &&
+        !err.message?.includes("Failed to create transaction")
+      ) {
         console.error("Error creating transaction:", err);
         toast.error("Something went wrong while creating the transaction.");
       }
