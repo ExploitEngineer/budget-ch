@@ -9,8 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { getSavingGoalsSummary } from "@/lib/services/saving-goal";
+import { useEffect } from "react";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 
 interface CardsContent {
   title: string;
@@ -23,53 +23,42 @@ interface SavingCardsSectionProps {
 }
 
 export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
-  const [totalTarget, setTotalTarget] = useState<number | null>(null);
-  const [totalSaved, setTotalSaved] = useState<number | null>(null);
-  const [remainingToSave, setRemainingToSave] = useState<number | null>(null);
-  const [totalGoals, setTotalGoals] = useState<number | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const { summary, summaryLoading, summaryError, fetchSummary } =
+    useSavingGoalStore();
 
   useEffect(() => {
-    const fetchSavingGoalsData = async () => {
-      try {
-        const res = await getSavingGoalsSummary();
-
-        if (!res.success || !res.data) {
-          setError(res.message || "Failed to fetch saving goals summary");
-          return;
-        }
-
-        const { totalTarget, totalSaved, remainingToSave, totalGoals } =
-          res.data;
-
-        setTotalTarget(totalTarget);
-        setTotalSaved(totalSaved);
-        setRemainingToSave(remainingToSave);
-        setTotalGoals(totalGoals);
-      } catch (err: unknown) {
-        console.error("Error fetching saving goals summary:", err);
-        setError("Unexpected error fetching saving goals");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSavingGoalsData();
-  }, []);
+    fetchSummary();
+  }, [fetchSummary]);
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
       {cards.map((card, idx) => {
         let content = card.content;
 
-        if (idx === 0 && totalTarget !== null)
-          content = `CHF ${totalTarget.toLocaleString()}`;
-        if (idx === 1 && totalSaved !== null)
-          content = `CHF ${totalSaved.toLocaleString()}`;
-        if (idx === 2 && remainingToSave !== null)
-          content = `CHF ${remainingToSave.toLocaleString()}`;
-        if (idx === 3 && totalGoals !== null) content = `${totalGoals}`;
+        if (
+          idx === 0 &&
+          summary?.totalTarget !== null &&
+          summary?.totalTarget !== undefined
+        )
+          content = `CHF ${summary.totalTarget.toLocaleString()}`;
+        if (
+          idx === 1 &&
+          summary?.totalSaved !== null &&
+          summary?.totalSaved !== undefined
+        )
+          content = `CHF ${summary.totalSaved.toLocaleString()}`;
+        if (
+          idx === 2 &&
+          summary?.remainingToSave !== null &&
+          summary?.remainingToSave !== undefined
+        )
+          content = `CHF ${summary.remainingToSave.toLocaleString()}`;
+        if (
+          idx === 3 &&
+          summary?.totalGoals !== null &&
+          summary?.totalGoals !== undefined
+        )
+          content = `${summary.totalGoals}`;
 
         return (
           <Card
@@ -81,7 +70,7 @@ export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
             </CardHeader>
             <CardContent>
               <h1 className="text-2xl font-bold">
-                {loading ? "..." : error ? "—" : content}
+                {summaryLoading ? "..." : summaryError ? "—" : content}
               </h1>
             </CardContent>
             <CardFooter className="mt-2">

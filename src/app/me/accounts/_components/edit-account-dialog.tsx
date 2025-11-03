@@ -30,21 +30,17 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import {
-  updateFinancialAccount,
-  deleteFinancialAccount,
-} from "@/lib/services/financial-account";
 import {
   FinancialAccountDialogSchema,
   FinancialAccountDialogValues,
 } from "@/lib/validations/financial-account-dialog-validations";
 import { cn } from "@/lib/utils";
-import type { AccountData } from "./data-table";
+import { useAccountStore } from "@/store/account-store";
+import type { AccountRow } from "@/store/account-store";
 
 interface EditAccountDialogProps {
-  accountData: AccountData;
+  accountData: AccountRow;
   fetchData: () => Promise<void>;
   variant?: "gradient" | "outline";
 }
@@ -58,8 +54,12 @@ export default function EditAccountDialog({
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const {
+    updateAccountAndSync,
+    deleteAccountAndSync,
+    updateLoading,
+    deleteLoading,
+  } = useAccountStore();
   const [open, setOpen] = useState(false);
 
   const form = useForm<FinancialAccountDialogValues>({
@@ -74,42 +74,22 @@ export default function EditAccountDialog({
   });
 
   async function onSubmit(values: FinancialAccountDialogValues) {
-    setIsLoading(true);
     try {
-      const result = await updateFinancialAccount(accountData.id, values);
-
-      if (!result.status) {
-        toast.error(result.message || "Failed to update account");
-        return;
-      }
-
-      toast.success("Account updated successfully");
+      await updateAccountAndSync(accountData.id, values);
       await fetchData();
       setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Something went wrong while updating account");
-    } finally {
-      setIsLoading(false);
+      console.error("Error submitting form:", err);
     }
   }
 
   async function handleDelete() {
-    setIsDeleting(true);
     try {
-      const result = await deleteFinancialAccount(accountData.id);
-      if (!result.status) {
-        toast.error(result.message || "Failed to delete account");
-        return;
-      }
-      toast.success("Account deleted successfully");
+      await deleteAccountAndSync(accountData.id);
       await fetchData();
       setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Error deleting account");
-    } finally {
-      setIsDeleting(false);
+      console.error("Error deleting account:", err);
     }
   }
 
@@ -122,7 +102,7 @@ export default function EditAccountDialog({
             "cursor-pointer text-xs",
             variant === "gradient"
               ? "btn-gradient dark:text-white"
-              : "dark:border-border-blue !bg-dark-blue-background",
+              : "dark:border-border-blue bg-dark-blue-background!",
           )}
         >
           {t("edit")}
@@ -269,16 +249,16 @@ export default function EditAccountDialog({
                 variant="outline"
                 className="cursor-pointer"
                 onClick={handleDelete}
-                disabled={isDeleting}
+                disabled={deleteLoading}
               >
-                {isDeleting ? <Spinner /> : t("delete")}
+                {deleteLoading ? <Spinner /> : t("delete")}
               </Button>
               <Button
                 type="submit"
                 className="cursor-pointer"
-                disabled={isLoading}
+                disabled={updateLoading}
               >
-                {isLoading ? <Spinner /> : t("save")}
+                {updateLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

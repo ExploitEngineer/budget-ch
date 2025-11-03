@@ -10,33 +10,20 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
-import type { AccountData } from "./data-table";
+import { useEffect } from "react";
+import { useAccountStore } from "@/store/account-store";
+import type { AccountRow } from "@/store/account-store";
 
 export function ContentCardsSection() {
   const t = useTranslations("main-dashboard.content-page");
-  const [loading, setLoading] = useState(true);
-  const [accounts, setAccounts] = useState<AccountData[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const { accounts, accountsLoading, accountsError, fetchAccounts } =
+    useAccountStore();
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const { tableData, status } = await getFinancialAccounts();
-        if (!status) throw new Error("Failed to fetch data");
-        setAccounts(tableData);
-      } catch (err) {
-        console.error("Error loading accounts:", err);
-        setError("Failed to load financial account data.");
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
+    fetchAccounts();
+  }, [fetchAccounts]);
 
-  const parsedAccounts = accounts.map((acc) => ({
+  const parsedAccounts = (accounts ?? []).map((acc) => ({
     ...acc,
     numericBalance:
       parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0,
@@ -90,7 +77,11 @@ export function ContentCardsSection() {
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
       {cards.map((card, idx) => {
-        const content = loading ? "..." : error ? "—" : card.content;
+        const content = accountsLoading
+          ? "..."
+          : accountsError
+            ? "—"
+            : card.content;
 
         return (
           <Card
@@ -104,11 +95,11 @@ export function ContentCardsSection() {
               <h1
                 className={cn(
                   "text-2xl font-bold",
-                  loading && "animate-pulse text-gray-400",
-                  error && "text-red-500",
+                  accountsLoading && "text-gray-400",
+                  accountsError && "text-red-500",
                 )}
               >
-                {content}
+                {accountsLoading ? "..." : accountsError ? "—" : content}
               </h1>
             </CardContent>
             <CardFooter className="mt-2">

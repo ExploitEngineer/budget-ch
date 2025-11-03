@@ -593,6 +593,7 @@
                 "title": "Aktive Ziele",
                 "badge": "3 Ziele • Automatische Zuweisung: CHF 700.00",
                 "no-goals": "Keine Sparziele gefunden.",
+                "loading": "Wird geladen...",
                 "buttons": {
                     "due": "Fällig",
                     "progress": "Fortschritt",

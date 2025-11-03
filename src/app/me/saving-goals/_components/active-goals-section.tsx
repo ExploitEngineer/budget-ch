@@ -1,22 +1,28 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import SavingGoalEditDialog from "./saving-goal-edit-dialog";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { getSavingGoals } from "@/lib/services/saving-goal";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { AllocateForm } from "./allocate-form";
-import { getTranslations } from "next-intl/server";
+import { useTranslations } from "next-intl";
+import { useEffect } from "react";
 
-export async function ActiveGoalsSection() {
-  const t = await getTranslations(
+export function ActiveGoalsSection() {
+  const t = useTranslations(
     "main-dashboard.saving-goals-page.active-goals-section",
   );
 
-  const res = await getSavingGoals();
+  const { goals, goalsLoading, goalsError, fetchGoals } = useSavingGoalStore();
 
-  const activeGoalsData =
-    res.success && Array.isArray(res.data) ? res.data : [];
+  useEffect(() => {
+    fetchGoals();
+  }, [fetchGoals]);
+
+  const activeGoalsData = goals ?? [];
 
   return (
     <section>
@@ -63,117 +69,124 @@ export async function ActiveGoalsSection() {
         </CardHeader>
 
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
-          {activeGoalsData.length === 0 && (
+          {goalsError ? (
+            <p className="text-muted-foreground p-4 text-sm">{goalsError}</p>
+          ) : goals === null || goalsLoading ? (
+            <p className="text-muted-foreground p-4 text-sm">{t("loading")}</p>
+          ) : activeGoalsData.length === 0 ? (
             <p className="text-muted-foreground p-4 text-sm">{t("no-goals")}</p>
+          ) : (
+            activeGoalsData.map((goal, idx) => {
+              const remainingCHF = (
+                goal.goalAmount - goal.amountSaved
+              )?.toLocaleString("de-CH", {
+                minimumFractionDigits: 2,
+              });
+              const goalAmountCHF = goal.goalAmount?.toLocaleString("de-CH", {
+                minimumFractionDigits: 2,
+              });
+              const savedCHF = goal.amountSaved?.toLocaleString("de-CH", {
+                minimumFractionDigits: 2,
+              });
+              const monthlyCHF = goal.monthlyAllocation?.toLocaleString(
+                "de-CH",
+                {
+                  minimumFractionDigits: 2,
+                },
+              );
+
+              return (
+                <Card
+                  className="bg-blue-background dark:border-border-blue"
+                  key={idx}
+                >
+                  <CardHeader className="flex items-center justify-between">
+                    <CardTitle>{goal.name}</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
+                      >
+                        {goal.value}%
+                      </Badge>
+                      <SavingGoalEditDialog goalData={goal} />
+                    </div>
+                  </CardHeader>
+
+                  <Separator className="dark:bg-border-blue" />
+
+                  <CardContent className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <h3>{t("cards.tax-reserves.content.goal")}</h3>
+                        <p>CHF {goalAmountCHF}</p>
+                      </div>
+                      <div>
+                        <h3>{t("cards.tax-reserves.content.saved")}</h3>
+                        <p>CHF {savedCHF}</p>
+                      </div>
+                      <div>
+                        <h3>{t("cards.tax-reserves.content.remaining")}</h3>
+                        <p>CHF {remainingCHF}</p>
+                      </div>
+                      <div>
+                        <h3>
+                          {t("cards.tax-reserves.content.monthly-allocated")}
+                        </h3>
+                        <p>CHF {monthlyCHF}</p>
+                      </div>
+                    </div>
+
+                    <Progress value={goal.value} className="mt-2 mb-3" />
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+                      >
+                        {t("cards.tax-reserves.content.account.title")}:{" "}
+                        {goal.accountType || "—"}
+                      </Badge>
+
+                      <Badge
+                        variant="outline"
+                        className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+                      >
+                        {t("cards.tax-reserves.content.auto")}: CHF{" "}
+                        {goal.goalAmount?.toLocaleString("de-CH", {
+                          minimumFractionDigits: 2,
+                        }) ?? "0.00"}
+                      </Badge>
+
+                      <Badge
+                        variant="outline"
+                        className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
+                      >
+                        {t("cards.tax-reserves.content.remaining")}: CHF{" "}
+                        {goal.monthlyAllocation?.toLocaleString("de-CH", {
+                          minimumFractionDigits: 2,
+                        }) ?? "0.00"}
+                      </Badge>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-3">
+                        <AllocateForm
+                          amountSaved={goal.amountSaved || 0}
+                          goalId={goal.id}
+                        />
+                      </div>
+
+                      <p className="text-sm">
+                        {t("cards.tax-reserves.content.new-balance")}:{" "}
+                        <span className="font-bold">CHF {savedCHF ?? "—"}</span>
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
           )}
-
-          {activeGoalsData.map((goal, idx) => {
-            const remainingCHF = (
-              goal.goalAmount - goal.amountSaved
-            )?.toLocaleString("de-CH", {
-              minimumFractionDigits: 2,
-            });
-            const goalAmountCHF = goal.goalAmount?.toLocaleString("de-CH", {
-              minimumFractionDigits: 2,
-            });
-            const savedCHF = goal.amountSaved?.toLocaleString("de-CH", {
-              minimumFractionDigits: 2,
-            });
-            const monthlyCHF = goal.monthlyAllocation?.toLocaleString("de-CH", {
-              minimumFractionDigits: 2,
-            });
-
-            return (
-              <Card
-                className="bg-blue-background dark:border-border-blue"
-                key={idx}
-              >
-                <CardHeader className="flex items-center justify-between">
-                  <CardTitle>{goal.name}</CardTitle>
-                  <div className="flex items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
-                    >
-                      {goal.value}%
-                    </Badge>
-                    <SavingGoalEditDialog goalData={goal} />
-                  </div>
-                </CardHeader>
-
-                <Separator className="dark:bg-border-blue" />
-
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <h3>{t("cards.tax-reserves.content.goal")}</h3>
-                      <p>CHF {goalAmountCHF}</p>
-                    </div>
-                    <div>
-                      <h3>{t("cards.tax-reserves.content.saved")}</h3>
-                      <p>CHF {savedCHF}</p>
-                    </div>
-                    <div>
-                      <h3>{t("cards.tax-reserves.content.remaining")}</h3>
-                      <p>CHF {remainingCHF}</p>
-                    </div>
-                    <div>
-                      <h3>
-                        {t("cards.tax-reserves.content.monthly-allocated")}
-                      </h3>
-                      <p>CHF {monthlyCHF}</p>
-                    </div>
-                  </div>
-
-                  <Progress value={goal.value} className="mt-2 mb-3" />
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Badge
-                      variant="outline"
-                      className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
-                    >
-                      {t("cards.tax-reserves.content.account.title")}:{" "}
-                      {goal.accountType || "—"}
-                    </Badge>
-
-                    <Badge
-                      variant="outline"
-                      className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
-                    >
-                      {t("cards.tax-reserves.content.auto")}: CHF{" "}
-                      {goal.goalAmount?.toLocaleString("de-CH", {
-                        minimumFractionDigits: 2,
-                      }) ?? "0.00"}
-                    </Badge>
-
-                    <Badge
-                      variant="outline"
-                      className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
-                    >
-                      {t("cards.tax-reserves.content.remaining")}: CHF{" "}
-                      {goal.monthlyAllocation?.toLocaleString("de-CH", {
-                        minimumFractionDigits: 2,
-                      }) ?? "0.00"}
-                    </Badge>
-                  </div>
-
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-3">
-                      <AllocateForm
-                        amountSaved={goal.amountSaved || 0}
-                        goalId={goal.id}
-                      />
-                    </div>
-
-                    <p className="text-sm">
-                      {t("cards.tax-reserves.content.new-balance")}:{" "}
-                      <span className="font-bold">CHF {savedCHF ?? "—"}</span>
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
         </CardContent>
       </Card>
     </section>

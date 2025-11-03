@@ -41,8 +41,7 @@ import {
   SavingsGoalDialogValues,
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { toast } from "sonner";
-import { createSavingGoal } from "@/lib/services/saving-goal";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function SavingGoalDialog() {
@@ -50,7 +49,7 @@ export default function SavingGoalDialog() {
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { createGoalAndSync, createLoading } = useSavingGoalStore();
   const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<SavingsGoalDialogValues>({
@@ -66,9 +65,8 @@ export default function SavingGoalDialog() {
   });
 
   async function onSubmit(values: SavingsGoalDialogValues) {
-    setIsLoading(true);
     try {
-      const result = await createSavingGoal({
+      await createGoalAndSync({
         name: values.name,
         goalAmount: values.goalAmount,
         amountSaved: values.savedAmount,
@@ -76,19 +74,10 @@ export default function SavingGoalDialog() {
         accountType: values.account,
       });
 
-      if (!result.success) {
-        toast.error(result.message);
-        return;
-      }
-
-      toast.success("Saving goal created successfully");
       form.reset();
       setOpen(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while creating the Saving goal");
-    } finally {
-      setIsLoading(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
     }
   }
 
@@ -284,10 +273,10 @@ export default function SavingGoalDialog() {
             <div className="flex justify-end pt-4">
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={createLoading}
                 className="cursor-pointer"
               >
-                {isLoading ? <Spinner /> : t("save")}
+                {createLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

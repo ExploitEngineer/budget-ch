@@ -593,6 +593,7 @@
                 "title": "Obiettivi attivi",
                 "badge": "3 obiettivi • Assegnazione automatica: CHF 700.00",
                 "no-goals": "Nessun obiettivo di risparmio trovato.",
+                "loading": "Caricamento...",
                 "buttons": {
                     "due": "Scadenza",
                     "progress": "Progresso",
@@ -735,7 +736,6 @@
                 }
             },
             "data-table": {
-
                 "loading": "Caricamento dei dati...",
                 "title": "Tutte le categorie",
                 "badge": "5 conti • Liquidità CHF 2’620.00",

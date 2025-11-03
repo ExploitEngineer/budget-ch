@@ -32,8 +32,7 @@ import {
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { createBudget } from "@/lib/services/budget";
-import { toast } from "sonner";
+import { useBudgetStore } from "@/store/budget-store";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -48,7 +47,7 @@ export default function BudgetDialog({
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { createBudgetAndSync, createLoading } = useBudgetStore();
   const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<BudgetDialogValues>({
@@ -63,9 +62,8 @@ export default function BudgetDialog({
   });
 
   async function onSubmit(values: BudgetDialogValues) {
-    setIsLoading(true);
     try {
-      const result = await createBudget({
+      await createBudgetAndSync({
         categoryName: values.category,
         allocatedAmount: values.budgetChf,
         spentAmount: values.istChf,
@@ -73,19 +71,10 @@ export default function BudgetDialog({
         markerColor: values.colorMarker.toLowerCase(),
       });
 
-      if (!result.success) {
-        toast.error(result.message);
-        return;
-      }
-
-      toast.success("Budget created successfully");
       form.reset();
       setOpen(false);
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while creating the budget");
-    } finally {
-      setIsLoading(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
     }
   }
 
@@ -261,10 +250,10 @@ export default function BudgetDialog({
               </Button>
               <Button
                 className="cursor-pointer"
-                disabled={isLoading}
+                disabled={createLoading}
                 type="submit"
               >
-                {isLoading ? <Spinner /> : t("save")}
+                {createLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

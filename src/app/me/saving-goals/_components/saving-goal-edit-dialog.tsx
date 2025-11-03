@@ -41,8 +41,7 @@ import {
   SavingsGoalDialogValues,
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { toast } from "sonner";
-import { updateSavingGoal, deleteSavingGoal } from "@/lib/services/saving-goal";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { Spinner } from "@/components/ui/spinner";
 import type { SavingGoal } from "@/db/queries";
 
@@ -55,8 +54,8 @@ export default function SavingGoalEditDialog({
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const { updateGoalAndSync, deleteGoalAndSync, updateLoading, deleteLoading } =
+    useSavingGoalStore();
   const [open, setOpen] = useState(false);
 
   const form = useForm<SavingsGoalDialogValues>({
@@ -72,51 +71,29 @@ export default function SavingGoalEditDialog({
   });
 
   async function onSubmit(values: SavingsGoalDialogValues) {
-    setIsLoading(true);
     try {
-      const res = await updateSavingGoal({
-        goalId: goalData.id,
-        updatedData: {
-          name: values.name,
-          goalAmount: values.goalAmount,
-          amountSaved: values.savedAmount,
-          monthlyAllocation: values.monthlyAllocation,
-          accountType: values.account,
-          dueDate: values.dueDate ?? null,
-        },
+      await updateGoalAndSync(goalData.id, {
+        name: values.name,
+        goalAmount: values.goalAmount,
+        amountSaved: values.savedAmount,
+        monthlyAllocation: values.monthlyAllocation,
+        accountType: values.account,
+        dueDate: values.dueDate ?? null,
       });
 
-      if (!res.success) {
-        toast.error(res.message || "Failed to update saving goal");
-        return;
-      }
-
-      toast.success("Saving goal updated successfully");
       setOpen(false);
       form.reset(values);
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while updating the saving goal");
-    } finally {
-      setIsLoading(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
     }
   }
 
   async function handleDelete() {
-    setIsDeleting(true);
     try {
-      const result = await deleteSavingGoal(goalData.id);
-      if (!result.success) {
-        toast.error(result.message || "Failed to delete saving goal");
-        return;
-      }
-      toast.success("Saving goal deleted successfully");
+      await deleteGoalAndSync(goalData.id);
       setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Error deleting saving goal");
-    } finally {
-      setIsDeleting(false);
+      console.error("Error deleting saving goal:", err);
     }
   }
 
@@ -295,16 +272,16 @@ export default function SavingGoalEditDialog({
                 className="cursor-pointer"
                 variant="outline"
                 onClick={handleDelete}
-                disabled={isDeleting}
+                disabled={deleteLoading}
               >
-                {isDeleting ? <Spinner /> : t("delete")}
+                {deleteLoading ? <Spinner /> : t("delete")}
               </Button>
               <Button
                 type="submit"
                 className="cursor-pointer"
-                disabled={isLoading}
+                disabled={updateLoading}
               >
-                {isLoading ? <Spinner /> : t("save")}
+                {updateLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

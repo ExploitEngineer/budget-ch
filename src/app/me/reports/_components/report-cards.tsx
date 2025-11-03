@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -10,54 +10,25 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { getTransactions } from "@/lib/services/transaction";
+import { useReportStore } from "@/store/report-store";
 import { useTranslations } from "next-intl";
-import type { Transaction } from "@/lib/types/dashboard-types";
 
 export function ReportCardsSection() {
   const t = useTranslations("main-dashboard.report-page");
 
-  const [income, setIncome] = useState(0);
-  const [expense, setExpense] = useState(0);
-  const [balance, setBalance] = useState(0);
-  const [savingRate, setSavingRate] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    income,
+    expense,
+    balance,
+    savingRate,
+    loading,
+    error,
+    fetchTransactions,
+  } = useReportStore();
 
   useEffect(() => {
-    async function fetchTransactions() {
-      try {
-        const res = await getTransactions();
-
-        if (!res.success || !res.data) {
-          throw new Error(res.message || "Failed to fetch transactions");
-        }
-
-        let totalIncome = 0;
-        let totalExpense = 0;
-
-        (res.data as Transaction[]).forEach((tx) => {
-          if (tx.type === "income") totalIncome += tx.amount;
-          else if (tx.type === "expense") totalExpense += tx.amount;
-        });
-
-        const netBalance = totalIncome - totalExpense;
-        const rate = totalIncome > 0 ? (netBalance / totalIncome) * 100 : 0;
-
-        setIncome(totalIncome);
-        setExpense(totalExpense);
-        setBalance(netBalance);
-        setSavingRate(Number(rate.toFixed(1)));
-      } catch (err) {
-        console.error("Error fetching transactions:", err);
-        setError("Failed to load report data");
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions]);
 
   const cards = [
     {

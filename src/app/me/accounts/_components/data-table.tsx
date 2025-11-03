@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import EditAccountDialog from "./edit-account-dialog";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { useAccountStore } from "@/store/account-store";
 
 export interface AccountData {
   id: string;
@@ -29,56 +29,19 @@ export interface AccountData {
 export function ContentDataTable() {
   const t = useTranslations("main-dashboard.content-page.data-table");
 
-  const [accounts, setAccounts] = useState<AccountData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  async function fetchData() {
-    try {
-      const { tableData, status } = await getFinancialAccounts();
-
-      if (!status) throw new Error("Failed to fetch data");
-
-      setAccounts(tableData);
-    } catch (err) {
-      console.error("Error fetching accounts:", err);
-      setError("Failed to load financial account data.");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const {
+    accounts,
+    accountsLoading,
+    accountsError,
+    fetchAccounts,
+    refreshAccounts,
+  } = useAccountStore();
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchAccounts();
+  }, [fetchAccounts]);
 
-  if (loading) {
-    return (
-      <section className="grid auto-rows-min grid-cols-6">
-        <Card className="bg-blue-background dark:border-border-blue col-span-full">
-          <CardHeader>
-            <CardTitle className="text-gray-400">{t("loading")}</CardTitle>
-          </CardHeader>
-        </Card>
-      </section>
-    );
-  }
-
-  if (error) {
-    return (
-      <section className="grid auto-rows-min grid-cols-6">
-        <Card className="bg-blue-background dark:border-border-blue col-span-full">
-          <CardHeader>
-            <CardTitle className="text-red-500">
-              {t("errorMessage") ?? error}
-            </CardTitle>
-          </CardHeader>
-        </Card>
-      </section>
-    );
-  }
-
-  const totalBalance = accounts.reduce((sum, acc) => {
+  const totalBalance = (accounts ?? []).reduce((sum, acc) => {
     const amount =
       parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0;
     return sum + amount;
@@ -137,33 +100,58 @@ export function ContentDataTable() {
             </TableHeader>
 
             <TableBody>
-              {accounts.map((data) => (
-                <TableRow className="dark:border-border-blue" key={data.name}>
-                  <TableCell>{data.name}</TableCell>
-                  <TableCell>{data.type}</TableCell>
-                  <TableCell>{data.iban || data.note}</TableCell>
-                  <TableCell>{data.formattedBalance}</TableCell>
-                  <TableCell>
-                    <EditAccountDialog
-                      variant="outline"
-                      accountData={data}
-                      fetchData={fetchData}
-                    />
+              {accountsError ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-red-500">
+                    {accountsError}
                   </TableCell>
                 </TableRow>
-              ))}
-              <TableRow>
-                <TableCell className="font-bold opacity-60">
-                  {t("total")}
-                </TableCell>
-                <TableCell colSpan={2} />
-                <TableCell className="font-bold opacity-60">
-                  CHF{" "}
-                  {totalBalance.toLocaleString("de-CH", {
-                    minimumFractionDigits: 2,
-                  })}
-                </TableCell>
-              </TableRow>
+              ) : accountsLoading || accounts === null ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    {t("loading")}
+                  </TableCell>
+                </TableRow>
+              ) : accounts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center text-gray-400">
+                    No Accounts Yet
+                  </TableCell>
+                </TableRow>
+              ) : (
+                <>
+                  {accounts.map((data) => (
+                    <TableRow
+                      className="dark:border-border-blue"
+                      key={data.name}
+                    >
+                      <TableCell>{data.name}</TableCell>
+                      <TableCell>{data.type}</TableCell>
+                      <TableCell>{data.iban || data.note}</TableCell>
+                      <TableCell>{data.formattedBalance}</TableCell>
+                      <TableCell>
+                        <EditAccountDialog
+                          variant="outline"
+                          accountData={data}
+                          fetchData={() => refreshAccounts()}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  <TableRow>
+                    <TableCell className="font-bold opacity-60">
+                      {t("total")}
+                    </TableCell>
+                    <TableCell colSpan={2} />
+                    <TableCell className="font-bold opacity-60">
+                      CHF{" "}
+                      {totalBalance.toLocaleString("de-CH", {
+                        minimumFractionDigits: 2,
+                      })}
+                    </TableCell>
+                  </TableRow>
+                </>
+              )}
             </TableBody>
           </Table>
         </CardContent>

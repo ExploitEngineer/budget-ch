@@ -22,60 +22,29 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
 import BudgetEditDialog from "./budget-edit-dialog";
-import { useEffect, useState } from "react";
-import {
-  getBudgets,
-  BudgetRow,
-  getBudgetsAmounts,
-} from "@/lib/services/budget";
+import { useEffect } from "react";
+import { useBudgetStore } from "@/store/budget-store";
 
 interface BudgetDataTableProps {}
 
 export function BudgetDataTable({}: BudgetDataTableProps) {
   const t = useTranslations("main-dashboard.budgets-page");
 
-  const [tableData, setTableData] = useState<BudgetRow[]>([]);
-  const [allocated, setAllocated] = useState<number | null>(null);
-  const [available, setAvailable] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchBudgetData() {
-      try {
-        const budgetRes = await getBudgetsAmounts();
-
-        if (!budgetRes.success) {
-          return;
-        }
-
-        const totalAllocated = budgetRes.data?.totalAllocated ?? 0;
-        const totalSpent = budgetRes.data?.totalSpent ?? 0;
-
-        setAllocated(totalAllocated);
-        setAvailable(totalAllocated - totalSpent);
-      } catch (err: any) {
-        console.error("Error fetching budgets/categories:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchBudgetData();
-  }, []);
-
-  async function fetchBudgets() {
-    setLoading(true);
-    const res = await getBudgets();
-
-    if (res.success && res.data) {
-      setTableData(res.data);
-    }
-    setLoading(false);
-  }
+  const {
+    budgets,
+    budgetsLoading,
+    budgetsError,
+    allocated,
+    available,
+    fetchBudgets,
+    fetchBudgetsAmounts,
+    refreshBudgets,
+  } = useBudgetStore();
 
   useEffect(() => {
     fetchBudgets();
-  }, []);
+    fetchBudgetsAmounts();
+  }, [fetchBudgets, fetchBudgetsAmounts]);
 
   const budgetDataTableHeadings: string[] = [
     t("data-table.headings.category"),
@@ -131,20 +100,26 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {loading ? (
+              {budgetsError ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-red-500">
+                    {budgetsError}
+                  </TableCell>
+                </TableRow>
+              ) : budgetsLoading || budgets === null ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
-              ) : tableData.length === 0 ? (
+              ) : budgets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-gray-400">
                     No Budgets Yet
                   </TableCell>
                 </TableRow>
               ) : (
-                tableData.map((data) => (
+                budgets.map((data) => (
                   <TableRow key={data.id} className="dark:border-border-blue">
                     <TableCell>{data.category}</TableCell>
                     <TableCell>{data.allocated}</TableCell>
@@ -158,7 +133,6 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
                         variant="outline"
                         text="Edit"
                         budget={data}
-                        onUpdated={() => fetchBudgets()}
                       />
                     </TableCell>
                   </TableRow>

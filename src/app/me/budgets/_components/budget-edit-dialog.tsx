@@ -32,12 +32,7 @@ import {
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import {
-  createBudget,
-  updateBudget,
-  deleteBudget,
-} from "@/lib/services/budget";
-import { toast } from "sonner";
+import { useBudgetStore } from "@/store/budget-store";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import type { BudgetRow } from "@/lib/services/budget";
@@ -46,17 +41,23 @@ interface BudgetEditDialogProps {
   variant?: "gradient" | "outline";
   text?: string;
   budget?: BudgetRow;
-  onUpdated?: () => void;
 }
 
 export default function BudgetEditDialog({
   variant = "gradient",
   text,
   budget,
-  onUpdated,
 }: BudgetEditDialogProps) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const {
+    createBudgetAndSync,
+    updateBudgetAndSync,
+    deleteBudgetAndSync,
+    createLoading,
+    updateLoading,
+    deleteLoading,
+  } = useBudgetStore();
+
+  const [open, setOpen] = useState(false);
   const t = useTranslations(
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
@@ -73,76 +74,44 @@ export default function BudgetEditDialog({
   });
 
   async function onSubmit(values: BudgetDialogValues) {
-    setIsLoading(true);
     try {
       if (budget) {
-        const result = await updateBudget({
-          budgetId: budget.id,
-          updatedData: {
-            categoryName: values.category,
-            allocatedAmount: values.budgetChf,
-            spentAmount: values.istChf,
-            warningPercentage: values.warning,
-            markerColor: values.colorMarker.toLowerCase(),
-          },
-        });
-
-        if (!result.success) {
-          toast.error(result.message);
-          return;
-        }
-
-        toast.success("Budget updated successfully");
-        onUpdated?.();
-      } else {
-        const result = await createBudget({
+        await updateBudgetAndSync(budget.id, {
           categoryName: values.category,
           allocatedAmount: values.budgetChf,
           spentAmount: values.istChf,
           warningPercentage: values.warning,
           markerColor: values.colorMarker.toLowerCase(),
         });
-
-        if (!result.success) {
-          toast.error(result.message);
-          return;
-        }
-
-        toast.success("Budget created successfully");
+      } else {
+        await createBudgetAndSync({
+          categoryName: values.category,
+          allocatedAmount: values.budgetChf,
+          spentAmount: values.istChf,
+          warningPercentage: values.warning,
+          markerColor: values.colorMarker.toLowerCase(),
+        });
       }
 
       form.reset();
-    } catch (err) {
-      console.error(err);
-      toast.error("Something went wrong while saving the budget");
-    } finally {
-      setIsLoading(false);
+      setOpen(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
     }
   }
 
   async function handleDelete() {
     if (!budget) return;
-
-    setIsDeleting(true);
     try {
-      const result = await deleteBudget(budget.id);
-      if (!result.success) {
-        toast.error(result.message || "Failed to delete budget.");
-        return;
-      }
-
-      toast.success("Budget deleted successfully.");
-      onUpdated?.();
+      await deleteBudgetAndSync(budget.id);
+      setOpen(false);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Something went wrong while deleting budget.");
-    } finally {
-      setIsDeleting(false);
+      console.error("Error deleting budget:", err);
     }
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="cursor-pointer" asChild>
         <Button
           className={
@@ -307,21 +276,27 @@ export default function BudgetEditDialog({
 
             {/* Footer buttons */}
             <div className="flex justify-end gap-3 pt-4">
+              {budget && (
+                <Button
+                  type="button"
+                  className="cursor-pointer"
+                  variant="outline"
+                  disabled={deleteLoading}
+                  onClick={handleDelete}
+                >
+                  {deleteLoading ? <Spinner /> : t("delete-btn")}
+                </Button>
+              )}
               <Button
-                type="button"
                 className="cursor-pointer"
-                variant="outline"
-                disabled={isDeleting}
-                onClick={handleDelete}
-              >
-                {isDeleting ? <Spinner /> : t("delete-btn")}
-              </Button>
-              <Button
-                className="cursor-pointer"
-                disabled={isLoading}
+                disabled={budget ? updateLoading : createLoading}
                 type="submit"
               >
-                {isLoading ? <Spinner /> : t("save")}
+                {(budget ? updateLoading : createLoading) ? (
+                  <Spinner />
+                ) : (
+                  t("save")
+                )}
               </Button>
             </div>
           </form>

@@ -591,6 +591,7 @@
                 "title": "Active Goals",
                 "badge": "3 Goals • Auto Allocation: CHF 700.00",
                 "no-goals": "No saving goals found.",
+                "loading": "loading...",
                 "buttons": {
                     "due": "Due",
                     "progress": "Progress",
@@ -733,7 +734,7 @@
                 }
             },
             "data-table": {
-                "loading": "Loading Data...",
+                "loading": "Loading...",
                 "title": "All categories",
                 "badge": "5 Konten • Liquid CHF 2’620.00",
                 "buttons": {
@@ -762,6 +763,7 @@
             "latest-tranfers-section": {
                 "title": "Latest transfers",
                 "button": "Export CSV",
+                "no-transfers": "No transfers yet",
                 "data-table": {
                     "headings": {
                         "date": "DATE",

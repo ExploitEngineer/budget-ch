@@ -36,8 +36,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { createFinancialAccount } from "@/lib/services/financial-account";
-import { toast } from "sonner";
+import { useAccountStore } from "@/store/account-store";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function NewAccountDialog({
@@ -49,7 +48,7 @@ export default function NewAccountDialog({
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const { createAccountAndSync, createLoading } = useAccountStore();
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const form = useForm<FinancialAccountDialogValues>({
@@ -64,10 +63,8 @@ export default function NewAccountDialog({
   });
 
   async function onSubmit(values: FinancialAccountDialogValues) {
-    setLoading(true);
-
     try {
-      const result = await createFinancialAccount({
+      await createAccountAndSync({
         name: values.name,
         type: values.type,
         initialBalance: values.balance,
@@ -75,20 +72,10 @@ export default function NewAccountDialog({
         note: values.note,
       });
 
-      if (!result.status) {
-        toast.error(`${result.message} Something went wrong`);
-        return;
-      }
-
-      toast.success(result.message);
-
       form.reset();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(`Failed to create account: ${err.message}`);
-    } finally {
-      setLoading(false);
       setIsOpen(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
     }
   }
 
@@ -247,10 +234,10 @@ export default function NewAccountDialog({
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={createLoading}
                 className="cursor-pointer"
               >
-                {loading ? <Spinner /> : t("save")}
+                {createLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

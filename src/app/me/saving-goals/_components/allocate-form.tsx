@@ -17,8 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { updateSavingGoal } from "@/lib/services/saving-goal";
-import { toast } from "sonner";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { useState } from "react";
 
 type AllocateFormProps = {
@@ -31,7 +30,7 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
     "main-dashboard.saving-goals-page.active-goals-section",
   );
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { updateGoalAndSync, updateLoading } = useSavingGoalStore();
 
   const form = useForm<AllocateAmountValues>({
     resolver: zodResolver(AllocateAmountSchema) as any,
@@ -41,27 +40,16 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
   const handleSubmit = form.handleSubmit(async (values) => {
     if (!values.amount) return;
 
-    setIsLoading(true);
-
     try {
       const newAmount = (amountSaved || 0) + values.amount;
 
-      const res = await updateSavingGoal({
-        goalId,
-        updatedData: { amountSaved: newAmount },
+      await updateGoalAndSync(goalId, {
+        amountSaved: newAmount,
       });
 
-      if (res.success) {
-        toast.success("Updated monthly allocation");
-        form.reset({ amount: undefined });
-      } else {
-        toast.error("Failed to update");
-      }
-    } catch (error) {
-      console.error("Error updating saving goal:", error);
-      toast.error("An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
+      form.reset({ amount: undefined });
+    } catch (err: any) {
+      console.error("Error updating saving goal:", err);
     }
   });
 
@@ -71,10 +59,10 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
         <Button
           variant="outline"
           type="submit"
-          disabled={isLoading}
+          disabled={updateLoading}
           className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-3"
         >
-          {isLoading ? (
+          {updateLoading ? (
             "Updating..."
           ) : (
             <>
@@ -97,7 +85,7 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
                   )} (CHF)`}
                   step={0.5}
                   {...field}
-                  disabled={isLoading}
+                  disabled={updateLoading}
                 />
               </FormControl>
               <FormMessage />
