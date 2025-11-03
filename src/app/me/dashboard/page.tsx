@@ -8,7 +8,7 @@ import { BudgetHealthSection } from "./_components/budget-health-section";
 import { useDashboardData } from "./_components/data";
 
 export default function Dashboard() {
-  const { upComingTables, warningCards, healthCards } = useDashboardData();
+  const { upComingTables, warningCards } = useDashboardData();
   return (
     <section>
       <div>
@@ -24,7 +24,7 @@ export default function Dashboard() {
           upComingTables={upComingTables}
         />
         <RecentTransactionsTableSection />
-        <BudgetHealthSection cards={healthCards} />
+        <BudgetHealthSection />
       </div>
     </section>
   );

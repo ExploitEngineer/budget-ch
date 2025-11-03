@@ -1,10 +1,5 @@
 import { useTranslations } from "next-intl";
 
-interface HealthCards {
-  title: string;
-  value: string;
-}
-
 interface UpComingTables {
   name: string;
   account: string;
@@ -18,12 +13,6 @@ interface WarningCards {
 
 export function useDashboardData() {
   const t = useTranslations("main-dashboard");
-
-  const healthCards: HealthCards[] = [
-    { title: t("dashboard-page.cards.card-1.title"), value: "CHF 4’703" },
-    { title: t("dashboard-page.cards.card-2.title"), value: "CHF 2’456" },
-    { title: t("dashboard-page.cards.card-3.title"), value: "3" },
-  ];
 
   const upComingTables: UpComingTables[] = [
     {
@@ -70,7 +59,6 @@ export function useDashboardData() {
   ];
 
   return {
-    healthCards,
     upComingTables,
     warningCards,
   };
