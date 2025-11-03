@@ -8,6 +8,7 @@ import {
   type BudgetRow,
 } from "@/lib/services/budget";
 import { toast } from "sonner";
+import { getCategoriesCount } from "@/lib/services/category";
 
 interface BudgetState {
   budgets: BudgetRow[] | null;
@@ -20,6 +21,10 @@ interface BudgetState {
   amountsLoading: boolean;
   amountsError: string | null;
 
+  categoriesCount: number | null;
+  categoriesLoading: boolean;
+  categoriesError: string | null;
+
   createLoading: boolean;
   updateLoading: boolean;
   deleteLoading: boolean;
@@ -29,6 +34,9 @@ interface BudgetState {
 
   fetchBudgetsAmounts: () => Promise<void>;
   refreshBudgetsAmounts: () => Promise<void>;
+
+  fetchCategoriesCount: () => Promise<void>;
+  refreshCategoriesCount: () => Promise<void>;
 
   createBudgetAndSync: (data: {
     categoryName: string;
@@ -63,6 +71,10 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   amountsLoading: false,
   amountsError: null,
 
+  categoriesCount: null,
+  categoriesLoading: false,
+  categoriesError: null,
+
   createLoading: false,
   updateLoading: false,
   deleteLoading: false,
@@ -92,16 +104,12 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   fetchBudgetsAmounts: async () => {
     try {
       set({ amountsLoading: true, amountsError: null });
-
       const res = await getBudgetsAmounts();
-
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budget amounts");
       }
-
       const totalAllocated = res.data?.totalAllocated ?? 0;
       const totalSpent = res.data?.totalSpent ?? 0;
-
       set({
         allocated: totalAllocated,
         spent: totalSpent,
@@ -119,20 +127,38 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
     await get().fetchBudgetsAmounts();
   },
 
+  fetchCategoriesCount: async () => {
+    try {
+      set({ categoriesLoading: true, categoriesError: null });
+      const res = await getCategoriesCount();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch categories count");
+      }
+      set({ categoriesCount: Number(res.data?.count ?? 0) });
+    } catch (err: any) {
+      console.error("Error fetching categories count:", err);
+      set({ categoriesError: "Unexpected error fetching category count" });
+    } finally {
+      set({ categoriesLoading: false });
+    }
+  },
+
+  refreshCategoriesCount: async () => {
+    await get().fetchCategoriesCount();
+  },
+
   createBudgetAndSync: async (data) => {
     try {
       set({ createLoading: true });
-
       const result = await createBudget(data);
-
       if (!result.success) {
         const errorMessage = result.message || "Failed to create budget.";
         toast.error(errorMessage);
         throw new Error(errorMessage);
       }
-
       await get().fetchBudgets();
       await get().fetchBudgetsAmounts();
+      await get().fetchCategoriesCount();
       toast.success("Budget created successfully!");
     } catch (err: any) {
       if (
@@ -147,24 +173,21 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       set({ createLoading: false });
     }
   },
-
   updateBudgetAndSync: async (budgetId, updatedData) => {
     try {
       set({ updateLoading: true });
-
       const result = await updateBudget({
         budgetId,
         updatedData,
       });
-
       if (!result.success) {
         const errorMessage = result.message || "Failed to update budget.";
         toast.error(errorMessage);
         throw new Error(errorMessage);
       }
-
       await get().fetchBudgets();
       await get().fetchBudgetsAmounts();
+      await get().fetchCategoriesCount();
       toast.success("Budget updated successfully!");
     } catch (err: any) {
       if (!err.message?.includes("Failed to update budget")) {
@@ -176,21 +199,18 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
       set({ updateLoading: false });
     }
   },
-
   deleteBudgetAndSync: async (budgetId) => {
     try {
       set({ deleteLoading: true });
-
       const result = await deleteBudget(budgetId);
-
       if (!result.success) {
         const errorMessage = result.message || "Failed to delete budget.";
         toast.error(errorMessage);
         throw new Error(errorMessage);
       }
-
       await get().fetchBudgets();
       await get().fetchBudgetsAmounts();
+      await get().fetchCategoriesCount();
       toast.success("Budget deleted successfully!");
     } catch (err: any) {
       if (!err.message?.includes("Failed to delete budget")) {

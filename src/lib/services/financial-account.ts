@@ -76,8 +76,6 @@ export async function updateFinancialAccount(
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
 
-    console.log("UPDATED DATA: ", updatedData);
-
     const result = await updateFinancialAccountDB({
       hubId,
       accountId,

@@ -254,8 +254,6 @@ export async function updateFinancialAccountDB({
       return { success: false, message: "Access denied." };
     }
 
-    console.log("Accont: ", account);
-
     const cleanData = Object.fromEntries(
       Object.entries({
         name: updatedData.name,
@@ -266,15 +264,12 @@ export async function updateFinancialAccountDB({
       }).filter(([_, v]) => v !== undefined),
     );
 
-    console.log("Clean Account: ", cleanData);
-
     const [updatedAccount] = await db
       .update(financial_accounts)
       .set(cleanData)
       .where(eq(financial_accounts.id, accountId))
       .returning();
 
-    console.log("Updated Account DB:", updatedAccount);
     return {
       success: true,
       message: "Financial account updated successfully.",
