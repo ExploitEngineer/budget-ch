@@ -1,5 +1,3 @@
-import { useTranslations } from "next-intl";
-
 export interface TableData {
   month: string;
   income: string;
@@ -8,8 +6,6 @@ export interface TableData {
 }
 
 export function useReportData() {
-  const t = useTranslations("main-dashboard.report-page");
-
   const tableData: TableData[] = [
     {
       month: "Jan",
@@ -85,13 +81,5 @@ export function useReportData() {
     },
   ];
 
-  const detailedTableData: string[] = [
-    t("detailed-table.data-table.data.category.groceries"),
-    t("detailed-table.data-table.data.category.rent"),
-    t("detailed-table.data-table.data.category.restaurant"),
-    t("detailed-table.data-table.data.category.household"),
-    t("detailed-table.data-table.data.category.leisure"),
-  ];
-
-  return { tableData, detailedTableData };
+  return { tableData };
 }
