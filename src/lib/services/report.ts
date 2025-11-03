@@ -2,8 +2,12 @@
 
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
-import { getTransactionCategoriesWithAmountsDB } from "@/db/queries";
+import {
+  getTransactionCategoriesWithAmountsDB,
+  getMonthlyReportDB,
+} from "@/db/queries";
 
+// GET Transaction & Budget Categories with Amount [Action]
 export async function getDetailedCategories() {
   try {
     const hdrs = await headers();
@@ -28,6 +32,38 @@ export async function getDetailedCategories() {
     };
   } catch (err: any) {
     console.error("Server Action Error (getDetailedCategories):", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error.",
+    };
+  }
+}
+
+// GET Monthly Report [Action]
+export async function getMonthlyReportAction() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const res = await getMonthlyReportDB(hubId);
+    if (!res.success || !res.data) {
+      return {
+        success: false,
+        message: res.message || "Failed to fetch monthly reports",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Fetched monthly reports data successfully.",
+      data: res.data,
+    };
+  } catch (err: any) {
+    console.error("Server Action Error (getMonthlyReportAction)");
     return {
       success: false,
       message: err.message || "Unexpected server error.",

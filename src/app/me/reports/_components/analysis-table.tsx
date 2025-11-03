@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -11,8 +13,9 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import type { TableData } from "./data";
 import { useTranslations } from "next-intl";
+import { useReportStore } from "@/store/report-store";
+import { useEffect } from "react";
 
 interface ProgressChart {
   title: string;
@@ -20,12 +23,15 @@ interface ProgressChart {
   value: number;
 }
 
-interface AnalysisTableProps {
-  tableData: TableData[];
-}
-
-export function AnalysisTable({ tableData }: AnalysisTableProps) {
+export function AnalysisTable() {
   const t = useTranslations("main-dashboard.report-page");
+
+  const { monthlyReports, reportsError, fetchMonthlyReports, reportsLoading } =
+    useReportStore();
+
+  useEffect(() => {
+    fetchMonthlyReports();
+  }, []);
 
   const progressChart: ProgressChart[] = [
     {
@@ -141,17 +147,43 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tableData.map((data) => (
-                  <TableRow
-                    className="dark:border-border-blue"
-                    key={data.month}
-                  >
-                    <TableCell>{data.month}</TableCell>
-                    <TableCell>{data.income}</TableCell>
-                    <TableCell>{data.expenses}</TableCell>
-                    <TableCell>{data.balance}</TableCell>
+                {reportsError ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="px-6 text-sm text-red-500">
+                        {reportsError}
+                      </p>
+                    </TableCell>
                   </TableRow>
-                ))}
+                ) : monthlyReports === null || reportsLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="text-muted-foreground px-6 text-sm">
+                        {t("loading")}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                ) : monthlyReports.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="text-muted-foreground px-6 text-sm">
+                        {t("no-reports")}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  monthlyReports.map((row) => (
+                    <TableRow
+                      className="dark:border-border-blue"
+                      key={row.month}
+                    >
+                      <TableCell>{row.month}</TableCell>
+                      <TableCell>{row.income}</TableCell>
+                      <TableCell>{row.expenses}</TableCell>
+                      <TableCell>{row.balance}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

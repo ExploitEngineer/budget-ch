@@ -1,12 +1,22 @@
 import { create } from "zustand";
 import { getTransactions } from "@/lib/services/transaction";
-import { getDetailedCategories } from "@/lib/services/report";
+import {
+  getDetailedCategories,
+  getMonthlyReportAction,
+} from "@/lib/services/report";
 import type { Transaction } from "@/lib/types/dashboard-types";
 
 interface CategoryDetail {
   id: string;
   name: string;
   totalAmount: number;
+}
+
+interface MonthlyReport {
+  month: string;
+  income: number;
+  expenses: number;
+  balance: number;
 }
 
 interface ReportState {
@@ -22,11 +32,17 @@ interface ReportState {
   categories: CategoryDetail[] | null;
   categoriesTotal: number;
 
+  monthlyReports: MonthlyReport[] | null;
+  reportsLoading: boolean;
+  reportsError: string | null;
+
   fetchTransactions: () => Promise<void>;
   refreshTransactions: () => Promise<void>;
 
   fetchCategories: () => Promise<void>;
   refreshCategories: () => Promise<void>;
+
+  fetchMonthlyReports: () => Promise<void>;
 }
 
 export const useReportStore = create<ReportState>((set, get) => ({
@@ -94,9 +110,6 @@ export const useReportStore = create<ReportState>((set, get) => ({
         (acc: number, c: CategoryDetail) => acc + c.totalAmount,
         0,
       );
-
-      console.log("Data i am returning from store\n", res.data);
-
       set({ categories: res.data, categoriesTotal: total });
     } catch (err: any) {
       console.error("Error fetching categories:", err);
@@ -108,5 +121,28 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
   refreshCategories: async () => {
     await get().fetchCategories();
+  },
+
+  monthlyReports: [],
+  reportsLoading: true,
+  reportsError: null,
+
+  fetchMonthlyReports: async () => {
+    try {
+      set({ reportsLoading: true, reportsError: null });
+
+      const res = await getMonthlyReportAction();
+
+      if (!res.success || !res.data)
+        throw new Error(res.message || "Failed to fetch monthly repots.");
+
+
+      set({ monthlyReports: res.data });
+    } catch (err) {
+      console.error("Error fetching monthly reports:", err);
+      set({ reportsError: "Failed to load monthly reports" });
+    } finally {
+      set({ reportsLoading: false });
+    }
   },
 }));

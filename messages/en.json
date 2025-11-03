@@ -776,6 +776,8 @@
             }
         },
         "report-page": {
+            "loading": "loading...",
+            "no-reports": "No monthly reports yet",
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filter",

@@ -322,7 +322,7 @@ export async function deleteFinancialAccountDB({
   }
 }
 
-// READ Financial Account
+// GET Financial Account
 export async function getFinancialAccountsDB(userId: string, hubId: string) {
   try {
     const results = await db
@@ -1229,6 +1229,7 @@ export async function getAccountTransfersDB(financialAccountId: string) {
   }
 }
 
+// GET Transaction & Budget Categories with Amount
 export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
   try {
     const transactionTotals = db
@@ -1298,5 +1299,27 @@ export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
       success: false,
       message: "Failed to fetch transaction categories with amounts",
     };
+  }
+}
+
+// GET Monthly Report
+export async function getMonthlyReportDB(hubId: string) {
+  try {
+    const result = await db
+      .select({
+        month: sql<string>`TO_CHAR(${transactions.addedAt}, 'Month')`,
+        income: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0)`,
+        expenses: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`,
+        balance: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE -${transactions.amount} END), 0)`,
+      })
+      .from(transactions)
+      .where(eq(transactions.hubId, hubId))
+      .groupBy(sql`TO_CHAR(${transactions.addedAt}, 'Month')`)
+      .orderBy(sql`MIN(${transactions.addedAt})`);
+
+    return { success: true, data: result };
+  } catch (err: any) {
+    console.error("DB Error: getMonthlyReportDB:", err);
+    return { success: false, message: err.message };
   }
 }
