@@ -85,7 +85,7 @@ export default function BudgetDialog({
           className={
             variant === "gradient"
               ? "btn-gradient flex items-center gap-2 dark:text-white"
-              : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+              : "bg-dark-blue-background! dark:border-border-blue flex cursor-pointer items-center gap-2"
           }
           variant={variant === "gradient" ? "default" : "outline"}
         >

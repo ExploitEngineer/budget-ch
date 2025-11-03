@@ -6,6 +6,8 @@ import {
   getTransactionsDB,
   updateTransactionDB,
   deleteTransactionDB,
+  getFinancialAccountByType,
+  updateFinancialAccountDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -40,6 +42,28 @@ export async function createTransaction({
       return { success: false, reason: "NO_ACCOUNT" };
     }
 
+    // Balance check and update logic
+    const account = await getFinancialAccountByType(userId, hubId, accountType);
+    if (!account) {
+      throw new Error(`No ${accountType} account found for this user.`);
+    }
+
+    let newBalance = Number(account.initialBalance ?? 0);
+    if (transactionType === "expense") {
+      if (newBalance < amount) {
+        throw new Error("Insufficient funds in selected account type.");
+      }
+      newBalance -= amount;
+    } else if (transactionType === "income") {
+      newBalance += amount;
+    }
+
+    await updateFinancialAccountDB({
+      hubId,
+      accountId: account.id,
+      updatedData: { balance: newBalance },
+    });
+
     const normalizedName = categoryName.trim().toLowerCase();
 
     const existingCategory = await db.query.transaction_categories.findFirst({
@@ -63,7 +87,7 @@ export async function createTransaction({
       .returning({ id: transaction_categories.id });
 
     await createTransactionDB({
-      financialAccountId,
+      financialAccountId: account.id,
       hubId,
       userId,
       transactionCategoryId: newCategory.id,
