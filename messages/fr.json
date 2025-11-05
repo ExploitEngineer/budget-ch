@@ -436,6 +436,8 @@
                 "dialog": {
                     "title": "Nouveau budget",
                     "edit-budget": "Modifier le budget",
+                    "new-category": "Nouvelle catégorie",
+                    "no-category": "Aucune catégorie pour le moment",
                     "button": "Fermer",
                     "labels": {
                         "category": {

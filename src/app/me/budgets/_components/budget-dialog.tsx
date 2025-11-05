@@ -139,7 +139,7 @@ export default function BudgetDialog({
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                    <FormLabel>{t("labels.category.title")}</FormLabel>
                     <FormControl>
                       <Select
                         value={selectedCategory || ""}
@@ -160,13 +160,13 @@ export default function BudgetDialog({
                               className="w-full cursor-pointer justify-center text-sm"
                               onClick={() => setIsAddCategoryOpen(true)}
                             >
-                              + {t("dialog.new-category")}
+                              + {t("new-category")}
                             </Button>
                           </div>
 
                           {categories.length === 0 ? (
                             <SelectItem value="none" disabled>
-                              {t("dialog.no-category")}
+                              {t("no-category")}
                             </SelectItem>
                           ) : (
                             categories.map((category) => (
