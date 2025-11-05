@@ -825,7 +825,9 @@
             },
             "analysis-table-data": {
                 "title": "Analisi",
-                "badge": "Mese scorso: CHF 5’800.00 Entrate • CHF 4’800.00 Spese",
+                "badge-last-month": "Il mese scorso: ",
+                "badge-income": "Entrate • ",
+                "badge-expense": "Spese ",
                 "toggle-groups": {
                     "month": "Mese",
                     "quarter": "Trimestre",

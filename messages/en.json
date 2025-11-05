@@ -824,7 +824,9 @@
             },
             "analysis-table-data": {
                 "title": "Analysis",
-                "badge": "Last month: CHF 5,800.00 Income • CHF 4,800.00 Expenses",
+                "badge-last-month": "Last month: ",
+                "badge-income": "Income • ",
+                "badge-expense": "Expenses ",
                 "toggle-groups": {
                     "month": "Month",
                     "quarter": "Quarter",

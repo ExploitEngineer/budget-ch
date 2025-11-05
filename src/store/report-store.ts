@@ -136,7 +136,6 @@ export const useReportStore = create<ReportState>((set, get) => ({
       if (!res.success || !res.data)
         throw new Error(res.message || "Failed to fetch monthly repots.");
 
-
       set({ monthlyReports: res.data });
     } catch (err) {
       console.error("Error fetching monthly reports:", err);

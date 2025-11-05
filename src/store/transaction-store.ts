@@ -3,6 +3,7 @@ import {
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  deleteAllTransactionsAndCategories,
 } from "@/lib/services/transaction";
 import { toast } from "sonner";
 import type { AccountType } from "@/db/queries";
@@ -21,16 +22,19 @@ interface TransactionState {
   createLoading: boolean;
   updateLoading: boolean;
   deleteLoading: boolean;
+  deleteAllLoading: boolean;
 
   createTransactionAndSync: (data: CreateTransactionProps) => Promise<void>;
   updateTransactionAndSync: (id: string, data: FormData) => Promise<void>;
   deleteTransactionAndSync: (id: string) => Promise<void>;
+  deleteAllTransactionsAndCategoriesAndSync: () => Promise<void>;
 }
 
 export const useTransactionStore = create<TransactionState>((set) => ({
   createLoading: false,
   updateLoading: false,
   deleteLoading: false,
+  deleteAllLoading: false,
 
   createTransactionAndSync: async (data) => {
     try {
@@ -119,6 +123,32 @@ export const useTransactionStore = create<TransactionState>((set) => ({
       throw err;
     } finally {
       set({ deleteLoading: false });
+    }
+  },
+
+  deleteAllTransactionsAndCategoriesAndSync: async () => {
+    try {
+      set({ deleteAllLoading: true });
+
+      const result = await deleteAllTransactionsAndCategories();
+
+      if (!result.success) {
+        const errorMessage =
+          result.message || "Failed to delete all transactions and categories.";
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      await useDashboardStore.getState().refreshTransactions();
+      toast.success("All transactions and related categories deleted!");
+    } catch (err: any) {
+      console.error("Error deleting all transactions and categories:", err);
+      toast.error(
+        "Something went wrong while deleting all transactions and categories.",
+      );
+      throw err;
+    } finally {
+      set({ deleteAllLoading: false });
     }
   },
 }));

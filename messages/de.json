@@ -803,7 +803,9 @@
             },
             "analysis-table-data": {
                 "title": "Analyse",
-                "badge": "Letzter Monat: CHF 5’800.00 Einnahmen • CHF 4’800.00 Ausgaben",
+                "badge-last-month": "Letzter Monat: ",
+                "badge-income": "Einkommen • ",
+                "badge-expense": "Ausgaben ",
                 "toggle-groups": {
                     "month": "Monat",
                     "quarter": "Quartal",

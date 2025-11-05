@@ -11,7 +11,7 @@ import {
   quick_tasks,
   account_transfers,
 } from "./schema";
-import { eq, desc, sql, and, or } from "drizzle-orm";
+import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
 import type { QuickTask } from "./schema";
 import type {
   CreateBudgetInput,
@@ -322,7 +322,7 @@ export async function deleteFinancialAccountDB({
   }
 }
 
-// GET Financial Account
+// READ Financial Account
 export async function getFinancialAccountsDB(userId: string, hubId: string) {
   try {
     const results = await db
@@ -1321,5 +1321,39 @@ export async function getMonthlyReportDB(hubId: string) {
   } catch (err: any) {
     console.error("DB Error: getMonthlyReportDB:", err);
     return { success: false, message: err.message };
+  }
+}
+
+// DELETE ALL Transactions and related Categories
+export async function deleteAllTransactionsAndCategoriesDB(hubId: string) {
+  try {
+    const txs = await db.query.transactions.findMany({
+      where: (tx) => eq(tx.hubId, hubId),
+      columns: { transactionCategoryId: true },
+    });
+
+    const categoryIds = txs
+      .map((tx) => tx.transactionCategoryId)
+      .filter((id): id is string => !!id);
+
+    await db.delete(transactions).where(eq(transactions.hubId, hubId));
+
+    if (categoryIds.length > 0) {
+      await db
+        .delete(transaction_categories)
+        .where(inArray(transaction_categories.id, categoryIds));
+    }
+
+    return {
+      success: true,
+      message: "All transactions and related categories deleted.",
+    };
+  } catch (err: any) {
+    console.error("Error deleting all transactions and categories:", err);
+    return {
+      success: false,
+      message:
+        err.message || "Failed to delete all transactions and categories.",
+    };
   }
 }

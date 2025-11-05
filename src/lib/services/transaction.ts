@@ -8,6 +8,7 @@ import {
   deleteTransactionDB,
   getFinancialAccountByType,
   updateFinancialAccountDB,
+  deleteAllTransactionsAndCategoriesDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -338,6 +339,38 @@ export async function deleteTransaction(transactionId: string) {
     return {
       success: false,
       message: err.message || "Unexpected error while deleting transaction.",
+    };
+  }
+}
+
+// DELETE ALL Transactions and related Categories [Action]
+export async function deleteAllTransactionsAndCategories() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, true);
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const res = await deleteAllTransactionsAndCategoriesDB(hubId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to delete all transactions and categories.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "All transactions and related categories deleted.",
+    };
+  } catch (err: any) {
+    console.error("Error in deleteAllTransactionsAndCategories:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while deleting all transactions and categories.",
     };
   }
 }

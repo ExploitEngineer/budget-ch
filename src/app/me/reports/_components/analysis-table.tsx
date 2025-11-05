@@ -1,5 +1,4 @@
 "use client";
-
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -26,8 +25,14 @@ interface ProgressChart {
 export function AnalysisTable() {
   const t = useTranslations("main-dashboard.report-page");
 
-  const { monthlyReports, reportsError, fetchMonthlyReports, reportsLoading } =
-    useReportStore();
+  const {
+    monthlyReports,
+    reportsError,
+    income,
+    expense,
+    fetchMonthlyReports,
+    reportsLoading,
+  } = useReportStore();
 
   useEffect(() => {
     fetchMonthlyReports();
@@ -83,7 +88,9 @@ export function AnalysisTable() {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2 whitespace-pre-wrap"
               variant="outline"
             >
-              {t("analysis-table-data.badge")}
+              {t("analysis-table-data.badge-last-month")} {income}{" "}
+              {t("analysis-table-data.badge-income")}
+              {expense} {t("analysis-table-data.badge-expense")}
             </Badge>
           </div>
           <ToggleGroup

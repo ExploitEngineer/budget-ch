@@ -33,6 +33,8 @@ import {
 import { useTranslations } from "next-intl";
 import TransactionEditDialog from "./transactions-edit-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
+import { useTransactionStore } from "@/store/transaction-store";
+import { Spinner } from "@/components/ui/spinner";
 
 interface DataTableProps {
   transactions: Omit<Transaction, "type">[];
@@ -50,6 +52,9 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+
+  const { deleteAllTransactionsAndCategoriesAndSync, deleteAllLoading } =
+    useTransactionStore();
 
   const title = t("transaction-edit-dialog.title-1");
 
@@ -216,8 +221,14 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
             <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+              onClick={deleteAllTransactionsAndCategoriesAndSync}
+              disabled={deleteAllLoading}
             >
-              {t("data-table.header.buttons.delete")}
+              {deleteAllLoading ? (
+                <Spinner />
+              ) : (
+                t("data-table.header.buttons.delete")
+              )}
             </Button>
             <Button
               variant="outline"

@@ -825,7 +825,9 @@
             },
             "analysis-table-data": {
                 "title": "Analyse",
-                "badge": "Mois dernier : CHF 5’800.00 Revenus • CHF 4’800.00 Dépenses",
+                "badge-last-month": "Le mois dernier : ",
+                "badge-income": "Revenus • ",
+                "badge-expense": "Dépenses ",
                 "toggle-groups": {
                     "month": "Mois",
                     "quarter": "Trimestre",
