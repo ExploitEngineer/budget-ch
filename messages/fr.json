@@ -161,7 +161,7 @@
                 },
                 "card-2": {
                     "title": "Dépenses (Réelles)",
-                    "badge": "60% du budget"
+                    "badge": "% du budget"
                 },
                 "card-3": {
                     "title": "Disponible",
@@ -265,7 +265,8 @@
                 "secondary-title": "Vue mensuelle",
                 "warning-card": {
                     "title": "SCORE",
-                    "warning": "Avertissement : élevé",
+                    "warning-high": "Avertissement : élevé",
+                    "warning-normal": "Avertissement : normal",
                     "spending": "Rythme de dépenses"
                 },
                 "card-1": {
@@ -468,7 +469,7 @@
                 "card-2": {
                     "title": "Dépensé jusqu'à présent",
                     "content": "CHF 1’915.00",
-                    "badge": "66% du budget"
+                    "badge": "% du budget"
                 },
                 "card-3": {
                     "title": "Disponible",

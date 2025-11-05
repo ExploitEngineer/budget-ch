@@ -256,12 +256,6 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
                 }).format(totalBalance)}
               </span>
             </Badge>
-            <Button
-              variant="outline"
-              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-            >
-              {t("data-table.header.buttons.update")}
-            </Button>
           </div>
         </CardHeader>
 

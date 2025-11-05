@@ -160,7 +160,7 @@
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
-                    "badge": "60% of the budget"
+                    "badge": "% of the budget"
                 },
                 "card-3": {
                     "title": "Available",
@@ -263,7 +263,8 @@
                 "secondary-title": "Monthly overview",
                 "warning-card": {
                     "title": "SCORE",
-                    "warning": "Warning: high",
+                    "warning-high": "Warning: high",
+                    "warning-normal": "Warning: normal",
                     "spending": "Spending pace"
                 },
                 "card-1": {
@@ -466,7 +467,7 @@
                 "card-2": {
                     "title": "Spent so far",
                     "content": "CHF 1’915.00",
-                    "badge": "66% of the budget"
+                    "badge": "% of the budget"
                 },
                 "card-3": {
                     "title": "Available",

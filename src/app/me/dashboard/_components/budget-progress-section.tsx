@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
 import { useDashboardStore } from "@/store/dashboard-store";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link"
 
 export function BudgetProgressSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
@@ -75,12 +76,14 @@ export function BudgetProgressSection() {
       <Card className="bg-blue-background dark:border-border-blue relative lg:col-span-3">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("line-progress-cards.title")}</CardTitle>
+          <Link href="/me/budgets">
           <Button
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
           >
             {t("line-progress-cards.button")}
           </Button>
+          </Link>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <div className="grid grid-cols-2 gap-4 pb-10">

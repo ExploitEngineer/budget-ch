@@ -161,7 +161,7 @@
                 },
                 "card-2": {
                     "title": "Spese (Attuali)",
-                    "badge": "60% del budget"
+                    "badge": "% del budget"
                 },
                 "card-3": {
                     "title": "Disponibile",
@@ -265,7 +265,8 @@
                 "secondary-title": "Panoramica mensile",
                 "warning-card": {
                     "title": "SCORE",
-                    "warning": "Avviso: alto",
+                    "warning-high": "Avviso: alto",
+                    "warning-normal": "Avviso: normale",
                     "spending": "Ritmo di spesa"
                 },
                 "card-1": {
@@ -468,7 +469,7 @@
                 "card-2": {
                     "title": "Speso finora",
                     "content": "CHF 1’915.00",
-                    "badge": "66% del budget"
+                    "badge": "% del budget"
                 },
                 "card-3": {
                     "title": "Disponibile",

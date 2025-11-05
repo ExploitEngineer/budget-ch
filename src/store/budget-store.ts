@@ -18,6 +18,7 @@ interface BudgetState {
   allocated: number | null;
   spent: number | null;
   available: number | null;
+  percent: number;
   amountsLoading: boolean;
   amountsError: string | null;
 
@@ -68,6 +69,7 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
   allocated: null,
   spent: null,
   available: null,
+  percent: 0,
   amountsLoading: false,
   amountsError: null,
 
@@ -114,6 +116,10 @@ export const useBudgetStore = create<BudgetState>((set, get) => ({
         allocated: totalAllocated,
         spent: totalSpent,
         available: totalAllocated - totalSpent,
+        percent:
+          totalAllocated > 0
+            ? Math.min((totalSpent / totalAllocated) * 100, 100)
+            : 0,
       });
     } catch (err: any) {
       console.error("Error fetching budget amounts:", err);

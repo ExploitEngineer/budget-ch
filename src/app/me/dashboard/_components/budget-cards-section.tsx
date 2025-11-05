@@ -21,6 +21,7 @@ export function BudgetCardsSection() {
     allocated,
     spent,
     available,
+    percent,
     budgetLoading,
     budgetError,
     fetchBudgets,
@@ -42,7 +43,7 @@ export function BudgetCardsSection() {
     {
       title: t("cards.card-2.title"),
       content: `CHF ${(spent ?? 0).toLocaleString()}`,
-      badge: t("cards.card-2.badge"),
+      badge: percent + t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),

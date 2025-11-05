@@ -161,7 +161,7 @@
                 },
                 "card-2": {
                     "title": "Ausgaben (Aktuell)",
-                    "badge": "60% des Budgets"
+                    "badge": "% des Budgets"
                 },
                 "card-3": {
                     "title": "Verfügbar",
@@ -265,7 +265,8 @@
                 "secondary-title": "Monatliche Übersicht",
                 "warning-card": {
                     "title": "SCORE",
-                    "warning": "Achtung: hoch",
+                    "warning-high": "Warnung: hoch",
+                    "warning-normal": "Warnung: normal",
                     "spending": "Ausgaben-Tempo"
                 },
                 "card-1": {
@@ -468,7 +469,7 @@
                 "card-2": {
                     "title": "Bisher ausgegeben",
                     "content": "CHF 1’915.00",
-                    "badge": "66% des Budgets"
+                    "badge": "% des Budgets"
                 },
                 "card-3": {
                     "title": "Verfügbar",

@@ -22,12 +22,10 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
 import BudgetEditDialog from "./budget-edit-dialog";
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useBudgetStore } from "@/store/budget-store";
 
-interface BudgetDataTableProps {}
-
-export function BudgetDataTable({}: BudgetDataTableProps) {
+export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
 
   const {
@@ -38,8 +36,9 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
     available,
     fetchBudgets,
     fetchBudgetsAmounts,
-    refreshBudgets,
   } = useBudgetStore();
+
+  const [warnFilter, setWarnFilter] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBudgets();
@@ -54,6 +53,20 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
     t("data-table.headings.progress"),
     t("data-table.headings.action"),
   ];
+
+  const filteredBudgets = useMemo(() => {
+    if (!budgets) return [];
+
+    if (warnFilter === "warn-80") {
+      return budgets.filter((b) => b.progress >= 80 && b.progress < 90);
+    } else if (warnFilter === "warn-90") {
+      return budgets.filter((b) => b.progress >= 90 && b.progress < 100);
+    } else if (warnFilter === "warn-100") {
+      return budgets.filter((b) => b.progress >= 100);
+    }
+
+    return budgets;
+  }, [budgets, warnFilter]);
 
   return (
     <section>
@@ -80,11 +93,13 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
             <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+              onClick={() => setWarnFilter(null)} // ✅ reset filter button
             >
               {t("data-table.buttons.reset")}
             </Button>
           </div>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
@@ -112,14 +127,14 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
                     Loading...
                   </TableCell>
                 </TableRow>
-              ) : budgets.length === 0 ? (
+              ) : filteredBudgets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-gray-400">
-                    No Budgets Yet
+                    No Budgets Found
                   </TableCell>
                 </TableRow>
               ) : (
-                budgets.map((data) => (
+                filteredBudgets.map((data) => (
                   <TableRow key={data.id} className="dark:border-border-blue">
                     <TableCell>{data.category}</TableCell>
                     <TableCell>{data.allocated}</TableCell>
@@ -142,6 +157,7 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
           </Table>
           <Separator className="bg-border-blue mt-2" />
         </CardContent>
+
         <CardFooter className="flex flex-wrap items-center justify-between gap-2">
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background border"
@@ -154,9 +170,12 @@ export function BudgetDataTable({}: BudgetDataTableProps) {
               {t("data-table.toggle-groups.week")}
             </ToggleGroupItem>
           </ToggleGroup>
+
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background border"
             type="single"
+            value={warnFilter ?? ""}
+            onValueChange={(val) => setWarnFilter(val || null)}
           >
             <ToggleGroupItem value="warn-80" aria-label="toggle-warn-80">
               {t("data-table.toggle-groups.warn-80")}

@@ -72,8 +72,8 @@ export function BudgetHealthSection() {
                   <h3 className="text-lg font-bold">{progressStr}</h3>
                   <p className="text-sm">
                     {warning
-                      ? t("warning-card.warning")
-                      : t("warning-card.spending")}
+                      ? t("warning-card.warning-high")
+                      : t("warning-card.warning-normal")}
                   </p>
                   <p className="text-muted-foreground text-xs">
                     {t("warning-card.spending")}

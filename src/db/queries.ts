@@ -1370,10 +1370,7 @@ export async function getCategoriesByExpensesDB(hubId: string) {
       })
       .from(transactions)
       .where(
-        and(
-          eq(transactions.hubId, hubId),
-          eq(transactions.type, "expense"),
-        ),
+        and(eq(transactions.hubId, hubId), eq(transactions.type, "expense")),
       );
 
     const grouped: Record<
@@ -1408,10 +1405,7 @@ export async function getCategoriesByExpensesDB(hubId: string) {
       });
       const accountRow = await db.query.financial_accounts.findFirst({
         where: (acc) =>
-          and(
-            eq(acc.hubId, hubId),
-            eq(acc.type, accountType as any),
-          ),
+          and(eq(acc.hubId, hubId), eq(acc.type, accountType as any)),
         columns: { initialBalance: true },
       });
 
@@ -1426,6 +1420,9 @@ export async function getCategoriesByExpensesDB(hubId: string) {
     return { success: true, data: results };
   } catch (err: any) {
     console.error("Error in getCategoriesByExpensesDB:", err);
-    return { success: false, message: err.message || "Failed to fetch expense categories" };
+    return {
+      success: false,
+      message: err.message || "Failed to fetch expense categories",
+    };
   }
 }

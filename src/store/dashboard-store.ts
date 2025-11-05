@@ -21,6 +21,7 @@ interface DashboardState {
   allocated: number | null;
   spent: number | null;
   available: number | null;
+  percent: number;
   budgetLoading: boolean;
   budgetError: string | null;
 
@@ -69,6 +70,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   allocated: null,
   spent: null,
   available: null,
+  percent: 0,
   budgetLoading: false,
   budgetError: null,
 
@@ -89,6 +91,10 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         allocated: totalAllocated,
         spent: totalSpent,
         available: totalAllocated - totalSpent,
+        percent:
+          totalAllocated > 0
+            ? Math.min((totalSpent / totalAllocated) * 100, 100)
+            : 0,
       });
     } catch (err: any) {
       console.error("Error fetching budgets:", err);
