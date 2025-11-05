@@ -778,6 +778,7 @@
         "report-page": {
             "loading": "loading...",
             "no-reports": "No monthly reports yet",
+            "no-categories-yet": "No categories yet",
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filter",

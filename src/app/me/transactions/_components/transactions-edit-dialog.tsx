@@ -560,21 +560,15 @@ export default function TransactionEditDialog({
 
                 {/* 7️⃣ Buttons */}
                 <div className="flex justify-end gap-3 pt-4">
-                  {isEditMode && (
-                    <Button
-                      variant="outline"
-                      className="cursor-pointer"
-                      type="button"
-                      disabled={deleteLoading}
-                      onClick={handleDelete}
-                    >
-                      {deleteLoading ? (
-                        <Spinner />
-                      ) : (
-                        t("dialog.buttons.delete")
-                      )}
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    className="cursor-pointer"
+                    type="button"
+                    disabled={deleteLoading}
+                    onClick={handleDelete}
+                  >
+                    {deleteLoading ? <Spinner /> : t("dialog.buttons.delete")}
+                  </Button>
                   <Button
                     type="submit"
                     disabled={isEditMode ? updateLoading : createLoading}

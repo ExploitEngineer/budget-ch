@@ -5,6 +5,7 @@ import { getContext } from "../auth/actions";
 import {
   getTransactionCategoriesWithAmountsDB,
   getMonthlyReportDB,
+  getCategoriesByExpensesDB,
 } from "@/db/queries";
 
 // GET Transaction & Budget Categories with Amount [Action]
@@ -67,6 +68,25 @@ export async function getMonthlyReportAction() {
     return {
       success: false,
       message: err.message || "Unexpected server error.",
+    };
+  }
+}
+
+// GET Categories by Expenses
+export async function getCategoriesByExpenses() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    if (!hubId) throw new Error("No hubId");
+
+    const data = await getCategoriesByExpensesDB(hubId);
+
+    return { success: true, data };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: err.message || "Failed to fetch expense categories progress",
     };
   }
 }

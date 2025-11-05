@@ -4,6 +4,7 @@ import {
   getDetailedCategories,
   getMonthlyReportAction,
 } from "@/lib/services/report";
+import { getCategoriesByExpenses } from "@/lib/services/report";
 import type { Transaction } from "@/lib/types/dashboard-types";
 
 interface CategoryDetail {
@@ -17,6 +18,14 @@ interface MonthlyReport {
   income: number;
   expenses: number;
   balance: number;
+}
+
+interface ExpenseCategoryProgress {
+  category: string;
+  amount: number;
+  accountType: string;
+  accountBalance: number;
+  percent: number;
 }
 
 interface ReportState {
@@ -36,6 +45,10 @@ interface ReportState {
   reportsLoading: boolean;
   reportsError: string | null;
 
+  expenseCategoriesProgress: ExpenseCategoryProgress[] | null;
+  expenseCategoriesProgressLoading: boolean;
+  expenseCategoriesProgressError: string | null;
+
   fetchTransactions: () => Promise<void>;
   refreshTransactions: () => Promise<void>;
 
@@ -43,6 +56,7 @@ interface ReportState {
   refreshCategories: () => Promise<void>;
 
   fetchMonthlyReports: () => Promise<void>;
+  fetchExpenseCategoriesProgress: () => Promise<void>;
 }
 
 export const useReportStore = create<ReportState>((set, get) => ({
@@ -57,6 +71,14 @@ export const useReportStore = create<ReportState>((set, get) => ({
 
   categories: null,
   categoriesTotal: 0,
+
+  monthlyReports: [],
+  reportsLoading: true,
+  reportsError: null,
+
+  expenseCategoriesProgress: null,
+  expenseCategoriesProgressLoading: false,
+  expenseCategoriesProgressError: null,
 
   fetchTransactions: async () => {
     try {
@@ -123,10 +145,6 @@ export const useReportStore = create<ReportState>((set, get) => ({
     await get().fetchCategories();
   },
 
-  monthlyReports: [],
-  reportsLoading: true,
-  reportsError: null,
-
   fetchMonthlyReports: async () => {
     try {
       set({ reportsLoading: true, reportsError: null });
@@ -142,6 +160,35 @@ export const useReportStore = create<ReportState>((set, get) => ({
       set({ reportsError: "Failed to load monthly reports" });
     } finally {
       set({ reportsLoading: false });
+    }
+  },
+
+  async fetchExpenseCategoriesProgress() {
+    set({
+      expenseCategoriesProgressLoading: true,
+      expenseCategoriesProgressError: null,
+    });
+    try {
+      const res = await getCategoriesByExpenses();
+      if (!res.success || !res.data?.data) throw new Error(res.message);
+
+      const dataArray = res.data.data;
+
+      const progress = dataArray.map((item: any) => ({
+        ...item,
+        percent:
+          item.accountBalance > 0
+            ? Math.round((item.amount / item.accountBalance) * 100)
+            : 0,
+      }));
+      set({ expenseCategoriesProgress: progress });
+    } catch (err: any) {
+      set({
+        expenseCategoriesProgressError:
+          err.message || "Failed to load expense categories progress",
+      });
+    } finally {
+      set({ expenseCategoriesProgressLoading: false });
     }
   },
 }));

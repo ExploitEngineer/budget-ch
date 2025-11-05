@@ -1357,3 +1357,75 @@ export async function deleteAllTransactionsAndCategoriesDB(hubId: string) {
     };
   }
 }
+
+// GET Categoreis by Expenses
+export async function getCategoriesByExpensesDB(hubId: string) {
+  try {
+    const expenseTxs = await db
+      .select({
+        categoryId: transactions.transactionCategoryId,
+        accountType: transactions.accountType,
+        amount: transactions.amount,
+        financialAccountId: transactions.financialAccountId,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.hubId, hubId),
+          eq(transactions.type, "expense"),
+        ),
+      );
+
+    const grouped: Record<
+      string,
+      { amount: number; accountType: string; financialAccountId: string }
+    > = {};
+
+    for (const tx of expenseTxs) {
+      const key = `${tx.categoryId}:${tx.accountType}`;
+      if (!grouped[key]) {
+        grouped[key] = {
+          amount: 0,
+          accountType: tx.accountType,
+          financialAccountId: tx.financialAccountId,
+        };
+      }
+      grouped[key].amount += tx.amount;
+    }
+
+    const results: {
+      category: string;
+      amount: number;
+      accountType: string;
+      accountBalance: number;
+    }[] = [];
+
+    for (const [key, value] of Object.entries(grouped)) {
+      const [categoryId, accountType] = key.split(":");
+      const categoryRow = await db.query.transaction_categories.findFirst({
+        where: (cat) => eq(cat.id, categoryId),
+        columns: { name: true },
+      });
+      const accountRow = await db.query.financial_accounts.findFirst({
+        where: (acc) =>
+          and(
+            eq(acc.hubId, hubId),
+            eq(acc.type, accountType as any),
+          ),
+        columns: { initialBalance: true },
+      });
+
+      results.push({
+        category: categoryRow?.name ?? "Unknown",
+        amount: Math.abs(value.amount),
+        accountType: value.accountType,
+        accountBalance: accountRow?.initialBalance ?? 0,
+      });
+    }
+
+    return { success: true, data: results };
+  } catch (err: any) {
+    console.error("Error in getCategoriesByExpensesDB:", err);
+    return { success: false, message: err.message || "Failed to fetch expense categories" };
+  }
+}

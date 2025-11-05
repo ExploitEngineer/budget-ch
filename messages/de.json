@@ -779,6 +779,7 @@
         "report-page": {
             "loading": "Wird geladen...",
             "no-reports": "Noch keine Monatsberichte",
+            "no-categories-yet": "Noch keine Kategorien",
             "cards": {
                 "card-1": {
                     "title": "Einkommen",

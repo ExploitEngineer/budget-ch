@@ -779,6 +779,7 @@
         "report-page": {
             "loading": "Chargement...",
             "no-reports": "Aucun rapport mensuel pour le moment",
+            "no-categories-yet": "Aucune catégorie pour le moment",
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filtrer",

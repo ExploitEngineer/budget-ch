@@ -779,6 +779,7 @@
         "report-page": {
             "loading": "Caricamento...",
             "no-reports": "Nessun rapporto mensile ancora",
+            "no-categories-yet": "Nessuna categoria ancora",
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filtro",

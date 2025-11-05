@@ -1,4 +1,5 @@
 "use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -16,12 +17,6 @@ import { useTranslations } from "next-intl";
 import { useReportStore } from "@/store/report-store";
 import { useEffect } from "react";
 
-interface ProgressChart {
-  title: string;
-  amount: string;
-  value: number;
-}
-
 export function AnalysisTable() {
   const t = useTranslations("main-dashboard.report-page");
 
@@ -32,44 +27,16 @@ export function AnalysisTable() {
     expense,
     fetchMonthlyReports,
     reportsLoading,
+    expenseCategoriesProgress,
+    expenseCategoriesProgressLoading,
+    expenseCategoriesProgressError,
+    fetchExpenseCategoriesProgress,
   } = useReportStore();
 
   useEffect(() => {
     fetchMonthlyReports();
+    fetchExpenseCategoriesProgress();
   }, []);
-
-  const progressChart: ProgressChart[] = [
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.groceries"),
-      amount: "CHF 820.00",
-      value: 40,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.rent"),
-      amount: "CHF 1’920.00",
-      value: 70,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.transportation"),
-      amount: "CHF 320.00",
-      value: 20,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.restaurant"),
-      amount: "CHF 460.00",
-      value: 30,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.household"),
-      amount: "CHF 280.00",
-      value: 15,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.leisure"),
-      amount: "CHF 190.00",
-      value: 10,
-    },
-  ];
 
   const tableHeadings: string[] = [
     t("income-exp.data-table.headings.month"),
@@ -127,15 +94,35 @@ export function AnalysisTable() {
               {t("analysis-table-data.exp-by-cat.title")}
             </h2>
             <div className="flex flex-col gap-3">
-              {progressChart.map((data) => (
-                <div key={data.title} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3>{data.title}</h3>
-                    <h3>{data.amount}</h3>
-                  </div>
-                  <Progress value={data.value} />
+              {expenseCategoriesProgressError ? (
+                <p className="text-sm text-red-500">
+                  {expenseCategoriesProgressError}
+                </p>
+              ) : expenseCategoriesProgressLoading ? (
+                <p className="text-muted-foreground text-sm">{t("loading")}</p>
+              ) : expenseCategoriesProgress &&
+                expenseCategoriesProgress.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {expenseCategoriesProgress.map((data) => (
+                    <div key={data.category} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <h3>{data.category}</h3>
+                        <h3>
+                          CHF{" "}
+                          {data.amount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                          })}
+                        </h3>
+                      </div>
+                      <Progress value={data.percent} />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  {t("no-categories-yet")}
+                </p>
+              )}
             </div>
           </div>
           <div className="overflow-x-auto">
