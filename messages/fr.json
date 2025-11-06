@@ -349,7 +349,8 @@
                         "current-account": "Compte courant",
                         "credit-card": "Carte de crédit",
                         "savings": "Épargne",
-                        "cash": "Espèces"
+                        "cash": "Espèces",
+                        "all": "Tous les comptes"
                     }
                 },
                 "category": {
@@ -358,7 +359,9 @@
                         "categories": "Toutes les catégories",
                         "groceries": "Courses",
                         "restaurant": "Restaurant & Café",
-                        "transportation": "Transport"
+                        "transportation": "Transport",
+                        "new-category": "Nouvelle catégorie",
+                        "no-category": "Aucune catégorie pour le moment"
                     }
                 },
                 "search": {

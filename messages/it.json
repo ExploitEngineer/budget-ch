@@ -349,7 +349,8 @@
                         "current-account": "Conto corrente",
                         "credit-card": "Carta di credito",
                         "savings": "Risparmi",
-                        "cash": "Contanti"
+                        "cash": "Contanti",
+                        "all": "Tutti i conti"
                     }
                 },
                 "category": {
@@ -358,7 +359,9 @@
                         "categories": "Tutte le categorie",
                         "groceries": "Spesa",
                         "restaurant": "Ristorante & Café",
-                        "transportation": "Trasporto"
+                        "transportation": "Trasporto",
+                        "new-category": "Nuova categoria",
+                        "no-category": "Nessuna categoria ancora"
                     }
                 },
                 "search": {

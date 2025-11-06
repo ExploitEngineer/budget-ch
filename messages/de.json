@@ -349,7 +349,8 @@
                         "current-account": "Girokonto",
                         "credit-card": "Kreditkarte",
                         "savings": "Sparkonto",
-                        "cash": "Bargeld"
+                        "cash": "Bargeld",
+                        "all": "Alle Konten"
                     }
                 },
                 "category": {
@@ -358,7 +359,9 @@
                         "categories": "Alle Kategorien",
                         "groceries": "Lebensmittel",
                         "restaurant": "Restaurant & Café",
-                        "transportation": "Transport"
+                        "transportation": "Transport",
+                        "new-category": "Neue Kategorie",
+                        "no-category": "Noch keine Kategorien"
                     }
                 },
                 "search": {

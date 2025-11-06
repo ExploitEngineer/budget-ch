@@ -5,20 +5,15 @@ const accountType = [
   "credit-card",
   "savings",
   "cash",
-] as const;
-const categoryType = [
-  "categories",
-  "groceries",
-  "restaurant",
-  "transportation",
+  "all",
 ] as const;
 
 export const calculationFormSchema = z
   .object({
     dateFrom: z.date().optional(),
     dateTo: z.date().optional(),
-    select1: z.enum(accountType, { message: "Account is required" }),
-    select2: z.enum(categoryType, { message: "Category is required" }),
+    accountType: z.enum(accountType, { message: "Account is required" }),
+    category: z.string({ message: "Category is required" }),
     amountMin: z.coerce
       .number()
       .min(0, { message: "Amount must be 0 or more" })

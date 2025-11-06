@@ -35,22 +35,33 @@ import {
   CalculationFormValues,
   calculationFormSchema,
 } from "@/lib/validations/calculation-section-validations";
+import { useState } from "react";
+import AddCategory from "../../dashboard/_components/add-category-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
 interface CalculationSectionProps {
   onFilter: (filters: CalculationFormValues) => void;
   onReset?: () => void;
 }
 
-export function CalculationSection({ onFilter, onReset }: CalculationSectionProps) {
+export function CalculationSection({
+  onFilter,
+  onReset,
+}: CalculationSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isApplying, setIsApplying] = useState<boolean>(false);
 
   const form = useForm<CalculationFormValues>({
     resolver: zodResolver(calculationFormSchema) as any,
     defaultValues: {
       dateFrom: undefined,
       dateTo: undefined,
-      select1: "savings",
-      select2: "restaurant",
+      category: "",
+      accountType: "all",
       amountMax: 0,
       amountMin: 0,
       text: "",
@@ -66,8 +77,20 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
     onReset?.();
   };
 
+  function handleCategoryAdded(newCategory: string) {
+    setCategories((prev) => [...prev, newCategory]);
+    setSelectedCategory(newCategory);
+    form.setValue("category", newCategory);
+  }
+
   return (
     <section>
+      <AddCategory
+        open={isAddCategoryOpen}
+        onOpenChangeAction={setIsAddCategoryOpen}
+        onCategoryAddedAction={handleCategoryAdded}
+      />
+
       <FormProvider {...form}>
         <Card className="bg-blue-background dark:border-border-blue">
           <CardContent>
@@ -140,7 +163,7 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
 
                 <FormField
                   control={form.control}
-                  name="select1"
+                  name="accountType"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>{t("labels.account.title")}</FormLabel>
@@ -152,7 +175,7 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
                           <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
                             <SelectValue
                               placeholder={t(
-                                "labels.account.data.current-account"
+                                "labels.account.data.current-account",
                               )}
                             />
                           </SelectTrigger>
@@ -169,6 +192,9 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
                             <SelectItem value="cash">
                               {t("labels.account.data.cash")}
                             </SelectItem>
+                            <SelectItem value="all">
+                              {t("labels.account.data.all")}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -178,33 +204,49 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
 
                 <FormField
                   control={form.control}
-                  name="select2"
+                  name="category"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="flex flex-1 flex-col">
                       <FormLabel>{t("labels.category.title")}</FormLabel>
                       <FormControl>
                         <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
+                          value={selectedCategory || ""}
+                          onValueChange={(value) => {
+                            setSelectedCategory(value);
+                            field.onChange(value);
+                          }}
                         >
-                          <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
-                            <SelectValue
-                              placeholder={t("labels.category.data.categories")}
-                            />
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select or add a category" />
                           </SelectTrigger>
+
                           <SelectContent>
-                            <SelectItem value="groceries">
-                              {t("labels.category.data.groceries")}
-                            </SelectItem>
-                            <SelectItem value="restaurant">
-                              {t("labels.category.data.restaurant")}
-                            </SelectItem>
-                            <SelectItem value="transportation">
-                              {t("labels.category.data.transportation")}
-                            </SelectItem>
+                            <div className="flex items-center justify-between border-b px-2 py-1.5">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full cursor-pointer justify-center text-sm"
+                                onClick={() => setIsAddCategoryOpen(true)}
+                              >
+                                + {t("labels.category.data.new-category")}
+                              </Button>
+                            </div>
+
+                            {categories.length === 0 ? (
+                              <SelectItem value="none" disabled>
+                                {t("labels.category.data.no-category")}
+                              </SelectItem>
+                            ) : (
+                              categories.map((category) => (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -274,22 +316,37 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
           {/* Footer */}
           <CardFooter className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="outline" className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2">
+              <Badge
+                variant="outline"
+                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+              >
                 <label className="flex items-center gap-2">
                   <Checkbox />
-                  <span>{t("checkboxes.receipt")}</span>
+                  <span className="cursor-pointer">
+                    {t("checkboxes.receipt")}
+                  </span>
                 </label>
               </Badge>
-              <Badge variant="outline" className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2">
+              <Badge
+                variant="outline"
+                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+              >
                 <label className="flex items-center gap-2">
                   <Checkbox />
-                  <span>{t("checkboxes.recurring")}</span>
+                  <span className="cursor-pointer">
+                    {t("checkboxes.recurring")}
+                  </span>
                 </label>
               </Badge>
-              <Badge variant="outline" className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2">
+              <Badge
+                variant="outline"
+                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+              >
                 <label className="flex items-center gap-2">
                   <Checkbox />
-                  <span>{t("checkboxes.transfers")}</span>
+                  <span className="cursor-pointer">
+                    {t("checkboxes.transfers")}
+                  </span>
                 </label>
               </Badge>
             </div>
@@ -304,10 +361,17 @@ export function CalculationSection({ onFilter, onReset }: CalculationSectionProp
               </Button>
               <Button
                 variant="outline"
-                onClick={handleApply}
-                className="btn-gradient cursor-pointer border-transparent"
+                disabled={isApplying}
+                onClick={() => {
+                  setIsApplying(true);
+                  setTimeout(() => {
+                    handleApply();
+                    setIsApplying(false);
+                  }, 2000);
+                }}
+                className="btn-gradient cursor-pointer border-transparent hover:text-white"
               >
-                {t("buttons.apply")}
+                {isApplying ? <Spinner /> : t("buttons.apply")}
               </Button>
             </div>
           </CardFooter>

@@ -347,7 +347,8 @@
                         "current-account": "Current account",
                         "credit-card": "Credit card",
                         "savings": "Savings",
-                        "cash": "Cash"
+                        "cash": "Cash",
+                        "all": "All Accounts"
                     }
                 },
                 "category": {
@@ -356,7 +357,9 @@
                         "categories": "All Categories",
                         "groceries": "Groceries",
                         "restaurant": "Restaurant & Café",
-                        "transportation": "Transportation"
+                        "transportation": "Transportation",
+                        "new-category": "New category",
+                        "no-category": "No categories yet"
                     }
                 },
                 "search": {

@@ -35,15 +35,33 @@ export default function TransactionsClient() {
     ) as Omit<Transaction, "type">[];
 
     const filteredData = sanitized.filter((tx) => {
-      const matchDate =
-        (!filters.dateFrom ||
-          new Date(tx.date) >= new Date(filters.dateFrom)) &&
-        (!filters.dateTo || new Date(tx.date) <= new Date(filters.dateTo));
+      if (!tx.date) return false;
+
+      const [day, month, year] = tx.date.split("/").map(Number);
+      const txDate = new Date(year, month - 1, day);
+      txDate.setHours(0, 0, 0, 0);
+
+      let matchDate = true;
+
+      if (filters.dateFrom) {
+        const fromDate = new Date(filters.dateFrom);
+        fromDate.setHours(0, 0, 0, 0);
+        matchDate = txDate >= fromDate;
+      }
+
+      if (filters.dateTo) {
+        const toDate = new Date(filters.dateTo);
+        toDate.setHours(0, 0, 0, 0);
+        matchDate = matchDate && txDate <= toDate;
+      }
 
       const matchAccount =
-        !filters.select1 || tx.accountType === filters.select1;
+        !filters.accountType ||
+        filters.accountType === "all" ||
+        tx.accountType === filters.accountType;
 
-      const matchCategory = !filters.select2 || tx.category === filters.select2;
+      const matchCategory =
+        !filters.category || tx.category === filters.category;
 
       const matchAmount =
         (!filters.amountMin || tx.amount >= filters.amountMin) &&
@@ -52,7 +70,9 @@ export default function TransactionsClient() {
       const matchText =
         !filters.text ||
         tx.recipient?.toLowerCase().includes(filters.text.toLowerCase()) ||
-        tx.note?.toLowerCase().includes(filters.text.toLowerCase());
+        tx.note?.toLowerCase().includes(filters.text.toLowerCase()) ||
+        tx.accountType?.toLowerCase().includes(filters.text.toLowerCase()) ||
+        tx.category?.toLowerCase().includes(filters.text.toLowerCase());
 
       return (
         matchDate && matchAccount && matchCategory && matchAmount && matchText
