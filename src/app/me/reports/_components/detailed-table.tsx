@@ -24,16 +24,53 @@ export function DetailedTable() {
     fetchCategories();
   }, [fetchCategories]);
 
+  const exportToCSV = () => {
+    const headers = [
+      t("data-table.headings.category"),
+      t("data-table.headings.amount"),
+    ];
+
+    const csvData = (categories ?? []).map((cat) => [
+      cat.name,
+      cat.totalAmount.toFixed(2),
+      ,
+    ]);
+
+    csvData.unshift(headers);
+
+    const csvString = csvData
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `categories-${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" className="!bg-dark-blue-background">
+            <Button
+              variant="outline"
+              onClick={exportToCSV}
+              className="!bg-dark-blue-background cursor-pointer"
+            >
               {t("buttons.categories-csv")}
             </Button>
-            <Button variant="outline" className="!bg-dark-blue-background">
+            <Button
+              variant="outline"
+              className="!bg-dark-blue-background cursor-pointer"
+            >
               {t("buttons.trend-csv")}
             </Button>
           </div>

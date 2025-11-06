@@ -68,6 +68,39 @@ export function BudgetDataTable() {
     return budgets;
   }, [budgets, warnFilter]);
 
+  const exportToCSV = () => {
+    const headers = budgetDataTableHeadings
+      .slice(0, -1)
+      .map((heading) => heading);
+
+    const csvData = (budgets ?? []).map((budget) => [
+      budget.category,
+      budget.allocated.toFixed(2),
+      budget.spent.toFixed(2),
+      budget.remaining.toFixed(2),
+      `${budget.progress.toFixed(1)}%`,
+      ,
+    ]);
+
+    csvData.unshift(headers);
+
+    const csvString = csvData
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `budgets-${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
@@ -86,6 +119,7 @@ export function BudgetDataTable() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
+              onClick={exportToCSV}
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.buttons.export")}
@@ -93,7 +127,7 @@ export function BudgetDataTable() {
             <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-              onClick={() => setWarnFilter(null)} // ✅ reset filter button
+              onClick={() => setWarnFilter(null)}
             >
               {t("data-table.buttons.reset")}
             </Button>

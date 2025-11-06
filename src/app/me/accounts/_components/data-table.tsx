@@ -47,13 +47,43 @@ export function ContentDataTable() {
     return sum + amount;
   }, 0);
 
-  const budgetDataTableHeadings: string[] = [
+  const accountTableHeadings: string[] = [
     t("headings.name"),
     t("headings.type"),
     t("headings.iban"),
     t("headings.balance"),
     t("headings.action"),
   ];
+
+  const exportToCSV = () => {
+    const headers = accountTableHeadings.slice(0, -1).map((heading) => heading);
+
+    const csvData = (accounts ?? []).map((acc) => [
+      acc.name,
+      acc.type,
+      acc.iban || acc.note,
+      acc.balance.toFixed(2),
+      ,
+    ]);
+
+    csvData.unshift(headers);
+
+    const csvString = csvData
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `accounts-${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <section className="grid auto-rows-min grid-cols-6">
@@ -71,6 +101,7 @@ export function ContentDataTable() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
+              onClick={exportToCSV}
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.export")}
@@ -88,7 +119,7 @@ export function ContentDataTable() {
           <Table className="min-w-[620px]">
             <TableHeader>
               <TableRow className="dark:border-border-blue">
-                {budgetDataTableHeadings.map((heading) => (
+                {accountTableHeadings.map((heading) => (
                   <TableHead
                     className="font-bold text-gray-500 dark:text-gray-400/80"
                     key={heading}

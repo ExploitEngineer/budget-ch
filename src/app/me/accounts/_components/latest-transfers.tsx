@@ -61,6 +61,36 @@ export function LatestTransfers() {
     t("data-table.headings.amount"),
   ];
 
+  const exportToCSV = () => {
+    const headers = tableHeadings.map((heading) => heading);
+
+    const csvData = (transfers ?? []).map((transfer) => [
+      new Date(transfer.date),
+      transfer.source,
+      transfer.destination,
+      transfer.note,
+      transfer.amount.toFixed(2),
+      ,
+    ]);
+
+    csvData.unshift(headers);
+
+    const csvString = csvData
+      .map((row) => row.map((cell) => `"${cell}"`).join(","))
+      .join("\n");
+    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute(
+      "download",
+      `transfers-${new Date().toISOString().split("T")[0]}.csv`,
+    );
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   if (loading) {
     return (
       <Card className="bg-blue-background dark:border-border-blue">
@@ -88,8 +118,8 @@ export function LatestTransfers() {
           <CardTitle>{t("title")}</CardTitle>
           <Button
             variant="outline"
-            className="!bg-dark-blue-background dark:border-border-blue"
-            onClick={fetchTransfers}
+            className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+            onClick={exportToCSV}
           >
             {t("button")}
           </Button>
