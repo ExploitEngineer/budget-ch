@@ -7,6 +7,7 @@ import {
   exportFinancialAccountsToCSV,
   exportLatestTransfersToCSV,
   exportTransactionsToCSV,
+  exportSavingGoalsToCSV,
 } from "@/lib/utils/export-csv";
 import type {
   TransactionExportArgs,
@@ -14,6 +15,7 @@ import type {
   FinancialAccountExportArgs,
   LatestTranfersExportArgs,
   CategoriesExportArgs,
+  SavingGoalsExportArgs,
 } from "@/lib/utils/export-csv";
 
 export const useExportCSV = () => {
@@ -27,6 +29,9 @@ export const useExportCSV = () => {
   );
   const latestTransfert = useTranslations(
     "main-dashboard.content-page.latest-tranfers-section",
+  );
+  const savingGoalsT = useTranslations(
+    "main-dashboard.saving-goals-page.active-goals-section",
   );
 
   const budgetDataTableHeadings: string[] = [
@@ -69,5 +74,7 @@ export const useExportCSV = () => {
       exportLatestTransfersToCSV({ tableHeadings, transfers }),
     exportCategories: ({ categories }: Omit<CategoriesExportArgs, "t">) =>
       exportCategoriesToCSV({ categories, t: categoriesT }),
+    exportSavingGoals: ({ goals }: Omit<SavingGoalsExportArgs, "t">) =>
+      exportSavingGoalsToCSV({ goals, t: savingGoalsT }),
   };
 };

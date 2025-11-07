@@ -13,6 +13,7 @@ import { useAccountStore } from "@/store/account-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
@@ -22,8 +23,14 @@ export function Export() {
   const { transactions, fetchTransactions } = useDashboardStore();
   const { budgets, fetchBudgets } = useBudgetStore();
   const { accounts, fetchAccounts } = useAccountStore();
-  const { exportTransactions, exportBudgets, exportAccounts, exportTransfers } =
-    useExportCSV();
+  const { goals, fetchGoals } = useSavingGoalStore();
+  const {
+    exportTransactions,
+    exportBudgets,
+    exportAccounts,
+    exportTransfers,
+    exportSavingGoals,
+  } = useExportCSV();
 
   async function fetchTransfers() {
     try {
@@ -43,6 +50,7 @@ export function Export() {
     fetchTransactions();
     fetchBudgets();
     fetchAccounts();
+    fetchGoals();
     fetchTransfers();
   }, []);
 
@@ -65,9 +73,7 @@ export function Export() {
     },
     {
       title: t("export-card.buttons.savings-goals"),
-      onClick: () => {
-        console.log("hi");
-      },
+      onClick: () => exportSavingGoals({ goals }),
     },
     {
       title: t("export-card.buttons.accounts"),

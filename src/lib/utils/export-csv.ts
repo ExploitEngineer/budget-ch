@@ -4,6 +4,7 @@ import type { BudgetRow } from "../services/budget";
 import type { AccountRow } from "@/store/account-store";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
 import type { CategoryDetail } from "@/store/report-store";
+import type { SavingGoal } from "@/db/queries";
 
 export type TransactionExportArgs = {
   transactions: Omit<Transaction, "type">[];
@@ -27,6 +28,11 @@ export type LatestTranfersExportArgs = {
 
 export type CategoriesExportArgs = {
   categories: CategoryDetail[] | null;
+  t: (key: string) => string;
+};
+
+export type SavingGoalsExportArgs = {
+  goals: SavingGoal[] | null;
   t: (key: string) => string;
 };
 
@@ -161,4 +167,37 @@ export const exportCategoriesToCSV = ({
 
   const csv = Papa.unparse(data);
   triggerCSVDownload(csv, "categories");
+};
+
+// Saving Goals export
+export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
+  if (!goals || goals.length === 0) {
+    console.warn("No saving goals to export.");
+    return;
+  }
+
+  const headers = [
+    t("cards.tax-reserves.content.goal"),
+    t("cards.tax-reserves.content.saved"),
+    t("cards.tax-reserves.content.remaining"),
+    t("cards.tax-reserves.content.monthly-allocated"),
+    t("cards.tax-reserves.content.account.title"),
+    "Account Type",
+  ];
+
+  const data = goals.map((goal) => {
+    const remaining = goal.goalAmount - goal.amountSaved;
+    return {
+      [headers[0]]: goal.name,
+      [headers[1]]: goal.goalAmount.toFixed(2),
+      [headers[2]]: goal.amountSaved.toFixed(2),
+      [headers[3]]: remaining.toFixed(2),
+      [headers[4]]: goal.monthlyAllocation?.toFixed(2) ?? "0.00",
+      [headers[5]]: `${goal.value.toFixed(1)}%`,
+      [headers[6]]: goal.accountType || "-",
+    };
+  });
+
+  const csv = Papa.unparse(data);
+  triggerCSVDownload(csv, "saving-goals");
 };
