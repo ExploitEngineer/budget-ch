@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import EditAccountDialog from "./edit-account-dialog";
 import { useAccountStore } from "@/store/account-store";
+import { useExportCSV } from "@/hooks/use-export-csv";
 
 export interface AccountData {
   id: string;
@@ -28,6 +29,8 @@ export interface AccountData {
 
 export function ContentDataTable() {
   const t = useTranslations("main-dashboard.content-page.data-table");
+
+  const { exportAccounts } = useExportCSV();
 
   const {
     accounts,
@@ -55,36 +58,6 @@ export function ContentDataTable() {
     t("headings.action"),
   ];
 
-  const exportToCSV = () => {
-    const headers = accountTableHeadings.slice(0, -1).map((heading) => heading);
-
-    const csvData = (accounts ?? []).map((acc) => [
-      acc.name,
-      acc.type,
-      acc.iban || acc.note,
-      acc.balance.toFixed(2),
-      ,
-    ]);
-
-    csvData.unshift(headers);
-
-    const csvString = csvData
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
-      .join("\n");
-    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `accounts-${new Date().toISOString().split("T")[0]}.csv`,
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <section className="grid auto-rows-min grid-cols-6">
       <Card className="bg-blue-background dark:border-border-blue col-span-full">
@@ -101,7 +74,7 @@ export function ContentDataTable() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={exportToCSV}
+              onClick={() => exportAccounts({ accounts })}
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.export")}

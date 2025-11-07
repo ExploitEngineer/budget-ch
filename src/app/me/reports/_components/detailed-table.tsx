@@ -14,9 +14,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
+import { useExportCSV } from "@/hooks/use-export-csv";
 
 export function DetailedTable() {
   const t = useTranslations("main-dashboard.report-page.detailed-table");
+
+  const { exportCategories } = useExportCSV();
+
   const { categories, categoriesTotal, fetchCategories, loading } =
     useReportStore();
 
@@ -24,36 +28,6 @@ export function DetailedTable() {
     fetchCategories();
   }, [fetchCategories]);
 
-  const exportToCSV = () => {
-    const headers = [
-      t("data-table.headings.category"),
-      t("data-table.headings.amount"),
-    ];
-
-    const csvData = (categories ?? []).map((cat) => [
-      cat.name,
-      cat.totalAmount.toFixed(2),
-      ,
-    ]);
-
-    csvData.unshift(headers);
-
-    const csvString = csvData
-      .map((row) => row.map((cell) => `"${cell}"`).join(","))
-      .join("\n");
-    const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute(
-      "download",
-      `categories-${new Date().toISOString().split("T")[0]}.csv`,
-    );
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
@@ -62,7 +36,7 @@ export function DetailedTable() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={exportToCSV}
+              onClick={() => exportCategories({ categories })}
               className="!bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.categories-csv")}

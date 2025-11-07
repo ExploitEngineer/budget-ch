@@ -7,7 +7,7 @@ import {
 import { getCategoriesByExpenses } from "@/lib/services/report";
 import type { Transaction } from "@/lib/types/dashboard-types";
 
-interface CategoryDetail {
+export interface CategoryDetail {
   id: string;
   name: string;
   totalAmount: number;

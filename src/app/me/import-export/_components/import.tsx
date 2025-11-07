@@ -41,7 +41,7 @@ export function Import() {
               <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue w-full cursor-pointer">
                 <SelectValue placeholder="Choose" />
               </SelectTrigger>
-              <SelectContent className="bg-dark-blue-background">
+              <SelectContent className="dark:bg-dark-blue-background bg-white">
                 <SelectItem value="groceries">
                   {t("data-type.transactions")}
                 </SelectItem>
@@ -66,7 +66,7 @@ export function Import() {
               <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue w-full cursor-pointer">
                 <SelectValue placeholder="Choose" />
               </SelectTrigger>
-              <SelectContent className="bg-dark-blue-background">
+              <SelectContent className="dark:bg-dark-blue-background bg-white">
                 <SelectItem value="income">{t("modes.append")}</SelectItem>
                 <SelectItem value="income">
                   {t("modes.replace-existing")}

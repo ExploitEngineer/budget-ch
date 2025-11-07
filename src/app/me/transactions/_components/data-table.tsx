@@ -35,7 +35,7 @@ import TransactionEditDialog from "./transactions-edit-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import { useTransactionStore } from "@/store/transaction-store";
 import { Spinner } from "@/components/ui/spinner";
-import Papa from "papaparse";
+import { useExportCSV } from "@/hooks/use-export-csv";
 
 interface DataTableProps {
   transactions: Omit<Transaction, "type">[];
@@ -46,42 +46,7 @@ interface DataTableProps {
 export function DataTable({ transactions, loading, error }: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
 
-  const exportToCSV = () => {
-    const headers = [
-      t("data-table.headings.date"),
-      t("data-table.headings.category"),
-      t("data-table.headings.account"),
-      t("data-table.headings.amount"),
-      t("data-table.headings.recipient"),
-      t("data-table.headings.note"),
-    ];
-
-    const data = transactions.map((tx) => ({
-      [headers[0]]: tx.date,
-      [headers[1]]: tx.category,
-      [headers[2]]: tx.accountType,
-      [headers[3]]: tx.amount,
-      [headers[4]]: tx.recipient || "-",
-      [headers[5]]: tx.note || "-",
-    }));
-
-    const csv = Papa.unparse(data);
-
-    const blob = new Blob(["\uFEFF" + csv], {
-      type: "text/csv;charset=utf-8;",
-    });
-
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `transactions-${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
-
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+  const { exportTransactions } = useExportCSV();
 
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -276,7 +241,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
             </Button>
             <Button
               variant="outline"
-              onClick={exportToCSV}
+              onClick={() => exportTransactions({ transactions })}
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.header.buttons.export")} CSV

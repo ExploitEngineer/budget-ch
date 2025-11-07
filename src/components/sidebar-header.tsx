@@ -153,12 +153,12 @@ export default function SidebarHeader() {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2"
+                className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-2"
               >
                 <Download />
                 <span className="hidden sm:block">{t("export-json")}</span>
               </Button>
-              <Button className="btn-gradient flex items-center gap-2 dark:text-white">
+              <Button className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white">
                 <File />
                 <span className="hidden sm:block">{t("csv-templates")}</span>
               </Button>
