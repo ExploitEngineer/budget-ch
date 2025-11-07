@@ -22,6 +22,7 @@ import type {
   CategoriesExportArgs,
   SavingGoalsExportArgs,
 } from "@/lib/utils/export-csv";
+import { exportAllDataToJSON } from "@/lib/utils/export-json";
 
 export const useExportCSV = () => {
   const transactionT = useTranslations("main-dashboard.transactions-page");
@@ -91,5 +92,6 @@ export const useExportCSV = () => {
     exportTransferTemplate: () => exportTransfersTemplateToCSV(tableHeadings),
     exportSavingGoalTemplate: () =>
       exportSavingGoalsTemplateToCSV(savingGoalsT),
+    exportAllDataJSON: (data: Record<string, any>) => exportAllDataToJSON(data),
   };
 };

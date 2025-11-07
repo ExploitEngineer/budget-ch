@@ -35,6 +35,7 @@ export function Export() {
     exportAccountTemplate,
     exportTransferTemplate,
     exportSavingGoalTemplate,
+    exportAllDataJSON,
   } = useExportCSV();
 
   async function fetchTransfers() {
@@ -157,6 +158,15 @@ export function Export() {
               <p>{t("export-json-card.content")}</p>
               <Button
                 variant="outline"
+                onClick={() =>
+                  exportAllDataJSON({
+                    transactions,
+                    budgets,
+                    accounts,
+                    goals,
+                    transfers,
+                  })
+                }
                 className="btn-gradient dark:text-foreground w-[30%] cursor-pointer hover:text-white"
               >
                 {t("export-json-card.button")}
