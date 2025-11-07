@@ -201,3 +201,55 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
   const csv = Papa.unparse(data);
   triggerCSVDownload(csv, "saving-goals");
 };
+
+// CSV Templates
+export const exportTransactionsTemplateToCSV = (t: (key: string) => string) => {
+  const headers = [
+    t("data-table.headings.date"),
+    t("data-table.headings.category"),
+    t("data-table.headings.account"),
+    t("data-table.headings.amount"),
+    t("data-table.headings.recipient"),
+    t("data-table.headings.note"),
+  ];
+
+  const csv = Papa.unparse([headers]);
+  triggerCSVDownload(csv, "transactions-template");
+};
+
+export const exportBudgetsTemplateToCSV = (t: (key: string) => string) => {
+  const headers = [
+    t("data-table.headings.category"),
+    t("data-table.headings.budget"),
+    t("data-table.headings.ist"),
+    t("data-table.headings.rest"),
+    t("data-table.headings.progress"),
+  ];
+
+  const csv = Papa.unparse([headers]);
+  triggerCSVDownload(csv, "budgets-template");
+};
+
+export const exportAccountsTemplateToCSV = (headers: string[]) => {
+  const csv = Papa.unparse([headers]);
+  triggerCSVDownload(csv, "accounts-template");
+};
+
+export const exportTransfersTemplateToCSV = (headers: string[]) => {
+  const csv = Papa.unparse([headers]);
+  triggerCSVDownload(csv, "transfers-template");
+};
+
+export const exportSavingGoalsTemplateToCSV = (t: (key: string) => string) => {
+  const headers = [
+    t("cards.tax-reserves.content.goal"),
+    t("cards.tax-reserves.content.saved"),
+    t("cards.tax-reserves.content.remaining"),
+    t("cards.tax-reserves.content.monthly-allocated"),
+    t("cards.tax-reserves.content.account.title"),
+    "Account Type",
+  ];
+
+  const csv = Papa.unparse([headers]);
+  triggerCSVDownload(csv, "saving-goals-template");
+};

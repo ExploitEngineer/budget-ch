@@ -8,6 +8,11 @@ import {
   exportLatestTransfersToCSV,
   exportTransactionsToCSV,
   exportSavingGoalsToCSV,
+  exportTransactionsTemplateToCSV,
+  exportBudgetsTemplateToCSV,
+  exportAccountsTemplateToCSV,
+  exportSavingGoalsTemplateToCSV,
+  exportTransfersTemplateToCSV,
 } from "@/lib/utils/export-csv";
 import type {
   TransactionExportArgs,
@@ -76,5 +81,15 @@ export const useExportCSV = () => {
       exportCategoriesToCSV({ categories, t: categoriesT }),
     exportSavingGoals: ({ goals }: Omit<SavingGoalsExportArgs, "t">) =>
       exportSavingGoalsToCSV({ goals, t: savingGoalsT }),
+
+    // CSV Templates
+    exportTransactionTemplate: () =>
+      exportTransactionsTemplateToCSV(transactionT),
+    exportBudgetTemplate: () => exportBudgetsTemplateToCSV(budgetT),
+    exportAccountTemplate: () =>
+      exportAccountsTemplateToCSV(accountTableHeadings),
+    exportTransferTemplate: () => exportTransfersTemplateToCSV(tableHeadings),
+    exportSavingGoalTemplate: () =>
+      exportSavingGoalsTemplateToCSV(savingGoalsT),
   };
 };

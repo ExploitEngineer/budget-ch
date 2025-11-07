@@ -30,6 +30,11 @@ export function Export() {
     exportAccounts,
     exportTransfers,
     exportSavingGoals,
+    exportTransactionTemplate,
+    exportBudgetTemplate,
+    exportAccountTemplate,
+    exportTransferTemplate,
+    exportSavingGoalTemplate,
   } = useExportCSV();
 
   async function fetchTransfers() {
@@ -82,6 +87,29 @@ export function Export() {
     {
       title: t("export-card.buttons.transfers"),
       onClick: () => exportTransfers({ transfers }),
+    },
+  ];
+
+  const templateButtons = [
+    {
+      title: t("export-card.buttons.transactions"),
+      onClick: () => exportTransactionTemplate(),
+    },
+    {
+      title: t("export-card.buttons.budgets"),
+      onClick: () => exportBudgetTemplate(),
+    },
+    {
+      title: t("export-card.buttons.savings-goals"),
+      onClick: () => exportSavingGoalTemplate(),
+    },
+    {
+      title: t("export-card.buttons.accounts"),
+      onClick: () => exportAccountTemplate(),
+    },
+    {
+      title: t("export-card.buttons.transfers"),
+      onClick: () => exportTransferTemplate(),
     },
   ];
 
@@ -142,9 +170,10 @@ export function Export() {
             </CardHeader>
             <Separator className="dark:bg-border-blue" />
             <CardContent className="mt-3 grid grid-cols-2 gap-3">
-              {buttons.map((btn) => (
+              {templateButtons.map((btn) => (
                 <Button
                   key={btn.title}
+                  onClick={btn.onClick}
                   variant="outline"
                   className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl cursor-pointer border-dashed"
                 >
