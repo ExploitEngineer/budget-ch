@@ -64,7 +64,7 @@ export default function SidebarHeader() {
   const { accounts } = useAccountStore();
   const { goals } = useSavingGoalStore();
 
-  const { exportAllDataJSON } = useExportCSV();
+  const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
 
   async function fetchTransfers() {
     try {
@@ -201,7 +201,10 @@ export default function SidebarHeader() {
                 <Download />
                 <span className="hidden sm:block">{t("export-json")}</span>
               </Button>
-              <Button className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white">
+              <Button
+                onClick={exportALLCSVTemplates}
+                className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white"
+              >
                 <File />
                 <span className="hidden sm:block">{t("csv-templates")}</span>
               </Button>
