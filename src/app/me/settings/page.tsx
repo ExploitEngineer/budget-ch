@@ -13,7 +13,6 @@ import { loadStripePrices } from "@/lib/stripe";
 export default async function Settings() {
 
   const subscriptionPrices = await fetchPrices();
-  console.log("Subscription Prices:", subscriptionPrices);
 
   return (
     <section>

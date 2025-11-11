@@ -4,6 +4,7 @@ import db from "@/db/db";
 import { createHub } from "@/lib/services/hub";
 import * as schema from "@/db/schema";
 import { createHubMember } from "../services/hub-member";
+import { createAuthMiddleware, APIError } from "better-auth/api";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -16,6 +17,16 @@ export const auth = betterAuth({
       verifications: schema.verifications,
     },
   }),
+  
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if(ctx.path.startsWith("/sign-up")) { // access .body to get the user data
+        
+      }else if(ctx.path.startsWith("/sign-in")) { // access .body to get the user data
+        // Add any additional logic that should run after sign in
+      }
+    }),
+  },
   databaseHooks: {
     user: {
       create: {
