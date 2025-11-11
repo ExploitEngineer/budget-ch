@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardHeader,
@@ -7,45 +9,85 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { useDashboardStore } from "@/store/dashboard-store";
+import type { DashboardCards } from "@/lib/types/dashboard-types";
 
-interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
+export function BudgetCardsSection() {
+  const t = useTranslations("main-dashboard.dashboard-page");
 
-interface BudgetCardsSectionProps {
-  cards: CardsContent[];
-}
+  const {
+    allocated,
+    spent,
+    available,
+    percent,
+    budgetLoading,
+    budgetError,
+    fetchBudgets,
+  } = useDashboardStore();
 
-export function BudgetCardsSection({ cards }: BudgetCardsSectionProps) {
+  useEffect(() => {
+    fetchBudgets();
+  }, []);
+
+  const isLoading =
+    budgetLoading || allocated === null || spent === null || available === null;
+
+  const cards: DashboardCards[] = [
+    {
+      title: t("cards.card-1.title"),
+      content: `CHF ${(allocated ?? 0).toLocaleString()}`,
+      badge: t("cards.card-1.badge"),
+    },
+    {
+      title: t("cards.card-2.title"),
+      content: `CHF ${(spent ?? 0).toLocaleString()}`,
+      badge: percent + t("cards.card-2.badge"),
+    },
+    {
+      title: t("cards.card-3.title"),
+      content: `CHF ${(available ?? 0).toLocaleString()}`,
+      badge: t("cards.card-3.badge"),
+    },
+    {
+      title: t("cards.card-4.title"),
+      content: t("cards.card-4.content"),
+      badge: t("cards.card-4.badge"),
+    },
+  ];
+
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
-      {cards.map((card, idx) => (
-        <Card
-          key={card.title}
-          className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
-        >
-          <CardHeader>
-            <CardTitle className="text-sm font-light">{card.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <h1 className="text-2xl font-bold">{card.content}</h1>
-          </CardContent>
-          <CardFooter className="mt-2">
-            <Badge
-              variant="outline"
-              className={cn(
-                "bg-badge-background rounded-full px-2 py-1 whitespace-pre-wrap",
-                idx === 1 && "border-[#996E41]",
-                idx === 2 && "border-[#308BA4]",
-              )}
-            >
-              <p className="w-full text-xs">{card.badge}</p>
-            </Badge>
-          </CardFooter>
-        </Card>
-      ))}
+      {cards.map((card, idx) => {
+        return (
+          <Card
+            key={card.title}
+            className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
+          >
+            <CardHeader>
+              <CardTitle className="text-sm font-light">{card.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h1 className="text-2xl font-bold">
+                {isLoading ? "..." : budgetError ? "—" : card.content}
+              </h1>
+            </CardContent>
+            <CardFooter className="mt-2">
+              <Badge
+                variant="outline"
+                className={cn(
+                  "bg-badge-background rounded-full px-2 py-1 whitespace-pre-wrap",
+                  idx === 1 && "border-[#996E41]",
+                  idx === 2 && "border-[#308BA4]",
+                )}
+              >
+                <p className="w-full text-xs">{card.badge}</p>
+              </Badge>
+            </CardFooter>
+          </Card>
+        );
+      })}
     </div>
   );
 }

@@ -31,15 +31,23 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import type { Transaction } from "./data";
 import TransactionEditDialog from "./transactions-edit-dialog";
+import type { Transaction } from "@/lib/types/dashboard-types";
+import { useTransactionStore } from "@/store/transaction-store";
+import { Spinner } from "@/components/ui/spinner";
+import { useExportCSV } from "@/hooks/use-export-csv";
 
 interface DataTableProps {
-  transactions: Transaction[];
+  transactions: Omit<Transaction, "type">[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-export function DataTable({ transactions }: DataTableProps) {
+export function DataTable({ transactions, loading, error }: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+
+  const { exportTransactions } = useExportCSV();
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     [],
@@ -48,9 +56,12 @@ export function DataTable({ transactions }: DataTableProps) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  const { deleteAllTransactionsAndCategoriesAndSync, deleteAllLoading } =
+    useTransactionStore();
+
   const title = t("transaction-edit-dialog.title-1");
 
-  const columns: ColumnDef<Transaction>[] = [
+  const columns: ColumnDef<Omit<Transaction, "type">>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -70,30 +81,83 @@ export function DataTable({ transactions }: DataTableProps) {
       enableSorting: false,
       enableHiding: false,
     },
-    { accessorKey: "date", header: t("data-table.headings.date") },
-    { accessorKey: "recipient", header: t("data-table.headings.recipient") },
-    { accessorKey: "account", header: t("data-table.headings.account") },
-    { accessorKey: "category", header: t("data-table.headings.category") },
-    { accessorKey: "note", header: t("data-table.headings.note") },
+    {
+      accessorKey: "date",
+      header: t("data-table.headings.date"),
+    },
+    {
+      accessorKey: "source",
+      header: t("data-table.headings.recipient"),
+      cell: ({ row }) => row.original.recipient || "—",
+    },
+    {
+      accessorKey: "accountType",
+      header: t("data-table.headings.account"),
+      cell: ({ row }) => {
+        const account = row.original.accountType || "—";
+        return <span className="capitalize">{account}</span>;
+      },
+    },
+    {
+      accessorKey: "category",
+      header: t("data-table.headings.category"),
+      cell: ({ row }) => {
+        const category = row.original.category || "—";
+        return <span className="capitalize">{category}</span>;
+      },
+    },
+    {
+      accessorKey: "note",
+      header: t("data-table.headings.note"),
+      cell: ({ row }) => row.original.note || "—",
+    },
     {
       accessorKey: "amount",
       header: t("data-table.headings.amount"),
       cell: ({ row }) => {
-        const amount = row.original.amount;
+        const amount = row.original.amount ?? 0;
         const formatted = new Intl.NumberFormat("de-CH", {
           style: "currency",
           currency: "CHF",
         }).format(amount);
-
-        return <span>{formatted}</span>;
+        return (
+          <span
+            className={`font-semibold ${
+              amount < 0 ? "text-red-600" : "text-green-600"
+            }`}
+          >
+            {formatted}
+          </span>
+        );
       },
     },
     {
       id: "action",
       header: t("data-table.headings.action"),
-      cell: () => <TransactionEditDialog variant="outline" text={title} />,
+      cell: ({ row }) => {
+        const transaction = row.original;
+        return (
+          <TransactionEditDialog
+            variant="outline"
+            text={title}
+            transaction={{
+              id: transaction.id || "",
+              date: transaction.date || "-",
+              recipient: transaction.recipient || "-",
+              accountType: transaction.accountType || "cash",
+              category: transaction.category || "-",
+              note: transaction.note || "-",
+              amount: transaction.amount || 0,
+            }}
+          />
+        );
+      },
     },
   ];
+
+  const totalBalance = React.useMemo(() => {
+    return transactions.reduce((acc, tx) => acc + tx.amount, 0);
+  }, [transactions]);
 
   const table = useReactTable({
     data: transactions,
@@ -109,9 +173,36 @@ export function DataTable({ transactions }: DataTableProps) {
     state: { sorting, columnFilters, columnVisibility, rowSelection },
   });
 
+  if (loading) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
+        <p className="text-gray-500 dark:text-gray-400">{t("loading")}</p>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
+        <p className="text-red-500">{error}</p>
+      </Card>
+    );
+  }
+
+  if (transactions.length === 0) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
+        <p className="text-gray-500 dark:text-gray-400">
+          {t("no-transactions")}
+        </p>
+      </Card>
+    );
+  }
+
   return (
     <section className="grid auto-rows-min grid-cols-6">
       <Card className="bg-blue-background dark:border-border-blue col-span-full">
+        {/* Header */}
         <CardHeader className="flex flex-col flex-wrap items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="flex flex-wrap items-center gap-2">
             <Badge
@@ -133,8 +224,14 @@ export function DataTable({ transactions }: DataTableProps) {
             <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+              onClick={deleteAllTransactionsAndCategoriesAndSync}
+              disabled={deleteAllLoading}
             >
-              {t("data-table.header.buttons.delete")}
+              {deleteAllLoading ? (
+                <Spinner />
+              ) : (
+                t("data-table.header.buttons.delete")
+              )}
             </Button>
             <Button
               variant="outline"
@@ -144,6 +241,7 @@ export function DataTable({ transactions }: DataTableProps) {
             </Button>
             <Button
               variant="outline"
+              onClick={() => exportTransactions({ transactions })}
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.header.buttons.export")} CSV
@@ -155,29 +253,29 @@ export function DataTable({ transactions }: DataTableProps) {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
             >
               {t("data-table.header.badge")}{" "}
-              <span className="font-bold">CHF 4’443.90</span>
+              <span className="font-bold">
+                {new Intl.NumberFormat("de-CH", {
+                  style: "currency",
+                  currency: "CHF",
+                }).format(totalBalance)}
+              </span>
             </Badge>
-            <Button
-              variant="outline"
-              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-            >
-              {t("data-table.header.buttons.update")}
-            </Button>
           </div>
         </CardHeader>
 
+        {/* Table */}
         <CardContent className="overflow-x-auto">
           <Table className="min-w-[800px] overflow-x-auto">
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow
-                  className="dark:border-border-blue"
                   key={headerGroup.id}
+                  className="dark:border-border-blue"
                 >
                   {headerGroup.headers.map((header) => (
                     <TableHead
-                      className="font-bold text-gray-500 dark:text-gray-400/80"
                       key={header.id}
+                      className="font-bold text-gray-500 dark:text-gray-400/80"
                     >
                       {header.isPlaceholder
                         ? null
@@ -190,7 +288,7 @@ export function DataTable({ transactions }: DataTableProps) {
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody className="overflow-x-auto">
+            <TableBody>
               {table.getRowModel().rows.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow
@@ -222,6 +320,7 @@ export function DataTable({ transactions }: DataTableProps) {
           </Table>
         </CardContent>
 
+        {/* Footer */}
         <CardFooter className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="text-muted-foreground text-sm">
             {table.getFilteredSelectedRowModel().rows.length} of{" "}

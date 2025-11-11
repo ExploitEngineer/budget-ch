@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardHeader,
@@ -7,48 +9,117 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "next-intl";
+import { useEffect } from "react";
+import { useAccountStore } from "@/store/account-store";
+import type { AccountRow } from "@/store/account-store";
 
-interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
+export function ContentCardsSection() {
+  const t = useTranslations("main-dashboard.content-page");
+  const { accounts, accountsLoading, accountsError, fetchAccounts } =
+    useAccountStore();
 
-interface ContentCardsSectionProps {
-  cards: CardsContent[];
-}
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
 
-export function ContentCardsSection({ cards }: ContentCardsSectionProps) {
+  const parsedAccounts = (accounts ?? []).map((acc) => ({
+    ...acc,
+    numericBalance:
+      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0,
+  }));
+
+  const totalBalance = parsedAccounts.reduce(
+    (sum, acc) => sum + acc.numericBalance,
+    0,
+  );
+  const checkingCashTotal = parsedAccounts
+    .filter((a) => a.type === "checking" || a.type === "cash")
+    .reduce((sum, acc) => sum + acc.numericBalance, 0);
+  const savingsBalance = parsedAccounts
+    .filter((a) => a.type === "savings")
+    .reduce((sum, acc) => sum + acc.numericBalance, 0);
+  const creditCardTotal = parsedAccounts
+    .filter((a) => a.type === "credit-card")
+    .reduce((sum, acc) => sum + acc.numericBalance, 0);
+
+  const cards = [
+    {
+      title: t("cards.card-1.title"),
+      content: `CHF ${totalBalance.toLocaleString("de-CH", {
+        minimumFractionDigits: 2,
+      })}`,
+      badge: t("cards.card-1.badge"),
+    },
+    {
+      title: t("cards.card-2.title"),
+      content: `CHF ${checkingCashTotal.toLocaleString("de-CH", {
+        minimumFractionDigits: 2,
+      })}`,
+      badge: t("cards.card-2.badge"),
+    },
+    {
+      title: t("cards.card-3.title"),
+      content: `CHF ${savingsBalance.toLocaleString("de-CH", {
+        minimumFractionDigits: 2,
+      })}`,
+      badge: t("cards.card-3.badge"),
+    },
+    {
+      title: t("cards.card-4.title"),
+      content: `CHF ${creditCardTotal.toLocaleString("de-CH", {
+        minimumFractionDigits: 2,
+      })}`,
+      badge: t("cards.card-4.badge"),
+    },
+  ];
+
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
-      {cards.map((card, idx) => (
-        <Card
-          key={card.title}
-          className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
-        >
-          <CardHeader>
-            <CardTitle className="text-sm font-light">{card.title}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <h1 className="text-2xl font-bold">{card.content}</h1>
-          </CardContent>
-          <CardFooter className="mt-2">
-            <Badge
-              variant="outline"
-              className={cn(
-                "bg-badge-background rounded-full px-4 py-2",
-                idx === 2
-                  ? "border-[#308BA4]"
-                  : idx === 3
-                    ? "border-[#9A4249]"
-                    : "dark:border-border-blue",
-              )}
-            >
-              <p className="w-full text-xs">{card.badge}</p>
-            </Badge>
-          </CardFooter>
-        </Card>
-      ))}
+      {cards.map((card, idx) => {
+        const content = accountsLoading
+          ? "..."
+          : accountsError
+            ? "—"
+            : card.content;
+
+        return (
+          <Card
+            key={card.title}
+            className="bg-blue-background dark:border-border-blue flex flex-col gap-0 rounded-xl"
+          >
+            <CardHeader>
+              <CardTitle className="text-sm font-light">{card.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <h1
+                className={cn(
+                  "text-2xl font-bold",
+                  accountsLoading && "text-gray-400",
+                  accountsError && "text-red-500",
+                )}
+              >
+                {accountsLoading ? "..." : accountsError ? "—" : content}
+              </h1>
+            </CardContent>
+            <CardFooter className="mt-2">
+              <Badge
+                variant="outline"
+                className={cn(
+                  "bg-badge-background rounded-full px-4 py-2 whitespace-pre-wrap",
+                  idx === 2
+                    ? "border-[#308BA4]"
+                    : idx === 3
+                      ? "border-[#9A4249]"
+                      : "dark:border-border-blue",
+                )}
+              >
+                <p className="w-full text-xs">{card.badge}</p>
+              </Badge>
+            </CardFooter>
+          </Card>
+        );
+      })}
     </div>
   );
 }

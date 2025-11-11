@@ -11,13 +11,6 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogContent,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -27,109 +20,153 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogClose,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import {
   Popover,
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
-import { mainFormSchema, MainFormValues } from "@/lib/validations";
+import { useState } from "react";
+import {
+  SavingsGoalDialogSchema,
+  SavingsGoalDialogValues,
+} from "@/lib/validations/saving-goal-validations";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
+import { Spinner } from "@/components/ui/spinner";
 
-export default function SavingGoalsDialog() {
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
+export default function SavingGoalDialog() {
+  const t = useTranslations(
+    "main-dashboard.saving-goals-page.sidebar-header.dialog",
+  );
+
+  const { createGoalAndSync, createLoading } = useSavingGoalStore();
+  const [open, setOpen] = useState<boolean>(false);
+
+  const form = useForm<SavingsGoalDialogValues>({
+    resolver: zodResolver(SavingsGoalDialogSchema) as any,
     defaultValues: {
-      text: "",
-      amount: 0,
-      entries: [],
-      date: undefined,
-      account: "",
-      select: "",
-      amountMax: 0,
+      name: "",
+      goalAmount: 0,
+      savedAmount: 0,
+      dueDate: undefined,
+      account: "savings",
+      monthlyAllocation: 0,
     },
   });
 
-  const t = useTranslations("main-dashboard.saving-goals-page.dialog");
+  async function onSubmit(values: SavingsGoalDialogValues) {
+    try {
+      await createGoalAndSync({
+        name: values.name,
+        goalAmount: values.goalAmount,
+        amountSaved: values.savedAmount,
+        monthlyAllocation: values.monthlyAllocation,
+        accountType: values.account,
+      });
 
-  function onSubmit(values: MainFormValues) {
-    console.log(values);
+      form.reset();
+      setOpen(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
+    }
   }
 
   return (
-    <Dialog>
-      <DialogTrigger className="cursor-pointer" asChild>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         <Button
-          variant="outline"
-          className="dark:border-border-blue !bg-dark-blue-background"
+          className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white"
+          variant="default"
         >
-          {t("edit")}
+          <Plus className="h-5 w-5" />
+          <span className="hidden text-sm sm:block">{t("title")}</span>
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
-        <div className="flex items-center justify-between border-b pb-3">
+        <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
-            {t("title")}
+            {t("subtitle")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button className="cursor-pointer border" variant="ghost">
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
               {t("button")}
             </Button>
           </DialogClose>
-        </div>
+        </DialogHeader>
 
+        {/* Form */}
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 pt-4"
+          >
             {/* Row 1: Name */}
             <FormField
               control={form.control}
-              name="text"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t("labels.name")}</FormLabel>
+                  <FormLabel>{t("labels.name.title")}</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder={t("labels.name")} />
+                    <Input
+                      {...field}
+                      placeholder={t("labels.name.placeholder")}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Row 2: Target Amount & Already Saved */}
-            <div className="flex gap-4">
+            {/* Row 2: Target + Already Saved */}
+            <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
-                name="amount"
+                name="goalAmount"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>{t("labels.target-amount")}</FormLabel>
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.goal-amount")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step={0.5}
-                        {...field}
+                        min={0}
                         placeholder="0.00"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
-                name="amountMax"
+                name="savedAmount"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>{t("labels.already-saved")}</FormLabel>
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.saved-amount")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
                         step={0.5}
-                        {...field}
+                        min={0}
                         placeholder="0.00"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -138,14 +175,14 @@ export default function SavingGoalsDialog() {
               />
             </div>
 
-            {/* Row 3: Due On & Account */}
-            <div className="flex gap-4">
+            {/* Row 3: Due Date + Account */}
+            <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
-                name="date"
+                name="dueDate"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>{t("labels.due-on")}</FormLabel>
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.due-date.title")}</FormLabel>
                     <FormControl>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -156,7 +193,7 @@ export default function SavingGoalsDialog() {
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {field.value
                               ? format(field.value, "PPP")
-                              : "Pick a date"}
+                              : t("labels.due-date.placeholder")}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent>
@@ -177,25 +214,30 @@ export default function SavingGoalsDialog() {
                 control={form.control}
                 name="account"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>{t("labels.account")}</FormLabel>
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.account.title")}</FormLabel>
                     <FormControl>
                       <Select
-                        value={field.value}
                         onValueChange={field.onChange}
+                        value={field.value}
                       >
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder={t("labels.account")} />
+                          <SelectValue
+                            placeholder={t("labels.account.title")}
+                          />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="checking">
-                            {t("account-options.checking")}
+                            {t("labels.account.options.checking")}
                           </SelectItem>
                           <SelectItem value="savings">
-                            {t("account-options.savings")}
+                            {t("labels.account.options.save")}
+                          </SelectItem>
+                          <SelectItem value="credit-card">
+                            {t("labels.account.options.credit-card")}
                           </SelectItem>
                           <SelectItem value="cash">
-                            {t("account-options.cash")}
+                            {t("labels.account.options.cash")}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -209,7 +251,7 @@ export default function SavingGoalsDialog() {
             {/* Row 4: Monthly Allocation */}
             <FormField
               control={form.control}
-              name="select"
+              name="monthlyAllocation"
               render={({ field }) => (
                 <FormItem className="w-1/2">
                   <FormLabel>{t("labels.monthly-allocation")}</FormLabel>
@@ -217,8 +259,9 @@ export default function SavingGoalsDialog() {
                     <Input
                       type="number"
                       step={0.5}
-                      {...field}
+                      min={0}
                       placeholder="0.00"
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -227,11 +270,14 @@ export default function SavingGoalsDialog() {
             />
 
             {/* Footer Buttons */}
-            <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline">
-                {t("buttons.delete")}
+            <div className="flex justify-end pt-4">
+              <Button
+                type="submit"
+                disabled={createLoading}
+                className="cursor-pointer"
+              >
+                {createLoading ? <Spinner /> : t("save")}
               </Button>
-              <Button type="submit">{t("buttons.save")}</Button>
             </div>
           </form>
         </Form>

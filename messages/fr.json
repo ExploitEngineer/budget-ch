@@ -90,12 +90,20 @@
                             "cash": "Espèces"
                         }
                     },
+                    "transactionType": {
+                        "title": "Type de transaction",
+                        "options": {
+                            "income": "revenu",
+                            "expense": "dépense"
+                        }
+                    },
                     "quelle": {
                         "title": "Source",
                         "placeholder": "p. ex. Coop, employeur…"
                     },
                     "category": {
                         "title": "Catégorie",
+                        "category-name": "Nom de la catégorie",
                         "options": {
                             "groceries": "Courses",
                             "restaurant": "Restaurant & Café",
@@ -110,9 +118,13 @@
                         "placeholder": "Optionnel"
                     }
                 },
+                "no-categories-yet": "Aucune catégorie pour le moment",
                 "buttons": {
                     "save": "Enregistrer comme modèle",
-                    "post": "Valider"
+                    "post": "Publier",
+                    "add": "Ajouter",
+                    "add-category": "Ajouter une catégorie",
+                    "new-category": "Nouvelle catégorie"
                 }
             },
             "dashbaord-table-adjust-dialog": {
@@ -145,17 +157,14 @@
             "cards": {
                 "card-1": {
                     "title": "Budget total (Mois)",
-                    "content": "4’703 francs suisses",
                     "badge": "Fixe + Variable • incl. CC & SERAFE"
                 },
                 "card-2": {
                     "title": "Dépenses (Réelles)",
-                    "content": "2’456 francs suisses",
-                    "badge": "60% du budget"
+                    "badge": "% du budget"
                 },
                 "card-3": {
                     "title": "Disponible",
-                    "content": "3’447 francs suisses",
                     "badge": "+40% de marge"
                 },
                 "card-4": {
@@ -170,41 +179,29 @@
             },
             "progress-cards": {
                 "title": "Objectifs d’épargne",
-                "card-1": {
-                    "title": "Réserves fiscales"
-                },
-                "card-2": {
-                    "title": "Fonds d’urgence"
-                },
-                "card-3": {
-                    "title": "Vacances"
-                }
+                "loading": "Chargement...",
+                "no-goals": "Aucun objectif d’épargne pour le moment..."
             },
             "line-progress-cards": {
                 "title": "Catégories principales (Mois)",
                 "button": "Tous les budgets",
-                "card-1": {
-                    "title": "Courses"
-                },
-                "card-2": {
-                    "title": "Restaurant & Café"
-                },
-                "card-3": {
-                    "title": "Transport"
-                },
-                "card-4": {
-                    "title": "Ménage"
-                }
+                "loading": "Chargement...",
+                "no-categories-found": "Aucune catégorie trouvée"
             },
             "todos": {
                 "title": "Tâches rapides",
-                "button": "fait rapidement",
-                "placeholder": "Ajouter une tâche…"
+                "placeholder": "Ajouter une tâche…",
+                "no-tasks": "Aucune tâche pour le moment..",
+                "created": "Tâche créée avec succès !",
+                "updated": "Tâche mise à jour avec succès !",
+                "deleted": "Tâche supprimée avec succès !"
             },
             "upcoming-cards": {
                 "title": "Échéances à venir (Répétitif)",
                 "last-transaction": "Dernières transactions",
                 "button": "Prochains 14 jours",
+                "loading": "Chargement...",
+                "no-transactions": "Aucune transaction récente",
                 "table-data": {
                     "table-heading": {
                         "date": "DATE",
@@ -249,38 +246,16 @@
                 "table-headings": {
                     "date": "Date",
                     "recipient": {
-                        "title": "Bénéficiaire",
-                        "data": {
-                            "coop": "Coopérative",
-                            "sbb": "SBB",
-                            "cafe": "Cafe Roma",
-                            "employer": "Employeur"
-                        }
+                        "title": "Bénéficiaire"
                     },
                     "account": {
-                        "title": "Compte",
-                        "data": {
-                            "current-account": "Compte courant",
-                            "credit-card": "Carte de crédit"
-                        }
+                        "title": "Compte"
                     },
                     "category": {
-                        "title": "Catégorie",
-                        "data": {
-                            "groceries": "Courses",
-                            "transportation": "Transport",
-                            "restaurant": "Restaurant",
-                            "income": "Revenu"
-                        }
+                        "title": "Catégorie"
                     },
                     "note": {
-                        "title": "Note",
-                        "data": {
-                            "shopping": "Courses hebdomadaires",
-                            "ga": "Pass GA journalier",
-                            "lunch": "Déjeuner",
-                            "salary": "Salaire"
-                        }
+                        "title": "Note"
                     },
                     "amount": "Montant"
                 }
@@ -290,7 +265,8 @@
                 "secondary-title": "Vue mensuelle",
                 "warning-card": {
                     "title": "SCORE",
-                    "warning": "Avertissement : élevé",
+                    "warning-high": "Avertissement : élevé",
+                    "warning-normal": "Avertissement : normal",
                     "spending": "Rythme de dépenses"
                 },
                 "card-1": {
@@ -305,12 +281,16 @@
             }
         },
         "transactions-page": {
+            "loading": "Chargement...",
+            "no-transactions": "Aucune transaction pour le moment",
             "transaction-edit-dialog": {
                 "title-1": "Modifier",
                 "title-2": "Nouvelle transaction",
                 "dialog": {
                     "title": "Modifier la transaction",
                     "close": "Fermer",
+                    "new-category": "Nouvelle catégorie",
+                    "no-category": "Aucune catégorie pour le moment",
                     "labels": {
                         "date": "Date",
                         "account": "Compte",
@@ -319,7 +299,14 @@
                         "amount": "Montant (CHF)",
                         "note": "Remarque",
                         "file": "Reçus (PDF/JPG/PNG)",
-                        "splitSum": "Diviser la transaction"
+                        "splitSum": "Diviser la transaction",
+                        "transactionType": {
+                            "title": "Type de transaction",
+                            "options": {
+                                "income": "revenu",
+                                "expense": "dépense"
+                            }
+                        }
                     },
                     "placeholders": {
                         "date": "21/09/2025",
@@ -330,10 +317,10 @@
                         "note-optional": "Remarque (optionnelle)"
                     },
                     "options": {
-                        "giro": "Compte courant",
+                        "checking": "Compte courant",
                         "credit-card": "Carte de crédit",
-                        "sparen": "Compte épargne",
-                        "bar": "Espèces",
+                        "savings": "Compte épargne",
+                        "cash": "Espèces",
                         "lebensmittel": "Courses",
                         "restaurant": "Restaurant & Café",
                         "oev": "Transports publics & mobilité",
@@ -346,6 +333,7 @@
                     },
                     "buttons": {
                         "demo": "OCR (Démo)",
+                        "cancel": "Annuler",
                         "delete": "Supprimer",
                         "save": "Enregistrer"
                     }
@@ -361,7 +349,8 @@
                         "current-account": "Compte courant",
                         "credit-card": "Carte de crédit",
                         "savings": "Épargne",
-                        "cash": "Espèces"
+                        "cash": "Espèces",
+                        "all": "Tous les comptes"
                     }
                 },
                 "category": {
@@ -370,7 +359,9 @@
                         "categories": "Toutes les catégories",
                         "groceries": "Courses",
                         "restaurant": "Restaurant & Café",
-                        "transportation": "Transport"
+                        "transportation": "Transport",
+                        "new-category": "Nouvelle catégorie",
+                        "no-category": "Aucune catégorie pour le moment"
                     }
                 },
                 "search": {
@@ -447,6 +438,9 @@
             "sidebar-header": {
                 "dialog": {
                     "title": "Nouveau budget",
+                    "edit-budget": "Modifier le budget",
+                    "new-category": "Nouvelle catégorie",
+                    "no-category": "Aucune catégorie pour le moment",
                     "button": "Fermer",
                     "labels": {
                         "category": {
@@ -467,6 +461,7 @@
                         }
                     },
                     "delete-btn": "Supprimer",
+                    "cancel": "Annuler",
                     "save": "Enregistrer"
                 }
             },
@@ -479,7 +474,7 @@
                 "card-2": {
                     "title": "Dépensé jusqu'à présent",
                     "content": "CHF 1’915.00",
-                    "badge": "66% du budget"
+                    "badge": "% du budget"
                 },
                 "card-3": {
                     "title": "Disponible",
@@ -494,7 +489,8 @@
             },
             "data-table": {
                 "title": "Toutes les catégories",
-                "badge": "Budget total : CHF 2’900.00 • Restant : CHF 985.00",
+                "total-budget": "Budget total : ",
+                "rest-budget": "Restant : ",
                 "buttons": {
                     "export": "Exporter CSV",
                     "reset": "Réinitialiser (Demo)"
@@ -547,52 +543,34 @@
             "sidebar-header": {
                 "dialog": {
                     "title": "Nouvel objectif",
-                    "subtitle": "Nouvel objectif d'épargne",
+                    "subtitle": "Nouvel objectif d’épargne",
                     "button": "Fermer",
+                    "delete": "Supprimer",
+                    "edit-dialog": "Modifier l’objectif d’épargne",
+                    "edit": "Modifier",
                     "labels": {
                         "name": {
                             "title": "Nom",
-                            "placeholder": "ex. fonds d'urgence, vacances, impôts"
+                            "placeholder": "ex. Fonds d’urgence, Vacances, Impôts"
                         },
                         "goal-amount": "Montant cible (CHF)",
-                        "saved-amount": "Déjà épargné (CHF)",
+                        "saved-amount": "Déjà économisé (CHF)",
                         "due-date": {
-                            "title": "Date d'échéance",
-                            "placeholder": "mm/dd/yyyy"
+                            "title": "Date d’échéance",
+                            "placeholder": "jj/mm/aaaa"
                         },
                         "account": {
                             "title": "Compte",
                             "options": {
                                 "save": "Épargne",
                                 "checking": "Compte courant",
-                                "cash": "Espèces"
+                                "cash": "Espèces",
+                                "credit-card": "Carte de crédit"
                             }
                         },
                         "monthly-allocation": "Allocation mensuelle (CHF)"
                     },
                     "save": "Enregistrer"
-                }
-            },
-            "dialog": {
-                "title": "Modifier l'objectif d'épargne",
-                "button": "Fermer",
-                "edit": "Modifier",
-                "labels": {
-                    "name": "Nom",
-                    "target-amount": "Montant cible (CHF)",
-                    "already-saved": "Déjà économisé (CHF)",
-                    "due-on": "Échéance le",
-                    "account": "Compte",
-                    "monthly-allocation": "Allocation mensuelle (CHF)"
-                },
-                "buttons": {
-                    "delete": "Supprimer",
-                    "save": "Enregistrer"
-                },
-                "account-options": {
-                    "checking": "Compte courant",
-                    "savings": "Compte d'épargne",
-                    "cash": "Espèces"
                 }
             },
             "cards": {
@@ -620,6 +598,8 @@
             "active-goals-section": {
                 "title": "Objectifs actifs",
                 "badge": "3 objectifs • Allocation automatique : CHF 700.00",
+                "no-goals": "Aucun objectif d’épargne trouvé.",
+                "loading": "Chargement...",
                 "buttons": {
                     "due": "Échéance",
                     "progress": "Progression",
@@ -634,6 +614,7 @@
                         "content": {
                             "goal": "Objectif",
                             "saved": "Économisé",
+                            "monthly-allocated": "Alloué",
                             "rest": "Reste",
                             "due": "Échéance",
                             "account": {
@@ -671,7 +652,8 @@
                 "button": "Transfert",
                 "new-account-dialog": {
                     "title": "Nouveau compte",
-                    "subtitle": "Nouveau compte",
+                    "edit-title": "Modifier le compte",
+                    "edit": "Modifier",
                     "button": "Fermer",
                     "labels": {
                         "name": {
@@ -698,7 +680,8 @@
                             "placeholder": "facultatif"
                         }
                     },
-                    "save": "Enregistrer"
+                    "save": "Enregistrer",
+                    "delete": "Supprimer"
                 },
                 "dialog-box": {
                     "title": "Transfert entre comptes",
@@ -759,6 +742,7 @@
                 }
             },
             "data-table": {
+                "loading": "Chargement des données...",
                 "title": "Toutes les catégories",
                 "badge": "5 comptes • Liquidité CHF 2’620.00",
                 "buttons": {
@@ -799,6 +783,9 @@
             }
         },
         "report-page": {
+            "loading": "Chargement...",
+            "no-reports": "Aucun rapport mensuel pour le moment",
+            "no-categories-yet": "Aucune catégorie pour le moment",
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filtrer",
@@ -845,7 +832,9 @@
             },
             "analysis-table-data": {
                 "title": "Analyse",
-                "badge": "Mois dernier : CHF 5’800.00 Revenus • CHF 4’800.00 Dépenses",
+                "badge-last-month": "Le mois dernier : ",
+                "badge-income": "Revenus • ",
+                "badge-expense": "Dépenses ",
                 "toggle-groups": {
                     "month": "Mois",
                     "quarter": "Trimestre",
@@ -876,6 +865,7 @@
             },
             "detailed-table": {
                 "title": "Tableau détaillé",
+                "loading": "Chargement...",
                 "buttons": {
                     "categories-csv": "CSV catégories",
                     "trend-csv": "CSV tendances"
@@ -997,6 +987,7 @@
                         "title": "Individuel",
                         "sub-title": "Pour un utilisateur.",
                         "year": "Année",
+                        "month": "Mois",
                         "options": {
                             "all-free-features": "Toutes les fonctionnalités gratuites sans limites",
                             "unlimited": "Transactions, comptes, budgets & objectifs d'épargne illimités",

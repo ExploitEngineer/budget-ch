@@ -21,58 +21,25 @@ export function useSavingGoalsData() {
   const cards: CardsContent[] = [
     {
       title: t("cards.card-1.title"),
-      content: t("cards.card-1.content"),
+      content: "—",
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: t("cards.card-2.content"),
+      content: "—",
       badge: t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),
-      content: t("cards.card-3.content"),
+      content: "—",
       badge: t("cards.card-3.badge"),
     },
     {
       title: t("cards.card-4.title"),
-      content: t("cards.card-4.content"),
+      content: "—",
       badge: t("cards.card-4.badge"),
     },
   ];
 
-  const activeGoalsData: ActiveGoalsData[] = [
-    {
-      title: t("active-goals-section.cards.tax-reserves.header.title"),
-      badgeValue: 65,
-      button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 60,
-      accountBadge: t(
-        "active-goals-section.cards.tax-reserves.content.account.save",
-      ),
-      remainingBadgeDays: 91,
-    },
-    {
-      title: t("active-goals-section.cards.tax-reserves.header.title"),
-      badgeValue: 22,
-      button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 40,
-      accountBadge: t(
-        "active-goals-section.cards.tax-reserves.content.checking-account",
-      ),
-      remainingBadgeDays: 91,
-    },
-    {
-      title: t("active-goals-section.cards.tax-reserves.header.title"),
-      badgeValue: 47,
-      button: t("active-goals-section.cards.tax-reserves.header.button"),
-      progress: 55,
-      accountBadge: t(
-        "active-goals-section.cards.tax-reserves.content.account.save",
-      ),
-      remainingBadgeDays: 91,
-    },
-  ];
-
-  return { cards, activeGoalsData };
+  return { cards };
 }

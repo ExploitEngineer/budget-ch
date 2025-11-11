@@ -14,15 +14,23 @@ import {
   MessageSquare,
   Check,
 } from "lucide-react";
-import DashBoardDialog from "./dialogs/dashboard-dialog";
+import TransactionDialog from "./dialogs/transaction-dialog";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
 import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
-import SavingsGoalMainDialog from "@/app/me/budgets/_components/saving-goals-main-dialog";
+import SavingGoalDialog from "@/app/me/saving-goals/_components/saving-goal-dialog";
 import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
-import TransactionEditDialog from "@/app/me/transactions/_components/transactions-edit-dialog";
+import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
+import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
+import { useDashboardStore } from "@/store/dashboard-store";
+import { useBudgetStore } from "@/store/budget-store";
+import { useAccountStore } from "@/store/account-store";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
+import { useExportCSV } from "@/hooks/use-export-csv";
+import { useEffect } from "react";
 
 const monthNames: string[] = [
   "January",
@@ -44,11 +52,37 @@ export default function SidebarHeader() {
   const t = useTranslations("main-dashboard");
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [transfers, setTransfers] = useState<TransferData[]>([]);
   const [date, setDate] = useState(
     new Date(today.getFullYear(), today.getMonth()),
   );
   const pathname = usePathname();
   const route = pathname.split("/").pop();
+
+  const { transactions } = useDashboardStore();
+  const { budgets } = useBudgetStore();
+  const { accounts } = useAccountStore();
+  const { goals } = useSavingGoalStore();
+
+  const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
+
+  async function fetchTransfers() {
+    try {
+      const result = await getAccountTransfers();
+
+      if (!result || !result.status) {
+        throw new Error(result?.message || "Unknown error");
+      }
+
+      setTransfers((result.data as TransferData[]) || []);
+    } catch (err: any) {
+      console.error("Error fetching transfers:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchTransfers();
+  }, []);
 
   const goToPrevMonth = () => {
     setDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));
@@ -119,15 +153,15 @@ export default function SidebarHeader() {
             isSearchExpanded ? "hidden sm:flex" : "flex"
           }`}
         >
-          {route === "dashboard" && <DashBoardDialog />}
+          {route === "dashboard" && <TransactionDialog />}
 
           {route === "transactions" && (
-            <TransactionEditDialog variant="gradient" />
+            <CreateTransactionDialog variant="gradient" />
           )}
 
           {route === "budgets" && <BudgetDialog />}
 
-          {route === "saving-goals" && <SavingsGoalMainDialog />}
+          {route === "saving-goals" && <SavingGoalDialog />}
 
           {route === "accounts" && (
             <div className="flex items-center gap-2">
@@ -153,12 +187,24 @@ export default function SidebarHeader() {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
-                className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2"
+                onClick={() =>
+                  exportAllDataJSON({
+                    transactions,
+                    budgets,
+                    accounts,
+                    goals,
+                    transfers,
+                  })
+                }
+                className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-2"
               >
                 <Download />
                 <span className="hidden sm:block">{t("export-json")}</span>
               </Button>
-              <Button className="btn-gradient flex items-center gap-2 dark:text-white">
+              <Button
+                onClick={exportALLCSVTemplates}
+                className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white"
+              >
                 <File />
                 <span className="hidden sm:block">{t("csv-templates")}</span>
               </Button>

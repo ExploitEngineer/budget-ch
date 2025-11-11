@@ -27,8 +27,15 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { BudgetDialogSchema, BudgetDialogValues } from "@/lib/validations";
+import {
+  BudgetDialogSchema,
+  BudgetDialogValues,
+} from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { useBudgetStore } from "@/store/budget-store";
+import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
+import AddCategory from "../../dashboard/_components/add-category-dialog";
 
 export default function BudgetDialog({
   variant = "gradient",
@@ -41,6 +48,12 @@ export default function BudgetDialog({
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
 
+  const { createBudgetAndSync, createLoading } = useBudgetStore();
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [open, setOpen] = useState<boolean>(false);
+
   const form = useForm<BudgetDialogValues>({
     resolver: zodResolver(BudgetDialogSchema) as any,
     defaultValues: {
@@ -48,161 +61,120 @@ export default function BudgetDialog({
       budgetChf: 0,
       istChf: 0,
       warning: 0,
-      colorMarker: "std",
+      colorMarker: "standard",
     },
   });
 
-  function onSubmit(values: BudgetDialogValues) {
-    console.log("Budget dialog submitted:", values);
+  async function onSubmit(values: BudgetDialogValues) {
+    try {
+      await createBudgetAndSync({
+        categoryName: values.category,
+        allocatedAmount: values.budgetChf,
+        spentAmount: values.istChf,
+        warningPercentage: values.warning,
+        markerColor: values.colorMarker.toLowerCase(),
+      });
+
+      form.reset();
+      setOpen(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
+    }
   }
 
+  function handleCategoryAdded(newCategory: string) {
+    setCategories((prev) => [...prev, newCategory]);
+    setSelectedCategory(newCategory);
+    form.setValue("category", newCategory);
+  }
   return (
-    <Dialog>
-      <DialogTrigger className="cursor-pointer" asChild>
-        <Button
-          className={
-            variant === "gradient"
-              ? "btn-gradient flex items-center gap-2 dark:text-white"
-              : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
-          }
-          variant={variant === "gradient" ? "default" : "outline"}
-        >
-          <span className="hidden text-sm sm:block">
-            {variant === "gradient" ? t("title") : text}
-          </span>
-          <Plus className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
+    <>
+      <AddCategory
+        open={isAddCategoryOpen}
+        onOpenChangeAction={setIsAddCategoryOpen}
+        onCategoryAddedAction={handleCategoryAdded}
+      />
 
-      <DialogContent className="max-w-2xl [&>button]:hidden">
-        <div className="flex items-center justify-between border-b pb-3">
-          <DialogTitle className="text-lg font-semibold">
-            {t("title")}
-          </DialogTitle>
-          <DialogClose asChild>
-            <Button type="button" variant="ghost" className="border">
-              {t("button")}
-            </Button>
-          </DialogClose>
-        </div>
-
-        <Form {...form}>
-          <form
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 pt-4"
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger className="cursor-pointer" asChild>
+          <Button
+            className={
+              variant === "gradient"
+                ? "btn-gradient flex items-center gap-2 dark:text-white"
+                : "bg-dark-blue-background! dark:border-border-blue flex cursor-pointer items-center gap-2"
+            }
+            variant={variant === "gradient" ? "default" : "outline"}
           >
-            {/* Row 1: Category */}
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("labels.category.title")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={t("labels.category.placeholder")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <Plus className="h-5 w-5" />
+            <span className="hidden text-sm sm:block">
+              {variant === "gradient" ? t("title") : text}
+            </span>
+          </Button>
+        </DialogTrigger>
 
-            {/* Row 2: Budget & Ist */}
-            <div className="flex items-center justify-between gap-3">
-              <FormField
-                control={form.control}
-                name="budgetChf"
-                render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>{t("labels.budget-chf")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step={0.5}
-                        min={0}
-                        {...field}
-                        placeholder="0.00"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="istChf"
-                render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>{t("labels.1-chf")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step={0.5}
-                        min={0}
-                        {...field}
-                        placeholder="0.00"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+        <DialogContent className="max-w-2xl [&>button]:hidden">
+          <div className="flex items-center justify-between border-b pb-3">
+            <DialogTitle className="text-lg font-semibold">
+              {t("title")}
+            </DialogTitle>
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                className="cursor-pointer border"
+              >
+                {t("button")}
+              </Button>
+            </DialogClose>
+          </div>
 
-            {/* Row 3: Warning and Color Marker */}
-            <div className="flex items-center justify-between gap-3">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-6 pt-4"
+            >
+              {/* Row 1: Category */}
               <FormField
                 control={form.control}
-                name="warning"
+                name="category"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>{t("labels.warning")}</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step={1}
-                        min={0}
-                        max={100}
-                        {...field}
-                        placeholder="0"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="colorMarker"
-                render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>{t("labels.color-marker.title")}</FormLabel>
+                  <FormItem>
+                    <FormLabel>{t("labels.category.title")}</FormLabel>
                     <FormControl>
                       <Select
-                        onValueChange={field.onChange}
-                        value={field.value}
+                        value={selectedCategory || ""}
+                        onValueChange={(value) => {
+                          setSelectedCategory(value);
+                          field.onChange(value);
+                        }}
                       >
                         <SelectTrigger className="w-full">
-                          <SelectValue
-                            placeholder={t("labels.color-marker.title")}
-                          />
+                          <SelectValue placeholder="Select or add a category" />
                         </SelectTrigger>
+
                         <SelectContent>
-                          <SelectItem value="std">
-                            {t("labels.color-marker.options.std")}
-                          </SelectItem>
-                          <SelectItem value="green">
-                            {t("labels.color-marker.options.green")}
-                          </SelectItem>
-                          <SelectItem value="orange">
-                            {t("labels.color-marker.options.orange")}
-                          </SelectItem>
-                          <SelectItem value="red">
-                            {t("labels.color-marker.options.red")}
-                          </SelectItem>
+                          <div className="flex items-center justify-between border-b px-2 py-1.5">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className="w-full cursor-pointer justify-center text-sm"
+                              onClick={() => setIsAddCategoryOpen(true)}
+                            >
+                              + {t("new-category")}
+                            </Button>
+                          </div>
+
+                          {categories.length === 0 ? (
+                            <SelectItem value="none" disabled>
+                              {t("no-category")}
+                            </SelectItem>
+                          ) : (
+                            categories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -210,18 +182,131 @@ export default function BudgetDialog({
                   </FormItem>
                 )}
               />
-            </div>
+              {/* Row 2: Budget & Ist */}
+              <div className="flex items-center justify-between gap-3">
+                <FormField
+                  control={form.control}
+                  name="budgetChf"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-1 flex-col">
+                      <FormLabel>{t("labels.budget-chf")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step={0.5}
+                          min={0}
+                          {...field}
+                          placeholder="0.00"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="istChf"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-1 flex-col">
+                      <FormLabel>{t("labels.1-chf")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step={0.5}
+                          min={0}
+                          {...field}
+                          placeholder="0.00"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
-            {/* Footer buttons */}
-            <div className="flex justify-end gap-3 pt-4">
-              <Button type="button" variant="outline">
-                {t("delete-btn")}
-              </Button>
-              <Button type="submit">{t("save")}</Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+              {/* Row 3: Warning and Color Marker */}
+              <div className="flex items-center justify-between gap-3">
+                <FormField
+                  control={form.control}
+                  name="warning"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-1 flex-col">
+                      <FormLabel>{t("labels.warning")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step={1}
+                          min={0}
+                          max={100}
+                          {...field}
+                          placeholder="0"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="colorMarker"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-1 flex-col">
+                      <FormLabel>{t("labels.color-marker.title")}</FormLabel>
+                      <FormControl>
+                        <Select
+                          onValueChange={field.onChange}
+                          value={field.value}
+                        >
+                          <SelectTrigger className="w-full">
+                            <SelectValue
+                              placeholder={t("labels.color-marker.title")}
+                            />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="standard">
+                              {t("labels.color-marker.options.std")}
+                            </SelectItem>
+                            <SelectItem value="green">
+                              {t("labels.color-marker.options.green")}
+                            </SelectItem>
+                            <SelectItem value="orange">
+                              {t("labels.color-marker.options.orange")}
+                            </SelectItem>
+                            <SelectItem value="red">
+                              {t("labels.color-marker.options.red")}
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Footer buttons */}
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  className="cursor-pointer"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
+                  {t("cancel")}
+                </Button>
+                <Button
+                  className="cursor-pointer"
+                  disabled={createLoading}
+                  type="submit"
+                >
+                  {createLoading ? <Spinner /> : t("save")}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

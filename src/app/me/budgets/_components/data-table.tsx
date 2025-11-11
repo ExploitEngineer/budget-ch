@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Card,
   CardHeader,
@@ -19,23 +21,32 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
-import BudgetDialog from "./budget-dialog";
+import BudgetEditDialog from "./budget-edit-dialog";
+import { useEffect, useState, useMemo } from "react";
+import { useBudgetStore } from "@/store/budget-store";
+import { useExportCSV } from "@/hooks/use-export-csv";
 
-interface TableData {
-  category: string;
-  budget: string;
-  ist: string;
-  rest: string;
-  value: number;
-  action: string;
-}
-
-interface BudgetDataTableProps {
-  tableData: TableData[];
-}
-
-export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
+export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
+
+  const { exportBudgets } = useExportCSV();
+
+  const {
+    budgets,
+    budgetsLoading,
+    budgetsError,
+    allocated,
+    available,
+    fetchBudgets,
+    fetchBudgetsAmounts,
+  } = useBudgetStore();
+
+  const [warnFilter, setWarnFilter] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchBudgets();
+    fetchBudgetsAmounts();
+  }, [fetchBudgets, fetchBudgetsAmounts]);
 
   const budgetDataTableHeadings: string[] = [
     t("data-table.headings.category"),
@@ -46,22 +57,43 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
     t("data-table.headings.action"),
   ];
 
+  const filteredBudgets = useMemo(() => {
+    if (!budgets) return [];
+
+    if (warnFilter === "warn-80") {
+      return budgets.filter((b) => b.progress >= 80 && b.progress < 90);
+    } else if (warnFilter === "warn-90") {
+      return budgets.filter((b) => b.progress >= 90 && b.progress < 100);
+    } else if (warnFilter === "warn-100") {
+      return budgets.filter((b) => b.progress >= 100);
+    }
+
+    return budgets;
+  }, [budgets, warnFilter]);
+
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap items-center gap-2">
-            <CardTitle>{t("data-table.title")}</CardTitle>{" "}
+            <CardTitle>{t("data-table.title")}</CardTitle>
             <Badge
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
               variant="outline"
             >
-              {t("data-table.badge")}
+              {t("data-table.total-budget")}
+              {allocated ?? "..."} • {t("data-table.rest-budget")}
+              {available ?? "..."}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
+              onClick={() =>
+                exportBudgets({
+                  budgets,
+                })
+              }
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.buttons.export")}
@@ -69,19 +101,21 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
             <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+              onClick={() => setWarnFilter(null)}
             >
               {t("data-table.buttons.reset")}
             </Button>
           </div>
         </CardHeader>
+
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow className="dark:border-border-blue">
                 {budgetDataTableHeadings.map((heading) => (
                   <TableHead
-                    className="font-bold text-gray-500 dark:text-gray-400/80"
                     key={heading}
+                    className="font-bold text-gray-500 dark:text-gray-400/80"
                   >
                     {heading}
                   </TableHead>
@@ -89,27 +123,49 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {tableData.map((data) => (
-                <TableRow
-                  className="dark:border-border-blue"
-                  key={data.category}
-                >
-                  <TableCell>{data.category}</TableCell>
-                  <TableCell>{data.budget}</TableCell>
-                  <TableCell>{data.ist}</TableCell>
-                  <TableCell>{data.rest}</TableCell>
-                  <TableCell>
-                    <Progress value={data.value} />
-                  </TableCell>
-                  <TableCell>
-                    <BudgetDialog variant="outline" text={data.action} />
+              {budgetsError ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-red-500">
+                    {budgetsError}
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : budgetsLoading || budgets === null ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center">
+                    Loading...
+                  </TableCell>
+                </TableRow>
+              ) : filteredBudgets.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-gray-400">
+                    No Budgets Found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredBudgets.map((data) => (
+                  <TableRow key={data.id} className="dark:border-border-blue">
+                    <TableCell>{data.category}</TableCell>
+                    <TableCell>{data.allocated}</TableCell>
+                    <TableCell>{data.spent}</TableCell>
+                    <TableCell>{data.remaining}</TableCell>
+                    <TableCell>
+                      <Progress value={data.progress} />
+                    </TableCell>
+                    <TableCell>
+                      <BudgetEditDialog
+                        variant="outline"
+                        text="Edit"
+                        budget={data}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
           <Separator className="bg-border-blue mt-2" />
         </CardContent>
+
         <CardFooter className="flex flex-wrap items-center justify-between gap-2">
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background border"
@@ -122,9 +178,12 @@ export function BudgetDataTable({ tableData }: BudgetDataTableProps) {
               {t("data-table.toggle-groups.week")}
             </ToggleGroupItem>
           </ToggleGroup>
+
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background border"
             type="single"
+            value={warnFilter ?? ""}
+            onValueChange={(val) => setWarnFilter(val || null)}
           >
             <ToggleGroupItem value="warn-80" aria-label="toggle-warn-80">
               {t("data-table.toggle-groups.warn-80")}

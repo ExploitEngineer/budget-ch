@@ -32,67 +32,104 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { CalendarIcon, Plus } from "lucide-react";
+import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
+import { useState } from "react";
 import {
   SavingsGoalDialogSchema,
   SavingsGoalDialogValues,
-} from "@/lib/validations";
+} from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
+import { Spinner } from "@/components/ui/spinner";
+import type { SavingGoal } from "@/db/queries";
 
-export default function SavingsGoalMainDialog() {
+export default function SavingGoalEditDialog({
+  goalData,
+}: {
+  goalData: SavingGoal;
+}) {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
+  const { updateGoalAndSync, deleteGoalAndSync, updateLoading, deleteLoading } =
+    useSavingGoalStore();
+  const [open, setOpen] = useState(false);
+
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
     defaultValues: {
-      name: "",
-      goalAmount: 0,
-      savedAmount: 0,
-      dueDate: undefined,
-      account: "",
-      monthlyAllocation: 0,
+      name: goalData?.name ?? "",
+      goalAmount: goalData?.goalAmount ?? 0,
+      savedAmount: goalData?.amountSaved ?? 0,
+      dueDate: goalData?.dueDate ? new Date(goalData.dueDate) : new Date(),
+      account: goalData?.accountType ?? "savings",
+      monthlyAllocation: goalData?.monthlyAllocation ?? 0,
     },
   });
 
-  function onSubmit(values: SavingsGoalDialogValues) {
-    console.log("Savings goal submitted:", values);
+  async function onSubmit(values: SavingsGoalDialogValues) {
+    try {
+      await updateGoalAndSync(goalData.id, {
+        name: values.name,
+        goalAmount: values.goalAmount,
+        amountSaved: values.savedAmount,
+        monthlyAllocation: values.monthlyAllocation,
+        accountType: values.account,
+        dueDate: values.dueDate ?? null,
+      });
+
+      setOpen(false);
+      form.reset(values);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
+    }
+  }
+
+  async function handleDelete() {
+    try {
+      await deleteGoalAndSync(goalData.id);
+      setOpen(false);
+    } catch (err: any) {
+      console.error("Error deleting saving goal:", err);
+    }
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          className="btn-gradient flex items-center gap-2 dark:text-white"
-          variant="default"
+          variant="outline"
+          className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
         >
-          <Plus className="h-5 w-5" />
-          <span className="hidden text-sm sm:block">{t("title")}</span>
+          {t("edit")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
-            {t("subtitle")}
+            {t("edit-dialog")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="border">
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
               {t("button")}
             </Button>
           </DialogClose>
         </DialogHeader>
 
-        {/* Form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 pt-4"
           >
-            {/* Row 1: Name */}
+            {/* Name */}
             <FormField
               control={form.control}
               name="name"
@@ -110,22 +147,16 @@ export default function SavingsGoalMainDialog() {
               )}
             />
 
-            {/* Row 2: Target + Already Saved */}
+            {/* Goal + Saved */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="goalAmount"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.goal-amount")}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step={0.5}
-                        min={0}
-                        placeholder="0.00"
-                        {...field}
-                      />
+                      <Input type="number" step={0.5} min={0} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -135,16 +166,10 @@ export default function SavingsGoalMainDialog() {
                 control={form.control}
                 name="savedAmount"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.saved-amount")}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step={0.5}
-                        min={0}
-                        placeholder="0.00"
-                        {...field}
-                      />
+                      <Input type="number" step={0.5} min={0} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -152,13 +177,13 @@ export default function SavingsGoalMainDialog() {
               />
             </div>
 
-            {/* Row 3: Due Date + Account */}
+            {/* Due Date + Account */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="dueDate"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.due-date.title")}</FormLabel>
                     <FormControl>
                       <Popover>
@@ -191,7 +216,7 @@ export default function SavingsGoalMainDialog() {
                 control={form.control}
                 name="account"
                 render={({ field }) => (
-                  <FormItem className="flex flex-1 flex-col">
+                  <FormItem className="flex-1">
                     <FormLabel>{t("labels.account.title")}</FormLabel>
                     <FormControl>
                       <Select
@@ -204,11 +229,14 @@ export default function SavingsGoalMainDialog() {
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="save">
-                            {t("labels.account.options.save")}
-                          </SelectItem>
                           <SelectItem value="checking">
                             {t("labels.account.options.checking")}
+                          </SelectItem>
+                          <SelectItem value="savings">
+                            {t("labels.account.options.save")}
+                          </SelectItem>
+                          <SelectItem value="credit-card">
+                            {t("labels.account.options.credit-card")}
                           </SelectItem>
                           <SelectItem value="cash">
                             {t("labels.account.options.cash")}
@@ -222,7 +250,7 @@ export default function SavingsGoalMainDialog() {
               />
             </div>
 
-            {/* Row 4: Monthly Allocation */}
+            {/* Monthly Allocation */}
             <FormField
               control={form.control}
               name="monthlyAllocation"
@@ -230,22 +258,31 @@ export default function SavingsGoalMainDialog() {
                 <FormItem className="w-1/2">
                   <FormLabel>{t("labels.monthly-allocation")}</FormLabel>
                   <FormControl>
-                    <Input
-                      type="number"
-                      step={0.5}
-                      min={0}
-                      placeholder="0.00"
-                      {...field}
-                    />
+                    <Input type="number" step={0.5} min={0} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Footer Buttons */}
-            <div className="flex justify-end pt-4">
-              <Button type="submit">{t("save")}</Button>
+            {/* Footer */}
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                type="button"
+                className="cursor-pointer"
+                variant="outline"
+                onClick={handleDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? <Spinner /> : t("delete")}
+              </Button>
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={updateLoading}
+              >
+                {updateLoading ? <Spinner /> : t("save")}
+              </Button>
             </div>
           </form>
         </Form>

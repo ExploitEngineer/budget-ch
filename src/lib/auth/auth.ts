@@ -1,7 +1,9 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "@/db/db";
+import { createHub } from "@/lib/services/hub";
 import * as schema from "@/db/schema";
+import { createHubMember } from "../services/hub-member";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -14,6 +16,39 @@ export const auth = betterAuth({
       verifications: schema.verifications,
     },
   }),
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          try {
+            const result = await createHub(user.id, user.name);
+            if (result.status === "error") {
+              console.error(result.message);
+              return;
+            }
+
+            const { message, status } = await createHubMember({
+              userId: user.id,
+              hubId: result.data?.hubId!,
+              accessRole: "member",
+              isOwner: true,
+              userName: user.name,
+            });
+
+            if (status === "error") {
+              console.error(message);
+            }
+
+            // TODO: Create stripe customer for user
+          } catch (err) {
+            if (err instanceof Error) {
+              console.error(`Error: ${err.message}`);
+            }
+          }
+        },
+      },
+    },
+  },
   emailAndPassword: {
     enabled: true,
     // requireEmailVerification: true,

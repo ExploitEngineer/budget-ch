@@ -8,8 +8,13 @@ import { Security } from "./_components/security";
 import { DataPrivacy } from "./_components/data-privacy";
 import { BillingDetails } from "./_components/billing-details";
 import { AboutSection } from "./_components/about";
+import { loadStripePrices } from "@/lib/stripe";
 
-export default function Help() {
+export default async function Settings() {
+
+  const subscriptionPrices = await fetchPrices();
+  console.log("Subscription Prices:", subscriptionPrices);
+
   return (
     <section>
       <div>
@@ -18,7 +23,7 @@ export default function Help() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <ProfileHousehold />
-        <PlansUpgrade />
+        <PlansUpgrade subscriptionPrices={subscriptionPrices} />
         <MembersInvitations />
         <LocalizationAppearance />
         <Notifications />
@@ -29,4 +34,20 @@ export default function Help() {
       </div>
     </section>
   );
+}
+
+async function fetchPrices() {
+  "use server"
+  const result = await loadStripePrices();
+  if (result.success && result.prices) {
+    const pricesData = result.prices.data;
+    const prices: Record<string, number> = {};
+    for (const price of pricesData) {
+      if (price.lookup_key && price.unit_amount) {
+        prices[price.lookup_key] = price.unit_amount / 100;
+      }
+    }
+    return prices;
+  }
+  return {};
 }

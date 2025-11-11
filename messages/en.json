@@ -85,16 +85,24 @@
                         "options": {
                             "checking": "Checking",
                             "credit-card": "Credit card",
-                            "save": "Save",
+                            "save": "Savings",
                             "cash": "Cash"
                         }
                     },
+                    "transactionType": {
+                        "title": "Transaction Type",
+                        "options": {
+                            "income": "income",
+                            "expense": "expense"
+                        }
+                    },
                     "quelle": {
-                        "title": "Quelle",
+                        "title": "Recipient",
                         "placeholder": "e.g. Coop, employer…"
                     },
                     "category": {
                         "title": "Category",
+                        "category-name": "Category Name",
                         "options": {
                             "groceries": "Groceries",
                             "restaurant": "Restaurant & Café",
@@ -109,9 +117,13 @@
                         "placeholder": "Optional"
                     }
                 },
+                "no-categories-yet": "No categories yet",
                 "buttons": {
                     "save": "Save as template",
-                    "post": "Post"
+                    "post": "Post",
+                    "add": "Add",
+                    "add-category": "Add Category",
+                    "new-category": "New category"
                 }
             },
             "dashbaord-table-adjust-dialog": {
@@ -144,17 +156,14 @@
             "cards": {
                 "card-1": {
                     "title": "Total Budget (Month)",
-                    "content": "CHF 4’703",
                     "badge": "Fixed + Variable • incl. CC & SERAFE"
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
-                    "content": "CHF 2’456",
-                    "badge": "60% of the budget"
+                    "badge": "% of the budget"
                 },
                 "card-3": {
                     "title": "Available",
-                    "content": "CHF 3’447",
                     "badge": "+40% Buffer"
                 },
                 "card-4": {
@@ -169,41 +178,29 @@
             },
             "progress-cards": {
                 "title": "Savings Goals",
-                "card-1": {
-                    "title": "Tax Reserves"
-                },
-                "card-2": {
-                    "title": "Emergency Fund"
-                },
-                "card-3": {
-                    "title": "Vacation"
-                }
+                "loading": "loading...",
+                "no-goals": "No savings goals yet..."
             },
             "line-progress-cards": {
                 "title": "Top Categories (Month)",
                 "button": "All Budgets",
-                "card-1": {
-                    "title": "Groceries"
-                },
-                "card-2": {
-                    "title": "Restaurant & Cafe"
-                },
-                "card-3": {
-                    "title": "Transportation"
-                },
-                "card-4": {
-                    "title": "Household"
-                }
+                "loading": "loading...",
+                "no-categories-found": "No categories yet..."
             },
             "todos": {
                 "title": "Quick Tasks",
-                "button": "quick done",
-                "placeholder": "Add Task…"
+                "placeholder": "Add Task…",
+                "no-tasks": "No tasks yet...",
+                "created": "Task created successfully!",
+                "updated": "Task updated successfully!",
+                "deleted": "Task deleted successfully!"
             },
             "upcoming-cards": {
                 "title": "Upcoming Due (Recurring)",
                 "last-transaction": "Last Transactions",
                 "button": "Next 14 Days",
+                "loading": "loading...",
+                "no-transactions": "No recent transactions",
                 "table-data": {
                     "table-heading": {
                         "date": "DATE",
@@ -243,43 +240,20 @@
                 }
             },
             "recent-transactions-table": {
-                "title": "Recent Transactions",
                 "button": "Show all",
                 "table-headings": {
                     "date": "Date",
                     "recipient": {
-                        "title": "Recipient",
-                        "data": {
-                            "coop": "Cooperative",
-                            "sbb": "SBB",
-                            "cafe": "Cafe Rome",
-                            "employer": "Employer"
-                        }
+                        "title": "Recipient"
                     },
                     "account": {
-                        "title": "Account",
-                        "data": {
-                            "current-account": "Current account",
-                            "credit-card": "Credit card"
-                        }
+                        "title": "Account"
                     },
                     "category": {
-                        "title": "Category",
-                        "data": {
-                            "groceries": "Groceries",
-                            "transportation": "Transportation",
-                            "restaurant": "Restaurant",
-                            "income": "Income"
-                        }
+                        "title": "Category"
                     },
                     "note": {
-                        "title": "Note",
-                        "data": {
-                            "shopping": "Weekly shopping",
-                            "ga": "GA day pass",
-                            "lunch": "Lunch",
-                            "salary": "Salary"
-                        }
+                        "title": "Note"
                     },
                     "amount": "Amount"
                 }
@@ -289,7 +263,8 @@
                 "secondary-title": "Monthly overview",
                 "warning-card": {
                     "title": "SCORE",
-                    "warning": "Warning: high",
+                    "warning-high": "Warning: high",
+                    "warning-normal": "Warning: normal",
                     "spending": "Spending pace"
                 },
                 "card-1": {
@@ -304,12 +279,16 @@
             }
         },
         "transactions-page": {
+            "loading": "loading...",
+            "no-transactions": "No transactions yet",
             "transaction-edit-dialog": {
                 "title-1": "Edit",
                 "title-2": "New Transaction",
                 "dialog": {
                     "title": "Edit Transaction",
                     "close": "Close",
+                    "new-category": "New category",
+                    "no-category": "No categories yet",
                     "labels": {
                         "date": "Date",
                         "account": "Account",
@@ -318,7 +297,14 @@
                         "amount": "Amount (CHF)",
                         "note": "Note",
                         "file": "Receipts (PDF/JPG/PNG)",
-                        "splitSum": "Split Transaction"
+                        "splitSum": "Split Transaction",
+                        "transactionType": {
+                            "title": "Transaction Type",
+                            "options": {
+                                "income": "income",
+                                "expense": "expense"
+                            }
+                        }
                     },
                     "placeholders": {
                         "date": "09/21/2025",
@@ -329,10 +315,10 @@
                         "note-optional": "Note (optional)"
                     },
                     "options": {
-                        "giro": "Giro",
+                        "checking": "Checking",
                         "credit-card": "Credit Card",
-                        "sparen": "Savings",
-                        "bar": "Cash",
+                        "savings": "Savings",
+                        "cash": "Cash",
                         "lebensmittel": "Groceries",
                         "restaurant": "Restaurant & Café",
                         "oev": "Public Transport & Mobility",
@@ -346,6 +332,7 @@
                     "buttons": {
                         "demo": "OCR (Demo)",
                         "delete": "Delete",
+                        "cancel": "Cancel",
                         "save": "Save"
                     }
                 }
@@ -360,7 +347,8 @@
                         "current-account": "Current account",
                         "credit-card": "Credit card",
                         "savings": "Savings",
-                        "cash": "Cash"
+                        "cash": "Cash",
+                        "all": "All Accounts"
                     }
                 },
                 "category": {
@@ -369,7 +357,9 @@
                         "categories": "All Categories",
                         "groceries": "Groceries",
                         "restaurant": "Restaurant & Café",
-                        "transportation": "Transportation"
+                        "transportation": "Transportation",
+                        "new-category": "New category",
+                        "no-category": "No categories yet"
                     }
                 },
                 "search": {
@@ -446,6 +436,9 @@
             "sidebar-header": {
                 "dialog": {
                     "title": "New Budget",
+                    "edit-budget": "Edit Budget",
+                    "new-category": "New category",
+                    "no-category": "No categories yet",
                     "button": "Close",
                     "labels": {
                         "category": {
@@ -466,6 +459,7 @@
                         }
                     },
                     "delete-btn": "Delete",
+                    "cancel": "Cancel",
                     "save": "Save"
                 }
             },
@@ -478,7 +472,7 @@
                 "card-2": {
                     "title": "Spent so far",
                     "content": "CHF 1’915.00",
-                    "badge": "66% of the budget"
+                    "badge": "% of the budget"
                 },
                 "card-3": {
                     "title": "Available",
@@ -493,7 +487,8 @@
             },
             "data-table": {
                 "title": "All categories",
-                "badge": "Total Budget: CHF 2’900.00 • Rest: CHF 985.00",
+                "total-budget": "Total Budget: ",
+                "rest-budget": "Rest: ",
                 "buttons": {
                     "export": "Export CSV",
                     "reset": "Reset (Demo)"
@@ -548,6 +543,9 @@
                     "title": "New Goal",
                     "subtitle": "New Savings Goal",
                     "button": "Close",
+                    "delete": "Delete",
+                    "edit-dialog": "Edit savings goal",
+                    "edit": "Edit",
                     "labels": {
                         "name": {
                             "title": "Name",
@@ -564,34 +562,13 @@
                             "options": {
                                 "save": "Savings",
                                 "checking": "Checking",
-                                "cash": "Cash"
+                                "cash": "Cash",
+                                "credit-card": "Credit Card"
                             }
                         },
                         "monthly-allocation": "Monthly Allocation (CHF)"
                     },
                     "save": "Save"
-                }
-            },
-            "dialog": {
-                "title": "Edit savings goal",
-                "button": "Close",
-                "edit": "Edit",
-                "labels": {
-                    "name": "Name",
-                    "target-amount": "Target Amount (CHF)",
-                    "already-saved": "Already Saved (CHF)",
-                    "due-on": "Due on",
-                    "account": "Account",
-                    "monthly-allocation": "Monthly Allocation (CHF)"
-                },
-                "buttons": {
-                    "delete": "Delete",
-                    "save": "Save"
-                },
-                "account-options": {
-                    "checking": "Checking",
-                    "savings": "Savings",
-                    "cash": "Cash"
                 }
             },
             "cards": {
@@ -619,6 +596,8 @@
             "active-goals-section": {
                 "title": "Active Goals",
                 "badge": "3 Goals • Auto Allocation: CHF 700.00",
+                "no-goals": "No saving goals found.",
+                "loading": "loading...",
                 "buttons": {
                     "due": "Due",
                     "progress": "Progress",
@@ -633,6 +612,7 @@
                         "content": {
                             "goal": "Goal",
                             "saved": "Saved",
+                            "monthly-allocated": "Allocated",
                             "rest": "Rest",
                             "due": "Due",
                             "account": {
@@ -670,7 +650,8 @@
                 "button": "Transfer",
                 "new-account-dialog": {
                     "title": "New Account",
-                    "subtitle": "New Account",
+                    "edit-title": "Edit Account",
+                    "edit": "Edit",
                     "button": "Close",
                     "labels": {
                         "name": {
@@ -697,7 +678,8 @@
                             "placeholder": "optional"
                         }
                     },
-                    "save": "Save"
+                    "save": "Save",
+                    "delete": "Delete"
                 },
                 "dialog-box": {
                     "title": "Transfer between accounts",
@@ -758,6 +740,7 @@
                 }
             },
             "data-table": {
+                "loading": "Loading...",
                 "title": "All categories",
                 "badge": "5 Konten • Liquid CHF 2’620.00",
                 "buttons": {
@@ -786,6 +769,7 @@
             "latest-tranfers-section": {
                 "title": "Latest transfers",
                 "button": "Export CSV",
+                "no-transfers": "No transfers yet",
                 "data-table": {
                     "headings": {
                         "date": "DATE",
@@ -798,6 +782,9 @@
             }
         },
         "report-page": {
+            "loading": "loading...",
+            "no-reports": "No monthly reports yet",
+            "no-categories-yet": "No categories yet",
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filter",
@@ -844,7 +831,9 @@
             },
             "analysis-table-data": {
                 "title": "Analysis",
-                "badge": "Last month: CHF 5,800.00 Income • CHF 4,800.00 Expenses",
+                "badge-last-month": "Last month: ",
+                "badge-income": "Income • ",
+                "badge-expense": "Expenses ",
                 "toggle-groups": {
                     "month": "Month",
                     "quarter": "Quarter",
@@ -875,6 +864,7 @@
             },
             "detailed-table": {
                 "title": "Detailed table",
+                "loading": "loading...",
                 "buttons": {
                     "categories-csv": "Categories CSV",
                     "trend-csv": "Trend CSV"
@@ -996,6 +986,7 @@
                         "title": "Individual",
                         "sub-title": "For Individuals (1 User).",
                         "year": "Year",
+                        "month": "Month",
                         "options": {
                             "all-free-features": "All Free Features Without Limits",
                             "unlimited": "Unlimited Transactions, Accounts, Budgets & Savings Goals",
