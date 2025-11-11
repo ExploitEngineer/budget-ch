@@ -23,10 +23,11 @@ import { authClient } from "@/lib/auth/auth-client";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
-import { redirect } from "next/navigation";
 import { signInWithGoogle } from "@/lib/auth/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function SignUp() {
+  const router = useRouter();
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
   const form = useForm<UserSignUpValues>({
     resolver: zodResolver(userSignUpSchema),
@@ -47,16 +48,19 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
         // image: "https://example.com/image.png",
-        callbackURL: "/signin",
+        // callbackURL: "/signin",
+        fetchOptions: {
+          onSuccess(context) {
+              toast.success(`Signed up successfully!`);
+              form.reset();
+              router.push("/signin");
+          },
+          onError(context) {
+            console.error(context.error);
+            toast.error(`Could not sign up: ${context.error.message}`);
+          },
+        },
       });
-      if (error) {
-        console.error(error);
-        toast.error(`Could not sign up: ${error.message}`);
-      }
-      if (data) {
-        toast.success(`Signed up successfully!`);
-        redirect("/signin");
-      }
     } catch (err) {
       console.error(err);
     } finally {
