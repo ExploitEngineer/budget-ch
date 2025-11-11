@@ -1,18 +1,117 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import { useDashboardStore } from "@/store/dashboard-store";
+import { useExportCSV } from "@/hooks/use-export-csv";
+import { useEffect, useState } from "react";
+import { useBudgetStore } from "@/store/budget-store";
+import { useAccountStore } from "@/store/account-store";
+import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { type TransferData } from "../../accounts/_components/latest-transfers";
+import { type Transaction } from "@/lib/types/dashboard-types";
+import { useSavingGoalStore } from "@/store/saving-goal-store";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
 
-  const buttons: string[] = [
-    t("export-card.buttons.transactions"),
-    t("export-card.buttons.budgets"),
-    t("export-card.buttons.savings-goals"),
-    t("export-card.buttons.accounts"),
-    t("export-card.buttons.transfers"),
+  const [transfers, setTransfers] = useState<TransferData[]>([]);
+
+  const { transactions, fetchTransactions } = useDashboardStore();
+  const { budgets, fetchBudgets } = useBudgetStore();
+  const { accounts, fetchAccounts } = useAccountStore();
+  const { goals, fetchGoals } = useSavingGoalStore();
+  const {
+    exportTransactions,
+    exportBudgets,
+    exportAccounts,
+    exportTransfers,
+    exportSavingGoals,
+    exportTransactionTemplate,
+    exportBudgetTemplate,
+    exportAccountTemplate,
+    exportTransferTemplate,
+    exportSavingGoalTemplate,
+    exportAllDataJSON,
+  } = useExportCSV();
+
+  async function fetchTransfers() {
+    try {
+      const result = await getAccountTransfers();
+
+      if (!result || !result.status) {
+        throw new Error(result?.message || "Unknown error");
+      }
+
+      setTransfers((result.data as TransferData[]) || []);
+    } catch (err: any) {
+      console.error("Error fetching transfers:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchTransactions();
+    fetchBudgets();
+    fetchAccounts();
+    fetchGoals();
+    fetchTransfers();
+  }, []);
+
+  const buttons = [
+    {
+      title: t("export-card.buttons.transactions"),
+      onClick: () => {
+        if (transactions && transactions.length > 0) {
+          exportTransactions({
+            transactions: transactions as Omit<Transaction, "type">[],
+          });
+        } else {
+          console.warn("No transactions to export");
+        }
+      },
+    },
+    {
+      title: t("export-card.buttons.budgets"),
+      onClick: () => exportBudgets({ budgets }),
+    },
+    {
+      title: t("export-card.buttons.savings-goals"),
+      onClick: () => exportSavingGoals({ goals }),
+    },
+    {
+      title: t("export-card.buttons.accounts"),
+      onClick: () => exportAccounts({ accounts }),
+    },
+    {
+      title: t("export-card.buttons.transfers"),
+      onClick: () => exportTransfers({ transfers }),
+    },
+  ];
+
+  const templateButtons = [
+    {
+      title: t("export-card.buttons.transactions"),
+      onClick: () => exportTransactionTemplate(),
+    },
+    {
+      title: t("export-card.buttons.budgets"),
+      onClick: () => exportBudgetTemplate(),
+    },
+    {
+      title: t("export-card.buttons.savings-goals"),
+      onClick: () => exportSavingGoalTemplate(),
+    },
+    {
+      title: t("export-card.buttons.accounts"),
+      onClick: () => exportAccountTemplate(),
+    },
+    {
+      title: t("export-card.buttons.transfers"),
+      onClick: () => exportTransferTemplate(),
+    },
   ];
 
   return (
@@ -37,13 +136,14 @@ export function Export() {
             </CardHeader>
             <Separator className="dark:bg-border-blue" />
             <CardContent className="mt-3 grid grid-cols-2 gap-3">
-              {buttons.map((title) => (
+              {buttons.map((btn) => (
                 <Button
-                  key={title}
+                  key={btn.title}
+                  onClick={btn.onClick}
                   variant="outline"
-                  className="!bg-dark-blue-background dark:border-border-blue text-foreground"
+                  className="!bg-dark-blue-background dark:border-border-blue text-foreground cursor-pointer"
                 >
-                  {title}
+                  {btn.title}
                 </Button>
               ))}
             </CardContent>
@@ -58,7 +158,16 @@ export function Export() {
               <p>{t("export-json-card.content")}</p>
               <Button
                 variant="outline"
-                className="btn-gradient dark:text-foreground w-[30%]"
+                onClick={() =>
+                  exportAllDataJSON({
+                    transactions,
+                    budgets,
+                    accounts,
+                    goals,
+                    transfers,
+                  })
+                }
+                className="btn-gradient dark:text-foreground w-[30%] cursor-pointer hover:text-white"
               >
                 {t("export-json-card.button")}
               </Button>
@@ -71,13 +180,14 @@ export function Export() {
             </CardHeader>
             <Separator className="dark:bg-border-blue" />
             <CardContent className="mt-3 grid grid-cols-2 gap-3">
-              {buttons.map((title) => (
+              {templateButtons.map((btn) => (
                 <Button
-                  key={title}
+                  key={btn.title}
+                  onClick={btn.onClick}
                   variant="outline"
-                  className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl border-dashed"
+                  className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl cursor-pointer border-dashed"
                 >
-                  {title}
+                  {btn.title}
                 </Button>
               ))}
             </CardContent>

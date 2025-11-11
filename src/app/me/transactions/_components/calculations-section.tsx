@@ -31,29 +31,71 @@ import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { MainFormValues, mainFormSchema } from "@/lib/validations";
+import {
+  CalculationFormValues,
+  calculationFormSchema,
+} from "@/lib/validations/calculation-section-validations";
+import { useState } from "react";
+import AddCategory from "../../dashboard/_components/add-category-dialog";
+import { Spinner } from "@/components/ui/spinner";
 
-export function CalculationSection() {
+interface CalculationSectionProps {
+  onFilter: (filters: CalculationFormValues) => void;
+  onReset?: () => void;
+}
+
+export function CalculationSection({
+  onFilter,
+  onReset,
+}: CalculationSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
 
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
+  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isApplying, setIsApplying] = useState<boolean>(false);
+
+  const form = useForm<CalculationFormValues>({
+    resolver: zodResolver(calculationFormSchema) as any,
     defaultValues: {
       dateFrom: undefined,
       dateTo: undefined,
-      select: "",
+      category: "",
+      accountType: "all",
       amountMax: 0,
       amountMin: 0,
       text: "",
     },
   });
 
+  const handleApply = () => {
+    onFilter(form.getValues());
+  };
+
+  const handleReset = () => {
+    form.reset();
+    onReset?.();
+  };
+
+  function handleCategoryAdded(newCategory: string) {
+    setCategories((prev) => [...prev, newCategory]);
+    setSelectedCategory(newCategory);
+    form.setValue("category", newCategory);
+  }
+
   return (
     <section>
+      <AddCategory
+        open={isAddCategoryOpen}
+        onOpenChangeAction={setIsAddCategoryOpen}
+        onCategoryAddedAction={handleCategoryAdded}
+      />
+
       <FormProvider {...form}>
         <Card className="bg-blue-background dark:border-border-blue">
           <CardContent>
             <Form {...form}>
+              {/* Top Row */}
               <div className="flex flex-col flex-wrap gap-4 md:flex-row">
                 <FormField
                   control={form.control}
@@ -70,7 +112,7 @@ export function CalculationSection() {
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
-                                ? format(field.value, "PPP")
+                                ? format(field.value, "dd/MM/yyyy")
                                 : "Pick a date"}
                             </Button>
                           </PopoverTrigger>
@@ -83,7 +125,6 @@ export function CalculationSection() {
                           </PopoverContent>
                         </Popover>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -103,7 +144,7 @@ export function CalculationSection() {
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
-                                ? format(field.value, "PPP")
+                                ? format(field.value, "dd/MM/yyyy")
                                 : "Pick a date"}
                             </Button>
                           </PopoverTrigger>
@@ -116,14 +157,13 @@ export function CalculationSection() {
                           </PopoverContent>
                         </Popover>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
                   control={form.control}
-                  name="select1"
+                  name="accountType"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>{t("labels.account.title")}</FormLabel>
@@ -152,43 +192,57 @@ export function CalculationSection() {
                             <SelectItem value="cash">
                               {t("labels.account.data.cash")}
                             </SelectItem>
+                            <SelectItem value="all">
+                              {t("labels.account.data.all")}
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
                   control={form.control}
-                  name="select2"
+                  name="category"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="flex flex-1 flex-col">
                       <FormLabel>{t("labels.category.title")}</FormLabel>
                       <FormControl>
                         <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
+                          value={selectedCategory || ""}
+                          onValueChange={(value) => {
+                            setSelectedCategory(value);
+                            field.onChange(value);
+                          }}
                         >
-                          <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
-                            <SelectValue
-                              placeholder={t("labels.category.data.categories")}
-                            />
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select or add a category" />
                           </SelectTrigger>
+
                           <SelectContent>
-                            <SelectItem value="categories">
-                              {t("labels.category.data.categories")}
-                            </SelectItem>
-                            <SelectItem value="groceries">
-                              {t("labels.category.data.groceries")}
-                            </SelectItem>
-                            <SelectItem value="restaurant">
-                              {t("labels.category.data.restaurant")}
-                            </SelectItem>
-                            <SelectItem value="transportation">
-                              {t("labels.category.data.transportation")}
-                            </SelectItem>
+                            <div className="flex items-center justify-between border-b px-2 py-1.5">
+                              <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full cursor-pointer justify-center text-sm"
+                                onClick={() => setIsAddCategoryOpen(true)}
+                              >
+                                + {t("labels.category.data.new-category")}
+                              </Button>
+                            </div>
+
+                            {categories.length === 0 ? (
+                              <SelectItem value="none" disabled>
+                                {t("labels.category.data.no-category")}
+                              </SelectItem>
+                            ) : (
+                              categories.map((category) => (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              ))
+                            )}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -198,10 +252,11 @@ export function CalculationSection() {
                 />
               </div>
 
+              {/* Second Row */}
               <div className="mt-4 flex flex-col flex-wrap gap-4 md:flex-row">
                 <FormField
                   control={form.control}
-                  name="amountMax"
+                  name="amountMin"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Min (CHF)</FormLabel>
@@ -214,14 +269,13 @@ export function CalculationSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
                 <FormField
                   control={form.control}
-                  name="amountMin"
+                  name="amountMax"
                   render={({ field }) => (
                     <FormItem className="flex-1">
                       <FormLabel>Max (CHF)</FormLabel>
@@ -234,7 +288,6 @@ export function CalculationSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
@@ -253,58 +306,72 @@ export function CalculationSection() {
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage />
                     </FormItem>
                   )}
                 />
               </div>
             </Form>
           </CardContent>
+
+          {/* Footer */}
           <CardFooter className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
               <Badge
                 variant="outline"
                 className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-                asChild
               >
                 <label className="flex items-center gap-2">
                   <Checkbox />
-                  <span>{t("checkboxes.receipt")}</span>
+                  <span className="cursor-pointer">
+                    {t("checkboxes.receipt")}
+                  </span>
                 </label>
               </Badge>
               <Badge
                 variant="outline"
                 className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-                asChild
               >
                 <label className="flex items-center gap-2">
                   <Checkbox />
-                  <span>{t("checkboxes.recurring")}</span>
+                  <span className="cursor-pointer">
+                    {t("checkboxes.recurring")}
+                  </span>
                 </label>
               </Badge>
               <Badge
                 variant="outline"
                 className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-                asChild
               >
                 <label className="flex items-center gap-2">
                   <Checkbox />
-                  <span>{t("checkboxes.transfers")}</span>
+                  <span className="cursor-pointer">
+                    {t("checkboxes.transfers")}
+                  </span>
                 </label>
               </Badge>
             </div>
+
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
+                onClick={handleReset}
                 className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
               >
                 {t("buttons.reset")}
               </Button>
               <Button
                 variant="outline"
-                className="btn-gradient cursor-pointer border-transparent"
+                disabled={isApplying}
+                onClick={() => {
+                  setIsApplying(true);
+                  setTimeout(() => {
+                    handleApply();
+                    setIsApplying(false);
+                  }, 2000);
+                }}
+                className="btn-gradient cursor-pointer border-transparent hover:text-white"
               >
-                {t("buttons.apply")}
+                {isApplying ? <Spinner /> : t("buttons.apply")}
               </Button>
             </div>
           </CardFooter>

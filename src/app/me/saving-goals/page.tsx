@@ -6,7 +6,7 @@ import { Settings } from "./_components/settings";
 import { useSavingGoalsData } from "./_components/data";
 
 export default function SavingGoals() {
-  const { cards, activeGoalsData } = useSavingGoalsData();
+  const { cards } = useSavingGoalsData();
   return (
     <section>
       <div>
@@ -15,7 +15,7 @@ export default function SavingGoals() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <SavingCardsSection cards={cards} />
-        <ActiveGoalsSection activeGoalsData={activeGoalsData} />
+        <ActiveGoalsSection />
         <WarningSection />
         <Settings />
       </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { Bar, BarChart, XAxis, YAxis, Cell } from "recharts";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -12,32 +12,53 @@ import {
 } from "@/components/ui/chart";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-
-const chartData = [
-  { month: "January", desktop: 342 },
-  { month: "February", desktop: 876 },
-  { month: "March", desktop: 512 },
-  { month: "April", desktop: 629 },
-  { month: "May", desktop: 458 },
-  { month: "June", desktop: 781 },
-  { month: "July", desktop: 394 },
-  { month: "August", desktop: 925 },
-  { month: "September", desktop: 647 },
-  { month: "October", desktop: 532 },
-  { month: "November", desktop: 803 },
-  { month: "December", desktop: 271 },
-];
+import { useReportStore } from "@/store/report-store";
+import { Spinner } from "@/components/ui/spinner";
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  expenses: {
+    label: "Expenses",
     color: "url(#bar-gradient)",
   },
 } satisfies ChartConfig;
 
+const ALL_MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 export function HighlightedBarChart() {
   const t = useTranslations("main-dashboard");
-  const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  const { monthlyReports, fetchMonthlyReports, reportsLoading, reportsError } =
+    useReportStore();
+
+  useEffect(() => {
+    fetchMonthlyReports();
+  }, [fetchMonthlyReports]);
+
+  const chartData = ALL_MONTHS.map((month) => {
+    const found = monthlyReports?.find((report) => {
+      const reportMonth = report.month.toLowerCase();
+      return reportMonth.includes(month.slice(0, 3).toLowerCase());
+    });
+
+    return {
+      month,
+      expenses: found ? Number(found.expenses) || 0 : 0,
+    };
+  });
 
   return (
     <Card className="bg-blue-background dark:border-[#1A2441]">
@@ -50,67 +71,73 @@ export function HighlightedBarChart() {
         </div>
         <Separator className="my-2 dark:bg-[#1A2441]" />
       </CardHeader>
+
       <CardContent className="flex justify-center">
-        <ChartContainer
-          className="w-full xl:h-[360px] xl:w-[80%]"
-          config={chartConfig}
-        >
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            onMouseLeave={() => setActiveIndex(null)}
-            barSize={80}
+        {reportsError ? (
+          <p className="text-sm text-red-500">{reportsError}</p>
+        ) : reportsLoading ? (
+          <Spinner />
+        ) : (
+          <ChartContainer
+            className="w-full xl:h-[360px] xl:w-[80%]"
+            config={chartConfig}
           >
-            <defs>
-              <linearGradient id="bar-gradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--brand)" />
-                <stop offset="100%" stopColor="var(--acc)" />
-              </linearGradient>
-            </defs>
+            <BarChart
+              accessibilityLayer
+              data={chartData}
+              onMouseLeave={() => setActiveIndex(null)}
+              barSize={80}
+            >
+              <defs>
+                <linearGradient id="bar-gradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--brand)" />
+                  <stop offset="100%" stopColor="var(--acc)" />
+                </linearGradient>
+              </defs>
 
-            <YAxis
-              ticks={[0, 300, 600, 900]}
-              domain={[0, 900]}
-              tickFormatter={(value) => `CHF ${value.toLocaleString("de-CH")}`}
-              axisLine={true}
-              tickLine={true}
-              width={60}
-              tickMargin={14}
-              className="flex items-center"
-              tick={{ fill: "oklch(0.4 0 0)", fontSize: 12 }}
-              style={{ userSelect: "none" }}
-            />
+              <YAxis
+                tickFormatter={(value) =>
+                  `CHF ${value.toLocaleString("de-CH")}`
+                }
+                axisLine
+                tickLine
+                width={80}
+                tickMargin={14}
+                tick={{ fill: "oklch(0.4 0 0)", fontSize: 12 }}
+                style={{ userSelect: "none" }}
+              />
 
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
 
-            <ChartTooltip
-              cursor={false}
-              content={(props: CustomTooltipProps) => (
-                <ChartTooltipContent {...props} hideIndicator hideLabel />
-              )}
-            />
+              <ChartTooltip
+                cursor={false}
+                content={(props: CustomTooltipProps) => (
+                  <ChartTooltipContent {...props} hideIndicator hideLabel />
+                )}
+              />
 
-            <Bar dataKey="desktop" radius={4} fill="url(#bar-gradient)">
-              {chartData.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fillOpacity={
-                    activeIndex === null ? 1 : activeIndex === index ? 1 : 0.3
-                  }
-                  stroke={activeIndex === index ? "url(#bar-gradient)" : ""}
-                  className="duration-200"
-                  onMouseEnter={() => setActiveIndex(index)}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ChartContainer>
+              <Bar dataKey="expenses" radius={4} fill="url(#bar-gradient)">
+                {chartData.map((_, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fillOpacity={
+                      activeIndex === null ? 1 : activeIndex === index ? 1 : 0.3
+                    }
+                    stroke={activeIndex === index ? "url(#bar-gradient)" : ""}
+                    className="duration-200"
+                    onMouseEnter={() => setActiveIndex(index)}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ChartContainer>
+        )}
       </CardContent>
     </Card>
   );

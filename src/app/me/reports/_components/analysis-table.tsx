@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -11,54 +13,30 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import type { TableData } from "./data";
 import { useTranslations } from "next-intl";
+import { useReportStore } from "@/store/report-store";
+import { useEffect } from "react";
 
-interface ProgressChart {
-  title: string;
-  amount: string;
-  value: number;
-}
-
-interface AnalysisTableProps {
-  tableData: TableData[];
-}
-
-export function AnalysisTable({ tableData }: AnalysisTableProps) {
+export function AnalysisTable() {
   const t = useTranslations("main-dashboard.report-page");
 
-  const progressChart: ProgressChart[] = [
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.groceries"),
-      amount: "CHF 820.00",
-      value: 40,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.rent"),
-      amount: "CHF 1’920.00",
-      value: 70,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.transportation"),
-      amount: "CHF 320.00",
-      value: 20,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.restaurant"),
-      amount: "CHF 460.00",
-      value: 30,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.household"),
-      amount: "CHF 280.00",
-      value: 15,
-    },
-    {
-      title: t("analysis-table-data.exp-by-cat.progress.leisure"),
-      amount: "CHF 190.00",
-      value: 10,
-    },
-  ];
+  const {
+    monthlyReports,
+    reportsError,
+    income,
+    expense,
+    fetchMonthlyReports,
+    reportsLoading,
+    expenseCategoriesProgress,
+    expenseCategoriesProgressLoading,
+    expenseCategoriesProgressError,
+    fetchExpenseCategoriesProgress,
+  } = useReportStore();
+
+  useEffect(() => {
+    fetchMonthlyReports();
+    fetchExpenseCategoriesProgress();
+  }, []);
 
   const tableHeadings: string[] = [
     t("income-exp.data-table.headings.month"),
@@ -77,7 +55,9 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2 whitespace-pre-wrap"
               variant="outline"
             >
-              {t("analysis-table-data.badge")}
+              {t("analysis-table-data.badge-last-month")} {income}{" "}
+              {t("analysis-table-data.badge-income")}
+              {expense} {t("analysis-table-data.badge-expense")}
             </Badge>
           </div>
           <ToggleGroup
@@ -114,15 +94,35 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
               {t("analysis-table-data.exp-by-cat.title")}
             </h2>
             <div className="flex flex-col gap-3">
-              {progressChart.map((data) => (
-                <div key={data.title} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <h3>{data.title}</h3>
-                    <h3>{data.amount}</h3>
-                  </div>
-                  <Progress value={data.value} />
+              {expenseCategoriesProgressError ? (
+                <p className="text-sm text-red-500">
+                  {expenseCategoriesProgressError}
+                </p>
+              ) : expenseCategoriesProgressLoading ? (
+                <p className="text-muted-foreground text-sm">{t("loading")}</p>
+              ) : expenseCategoriesProgress &&
+                expenseCategoriesProgress.length > 0 ? (
+                <div className="flex flex-col gap-3">
+                  {expenseCategoriesProgress.map((data) => (
+                    <div key={data.category} className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <h3>{data.category}</h3>
+                        <h3>
+                          CHF{" "}
+                          {data.amount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                          })}
+                        </h3>
+                      </div>
+                      <Progress value={data.percent} />
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <p className="text-muted-foreground text-sm">
+                  {t("no-categories-yet")}
+                </p>
+              )}
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -141,17 +141,43 @@ export function AnalysisTable({ tableData }: AnalysisTableProps) {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {tableData.map((data) => (
-                  <TableRow
-                    className="dark:border-border-blue"
-                    key={data.month}
-                  >
-                    <TableCell>{data.month}</TableCell>
-                    <TableCell>{data.income}</TableCell>
-                    <TableCell>{data.expenses}</TableCell>
-                    <TableCell>{data.balance}</TableCell>
+                {reportsError ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="px-6 text-sm text-red-500">
+                        {reportsError}
+                      </p>
+                    </TableCell>
                   </TableRow>
-                ))}
+                ) : monthlyReports === null || reportsLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="text-muted-foreground px-6 text-sm">
+                        {t("loading")}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                ) : monthlyReports.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4}>
+                      <p className="text-muted-foreground px-6 text-sm">
+                        {t("no-reports")}
+                      </p>
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  monthlyReports.map((row) => (
+                    <TableRow
+                      className="dark:border-border-blue"
+                      key={row.month}
+                    >
+                      <TableCell>{row.month}</TableCell>
+                      <TableCell>{row.income}</TableCell>
+                      <TableCell>{row.expenses}</TableCell>
+                      <TableCell>{row.balance}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </div>

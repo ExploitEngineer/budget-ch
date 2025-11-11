@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+const accountType = ["checking", "savings", "credit-card", "cash"] as const;
+
 export const userSignUpSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email({ message: "Invalid email address." }),
@@ -129,70 +131,6 @@ export const appearanceSchema = z.object({
 });
 
 export type AppearanceValues = z.infer<typeof appearanceSchema>;
-
-// Budget Dialog Schema
-export const BudgetDialogSchema = z.object({
-  category: z.string().min(1, { message: "Category is required" }),
-  budgetChf: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  istChf: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  warning: z.coerce
-    .number()
-    .min(0)
-    .max(100, { message: "Must be between 0 and 100" }),
-  colorMarker: z.string().min(1, { message: "Color marker is required" }),
-});
-
-export type BudgetDialogValues = z.infer<typeof BudgetDialogSchema>;
-
-// Saving-Goals Dialog Schema
-export const SavingsGoalDialogSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  goalAmount: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  savedAmount: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  dueDate: z.coerce
-    .date()
-    .refine((d) => !isNaN(d.getTime()), { message: "Due date is required" }),
-  account: z.string().min(1, { message: "Account is required" }),
-  monthlyAllocation: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-});
-
-export type SavingsGoalDialogValues = z.infer<typeof SavingsGoalDialogSchema>;
-
-// Content Dialog Schema
-export const NewAccountDialogSchema = z.object({
-  name: z.string().min(1, { message: "Name is required" }),
-  type: z
-    .string()
-    .refine(
-      (val) =>
-        [
-          "checking",
-          "savings",
-          "credit-card",
-          "cash",
-          "retirement-3a",
-        ].includes(val),
-      { message: "Please select a valid account type" },
-    ),
-  balance: z.coerce.number().min(0, { message: "Must be 0 or more" }),
-  iban: z.string().optional(),
-  note: z.string().optional(),
-});
-
-export type NewAccountDialogValues = z.infer<typeof NewAccountDialogSchema>;
-
-// Main Transfer Dialog Schema
-export const transferDialogSchema = z.object({
-  from: z.string().min(1, { message: "From account is required" }),
-  to: z.string().min(1, { message: "To account is required" }),
-  amount: z.coerce.number().min(0, { message: "Amount is required" }),
-  date: z.coerce
-    .date()
-    .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
-  text: z.string().optional(),
-});
-
-export type TransferDialogValues = z.infer<typeof transferDialogSchema>;
 
 // Filter Dialog Schema
 export const filterDialogSchema = z.object({

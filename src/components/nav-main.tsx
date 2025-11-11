@@ -26,7 +26,9 @@ import { useSidebar } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useState } from "react";
 import { authClient } from "@/lib/auth/auth-client";
+import { Spinner } from "./ui/spinner";
 
 interface Items {
   title: string;
@@ -37,9 +39,22 @@ interface Items {
 
 export function NavMain() {
   const { open, setOpenMobile } = useSidebar();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
   const t = useTranslations("main-dashboard");
   const pathname = usePathname();
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      await authClient.signOut();
+      router.push("/signin");
+    } catch (err) {
+      console.error("Error logging out", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const items: Items[] = [
     {
@@ -90,10 +105,7 @@ export function NavMain() {
     {
       title: t("sidebar.links.logout"),
       icon: LogOut,
-      onClick: async () => {
-        await authClient.signOut();
-        router.push("/signin");
-      },
+      onClick: handleLogout,
     },
   ];
 
@@ -116,6 +128,7 @@ export function NavMain() {
             <Link key={item.title} href={item.url || ""}>
               <SidebarMenuItem>
                 <SidebarMenuButton
+                  disabled={item.onClick && isLoading}
                   className={cn(
                     open
                       ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-5 ring-0 transition-all duration-300 hover:border-blue-600 focus:ring-0 hover:focus:ring-0 dark:hover:border-[#2B365C] hover:dark:bg-[#141B2C]"
@@ -126,7 +139,9 @@ export function NavMain() {
                   tooltip={item.title}
                 >
                   {item.icon && <item.icon />}
-                  <span>{item.title}</span>
+                  <span>
+                    {item.onClick && isLoading ? <Spinner /> : item.title}
+                  </span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </Link>

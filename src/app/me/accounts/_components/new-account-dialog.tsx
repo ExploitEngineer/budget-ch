@@ -30,55 +30,69 @@ import {
 import { Plus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
-  NewAccountDialogSchema,
-  NewAccountDialogValues,
-} from "@/lib/validations";
+  FinancialAccountDialogSchema,
+  FinancialAccountDialogValues,
+} from "@/lib/validations/financial-account-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { useAccountStore } from "@/store/account-store";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function NewAccountDialog({
   variant,
-  text,
 }: {
   variant?: "gradient" | "outline";
-  text?: string;
 }) {
   const t = useTranslations(
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
-  const form = useForm<NewAccountDialogValues>({
-    resolver: zodResolver(NewAccountDialogSchema) as any,
+  const { createAccountAndSync, createLoading } = useAccountStore();
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const form = useForm<FinancialAccountDialogValues>({
+    resolver: zodResolver(FinancialAccountDialogSchema) as any,
     defaultValues: {
       name: "",
-      type: "",
+      type: "checking",
       balance: 0,
       iban: "",
       note: "",
     },
   });
 
-  function onSubmit(values: NewAccountDialogValues) {
-    console.log("New account submitted:", values);
+  async function onSubmit(values: FinancialAccountDialogValues) {
+    try {
+      await createAccountAndSync({
+        name: values.name,
+        type: values.type,
+        initialBalance: values.balance,
+        iban: values.iban,
+        note: values.note,
+      });
+
+      form.reset();
+      setIsOpen(false);
+    } catch (err: any) {
+      console.error("Error submitting form:", err);
+    }
   }
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
           className={cn(
+            "cursor-pointer",
             variant === "gradient"
               ? "btn-gradient dark:text-white"
-              : "dark:border-border-blue !bg-dark-blue-background cursor-pointer text-xs",
+              : "dark:border-border-blue !bg-dark-blue-background text-xs",
           )}
           variant={variant === "gradient" ? "default" : "outline"}
         >
-          {variant === "gradient" ? (
-            <span className="hidden text-sm sm:block">{t("title")}</span>
-          ) : (
-            text
-          )}
           <Plus className="h-5 w-5" />
+          <span className="hidden text-sm sm:block">{t("title")}</span>
         </Button>
       </DialogTrigger>
 
@@ -86,10 +100,14 @@ export default function NewAccountDialog({
         {/* Header */}
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
-            {t("subtitle")}
+            {t("title")}
           </DialogTitle>
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="border">
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
               {t("button")}
             </Button>
           </DialogClose>
@@ -146,9 +164,6 @@ export default function NewAccountDialog({
                           </SelectItem>
                           <SelectItem value="cash">
                             {t("labels.type.options.cash")}
-                          </SelectItem>
-                          <SelectItem value="retirement-3a">
-                            {t("labels.type.options.retirement-3a")}
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -217,7 +232,13 @@ export default function NewAccountDialog({
 
             {/* Footer */}
             <div className="flex justify-end gap-3 pt-4">
-              <Button type="submit">{t("save")}</Button>
+              <Button
+                type="submit"
+                disabled={createLoading}
+                className="cursor-pointer"
+              >
+                {createLoading ? <Spinner /> : t("save")}
+              </Button>
             </div>
           </form>
         </Form>

@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { useReportStore } from "@/store/report-store";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -10,65 +14,77 @@ import {
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
+import { useExportCSV } from "@/hooks/use-export-csv";
 
-export function DetailedTable({
-  detailedTableData,
-}: {
-  detailedTableData: string[];
-}) {
+export function DetailedTable() {
   const t = useTranslations("main-dashboard.report-page.detailed-table");
 
-  const tableHeadings: string[] = [
-    t("data-table.headings.category"),
-    t("data-table.headings.amount"),
-  ];
+  const { exportCategories } = useExportCSV();
+
+  const { categories, categoriesTotal, fetchCategories, loading } =
+    useReportStore();
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between">
-          <CardTitle>{t("title")}</CardTitle>{" "}
+          <CardTitle>{t("title")}</CardTitle>
           <div className="flex items-center gap-2">
-            <Button variant="outline" className="!bg-dark-blue-background">
+            <Button
+              variant="outline"
+              onClick={() => exportCategories({ categories })}
+              className="!bg-dark-blue-background cursor-pointer"
+            >
               {t("buttons.categories-csv")}
             </Button>
-            <Button variant="outline" className="!bg-dark-blue-background">
+            <Button
+              variant="outline"
+              className="!bg-dark-blue-background cursor-pointer"
+            >
               {t("buttons.trend-csv")}
             </Button>
           </div>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow className="dark:border-border-blue">
-                {tableHeadings.map((heading) => (
-                  <TableHead
-                    className="font-bold text-gray-500 dark:text-gray-400/80"
-                    key={heading}
-                  >
-                    {heading}
+          {loading ? (
+            <p className="text-muted-foreground px-6 text-sm">{t("loading")}</p>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow className="dark:border-border-blue">
+                  <TableHead className="font-bold text-gray-500 dark:text-gray-400/80">
+                    {t("data-table.headings.category")}
                   </TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {detailedTableData.map((data, idx: number) => (
-                <TableRow className="dark:border-border-blue" key={idx}>
-                  <TableCell>{data}</TableCell>
-                  <TableCell>CHF 1’920.00</TableCell>
+                  <TableHead className="font-bold text-gray-500 dark:text-gray-400/80">
+                    {t("data-table.headings.amount")}
+                  </TableHead>
                 </TableRow>
-              ))}
-              <TableRow className="dark:border-border-blue">
-                <TableCell className="font-bold opacity-60">
-                  {t("data-table.data.total")}
-                </TableCell>
-                <TableCell className="font-bold opacity-60">
-                  CHF 3’990.00
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {categories?.map((cat) => (
+                  <TableRow key={cat.id} className="dark:border-border-blue">
+                    <TableCell>{cat.name}</TableCell>
+                    <TableCell>
+                      CHF {cat.totalAmount.toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                <TableRow className="dark:border-border-blue">
+                  <TableCell className="font-bold opacity-60">
+                    {t("data-table.data.total")}
+                  </TableCell>
+                  <TableCell className="font-bold opacity-60">
+                    CHF {categoriesTotal.toLocaleString()}
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </section>
