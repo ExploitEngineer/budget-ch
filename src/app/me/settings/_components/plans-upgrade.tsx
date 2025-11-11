@@ -10,18 +10,19 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { usePlansData } from "./data";
+import { usePricingCardsData } from "@/hooks/use-pricing-cards-data";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+interface PlansUpgradeProps {
+  subscriptionPrices: Record<string, number>;
+}
 
-// TODO load prices dynamically from the stripe API
-
-export function PlansUpgrade() {
+export function PlansUpgrade({ subscriptionPrices }: PlansUpgradeProps) {
   const t = useTranslations(
     "main-dashboard.settings-page.plans-upgrade-section",
   );
-  const { cards } = usePlansData();
+  const { cards } = usePricingCardsData();
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly",
   );
@@ -64,16 +65,18 @@ export function PlansUpgrade() {
             >
               <CardHeader className="mb-5 flex flex-wrap items-center justify-between gap-2">
                 <CardTitle>{card.title}</CardTitle>
-                <h1 className="text-lg font-bold">
-                  CHF{" "}
-                  {planDuration === "monthly"
-                    ? card.amountMonthly
-                    : card.amountYearly}{" "}
-                  /{" "}
-                  {planDuration === "monthly"
-                    ? t("plans-cards.individual-card.month")
-                    : t("plans-cards.individual-card.year")}
-                </h1>
+                {idx !== 0 && (
+                  <h1 className="text-lg font-bold">
+                    CHF{" "}
+                    {planDuration === "monthly"
+                      ? subscriptionPrices[card.lookupKeyMonthly!]
+                      : subscriptionPrices[card.lookupKeyYearly!]}{" "}
+                    /{" "}
+                    {planDuration === "monthly"
+                      ? t("plans-cards.individual-card.month")
+                      : t("plans-cards.individual-card.year")}
+                  </h1>
+                )}
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-5 text-sm">
