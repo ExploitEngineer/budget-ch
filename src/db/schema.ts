@@ -32,7 +32,7 @@ export const BudgetColorMakerType = pgEnum("budgets_type", [
   "red",
 ]);
 
-export type QuickTask = InferModel<typeof quick_tasks>;
+export type QuickTask = InferModel<typeof quickTasks>;
 
 /* AUTH SCHEMAS */
 
@@ -62,7 +62,7 @@ export const hubs = pgTable("hubs", {
     .notNull(),
 });
 
-export const hub_members = pgTable(
+export const hubMembers = pgTable(
   "hub_members",
   {
     hubId: uuid("hub_id")
@@ -98,7 +98,7 @@ export const sessions = pgTable("sessions", {
     .references(() => users.id, { onDelete: "cascade" }),
 });
 
-export const financial_accounts = pgTable("financial_accounts", {
+export const financialAccounts = pgTable("financial_accounts", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   userId: text("user_id")
     .notNull()
@@ -118,7 +118,7 @@ export const financial_accounts = pgTable("financial_accounts", {
     .notNull(),
 });
 
-export const transaction_categories = pgTable("transaction_categories", {
+export const transactionCategories = pgTable("transaction_categories", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   hubId: uuid("hub_id")
     .notNull()
@@ -135,7 +135,7 @@ export const transactions = pgTable("transactions", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   financialAccountId: uuid("financial_account_id")
     .notNull()
-    .references(() => financial_accounts.id, { onDelete: "cascade" }),
+    .references(() => financialAccounts.id, { onDelete: "cascade" }),
   hubId: uuid("hub_id")
     .notNull()
     .references(() => hubs.id, { onDelete: "cascade" }),
@@ -144,7 +144,7 @@ export const transactions = pgTable("transactions", {
     .references(() => users.id, { onDelete: "cascade" }),
   transactionCategoryId: uuid("transaction_category_id")
     .notNull()
-    .references(() => transaction_categories.id, { onDelete: "cascade" }),
+    .references(() => transactionCategories.id, { onDelete: "cascade" }),
   addedAt: timestamp("transaction_added_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
@@ -170,7 +170,7 @@ export const budgets = pgTable("budgets", {
     .references(() => users.id, { onDelete: "cascade" }),
   transactionCategoryId: uuid("transaction_category_id")
     .notNull()
-    .references(() => transaction_categories.id, { onDelete: "cascade" }),
+    .references(() => transactionCategories.id, { onDelete: "cascade" }),
   allocatedAmount: doublePrecision("allocated_amount").notNull().default(0),
   spentAmount: doublePrecision("spent_amount").notNull().default(0),
   warningPercentage: integer("warning_percentage").notNull(),
@@ -181,7 +181,7 @@ export const budgets = pgTable("budgets", {
     .notNull(),
 });
 
-export const saving_goals = pgTable("saving_goals", {
+export const savingGoals = pgTable("saving_goals", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   hubId: uuid("hub_id")
     .notNull()
@@ -202,7 +202,7 @@ export const saving_goals = pgTable("saving_goals", {
     .notNull(),
 });
 
-export const quick_tasks = pgTable("quick_tasks", {
+export const quickTasks = pgTable("quick_tasks", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   userId: text("user_id")
     .notNull()
@@ -251,11 +251,11 @@ export const verifications = pgTable("verifications", {
     .notNull(),
 });
 
-export const account_transfers = pgTable("account_transfers", {
+export const accountTransfers = pgTable("account_transfers", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   financialAccountId: uuid("financial_account_id")
     .notNull()
-    .references(() => financial_accounts.id, { onDelete: "cascade" }),
+    .references(() => financialAccounts.id, { onDelete: "cascade" }),
   sourceAccount: accountType().notNull(),
   destinationAccount: accountType().notNull(),
   note: text("note"),

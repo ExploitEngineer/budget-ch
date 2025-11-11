@@ -2,14 +2,14 @@ import db from "./db";
 import {
   hubs,
   users,
-  hub_members,
+  hubMembers,
   transactions,
-  transaction_categories,
-  financial_accounts,
+  transactionCategories,
+  financialAccounts,
   budgets,
-  saving_goals,
-  quick_tasks,
-  account_transfers,
+  savingGoals,
+  quickTasks,
+  accountTransfers,
 } from "./schema";
 import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
 import type { QuickTask } from "./schema";
@@ -182,7 +182,7 @@ export async function createHubMemberDB({
   isOwner,
 }: createHubMemberArgs) {
   try {
-    await db.insert(hub_members).values({
+    await db.insert(hubMembers).values({
       userId,
       hubId,
       accessRole,
@@ -205,7 +205,7 @@ export async function createFinancialAccountDB({
   note,
 }: financialAccountArgs) {
   try {
-    const existing = await db.query.financial_accounts.findFirst({
+    const existing = await db.query.financialAccounts.findFirst({
       where: (a) => and(eq(a.hubId, hubId), eq(a.type, type)),
       columns: { id: true },
     });
@@ -215,7 +215,7 @@ export async function createFinancialAccountDB({
     }
 
     const [account] = await db
-      .insert(financial_accounts)
+      .insert(financialAccounts)
       .values({
         userId,
         hubId,
@@ -241,7 +241,7 @@ export async function updateFinancialAccountDB({
   updatedData,
 }: UpdateFinancialAccountArgs) {
   try {
-    const account = await db.query.financial_accounts.findFirst({
+    const account = await db.query.financialAccounts.findFirst({
       where: (a) => eq(a.id, accountId),
       columns: { id: true, hubId: true },
     });
@@ -265,9 +265,9 @@ export async function updateFinancialAccountDB({
     );
 
     const [updatedAccount] = await db
-      .update(financial_accounts)
+      .update(financialAccounts)
       .set(cleanData)
-      .where(eq(financial_accounts.id, accountId))
+      .where(eq(financialAccounts.id, accountId))
       .returning();
 
     return {
@@ -290,7 +290,7 @@ export async function deleteFinancialAccountDB({
   accountId,
 }: DeleteFinancialAccountArgs) {
   try {
-    const account = await db.query.financial_accounts.findFirst({
+    const account = await db.query.financialAccounts.findFirst({
       where: (a) => eq(a.id, accountId),
       columns: { id: true, hubId: true },
     });
@@ -304,8 +304,8 @@ export async function deleteFinancialAccountDB({
     }
 
     const [deletedAccount] = await db
-      .delete(financial_accounts)
-      .where(eq(financial_accounts.id, accountId))
+      .delete(financialAccounts)
+      .where(eq(financialAccounts.id, accountId))
       .returning();
 
     return {
@@ -327,11 +327,11 @@ export async function getFinancialAccountsDB(userId: string, hubId: string) {
   try {
     const results = await db
       .select()
-      .from(financial_accounts)
+      .from(financialAccounts)
       .where(
         and(
-          eq(financial_accounts.userId, userId),
-          eq(financial_accounts.hubId, hubId),
+          eq(financialAccounts.userId, userId),
+          eq(financialAccounts.hubId, hubId),
         ),
       );
 
@@ -356,7 +356,7 @@ export async function getFinancialAccountByType(
   accountType: AccountType,
 ) {
   try {
-    return await db.query.financial_accounts.findFirst({
+    return await db.query.financialAccounts.findFirst({
       where: (a) =>
         and(eq(a.userId, userId), eq(a.hubId, hubId), eq(a.type, accountType)),
     });
@@ -414,10 +414,10 @@ export async function getTransactionsDB(
       recipient: transactions.source,
       accountType: transactions.accountType,
       type: transactions.type,
-      category: transaction_categories.name,
+      category: transactionCategories.name,
       note: transactions.note,
       amount: transactions.amount,
-      accountName: financial_accounts.name,
+      accountName: financialAccounts.name,
       userName: users.name,
     };
 
@@ -435,12 +435,12 @@ export async function getTransactionsDB(
       .select(selectObj)
       .from(transactions)
       .leftJoin(
-        transaction_categories,
-        eq(transactions.transactionCategoryId, transaction_categories.id),
+        transactionCategories,
+        eq(transactions.transactionCategoryId, transactionCategories.id),
       )
       .leftJoin(
-        financial_accounts,
-        eq(transactions.financialAccountId, financial_accounts.id),
+        financialAccounts,
+        eq(transactions.financialAccountId, financialAccounts.id),
       )
       .leftJoin(users, eq(transactions.userId, users.id))
       .where(eq(transactions.hubId, hubId))
@@ -534,8 +534,8 @@ export async function deleteTransactionDB({
 
     if (categoryId) {
       await db
-        .delete(transaction_categories)
-        .where(eq(transaction_categories.id, categoryId));
+        .delete(transactionCategories)
+        .where(eq(transactionCategories.id, categoryId));
     }
 
     return { success: true, data: deleted[0] };
@@ -553,7 +553,7 @@ export async function createTransactionCategoryDB(name: string, hubId: string) {
   try {
     const normalized = name.trim().toLowerCase();
 
-    const existingCategory = await db.query.transaction_categories.findFirst({
+    const existingCategory = await db.query.transactionCategories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
           sql`LOWER(${categories.name}) = ${normalized}`,
@@ -566,7 +566,7 @@ export async function createTransactionCategoryDB(name: string, hubId: string) {
     }
 
     const [category] = await db
-      .insert(transaction_categories)
+      .insert(transactionCategories)
       .values({
         name: normalized,
         hubId,
@@ -593,7 +593,7 @@ export async function createBudgetDB({
   try {
     const normalizedName = categoryName.trim().toLowerCase();
 
-    const existingCategory = await db.query.transaction_categories.findFirst({
+    const existingCategory = await db.query.transactionCategories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
           sql`LOWER(${categories.name}) = ${normalizedName}`,
@@ -606,7 +606,7 @@ export async function createBudgetDB({
     }
 
     const [category] = await db
-      .insert(transaction_categories)
+      .insert(transactionCategories)
       .values({
         name: normalizedName,
         hubId,
@@ -644,7 +644,7 @@ export async function createSavingGoalDB({
   accountType,
 }: savingGoalArgs) {
   try {
-    await db.insert(saving_goals).values({
+    await db.insert(savingGoals).values({
       hubId,
       userId,
       name,
@@ -678,17 +678,17 @@ export async function getSavingGoalsDB(
 
     let query = db
       .select({
-        id: saving_goals.id,
-        name: saving_goals.name,
-        goalAmount: saving_goals.goalAmount,
-        amountSaved: saving_goals.amountSaved,
-        monthlyAllocation: saving_goals.monthlyAllocation,
-        accountType: saving_goals.accountType,
-        dueDate: saving_goals.dueDate,
+        id: savingGoals.id,
+        name: savingGoals.name,
+        goalAmount: savingGoals.goalAmount,
+        amountSaved: savingGoals.amountSaved,
+        monthlyAllocation: savingGoals.monthlyAllocation,
+        accountType: savingGoals.accountType,
+        dueDate: savingGoals.dueDate,
       })
-      .from(saving_goals)
-      .where(eq(saving_goals.hubId, hubId))
-      .orderBy(desc(saving_goals.dueDate));
+      .from(savingGoals)
+      .where(eq(savingGoals.hubId, hubId))
+      .orderBy(desc(savingGoals.dueDate));
 
     if (limit) query.limit(limit);
 
@@ -751,7 +751,7 @@ export async function updateSavingGoalDB({
   updatedData,
 }: UpdateSavingGoalArgs) {
   try {
-    const goal = await db.query.saving_goals.findFirst({
+    const goal = await db.query.savingGoals.findFirst({
       where: (g) => eq(g.id, goalId),
       columns: { id: true, hubId: true },
     });
@@ -776,9 +776,9 @@ export async function updateSavingGoalDB({
     );
 
     const [updatedGoal] = await db
-      .update(saving_goals)
+      .update(savingGoals)
       .set(cleanData)
-      .where(eq(saving_goals.id, goalId))
+      .where(eq(savingGoals.id, goalId))
       .returning();
 
     return {
@@ -804,7 +804,7 @@ export async function deleteSavingGoalDB({
   goalId: string;
 }) {
   try {
-    const goal = await db.query.saving_goals.findFirst({
+    const goal = await db.query.savingGoals.findFirst({
       where: (g) => eq(g.id, goalId),
       columns: { hubId: true },
     });
@@ -814,8 +814,8 @@ export async function deleteSavingGoalDB({
       return { success: false, message: "Access denied." };
 
     const deleted = await db
-      .delete(saving_goals)
-      .where(eq(saving_goals.id, goalId))
+      .delete(savingGoals)
+      .where(eq(savingGoals.id, goalId))
       .returning();
 
     return {
@@ -845,7 +845,7 @@ export async function createTaskDB({
   checked?: boolean;
 }) {
   try {
-    await db.insert(quick_tasks).values({
+    await db.insert(quickTasks).values({
       userId,
       hubId,
       name,
@@ -867,9 +867,9 @@ export async function getTasksByHubDB(hubId: string): Promise<{
   try {
     const tasks = await db
       .select()
-      .from(quick_tasks)
-      .where(eq(quick_tasks.hubId, hubId))
-      .orderBy(quick_tasks.name);
+      .from(quickTasks)
+      .where(eq(quickTasks.hubId, hubId))
+      .orderBy(quickTasks.name);
 
     return { success: true, data: tasks };
   } catch (err: any) {
@@ -890,12 +890,12 @@ export async function updateTaskDB({
 }) {
   try {
     await db
-      .update(quick_tasks)
+      .update(quickTasks)
       .set({
         ...(name !== undefined ? { name } : {}),
         ...(checked !== undefined ? { checked } : {}),
       })
-      .where(eq(quick_tasks.id, taskId));
+      .where(eq(quickTasks.id, taskId));
 
     return { success: true, message: "Task updated successfully" };
   } catch (err: any) {
@@ -907,7 +907,7 @@ export async function updateTaskDB({
 // DELETE Task
 export async function deleteTaskDB(taskId: string) {
   try {
-    await db.delete(quick_tasks).where(eq(quick_tasks.id, taskId));
+    await db.delete(quickTasks).where(eq(quickTasks.id, taskId));
     return { success: true, message: "Task deleted successfully" };
   } catch (err: any) {
     console.error("Error deleting task", err);
@@ -924,7 +924,7 @@ export async function getBudgetsDB(
   try {
     const allFields = {
       id: budgets.id,
-      category: transaction_categories.name,
+      category: transactionCategories.name,
       allocated: budgets.allocatedAmount,
       spent: budgets.spentAmount,
       createdAt: budgets.createdAt,
@@ -944,8 +944,8 @@ export async function getBudgetsDB(
       .select(selectObj)
       .from(budgets)
       .leftJoin(
-        transaction_categories,
-        eq(transaction_categories.id, budgets.transactionCategoryId),
+        transactionCategories,
+        eq(transactionCategories.id, budgets.transactionCategoryId),
       )
       .where(eq(budgets.hubId, hubId))
       .orderBy(desc(budgets.createdAt));
@@ -993,7 +993,7 @@ export async function updateBudgetDB({
     if (updatedData.categoryName) {
       const newName = updatedData.categoryName.trim();
 
-      const currentCategory = await db.query.transaction_categories.findFirst({
+      const currentCategory = await db.query.transactionCategories.findFirst({
         where: (cat) => eq(cat.id, budget.transactionCategoryId),
       });
 
@@ -1008,7 +1008,7 @@ export async function updateBudgetDB({
         transactionCategoryId = currentCategory.id;
       } else {
         const existingCategory =
-          await db.query.transaction_categories.findFirst({
+          await db.query.transactionCategories.findFirst({
             where: (cat) => and(eq(cat.hubId, hubId), eq(cat.name, newName)),
           });
 
@@ -1020,9 +1020,9 @@ export async function updateBudgetDB({
         }
 
         await db
-          .update(transaction_categories)
+          .update(transactionCategories)
           .set({ name: newName })
-          .where(eq(transaction_categories.id, currentCategory.id));
+          .where(eq(transactionCategories.id, currentCategory.id));
 
         transactionCategoryId = currentCategory.id;
       }
@@ -1084,8 +1084,8 @@ export async function deleteBudgetDB({
 
     if (categoryId) {
       await db
-        .delete(transaction_categories)
-        .where(eq(transaction_categories.id, categoryId));
+        .delete(transactionCategories)
+        .where(eq(transactionCategories.id, categoryId));
     }
 
     return {
@@ -1112,7 +1112,7 @@ export async function createAccountTransferDB({
   note,
 }: AccountTransferArgs) {
   try {
-    const from = await db.query.financial_accounts.findFirst({
+    const from = await db.query.financialAccounts.findFirst({
       where: (a) => and(eq(a.type, fromAccountType), eq(a.hubId, hubId)),
       columns: {
         id: true,
@@ -1123,7 +1123,7 @@ export async function createAccountTransferDB({
       },
     });
 
-    const to = await db.query.financial_accounts.findFirst({
+    const to = await db.query.financialAccounts.findFirst({
       where: (a) => and(eq(a.type, toAccountType), eq(a.hubId, hubId)),
       columns: {
         id: true,
@@ -1158,17 +1158,17 @@ export async function createAccountTransferDB({
     const newToBalance = Number(to.initialBalance ?? 0) + amount;
 
     await db
-      .update(financial_accounts)
+      .update(financialAccounts)
       .set({ initialBalance: newFromBalance })
-      .where(eq(financial_accounts.id, from.id));
+      .where(eq(financialAccounts.id, from.id));
 
     await db
-      .update(financial_accounts)
+      .update(financialAccounts)
       .set({ initialBalance: newToBalance })
-      .where(eq(financial_accounts.id, to.id));
+      .where(eq(financialAccounts.id, to.id));
 
     const [transfer] = await db
-      .insert(account_transfers)
+      .insert(accountTransfers)
       .values({
         financialAccountId,
         sourceAccount: from.type,
@@ -1191,8 +1191,8 @@ export async function createAccountTransferDB({
 // GET Account Transfers
 export async function getAccountTransfersDB(financialAccountId: string) {
   try {
-    const account = await db.query.financial_accounts.findFirst({
-      where: eq(financial_accounts.id, financialAccountId),
+    const account = await db.query.financialAccounts.findFirst({
+      where: eq(financialAccounts.id, financialAccountId),
       columns: { type: true },
     });
 
@@ -1201,14 +1201,14 @@ export async function getAccountTransfersDB(financialAccountId: string) {
     }
     const results = await db
       .select()
-      .from(account_transfers)
+      .from(accountTransfers)
       .where(
         or(
-          eq(account_transfers.sourceAccount, account.type),
-          eq(account_transfers.destinationAccount, account.type),
+          eq(accountTransfers.sourceAccount, account.type),
+          eq(accountTransfers.destinationAccount, account.type),
         ),
       )
-      .orderBy(desc(account_transfers.updatedAt));
+      .orderBy(desc(accountTransfers.updatedAt));
 
     const formatted = results.map((tx) => ({
       date: tx.updatedAt,
@@ -1260,8 +1260,8 @@ export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
 
     const result = await db
       .select({
-        id: transaction_categories.id,
-        name: transaction_categories.name,
+        id: transactionCategories.id,
+        name: transactionCategories.name,
         transactionAmount:
           sql<number>`COALESCE(${transactionTotals.transactionTotal}, 0)`.as(
             "transactionAmount",
@@ -1274,16 +1274,16 @@ export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
           + COALESCE(${budgetTotals.budgetTotal}, 0)
         `.as("totalAmount"),
       })
-      .from(transaction_categories)
+      .from(transactionCategories)
       .leftJoin(
         transactionTotals,
-        eq(transactionTotals.categoryId, transaction_categories.id),
+        eq(transactionTotals.categoryId, transactionCategories.id),
       )
       .leftJoin(
         budgetTotals,
-        eq(budgetTotals.categoryId, transaction_categories.id),
+        eq(budgetTotals.categoryId, transactionCategories.id),
       )
-      .where(eq(transaction_categories.hubId, hubId));
+      .where(eq(transactionCategories.hubId, hubId));
 
     return {
       success: true,
@@ -1340,8 +1340,8 @@ export async function deleteAllTransactionsAndCategoriesDB(hubId: string) {
 
     if (categoryIds.length > 0) {
       await db
-        .delete(transaction_categories)
-        .where(inArray(transaction_categories.id, categoryIds));
+        .delete(transactionCategories)
+        .where(inArray(transactionCategories.id, categoryIds));
     }
 
     return {
@@ -1399,11 +1399,11 @@ export async function getCategoriesByExpensesDB(hubId: string) {
 
     for (const [key, value] of Object.entries(grouped)) {
       const [categoryId, accountType] = key.split(":");
-      const categoryRow = await db.query.transaction_categories.findFirst({
+      const categoryRow = await db.query.transactionCategories.findFirst({
         where: (cat) => eq(cat.id, categoryId),
         columns: { name: true },
       });
-      const accountRow = await db.query.financial_accounts.findFirst({
+      const accountRow = await db.query.financialAccounts.findFirst({
         where: (acc) =>
           and(eq(acc.hubId, hubId), eq(acc.type, accountType as any)),
         columns: { initialBalance: true },

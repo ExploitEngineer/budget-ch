@@ -2,13 +2,13 @@
 
 import { countDistinct } from "drizzle-orm";
 import db from "@/db/db";
-import { transaction_categories } from "@/db/schema";
+import { transactionCategories } from "@/db/schema";
 
 export async function getCategoriesCount() {
   try {
     const result = await db
-      .select({ count: countDistinct(transaction_categories.id) })
-      .from(transaction_categories);
+      .select({ count: countDistinct(transactionCategories.id) })
+      .from(transactionCategories);
 
     return { success: true, data: { count: result[0].count } };
   } catch (error) {

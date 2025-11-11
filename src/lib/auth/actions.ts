@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth/auth";
 import db from "@/db/db";
 import { eq } from "drizzle-orm";
-import { financial_accounts, hubs } from "@/db/schema";
+import { financialAccounts, hubs } from "@/db/schema";
 
 export async function getContext(headersObj: Headers, requireAccount = true) {
   const session = await auth.api.getSession({ headers: headersObj });
@@ -21,8 +21,8 @@ export async function getContext(headersObj: Headers, requireAccount = true) {
   let financialAccount = null;
 
   if (requireAccount) {
-    financialAccount = await db.query.financial_accounts.findFirst({
-      where: eq(financial_accounts.userId, userId),
+    financialAccount = await db.query.financialAccounts.findFirst({
+      where: eq(financialAccounts.userId, userId),
     });
 
     if (!financialAccount) throw new Error("Financial account not found");

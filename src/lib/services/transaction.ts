@@ -13,7 +13,7 @@ import {
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
-import { transaction_categories } from "@/db/schema";
+import { transactionCategories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import type { Transaction } from "../types/dashboard-types";
 import db from "@/db/db";
@@ -67,7 +67,7 @@ export async function createTransaction({
 
     const normalizedName = categoryName.trim().toLowerCase();
 
-    const existingCategory = await db.query.transaction_categories.findFirst({
+    const existingCategory = await db.query.transactionCategories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
           sql`LOWER(${categories.name}) = ${normalizedName}`,
@@ -80,12 +80,12 @@ export async function createTransaction({
     }
 
     const [newCategory] = await db
-      .insert(transaction_categories)
+      .insert(transactionCategories)
       .values({
         hubId,
         name: normalizedName,
       })
-      .returning({ id: transaction_categories.id });
+      .returning({ id: transactionCategories.id });
 
     await createTransactionDB({
       financialAccountId: account.id,
@@ -255,7 +255,7 @@ export async function updateTransaction(
     let transactionCategoryId: string | null = null;
 
     if (categoryName) {
-      const existingCategory = await db.query.transaction_categories.findFirst({
+      const existingCategory = await db.query.transactionCategories.findFirst({
         where: (categories, { and, eq, sql }) =>
           and(
             eq(categories.hubId, hubId),
@@ -267,12 +267,12 @@ export async function updateTransaction(
         transactionCategoryId = existingCategory.id;
       } else {
         const [newCategory] = await db
-          .insert(transaction_categories)
+          .insert(transactionCategories)
           .values({
             hubId,
             name: categoryName,
           })
-          .returning({ id: transaction_categories.id });
+          .returning({ id: transactionCategories.id });
 
         transactionCategoryId = newCategory.id;
       }
