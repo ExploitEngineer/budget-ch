@@ -38,6 +38,8 @@ export const auth = betterAuth({
             if (status === "error") {
               console.error(message);
             }
+
+            // TODO: Create stripe customer for user
           } catch (err) {
             if (err instanceof Error) {
               console.error(`Error: ${err.message}`);
