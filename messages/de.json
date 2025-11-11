@@ -965,6 +965,7 @@
                         "title": "Einzeln",
                         "sub-title": "Für Einzelpersonen (1 Nutzer).",
                         "year": "Jahr",
+                        "month": "Monat",
                         "options": {
                             "all-free-features": "Alle kostenlosen Funktionen ohne Limits",
                             "unlimited": "Unbegrenzte Transaktionen, Konten, Budgets & Sparziele",

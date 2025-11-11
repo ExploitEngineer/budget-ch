@@ -3,7 +3,8 @@ import { useTranslations } from "next-intl";
 export interface PlanCard {
   title: string;
   subTitle: string;
-  amount: string;
+  amountMonthly: number;
+  amountYearly: number;
   options: Record<string, string>;
   button: string;
 }
@@ -17,7 +18,8 @@ export function usePlansData() {
     {
       title: t("free-card.title"),
       subTitle: t("free-card.sub-title"),
-      amount: "CHF 0",
+      amountMonthly: 0,
+      amountYearly: 0,
       options: {
         manualEntry: t("free-card.options.manual-entry"),
         basicBudgets: t("free-card.options.basic-budgets"),
@@ -29,7 +31,8 @@ export function usePlansData() {
     {
       title: t("individual-card.title"),
       subTitle: t("individual-card.sub-title"),
-      amount: "CHF 69 /",
+      amountMonthly: 6.9,
+      amountYearly: 69,
       options: {
         allFreeFeatures: t("individual-card.options.all-free-features"),
         unlimited: t("individual-card.options.unlimited"),
@@ -42,7 +45,8 @@ export function usePlansData() {
     {
       title: t("family-card.title"),
       subTitle: t("family-card.sub-title"),
-      amount: "CHF 199 /",
+      amountMonthly: 11.9,
+      amountYearly: 199,
       options: {
         allIndividualFeatures: t("family-card.options.all-individual-features"),
         unlimitedUsers: t("family-card.options.unlimited-users"),

@@ -987,6 +987,7 @@
                         "title": "Individuel",
                         "sub-title": "Pour un utilisateur.",
                         "year": "Année",
+                        "month": "Mois",
                         "options": {
                             "all-free-features": "Toutes les fonctionnalités gratuites sans limites",
                             "unlimited": "Transactions, comptes, budgets & objectifs d'épargne illimités",

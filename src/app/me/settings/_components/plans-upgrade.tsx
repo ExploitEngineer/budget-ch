@@ -13,12 +13,18 @@ import { useTranslations } from "next-intl";
 import { usePlansData } from "./data";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+
+// TODO load prices dynamically from the stripe API
 
 export function PlansUpgrade() {
   const t = useTranslations(
     "main-dashboard.settings-page.plans-upgrade-section",
   );
   const { cards } = usePlansData();
+  const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
+    "monthly",
+  );
 
   return (
     <section className="space-y-4">
@@ -29,6 +35,10 @@ export function PlansUpgrade() {
             className="bg-dark-blue-background dark:border-border-blue inline-flex flex-none items-center gap-1 rounded-lg border"
             type="single"
             aria-label="view"
+            value={planDuration}
+            onValueChange={(value) =>
+              setPlanDuration(value as "monthly" | "yearly")
+            }
           >
             <ToggleGroupItem
               value="monthly"
@@ -43,12 +53,6 @@ export function PlansUpgrade() {
             >
               {t("buttons.yearly")}
             </ToggleGroupItem>
-
-            <ToggleGroupItem value="2-months" className="px-3 py-1 text-sm">
-              <span className="inline-block max-w-[10rem] truncate">
-                {t("buttons.2-months")}
-              </span>
-            </ToggleGroupItem>
           </ToggleGroup>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
@@ -61,8 +65,14 @@ export function PlansUpgrade() {
               <CardHeader className="mb-5 flex flex-wrap items-center justify-between gap-2">
                 <CardTitle>{card.title}</CardTitle>
                 <h1 className="text-lg font-bold">
-                  {card.amount}{" "}
-                  {idx === 0 ? null : t("plans-cards.individual-card.year")}
+                  CHF{" "}
+                  {planDuration === "monthly"
+                    ? card.amountMonthly
+                    : card.amountYearly}{" "}
+                  /{" "}
+                  {planDuration === "monthly"
+                    ? t("plans-cards.individual-card.month")
+                    : t("plans-cards.individual-card.year")}
                 </h1>
               </CardHeader>
               <CardContent>

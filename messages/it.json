@@ -987,6 +987,7 @@
                         "title": "Individuale",
                         "sub-title": "Per utenti singoli.",
                         "year": "Anno",
+                        "month": "Mese",
                         "options": {
                             "all-free-features": "Tutte le funzionalità gratuite senza limiti",
                             "unlimited": "Transazioni, conti, budget & obiettivi di risparmio illimitati",

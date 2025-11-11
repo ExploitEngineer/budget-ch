@@ -986,6 +986,7 @@
                         "title": "Individual",
                         "sub-title": "For Individuals (1 User).",
                         "year": "Year",
+                        "month": "Month",
                         "options": {
                             "all-free-features": "All Free Features Without Limits",
                             "unlimited": "Unlimited Transactions, Accounts, Budgets & Savings Goals",
