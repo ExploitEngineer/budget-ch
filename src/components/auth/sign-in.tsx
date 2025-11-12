@@ -28,6 +28,7 @@ import { signInWithGoogle } from "@/lib/auth/auth-client";
 
 export default function SignIn() {
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<UserSignInValues>({
     resolver: zodResolver(userSignInSchema),
     defaultValues: {
@@ -74,9 +75,16 @@ export default function SignIn() {
   }
 
   const handleGoogleSignIn = async () => {
-    const result = await signInWithGoogle();
-    if (result.status === "error") {
-      toast.error("Error signing in with Google");
+    setLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      if (result.status === "error") {
+        toast.error("Error signing in with Google");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -153,18 +161,25 @@ export default function SignIn() {
           <Button
             type="button"
             onClick={handleGoogleSignIn}
+            disabled={loading}
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background flex w-full cursor-pointer items-center gap-3 rounded-xl py-5 font-bold"
           >
-            <Image
-              src="/assets/images/google.svg"
-              width={15}
-              height={15}
-              alt="google image"
-            />
-            <span>
-              {t("signin")} {t("buttons.google")}
-            </span>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <div className="flex items-center gap-3">
+                <Image
+                  src="/assets/images/google.svg"
+                  width={15}
+                  height={15}
+                  alt="google image"
+                />
+                <span>
+                  {t("signin")} {t("buttons.google")}
+                </span>
+              </div>
+            )}
           </Button>
 
           <Separator className="dark:bg-border-blue" />
