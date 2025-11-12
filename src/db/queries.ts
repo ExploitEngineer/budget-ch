@@ -12,7 +12,7 @@ import {
   accountTransfers,
 } from "./schema";
 import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
-import type { QuickTask } from "./schema";
+import type { QuickTask, UserType } from "./schema";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
@@ -158,6 +158,220 @@ export type AccountTransferArgs = {
   amount: number;
   note?: string;
 };
+
+export async function updateUser(
+  userId: string,
+  updateData: Partial<Omit<UserType, "id" | "email">>,
+): Promise<{ success: boolean; message: string; data?: UserType }> {
+  try {
+    // Filter out restricted fields (id and email) and undefined values
+    const { id, email, ...allowedFields } = updateData as any;
+    const cleanData = Object.fromEntries(
+      Object.entries(allowedFields).filter(([_, value]) => value !== undefined),
+    );
+
+    // If no fields to update, return early
+    if (Object.keys(cleanData).length === 0) {
+      const [user] = await db.select().from(users).where(eq(users.id, userId));
+      return { success: true, message: "No fields to update", data: user };
+    }
+
+    const [updatedUser] = await db
+      .update(users)
+      .set(cleanData)
+      .where(eq(users.id, userId))
+      .returning();
+
+    return {
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser,
+    };
+  } catch (err) {
+    console.error("Error updating user: ", err);
+    return {
+      success: false,
+      message: `Failed to update user: ${(err as Error).message}`,
+    };
+  }
+}
+
+// GET user by email
+export async function getUserByEmailDB(email: string) {
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(users.email, email),
+      columns: {
+        id: true,
+        name: true,
+        email: true,
+        stripeCustomerId: true,
+      },
+    });
+    return user;
+  } catch (err) {
+    console.error("Error fetching user by email: ", err);
+    return null;
+  }
+}
+
+// CHECK if user onboarding is complete
+export async function isUserOnboardingCompleteDB(
+  userId: string,
+): Promise<boolean> {
+  try {
+    // Check if user has stripe customer ID
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { stripeCustomerId: true },
+    });
+
+    if (!user || !user.stripeCustomerId) {
+      return false;
+    }
+
+    // Check if user has a hub
+    const hub = await db.query.hubs.findFirst({
+      where: eq(hubs.userId, userId),
+      columns: { id: true },
+    });
+
+    if (!hub) {
+      return false;
+    }
+
+    // Check if user has a hub member record
+    const hubMember = await db.query.hubMembers.findFirst({
+      where: (hm) => and(eq(hm.userId, userId), eq(hm.hubId, hub.id)),
+      columns: { userId: true },
+    });
+
+    if (!hubMember) {
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error("Error checking user onboarding status: ", err);
+    return false;
+  }
+}
+
+// Complete user onboarding - checks for existing records and creates missing ones
+// This function only handles DB operations, no external API calls
+export async function completeUserOnboardingDB({
+  userId,
+  userName,
+  stripeCustomerId,
+}: {
+  userId: string;
+  userName: string;
+  stripeCustomerId: string;
+}): Promise<{
+  success: boolean;
+  message: string;
+  data?: { hubId: string };
+}> {
+  try {
+    // Check current state
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { stripeCustomerId: true },
+    });
+
+    const existingHub = await db.query.hubs.findFirst({
+      where: eq(hubs.userId, userId),
+      columns: { id: true },
+    });
+
+    let hubId: string;
+
+    if (existingHub) {
+      hubId = existingHub.id;
+
+      // Check if hub member exists
+      const hubMember = await db.query.hubMembers.findFirst({
+        where: (hm) => and(eq(hm.userId, userId), eq(hm.hubId, hubId)),
+        columns: { userId: true },
+      });
+
+      if (hubMember) {
+        // Hub and hub member exist, just update stripe customer ID if needed
+        if (!user?.stripeCustomerId) {
+          await db
+            .update(users)
+            .set({ stripeCustomerId })
+            .where(eq(users.id, userId));
+        }
+        return {
+          success: true,
+          message: "User onboarding already complete",
+          data: { hubId },
+        };
+      }
+
+      // Hub exists but no hub member - create hub member and update stripe
+      await db.transaction(async (tx) => {
+        await tx.insert(hubMembers).values({
+          userId,
+          hubId,
+          accessRole: "member",
+          isOwner: true,
+        });
+
+        if (!user?.stripeCustomerId) {
+          await tx
+            .update(users)
+            .set({ stripeCustomerId })
+            .where(eq(users.id, userId));
+        }
+      });
+
+      return {
+        success: true,
+        message: "User onboarding completed successfully",
+        data: { hubId },
+      };
+    }
+
+    // No hub exists - create everything in a transaction
+    const result = await db.transaction(async (tx) => {
+      // Create hub
+      const [hub] = await tx
+        .insert(hubs)
+        .values({ userId, name: `${userName}'s Hub` })
+        .returning({ id: hubs.id });
+
+      // Create hub member
+      await tx.insert(hubMembers).values({
+        userId,
+        hubId: hub.id,
+        accessRole: "member",
+        isOwner: true,
+      });
+
+      // Update user with stripe customer ID
+      await tx
+        .update(users)
+        .set({ stripeCustomerId })
+        .where(eq(users.id, userId));
+
+      return { hubId: hub.id };
+    });
+
+    return {
+      success: true,
+      message: "User onboarding completed successfully",
+      data: result,
+    };
+  } catch (err) {
+    console.error("Error completing user onboarding: ", err);
+    return {
+      success: false,
+      message: `Failed to complete user onboarding: ${(err as Error).message}`,
+    };
+  }
+}
 
 // CREATE Hub
 export async function createHubDB(userId: string, userName: string) {
@@ -1007,10 +1221,11 @@ export async function updateBudgetDB({
       if (currentCategory.name === newName) {
         transactionCategoryId = currentCategory.id;
       } else {
-        const existingCategory =
-          await db.query.transactionCategories.findFirst({
+        const existingCategory = await db.query.transactionCategories.findFirst(
+          {
             where: (cat) => and(eq(cat.hubId, hubId), eq(cat.name, newName)),
-          });
+          },
+        );
 
         if (existingCategory) {
           return {
