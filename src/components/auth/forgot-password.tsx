@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   userForgotPasswordSchema,
   UserForgotPasswordValues,
-} from "@/lib/validations";
+} from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -19,8 +19,14 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
+import { useState } from "react";
+import { authClient } from "@/lib/auth/auth-client";
+import { toast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 export default function ForgotPassword() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const form = useForm<UserForgotPasswordValues>({
     resolver: zodResolver(userForgotPasswordSchema),
     defaultValues: {
@@ -30,8 +36,27 @@ export default function ForgotPassword() {
 
   const t = useTranslations("authpages");
 
-  function onSubmit(values: UserForgotPasswordValues) {
-    console.log("Submitted:", values);
+  async function onSubmit(values: UserForgotPasswordValues) {
+    try {
+      setIsLoading(true);
+
+      const { error } = await authClient.forgetPassword({
+        email: values.email,
+        redirectTo: "/reset-password",
+      });
+
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success("Password reset email sent");
+        form.reset();
+      }
+    } catch (err) {
+      console.error("Reset password failed:", err);
+      toast.error("Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -66,9 +91,10 @@ export default function ForgotPassword() {
           <div className="flex items-center justify-between gap-2">
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full flex-1 cursor-pointer rounded-xl bg-[#235FE3] py-5 font-bold text-white hover:bg-blue-600 dark:bg-[#6371FF] dark:hover:bg-[#6371FF]/80"
             >
-              {t("buttons.send-email")}
+              {isLoading ? <Spinner /> : t("buttons.send-email")}
             </Button>
             <Link className="flex-1" href="/signin">
               <Button
