@@ -1641,3 +1641,38 @@ export async function getCategoriesByExpensesDB(hubId: string) {
     };
   }
 }
+
+// GET Hubs for User
+export async function getHubsByUserDB(userId: string) {
+  try {
+    const userHubs = await db.query.hubs.findMany({
+      where: eq(hubs.userId, userId),
+      columns: {
+        id: true,
+        name: true,
+      },
+      orderBy: desc(hubs.createdAt),
+    });
+
+    if (!userHubs || userHubs.length === 0) {
+      return {
+        success: false,
+        message: "No hubs found for user",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Hubs fetched successfully",
+      data: userHubs,
+    };
+  } catch (err: any) {
+    console.error("Error fetching hubs:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch hubs",
+      data: null,
+    };
+  }
+}
