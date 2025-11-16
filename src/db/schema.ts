@@ -75,7 +75,7 @@ export const hubMembers = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     accessRole: accessRole().notNull().default("member"),
-    isOwner: boolean("is_owner").default(true).notNull(),
+    isOwner: boolean("is_owner").default(false).notNull(),
     joinedAt: timestamp(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -85,6 +85,19 @@ export const hubMembers = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.hubId] })],
 );
+
+export const hubInvitations = pgTable("hub_invitations", {
+  id: uuid().primaryKey().defaultRandom(),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  role: accessRole().notNull().default("member"),
+  token: text("token").notNull(),
+  accepted: boolean("accepted").default(false).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),

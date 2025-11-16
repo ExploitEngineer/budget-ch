@@ -10,15 +10,16 @@ import {
   savingGoals,
   quickTasks,
   accountTransfers,
+  hubInvitations,
 } from "./schema";
-import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
+import { eq, desc, sql, gt, inArray, and, or } from "drizzle-orm";
 import type { QuickTask, UserType } from "./schema";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
 } from "@/lib/services/budget";
 
-type AccessRole = "admin" | "member";
+export type AccessRole = "admin" | "member";
 
 export type createHubMemberArgs = {
   userId: string;
@@ -158,6 +159,22 @@ export type AccountTransferArgs = {
   amount: number;
   note?: string;
 };
+
+type accessRole = "admin" | "member";
+
+interface HubInvitationProps {
+  hubId: string;
+  email: string;
+  role: accessRole;
+  token: string;
+  expiresAt: Date;
+}
+
+interface UserHubMemberProps {
+  hubId: string;
+  userId: string;
+  role: accessRole;
+}
 
 export async function updateUser(
   userId: string,
@@ -1642,7 +1659,7 @@ export async function getCategoriesByExpensesDB(hubId: string) {
   }
 }
 
-// GET Hubs for User
+// GET HUBS for User
 export async function getHubsByUserDB(userId: string) {
   try {
     const userHubs = await db.query.hubs.findMany({
@@ -1654,25 +1671,134 @@ export async function getHubsByUserDB(userId: string) {
       orderBy: desc(hubs.createdAt),
     });
 
-    if (!userHubs || userHubs.length === 0) {
-      return {
-        success: false,
-        message: "No hubs found for user",
-        data: null,
-      };
-    }
-
     return {
       success: true,
-      message: "Hubs fetched successfully",
-      data: userHubs,
+      message: "Hubs loaded",
+      data: userHubs ?? [],
     };
   } catch (err: any) {
-    console.error("Error fetching hubs:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to fetch hubs",
-      data: null,
-    };
+    return { success: false, message: err.message, data: [] };
+  }
+}
+
+// CREATE INVITATION
+export async function createHubInvitationDB({
+  hubId,
+  email,
+  role,
+  token,
+  expiresAt,
+}: HubInvitationProps) {
+  try {
+    const inserted = await db
+      .insert(hubInvitations)
+      .values({
+        hubId,
+        email,
+        role,
+        token,
+        expiresAt,
+      })
+      .returning();
+
+    return { success: true, data: inserted[0] };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+// GET INVITATIONS by HUB
+export async function getHubInvitationsByHubDB(hubId: string) {
+  try {
+    const rows = await db
+      .select({
+        id: hubInvitations.id,
+        email: hubInvitations.email,
+        role: hubInvitations.role,
+        accepted: hubInvitations.accepted,
+        expiresAt: hubInvitations.expiresAt,
+        createdAt: hubInvitations.createdAt,
+      })
+      .from(hubInvitations)
+      .where(eq(hubInvitations.hubId, hubId));
+
+    return { success: true, data: rows };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: [] };
+  }
+}
+
+// GET INVITE BY TOKEN
+export async function getInvitationByTokenDB(token: string) {
+  try {
+    const row = await db.query.hubInvitations.findFirst({
+      where: eq(hubInvitations.token, token),
+    });
+
+    if (!row) {
+      return { success: false, message: "Invalid token", data: null };
+    }
+
+    return { success: true, data: row };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: null };
+  }
+}
+
+// ACCEPT INVITATION
+export async function acceptInvitationDB(token: string, userId: string) {
+  try {
+    const invite = await db.query.hubInvitations.findFirst({
+      where: eq(hubInvitations.token, token),
+    });
+
+    if (!invite) return { success: false, message: "Invitation not found" };
+
+    if (invite.accepted) return { success: false, message: "Already accepted" };
+
+    if (new Date(invite.expiresAt) < new Date())
+      return { success: false, message: "Invitation expired" };
+
+    await db.transaction(async (tx) => {
+      await tx.insert(hubMembers).values({
+        hubId: invite.hubId,
+        userId,
+        accessRole: invite.role,
+        isOwner: false,
+        joinedAt: new Date(),
+      });
+
+      await tx
+        .update(hubInvitations)
+        .set({ accepted: true })
+        .where(eq(hubInvitations.id, invite.id));
+    });
+
+    return { success: true, message: "Invitation accepted" };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+// GET MEMBERS FOR HUB
+export async function getHubMembersDB(hubId: string) {
+  try {
+    const rows = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: hubMembers.accessRole,
+        isOwner: hubMembers.isOwner,
+        joinedAt: hubMembers.joinedAt,
+      })
+      .from(hubMembers)
+      .innerJoin(users, eq(hubMembers.userId, users.id))
+      .where(eq(hubMembers.hubId, hubId))
+      .orderBy(desc(hubMembers.joinedAt));
+
+    return { success: true, data: rows };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: [] };
   }
 }

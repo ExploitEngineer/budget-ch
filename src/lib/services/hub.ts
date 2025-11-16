@@ -1,8 +1,8 @@
 "use server";
 
-import { createHubDB, getHubsByUserDB } from "@/db/queries";
+import { getHubsByUserDB } from "@/db/queries";
 import { headers } from "next/headers";
-import { getContext } from "@/lib/auth/actions";
+import {getContext} from "@/lib/auth/actions"
 
 export interface Hub {
   id: string;
@@ -44,24 +44,6 @@ export async function getHubs(): Promise<GetHubsResponse> {
     return {
       success: false,
       message: (error as Error).message || "Failed to fetch hubs",
-    };
-  }
-}
-
-// Create Hub [Action]
-export async function createHub(userId: string, userName: string) {
-  try {
-    const hubId = await createHubDB(userId, userName);
-    return {
-      status: "success",
-      message: `Hub created successfully for ${userName}`,
-      data: { hubId },
-    };
-  } catch (err: any) {
-    console.error("[Service] CreateHub failed:", err);
-    return {
-      status: "error",
-      message: err.message || "Unexpected error creating hub",
     };
   }
 }
