@@ -18,7 +18,9 @@ export async function createTask({
   checked: boolean;
 }) {
   const hdrs = await headers();
-  const { userId, hubId } = await getContext(hdrs, false);
+  const { userId, role, hubId } = await getContext(hdrs, false);
+
+  if (role === "member") throw new Error("Members cannot modify this resource");
 
   return await createTaskDB({ userId, hubId, name, checked });
 }
@@ -41,10 +43,20 @@ export async function updateTask({
   name?: string;
   checked?: boolean;
 }) {
+  const hdrs = await headers();
+  const { role } = await getContext(hdrs, false);
+
+  if (role === "member") throw new Error("Members cannot modify this resource");
+
   return await updateTaskDB({ taskId, name, checked });
 }
 
 // DELETE Task
 export async function deleteTask(taskId: string) {
+  const hdrs = await headers();
+  const { role } = await getContext(hdrs);
+
+  if (role === "member") throw new Error("Members cannot modify this resource");
+
   return await deleteTaskDB(taskId);
 }

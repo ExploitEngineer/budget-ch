@@ -45,7 +45,13 @@ export async function createSavingGoal({
 }: Omit<savingGoalArgs, "financialAccountId" | "hubId" | "userId">) {
   try {
     const hdrs = await headers();
-    const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
+    const { userId, hubId, role, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     if (!financialAccountId) {
       return { success: false, message: "No financial account found" };
@@ -139,7 +145,10 @@ export async function updateSavingGoal({
 }: UpdateSavingGoalArgs): Promise<ActionResponse> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, role } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     if (!hubId) {
       return { success: false, message: "Hub not found" };
@@ -173,7 +182,10 @@ export async function updateSavingGoal({
 export async function deleteSavingGoal(goalId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, role } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     const result = await deleteSavingGoalDB({ hubId, goalId });
 

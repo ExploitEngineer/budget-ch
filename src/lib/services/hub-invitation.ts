@@ -19,12 +19,18 @@ interface SendInvitationParams {
   role: AccessRole;
 }
 
-// SEND INVITATION
+interface SendInvitationReturnType {
+  success: boolean;
+  message?: string;
+  data?: [];
+}
+
+// SEND Invitation
 export async function sendHubInvitation({
   hubId,
   email,
   role,
-}: SendInvitationParams) {
+}: SendInvitationParams): Promise<SendInvitationReturnType> {
   try {
     const hdrs = await headers();
     const { userId } = await getContext(hdrs, false);
@@ -88,7 +94,7 @@ export async function sendHubInvitation({
   }
 }
 
-// GET INVITATIONS
+// GET Invitations
 export async function getHubInvitations(hubId: string) {
   const hdrs = await headers();
   const { userId } = await getContext(hdrs, false);
@@ -99,17 +105,21 @@ export async function getHubInvitations(hubId: string) {
   return await getHubInvitationsByHubDB(hubId);
 }
 
-// ACCEPT INVITATION
+// ACCEPT Invitation
 export async function acceptHubInvitation(token: string) {
-  const hdrs = await headers();
-  const { userId } = await getContext(hdrs, false);
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
 
-  if (!userId) return { success: false, message: "Not authenticated" };
+    if (!userId) return { success: false, message: "Not authenticated" };
 
-  return await acceptInvitationDB(token, userId);
+    return await acceptInvitationDB(token, userId);
+  } catch (err: any) {
+    return { success: false, message: "Error accepting invitation" };
+  }
 }
 
-// GET MEMBERS
+// GET Members
 export async function getHubMembers(hubId: string) {
   const hdrs = await headers();
   const { userId } = await getContext(hdrs, false);

@@ -37,7 +37,13 @@ export async function createTransaction({
 >) {
   try {
     const hdrs = await headers();
-    const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
+    const { userId, role, hubId, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     if (!financialAccountId) {
       return { success: false, reason: "NO_ACCOUNT" };
@@ -233,7 +239,10 @@ export async function updateTransaction(
 ) {
   try {
     const hdrs = await headers();
-    const { hubId, financialAccountId } = await getContext(hdrs, true);
+    const { hubId, role, financialAccountId } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     if (!financialAccountId) {
       return {
@@ -319,7 +328,10 @@ export async function updateTransaction(
 export async function deleteTransaction(transactionId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, role } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     const res = await deleteTransactionDB({ hubId, transactionId });
 
@@ -347,7 +359,10 @@ export async function deleteTransaction(transactionId: string) {
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, role } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };
@@ -358,7 +373,8 @@ export async function deleteAllTransactionsAndCategories() {
     if (!res.success) {
       return {
         success: false,
-        message: res.message || "Failed to delete all transactions and categories.",
+        message:
+          res.message || "Failed to delete all transactions and categories.",
       };
     }
 
@@ -370,7 +386,9 @@ export async function deleteAllTransactionsAndCategories() {
     console.error("Error in deleteAllTransactionsAndCategories:", err);
     return {
       success: false,
-      message: err.message || "Unexpected error while deleting all transactions and categories.",
+      message:
+        err.message ||
+        "Unexpected error while deleting all transactions and categories.",
     };
   }
 }

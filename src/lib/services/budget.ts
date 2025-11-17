@@ -45,7 +45,13 @@ export async function createBudget(
 ): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
-    const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
+    const { userId, role, hubId, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     if (!financialAccountId) {
       return { success: false, message: "No financial account found" };
@@ -221,7 +227,10 @@ export async function updateBudget({
 }: Omit<UpdateBudgetInput, "hubId">): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, role } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     const result = await updateBudgetDB({
       hubId,
@@ -243,7 +252,10 @@ export async function updateBudget({
 export async function deleteBudget(budgetId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, role } = await getContext(hdrs, true);
+
+    if (role === "member")
+      throw new Error("Members cannot modify this resource");
 
     const result = await deleteBudgetDB({ hubId, budgetId });
 

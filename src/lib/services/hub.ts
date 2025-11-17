@@ -2,7 +2,7 @@
 
 import { getHubsByUserDB } from "@/db/queries";
 import { headers } from "next/headers";
-import {getContext} from "@/lib/auth/actions"
+import { getContext } from "@/lib/auth/actions";
 
 export interface Hub {
   id: string;

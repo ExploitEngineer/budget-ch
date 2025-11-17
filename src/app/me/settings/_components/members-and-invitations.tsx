@@ -24,13 +24,11 @@ import { Separator } from "@/components/ui/separator";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-
 import {
   sendHubInvitation,
   getHubInvitations,
   getHubMembers,
 } from "@/lib/services/hub-invitation";
-
 import { Spinner } from "@/components/ui/spinner";
 import {
   hubInvitesSchema,
@@ -73,11 +71,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
     },
   });
 
-  useEffect(() => {
-    loadData();
-  }, [hubId]);
-
-  const loadData = async () => {
+  const loadData = async (): Promise<void> => {
     try {
       setLoading(true);
 
@@ -101,8 +95,12 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
     }
   };
 
-  const onSubmit = (values: HubInvitesValues) => {
-    startTransition(async () => {
+  useEffect((): void => {
+    loadData();
+  }, [hubId]);
+
+  const onSubmit = (values: HubInvitesValues): void => {
+    startTransition(async (): Promise<void> => {
       try {
         const result = await sendHubInvitation({
           hubId,
@@ -110,7 +108,6 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
           role: values.role,
         });
 
-        // FIXED: success instead of status
         if (result.success) {
           toast.success(result.message || "Invitation sent");
           form.reset();
@@ -140,7 +137,8 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
   }
 
   const totalMembers =
-    members.length + invitations.filter((i) => i.accepted === true).length;
+    members.length +
+    invitations.filter((i: Invitation): boolean => i.accepted === true).length;
 
   return (
     <section>
@@ -206,7 +204,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
                               <SelectValue />
                             </SelectTrigger>
 
-                            <SelectContent className="!bg-dark-blue-background">
+                            <SelectContent className="dark:!bg-dark-blue-background bg-white">
                               <SelectItem value="member">Member</SelectItem>
                               <SelectItem value="admin">Admin</SelectItem>
                             </SelectContent>
@@ -222,7 +220,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => form.reset()}
+                    onClick={(): void => form.reset()}
                     disabled={isPending}
                   >
                     Cancel

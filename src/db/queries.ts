@@ -12,7 +12,7 @@ import {
   accountTransfers,
   hubInvitations,
 } from "./schema";
-import { eq, desc, sql, gt, inArray, and, or } from "drizzle-orm";
+import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
 import type { QuickTask, UserType } from "./schema";
 import type {
   CreateBudgetInput,
@@ -20,14 +20,6 @@ import type {
 } from "@/lib/services/budget";
 
 export type AccessRole = "admin" | "member";
-
-export type createHubMemberArgs = {
-  userId: string;
-  hubId: string;
-  accessRole: AccessRole;
-  isOwner: boolean;
-  userName?: string;
-};
 
 export type AccountType = "checking" | "savings" | "credit-card" | "cash";
 
@@ -170,10 +162,15 @@ interface HubInvitationProps {
   expiresAt: Date;
 }
 
-interface UserHubMemberProps {
-  hubId: string;
-  userId: string;
-  role: accessRole;
+interface UserHubProps {
+  id: string;
+  name: string;
+}
+
+interface getHubsByUserDBProps {
+  success: boolean;
+  message?: string;
+  data?: any[];
 }
 
 export async function updateUser(
@@ -402,26 +399,6 @@ export async function createHubDB(userId: string, userName: string) {
   } catch (err) {
     console.error("Error creating Hub: ", err);
     throw new Error("Failed to create hub");
-  }
-}
-
-// CREATE Hub Member
-export async function createHubMemberDB({
-  userId,
-  hubId,
-  accessRole,
-  isOwner,
-}: createHubMemberArgs) {
-  try {
-    await db.insert(hubMembers).values({
-      userId,
-      hubId,
-      accessRole,
-      isOwner,
-    });
-  } catch (err) {
-    console.error("Error creating Hub Member: ", err);
-    throw Error("Failed to create Hub Member");
   }
 }
 
@@ -1660,28 +1637,44 @@ export async function getCategoriesByExpensesDB(hubId: string) {
 }
 
 // GET HUBS for User
-export async function getHubsByUserDB(userId: string) {
+export async function getHubsByUserDB(
+  userId: string,
+): Promise<getHubsByUserDBProps> {
   try {
-    const userHubs = await db.query.hubs.findMany({
-      where: eq(hubs.userId, userId),
-      columns: {
-        id: true,
-        name: true,
-      },
-      orderBy: desc(hubs.createdAt),
-    });
+    const rows = await db
+      .select({
+        id: hubs.id,
+        name: hubs.name,
+        createdAt: hubs.createdAt,
+      })
+      .from(hubs)
+      .leftJoin(hubMembers, eq(hubMembers.hubId, hubs.id))
+      .where(or(eq(hubs.userId, userId), eq(hubMembers.userId, userId)))
+      .orderBy(desc(hubs.createdAt));
+
+    const unique = Object.values(
+      rows.reduce(
+        (acc, hub) => {
+          acc[hub.id] = hub;
+          return acc;
+        },
+        {} as Record<string, (typeof rows)[number]>,
+      ),
+    );
 
     return {
       success: true,
-      message: "Hubs loaded",
-      data: userHubs ?? [],
+      data: unique.map((h) => ({
+        id: h.id,
+        name: h.name,
+      })),
     };
   } catch (err: any) {
     return { success: false, message: err.message, data: [] };
   }
 }
 
-// CREATE INVITATION
+// CREATE Invitation
 export async function createHubInvitationDB({
   hubId,
   email,
@@ -1745,7 +1738,7 @@ export async function getInvitationByTokenDB(token: string) {
   }
 }
 
-// ACCEPT INVITATION
+// ACCEPT Invitation
 export async function acceptInvitationDB(token: string, userId: string) {
   try {
     const invite = await db.query.hubInvitations.findFirst({
@@ -1754,26 +1747,34 @@ export async function acceptInvitationDB(token: string, userId: string) {
 
     if (!invite) return { success: false, message: "Invitation not found" };
 
-    if (invite.accepted) return { success: false, message: "Already accepted" };
+    if (invite.accepted)
+      return { success: false, message: "Invitation Already accepted" };
 
     if (new Date(invite.expiresAt) < new Date())
       return { success: false, message: "Invitation expired" };
 
     await db.transaction(async (tx) => {
-      await tx.insert(hubMembers).values({
-        hubId: invite.hubId,
-        userId,
-        accessRole: invite.role,
-        isOwner: false,
-        joinedAt: new Date(),
+      const existingMember = await tx.query.hubMembers.findFirst({
+        where: eq(hubMembers.userId, userId),
       });
 
-      await tx
-        .update(hubInvitations)
-        .set({ accepted: true })
-        .where(eq(hubInvitations.id, invite.id));
-    });
+      if (!existingMember) {
+        await tx.insert(hubMembers).values({
+          hubId: invite.hubId,
+          userId,
+          accessRole: invite.role,
+          isOwner: false,
+          joinedAt: new Date(),
+        });
+      }
 
+      if (!invite.accepted) {
+        await tx
+          .update(hubInvitations)
+          .set({ accepted: true })
+          .where(eq(hubInvitations.id, invite.id));
+      }
+    });
     return { success: true, message: "Invitation accepted" };
   } catch (err: any) {
     return { success: false, message: err.message };

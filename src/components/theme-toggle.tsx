@@ -54,7 +54,7 @@ export function ThemeToggleDropdown() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="bg-blue-background"
+        className="dark:bg-blue-background bg-white"
         side="top"
         align="start"
       >

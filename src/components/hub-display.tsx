@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { getHubs, type Hub } from "@/lib/services/hub";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -19,40 +18,51 @@ import {
 } from "@/components/ui/command";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Spinner } from "./ui/spinner";
+import { useHubStore } from "@/store/hub-store";
+import { useRouter } from "next/navigation";
 
 export function HubDisplay() {
+  const router = useRouter();
+
+  const { activeHubId, setActiveHubId } = useHubStore();
+
   const [hubs, setHubs] = useState<Hub[]>([]);
   const [selectedHub, setSelectedHub] = useState<Hub | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
 
-  useEffect(() => {
+  useEffect((): void => {
+    const fetchHubs = async (): Promise<void> => {
+      setLoading(true);
+
+      try {
+        const res = await getHubs();
+
+        if (res.success && res.data?.length) {
+          setHubs(res.data);
+
+          const current =
+            res.data.find((h: Hub): boolean => h.id === activeHubId) ??
+            res.data[0];
+
+          setSelectedHub(current);
+        }
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load hubs");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchHubs();
   }, []);
-
-  const fetchHubs = async () => {
-    try {
-      setLoading(true);
-      const response = await getHubs();
-
-      if (response.success && response.data && response.data.length > 0) {
-        setHubs(response.data);
-        setSelectedHub(response.data[0]);
-      } else {
-        toast.error(response.message || "No hubs found");
-      }
-    } catch (error) {
-      console.error("Error fetching hubs:", error);
-      toast.error("Failed to load hubs");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
       <Button variant="outline" disabled className="w-full">
-        Loading...
+        <Spinner />
       </Button>
     );
   }
@@ -67,7 +77,7 @@ export function HubDisplay() {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild className="w-full">
+      <PopoverTrigger asChild className="w-full cursor-pointer">
         <Button
           variant="outline"
           role="combobox"
@@ -87,15 +97,35 @@ export function HubDisplay() {
           <CommandEmpty>No hubs found.</CommandEmpty>
 
           <CommandGroup>
-            {hubs.map((hub) => (
+            {hubs.map((hub: Hub) => (
               <CommandItem
                 key={hub.id}
                 value={hub.name}
-                onSelect={() => {
+                onSelect={async (): Promise<void> => {
                   setSelectedHub(hub);
                   setOpen(false);
+
+                  setActiveHubId(hub.id);
+
+                  try {
+                    await fetch("/api/switch-hub", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ hubId: hub.id }),
+                    });
+
+                    router.refresh();
+                  } catch (err) {
+                    console.error("Failed to switch hub on server", err);
+                    toast.error("Failed to switch hub");
+                  }
                 }}
-                className="cursor-pointer"
+                className={cn(
+                  "cursor-pointer",
+                  hub.id === selectedHub?.id
+                    ? "font-semibold text-blue-600"
+                    : "",
+                )}
               >
                 <Check
                   className={cn(
