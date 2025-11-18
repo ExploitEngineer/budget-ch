@@ -19,7 +19,7 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { useSearchParams, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/auth-client";
@@ -43,7 +43,14 @@ export default function ResetPassword() {
 
   const token = searchParams.get("token") as string;
 
-  async function onSubmit(values: UserResetPasswordValues) {
+  useEffect((): void => {
+    if (!token) {
+      toast.error("Invalid or missing token");
+      router.push("/forgot-password");
+    }
+  }, [token]);
+
+  async function onSubmit(values: UserResetPasswordValues): Promise<void> {
     try {
       setIsLoading(true);
 

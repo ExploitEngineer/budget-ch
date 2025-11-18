@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 import { Spinner } from "./ui/spinner";
 import { useHubStore } from "@/store/hub-store";
 import { useRouter } from "next/navigation";
+import { switchHub } from "@/lib/services/hub-switch";
 
 export function HubDisplay() {
   const router = useRouter();
@@ -108,12 +109,7 @@ export function HubDisplay() {
                   setActiveHubId(hub.id);
 
                   try {
-                    await fetch("/api/switch-hub", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ hubId: hub.id }),
-                    });
-
+                    await switchHub(hub.id);
                     router.refresh();
                   } catch (err) {
                     console.error("Failed to switch hub on server", err);

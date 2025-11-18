@@ -40,6 +40,18 @@ export async function sendHubInvitation({
     const user = await getUserByEmailDB(email);
     if (!user?.id) return { success: false, message: "User not found" };
 
+    const existingMembers = await getHubMembers(hubId);
+    const isAlreadyMember = existingMembers.data?.some(
+      (member) => member.email === email,
+    );
+
+    if (isAlreadyMember) {
+      return {
+        success: false,
+        message: "User is already a member of this hub",
+      };
+    }
+
     const token = randomBytes(32).toString("hex");
     const expiresAt = new Date(Date.now() + 7 * 86400000);
 

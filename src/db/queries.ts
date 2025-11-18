@@ -322,8 +322,8 @@ export async function completeUserOnboardingDB({
         await tx.insert(hubMembers).values({
           userId,
           hubId,
-          accessRole: "member",
-          isOwner: false,
+          accessRole: "admin",
+          isOwner: true,
         });
 
         if (!user?.stripeCustomerId) {
@@ -1741,6 +1741,20 @@ export async function acceptInvitationDB(token: string, userId: string) {
     if (new Date(invite.expiresAt) < new Date())
       return { success: false, message: "Invitation expired" };
 
+    // user email must match the invitation email
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+
+    if (!user) return { success: false, message: "User not found" };
+
+    if (user.email !== invite.email) {
+      return {
+        success: false,
+        message: "You cannot accept this invitation (email does not match)",
+      };
+    }
+
     await db.transaction(async (tx) => {
       const existingMember = await tx.query.hubMembers.findFirst({
         where: and(
@@ -1750,24 +1764,16 @@ export async function acceptInvitationDB(token: string, userId: string) {
       });
 
       if (existingMember) {
-        await tx
-          .update(hubMembers)
-          .set({
-            accessRole: invite.role,
-            isOwner: invite.role === "admin" ? true : existingMember.isOwner,
-          })
-          .where(
-            and(
-              eq(hubMembers.userId, userId),
-              eq(hubMembers.hubId, invite.hubId),
-            ),
-          );
+        return {
+          success: false,
+          message: "You are already a member of this hub",
+        };
       } else {
         await tx.insert(hubMembers).values({
           hubId: invite.hubId,
           userId,
           accessRole: invite.role,
-          isOwner: invite.role === "admin",
+          isOwner: false,
           joinedAt: new Date(),
         });
       }
@@ -1810,4 +1816,39 @@ export async function getHubMembersDB(hubId: string) {
   } catch (err: any) {
     return { success: false, message: err.message, data: [] };
   }
+}
+
+// Functions for getContext
+export async function getHubByIdDB(hubId: string) {
+  return await db.query.hubs.findFirst({
+    where: eq(hubs.id, hubId),
+    columns: { id: true },
+  });
+}
+
+export async function getFirstHubMemberDB(userId: string) {
+  return await db.query.hubMembers.findFirst({
+    where: eq(hubMembers.userId, userId),
+    columns: { hubId: true },
+  });
+}
+
+export async function getOwnedHubDB(userId: string) {
+  return await db.query.hubs.findFirst({
+    where: eq(hubs.userId, userId),
+    columns: { id: true },
+  });
+}
+
+export async function getHubMemberRoleDB(userId: string, hubId: string) {
+  return await db.query.hubMembers.findFirst({
+    where: and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)),
+    columns: { accessRole: true },
+  });
+}
+
+export async function getFinancialAccountDB(userId: string) {
+  return await db.query.financialAccounts.findFirst({
+    where: eq(financialAccounts.userId, userId),
+  });
 }

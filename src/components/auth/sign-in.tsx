@@ -42,7 +42,7 @@ export default function SignIn() {
 
   const t = useTranslations("authpages");
 
-  async function onSubmit(values: UserSignInValues) {
+  async function onSubmit(values: UserSignInValues): Promise<void> {
     setIsSigningIn(true);
     try {
       const { data, error } = await authClient.signIn.email({
@@ -68,6 +68,7 @@ export default function SignIn() {
       }
       if (data) {
         toast.success(`Signed in successfully!`);
+        form.reset();
         redirect("/me/dashboard");
       }
     } catch (err) {
