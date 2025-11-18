@@ -27,19 +27,31 @@ export default function AcceptInvitationPage() {
     const run = async (): Promise<void> => {
       const res = await acceptHubInvitation(token);
 
-      if (res.success) {
-        toast.success("Invitation accepted!");
-        setStatus("accepted");
-
-        const interval = setInterval((): void => {
-          setCountdown((prev: number): number => {
-            if (prev === 1) {
-              clearInterval(interval);
-              router.push("/me/dashboard");
-            }
-            return prev - 1;
+      if (res.success && res.data?.hubId) {
+        try {
+          await fetch("/api/switch-hub", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ hubId: res.data.hubId }),
           });
-        }, 1000);
+
+          toast.success("Invitation accepted!");
+          setStatus("accepted");
+
+          const interval = setInterval((): void => {
+            setCountdown((prev: number): number => {
+              if (prev === 1) {
+                clearInterval(interval);
+                router.push("/me/dashboard");
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        } catch (err) {
+          console.error("Failed to set active hub cookie", err);
+          toast.error("Invitation accepted but failed to set active hub");
+          setStatus("error");
+        }
       } else {
         toast.error(res.message);
         setStatus("error");

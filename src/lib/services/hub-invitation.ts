@@ -113,7 +113,14 @@ export async function acceptHubInvitation(token: string) {
 
     if (!userId) return { success: false, message: "Not authenticated" };
 
-    return await acceptInvitationDB(token, userId);
+    const res = await acceptInvitationDB(token, userId);
+    if (!res.success) return res;
+
+    return {
+      success: true,
+      message: "Invitation Accecpted Successfully",
+      data: { hubId: res.data?.hubId },
+    };
   } catch (err: any) {
     return { success: false, message: "Error accepting invitation" };
   }
