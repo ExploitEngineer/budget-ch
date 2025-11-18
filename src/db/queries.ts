@@ -152,19 +152,12 @@ export type AccountTransferArgs = {
   note?: string;
 };
 
-type accessRole = "admin" | "member";
-
 interface HubInvitationProps {
   hubId: string;
   email: string;
-  role: accessRole;
+  role: AccessRole;
   token: string;
   expiresAt: Date;
-}
-
-interface UserHubProps {
-  id: string;
-  name: string;
 }
 
 interface getHubsByUserDBProps {
@@ -330,7 +323,7 @@ export async function completeUserOnboardingDB({
           userId,
           hubId,
           accessRole: "member",
-          isOwner: true,
+          isOwner: false,
         });
 
         if (!user?.stripeCustomerId) {
@@ -360,7 +353,7 @@ export async function completeUserOnboardingDB({
       await tx.insert(hubMembers).values({
         userId,
         hubId: hub.id,
-        accessRole: "member",
+        accessRole: "admin",
         isOwner: true,
       });
 
@@ -531,17 +524,12 @@ export async function deleteFinancialAccountDB({
 }
 
 // READ Financial Account
-export async function getFinancialAccountsDB(userId: string, hubId: string) {
+export async function getFinancialAccountsDB(hubId: string) {
   try {
     const results = await db
       .select()
       .from(financialAccounts)
-      .where(
-        and(
-          eq(financialAccounts.userId, userId),
-          eq(financialAccounts.hubId, hubId),
-        ),
-      );
+      .where(and(eq(financialAccounts.hubId, hubId)));
 
     return results.map((acc) => ({
       id: acc.id,
@@ -1748,34 +1736,54 @@ export async function acceptInvitationDB(token: string, userId: string) {
     if (!invite) return { success: false, message: "Invitation not found" };
 
     if (invite.accepted)
-      return { success: false, message: "Invitation Already accepted" };
+      return { success: false, message: "Invitation already accepted" };
 
     if (new Date(invite.expiresAt) < new Date())
       return { success: false, message: "Invitation expired" };
 
     await db.transaction(async (tx) => {
       const existingMember = await tx.query.hubMembers.findFirst({
-        where: eq(hubMembers.userId, userId),
+        where: and(
+          eq(hubMembers.userId, userId),
+          eq(hubMembers.hubId, invite.hubId),
+        ),
       });
 
-      if (!existingMember) {
+      if (existingMember) {
+        await tx
+          .update(hubMembers)
+          .set({
+            accessRole: invite.role,
+            isOwner: invite.role === "admin" ? true : existingMember.isOwner,
+          })
+          .where(
+            and(
+              eq(hubMembers.userId, userId),
+              eq(hubMembers.hubId, invite.hubId),
+            ),
+          );
+      } else {
         await tx.insert(hubMembers).values({
           hubId: invite.hubId,
           userId,
           accessRole: invite.role,
-          isOwner: false,
+          isOwner: invite.role === "admin",
           joinedAt: new Date(),
         });
       }
 
-      if (!invite.accepted) {
-        await tx
-          .update(hubInvitations)
-          .set({ accepted: true })
-          .where(eq(hubInvitations.id, invite.id));
-      }
+      // Mark invitation as accepted
+      await tx
+        .update(hubInvitations)
+        .set({ accepted: true })
+        .where(eq(hubInvitations.id, invite.id));
     });
-    return { success: true, message: "Invitation accepted" };
+
+    return {
+      success: true,
+      message: "Invitation accepted",
+      data: { hubId: invite.hubId },
+    };
   } catch (err: any) {
     return { success: false, message: err.message };
   }
