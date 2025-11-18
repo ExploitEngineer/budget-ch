@@ -4,13 +4,16 @@ import { createAccountTransferDB, getAccountTransfersDB } from "@/db/queries";
 import type { AccountTransferArgs } from "@/db/queries";
 import { getContext } from "@/lib/auth/actions";
 import { headers } from "next/headers";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 // CREATE Account Transfers [Action]
 export async function createAccountTransfer(
   payload: Omit<AccountTransferArgs, "hubId" | "financialAccountId">,
 ) {
   const hdrs = await headers();
-  const { financialAccountId, hubId } = await getContext(hdrs, true);
+  const { financialAccountId, hubId, userRole } = await getContext(hdrs, true);
+
+  requireAdminRole(userRole);
 
   if (!financialAccountId)
     return {

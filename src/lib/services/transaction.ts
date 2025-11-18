@@ -17,6 +17,7 @@ import { transactionCategories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import type { Transaction } from "../types/dashboard-types";
 import db from "@/db/db";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 // CREATE Transaction
 export async function createTransaction({
@@ -37,13 +38,12 @@ export async function createTransaction({
 >) {
   try {
     const hdrs = await headers();
-    const { userId, role, hubId, financialAccountId } = await getContext(
+    const { userId, userRole, hubId, financialAccountId } = await getContext(
       hdrs,
       true,
     );
 
-    if (role === "member")
-      throw new Error("Members cannot modify this resource");
+    requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return { success: false, reason: "NO_ACCOUNT" };
@@ -239,10 +239,12 @@ export async function updateTransaction(
 ) {
   try {
     const hdrs = await headers();
-    const { hubId, role, financialAccountId } = await getContext(hdrs, true);
+    const { hubId, userRole, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
 
-    if (role === "member")
-      throw new Error("Members cannot modify this resource");
+    requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return {
@@ -328,10 +330,9 @@ export async function updateTransaction(
 export async function deleteTransaction(transactionId: string) {
   try {
     const hdrs = await headers();
-    const { hubId, role } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
 
-    if (role === "member")
-      throw new Error("Members cannot modify this resource");
+    requireAdminRole(userRole);
 
     const res = await deleteTransactionDB({ hubId, transactionId });
 
@@ -359,10 +360,9 @@ export async function deleteTransaction(transactionId: string) {
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
-    const { hubId, role } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
 
-    if (role === "member")
-      throw new Error("Members cannot modify this resource");
+    requireAdminRole(userRole);
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };
