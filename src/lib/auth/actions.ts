@@ -12,44 +12,59 @@ export async function getContext(headersObj: Headers, requireAccount = true) {
   const userId = session.user.id;
 
   const cookieHeader = headersObj.get("cookie");
-  const activeHubId =
+  let activeHubId =
     cookieHeader
       ?.split("; ")
-      .find((c: string): boolean => c.startsWith("activeHubId="))
+      .find((c) => c.startsWith("activeHubId="))
       ?.split("=")[1] ?? null;
 
-  if (!activeHubId) throw new Error("No hub selected");
-
-  // Fetch membership info
-  const member = await db.query.hubMembers.findFirst({
-    where: and(
-      eq(hubMembers.hubId, activeHubId),
-      eq(hubMembers.userId, userId),
-    ),
-  });
-
-  if (!member) throw new Error("Access denied to this hub");
-
-  const hub = await db.query.hubs.findFirst({
-    where: eq(hubs.id, activeHubId),
-  });
-  if (!hub) throw new Error("Hub not found");
-
-  // Fetch financial account
-  let financialAccount = null;
-  if (requireAccount) {
-    financialAccount = await db.query.financialAccounts.findFirst({
-      where: eq(financialAccounts.hubId, activeHubId),
+  // Validate cookie hub exists in DB
+  if (activeHubId) {
+    const hubExists = await db.query.hubs.findFirst({
+      where: eq(hubs.id, activeHubId),
+      columns: { id: true },
     });
-
-    if (!financialAccount) throw new Error("Financial account not found");
+    if (!hubExists) activeHubId = null; // reset if invalid
   }
 
-  return {
-    userId,
-    hubId: hub.id,
-    role: member.accessRole,
-    isOwner: member.isOwner,
-    financialAccountId: financialAccount?.id ?? null,
-  };
+  // Fallback: first hub where user is member or owner
+  if (!activeHubId) {
+    const hubMemberRow = await db.query.hubMembers.findFirst({
+      where: eq(hubMembers.userId, userId),
+      columns: { hubId: true },
+    });
+
+    const ownedHub = await db.query.hubs.findFirst({
+      where: eq(hubs.userId, userId),
+      columns: { id: true },
+    });
+
+    // Prefer member hub first, then owned hub
+    activeHubId = hubMemberRow?.hubId ?? ownedHub?.id ?? null;
+  }
+
+  if (!activeHubId) throw new Error("No hub selected for this user");
+
+  // Get role in this hub
+  const hubMember = await db.query.hubMembers.findFirst({
+    where: and(
+      eq(hubMembers.userId, userId),
+      eq(hubMembers.hubId, activeHubId),
+    ),
+    columns: { accessRole: true },
+  });
+
+  const userRole = hubMember?.accessRole ?? "admin"; // owner fallback to admin
+
+  // Financial account check
+  let financialAccountId: string | null = null;
+  if (requireAccount) {
+    const account = await db.query.financialAccounts.findFirst({
+      where: eq(financialAccounts.userId, userId),
+    });
+    if (!account) throw new Error("Financial account not found");
+    financialAccountId = account.id;
+  }
+
+  return { userId, hubId: activeHubId, userRole, financialAccountId };
 }
