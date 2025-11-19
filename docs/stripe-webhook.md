@@ -47,6 +47,12 @@ The shared `handleSubscriptionLifecycleEvent` prevents conflicting updates becau
 - Since `checkout.session.completed` is a no-op on the database, it cannot conflict with the subscription handlers.
 - When Stripe emits `customer.subscription.deleted` we delete the row, so downstream logic must treat a missing subscription as the free plan instead of assuming yesterday’s data still exists.
 
+## Running Stripe CLI Locally
+
+- Add `STRIPE_SECRET_KEY` (and/or `STRIPE_API_KEY` if needed) to the project’s `.env`. The script will refuse to run without the value, so that missing configuration can’t be accidentally ignored.
+- Run `pnpm stripe:listen` from the project root. The helper script loads the env file, injects the key, and spawns `stripe listen --forward-to http://localhost:3000/api/webhooks/stripe`, so the listener works the same on macOS, Linux, and Windows.
+- Use `pnpm dotenv:echo` to verify the key your shell sees before starting the CLI.
+
 ## Deployment Notes
 
 - Ensure `STRIPE_WEBHOOK_SECRET` is set when deploying so signature verification works.
