@@ -1013,21 +1013,32 @@
                         },
                         "button": "Aggiorna ora"
                     },
+                    "errors": {
+                        "no-price": "Questa opzione non è ancora disponibile.",
+                        "portal-failed": "Impossibile aprire il portale Stripe al momento. Riprova tra poco."
+                    },
+                    "current-plan-badge": "Piano attuale",
+                    "manage-plan-button": "Gestisci il piano",
                     "stripe-portal-button": "Gestisci abbonamento (Stripe Portal)"
                 }
             },
-            "subscription-section": {
+            "current-subscription-section": {
                 "title": "Abbonamento attuale",
                 "plan-label": "Piano",
                 "plan-labels": {
                     "individual": "Individuale",
                     "family": "Famiglia"
                 },
-                "status-label": "Stato",
-                "started-label": "Inizio",
-                "renewal-label": "Prossimo rinnovo",
-                "days-remaining-label": "Giorni rimanenti",
-                "cancel-button": "Annulla abbonamento"
+                    "status-label": "Stato",
+                    "started-label": "Inizio",
+                    "renewal-label": "Si rinnova il",
+                    "renews-label": "Si rinnova il",
+                    "cancels-at-label": "Si annulla il",
+                    "days-remaining-label": "Giorni rimanenti",
+                    "manage-button": "Gestisci abbonamento",
+                    "errors": {
+                        "portal-failed": "Impossibile aprire il portale Stripe in questo momento."
+                    }
             },
             "members-invitations-section": {
                 "title": "Membri & Inviti",

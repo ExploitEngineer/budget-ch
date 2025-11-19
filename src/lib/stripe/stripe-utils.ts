@@ -110,6 +110,41 @@ export async function createCheckoutSession({
   }
 }
 
+export async function createCustomerPortalSession({
+  customerId,
+  returnUrl,
+}: {
+  customerId: string;
+  returnUrl?: string;
+}) {
+  try {
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customerId,
+      return_url: returnUrl ?? `${process.env.NEXT_PUBLIC_APP_URL}/me/settings`,
+    });
+
+    if (!session.url) {
+      return {
+        success: false,
+        message: "Failed to create Stripe portal session",
+        data: null,
+      };
+    }
+
+    return {
+      success: true,
+      message: "Stripe customer portal session created successfully",
+      data: { url: session.url },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: `Error creating portal session: ${(error as Error).message}`,
+      data: null,
+    };
+  }
+}
+
 export async function getPriceByLookupKey(lookupKey: string) {
   try {
     const result = await stripe.prices.list({

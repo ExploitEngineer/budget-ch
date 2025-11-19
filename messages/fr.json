@@ -1013,21 +1013,32 @@
                         },
                         "button": "Améliorer maintenant"
                     },
+                    "errors": {
+                        "no-price": "Ce forfait n'est pas encore disponible.",
+                        "portal-failed": "Impossible d'ouvrir le portail Stripe pour le moment. Réessayez plus tard."
+                    },
+                    "current-plan-badge": "Forfait actuel",
+                    "manage-plan-button": "Gérer le forfait",
                     "stripe-portal-button": "Gérer l'abonnement (Stripe Portal)"
                 }
             },
-            "subscription-section": {
+            "current-subscription-section": {
                 "title": "Abonnement actuel",
                 "plan-label": "Forfait",
                 "plan-labels": {
                     "individual": "Individuel",
                     "family": "Famille"
                 },
-                "status-label": "Statut",
-                "started-label": "Début",
-                "renewal-label": "Prochain renouvellement",
-                "days-remaining-label": "Jours restants",
-                "cancel-button": "Annuler l'abonnement"
+                    "status-label": "Statut",
+                    "started-label": "Début",
+                    "renewal-label": "Se renouvelle le",
+                    "renews-label": "Se renouvelle le",
+                    "cancels-at-label": "Annule le",
+                    "days-remaining-label": "Jours restants",
+                    "manage-button": "Gérer l'abonnement",
+                    "errors": {
+                        "portal-failed": "Impossible d'ouvrir le portail Stripe pour le moment."
+                    }
             },
             "members-invitations-section": {
                 "title": "Membres & Invitations",

@@ -7,6 +7,8 @@ The `CurrentSubscription` card lives inside `src/app/me/settings/_components/cur
 - Shows the plan name, status, and a badge to highlight the current subscription state.
 - Displays the current period start date, next renewal date, and how many days are left in the cycle (never negative).
 - Provides a cancel button for the UI only; it is intentionally inert while we wire up cancellation flows later.
+- Replaces the previous "Cancel subscription" button with a real **Manage subscription** action that opens the Stripe customer portal (same portal link that `PlansUpgrade` uses once a subscription exists).
+- Renames the “Next renewal” label to “Renews at” and switches to “Cancels at” whenever `cancelAtPeriodEnd` is true so users immediately understand when their subscription will end if it is winding down.
 
 ## Styling
 - Reuses the existing `Card`/`CardHeader`/`CardContent`/`CardFooter` layout and the shared `bg-blue-background` / `dark:border-border-blue` styling present elsewhere in the settings sections.

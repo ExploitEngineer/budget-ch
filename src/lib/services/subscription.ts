@@ -70,9 +70,7 @@ const resolvePlanFromLookupKey = (
   return null;
 };
 
-const normalizeStatus = (
-  status?: string | null,
-): SubscriptionStatus | null => {
+const normalizeStatus = (status?: string | null): SubscriptionStatus | null => {
   if (!status) {
     return null;
   }
@@ -93,6 +91,7 @@ export interface StripeSubscriptionPayload {
   currentPeriodStart: Date;
   currentPeriodEnd: Date;
   canceledAt: Date | null;
+  cancelAt: Date | null;
   cancelAtPeriodEnd: boolean;
 }
 
@@ -143,6 +142,9 @@ export const buildSubscriptionPayload = (
     canceledAt: stripeSubscription.canceled_at
       ? new Date(stripeSubscription.canceled_at * 1000)
       : null,
+    cancelAt: stripeSubscription.cancel_at
+      ? new Date(stripeSubscription.cancel_at * 1000)
+      : null,
     cancelAtPeriodEnd: !!stripeSubscription.cancel_at_period_end,
   };
 };
@@ -158,11 +160,14 @@ export async function syncStripeSubscription(
   }
 
   const existingSubscription = await getSubscriptionByUserId(userId);
+  
+  // console.log(
+  //   `[syncStripeSubscription] Stripe Subscription:\n${JSON.stringify(stripeSubscription, null, 2)}\nExisting subscription:\n${JSON.stringify(existingSubscription, null, 2)}\nPayload:\n${JSON.stringify(payload, null, 2)}`,
+  // );
 
   if (existingSubscription) {
     const updated = await updateSubscriptionRecord(existingSubscription.id, {
       ...payload,
-      canceledAt: payload.canceledAt,
     });
 
     if (!updated) {
@@ -205,9 +210,8 @@ export async function refreshSubscriptionPeriodFromInvoice(
     return null;
   }
 
-  const subscription = await getSubscriptionByStripeSubscriptionId(
-    stripeSubscriptionId,
-  );
+  const subscription =
+    await getSubscriptionByStripeSubscriptionId(stripeSubscriptionId);
 
   if (!subscription) {
     return null;
@@ -220,4 +224,3 @@ export async function refreshSubscriptionPeriodFromInvoice(
 
   return updated;
 }
-

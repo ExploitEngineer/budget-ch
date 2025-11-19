@@ -29,7 +29,9 @@ export async function POST(request: NextRequest) {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    return new Response("Stripe webhook secret is not configured", { status: 500 });
+    return new Response("Stripe webhook secret is not configured", {
+      status: 500,
+    });
   }
 
   let event: Stripe.Event;
@@ -47,30 +49,45 @@ export async function POST(request: NextRequest) {
     case "invoice.created": {
       const invoice = event.data.object as Stripe.Invoice;
       result = await handleInvoiceCreated(invoice);
+      console.log(
+        `[stripe/webhook] Invoice created:\n${JSON.stringify(result, null, 2)}`,
+      );
       break;
     }
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
       result = await handleCheckoutSessionCompleted(session);
+      console.log(
+        `[stripe/webhook:${event.type}] Checkout session completed:\n${JSON.stringify(result, null, 2)}`,
+      );
       break;
     }
     case "customer.subscription.created": {
       const subscription = event.data.object as Stripe.Subscription;
       result = await handleSubscriptionLifecycleEvent(subscription);
+      console.log(
+        `[stripe/webhook:${event.type}] Subscription created:\n${JSON.stringify(result, null, 2)}`,
+      );
       break;
     }
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
       result = await handleSubscriptionLifecycleEvent(subscription);
+      console.log(
+        `[stripe/webhook:${event.type}] Subscription updated:\n${JSON.stringify(result, null, 2)}`,
+      );
       break;
     }
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       result = await handleSubscriptionDeleted(subscription);
+      console.log(
+        `[stripe/webhook:${event.type}] Subscription deleted:\n${JSON.stringify(result, null, 2)}`,
+      );
       break;
     }
     default:
-      console.log(`[stripe/webhook] Unhandled event type ${event.type}`);
+      console.log(`[stripe/webhook:${event.type}] Unhandled event type`);
       return new Response("Event type not handled", { status: 200 });
   }
 
@@ -180,7 +197,10 @@ async function handleSubscriptionDeleted(
       message: "Deleted subscription record",
     };
   } catch (error) {
-    console.error("[stripe/webhook] Failed to delete subscription record", error);
+    console.error(
+      "[stripe/webhook] Failed to delete subscription record",
+      error,
+    );
     return {
       status: 500,
       message: "Failed to delete subscription record",

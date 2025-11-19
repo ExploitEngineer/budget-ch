@@ -12,6 +12,7 @@ import { AboutSection } from "./_components/about";
 import { loadStripePrices } from "@/lib/stripe";
 import { getContext } from "@/lib/auth/actions";
 import { headers } from "next/headers";
+import type { SubscriptionDetails } from "./types";
 
 export default async function Settings() {
   const hdrs = await headers();
@@ -19,7 +20,7 @@ export default async function Settings() {
 
   const subscriptionPrices = await fetchPrices();
 
-  const subscriptionInfo =
+  const subscriptionInfo: SubscriptionDetails | null =
     subscription === null
       ? null
       : {
@@ -27,6 +28,8 @@ export default async function Settings() {
           status: subscription.status,
           currentPeriodStart: subscription.currentPeriodStart.toISOString(),
           currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          cancelAt: subscription.cancelAt ? new Date(subscription.cancelAt).toISOString() : null,
         };
 
   return (
@@ -40,7 +43,11 @@ export default async function Settings() {
         {subscriptionInfo && (
           <CurrentSubscription subscription={subscriptionInfo} />
         )}
-        <PlansUpgrade subscriptionPrices={subscriptionPrices} user={user} />
+        <PlansUpgrade
+          subscriptionPrices={subscriptionPrices}
+          user={user}
+          subscription={subscriptionInfo}
+        />
         <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />
         <Notifications />

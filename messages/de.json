@@ -991,10 +991,16 @@
                         },
                         "button": "Jetzt upgraden"
                     },
+                    "errors": {
+                        "no-price": "Für diese Option sind derzeit keine Preise verfügbar.",
+                        "portal-failed": "Das Stripe-Portal kann im Moment nicht geöffnet werden. Bitte versuche es später."
+                    },
+                    "current-plan-badge": "Aktueller Plan",
+                    "manage-plan-button": "Plan verwalten",
                     "stripe-portal-button": "Abonnement verwalten (Stripe Portal)"
                 }
             },
-                "subscription-section": {
+                "current-subscription-section": {
                     "title": "Aktuelles Abonnement",
                     "plan-label": "Plan",
                     "plan-labels": {
@@ -1003,9 +1009,14 @@
                     },
                     "status-label": "Status",
                     "started-label": "Beginn",
-                    "renewal-label": "Nächste Verlängerung",
+                    "renewal-label": "Erneuert am",
+                    "renews-label": "Erneuert am",
+                    "cancels-at-label": "Wird beendet am",
                     "days-remaining-label": "Verbleibende Tage",
-                    "cancel-button": "Abonnement kündigen"
+                    "manage-button": "Abonnement verwalten",
+                    "errors": {
+                        "portal-failed": "Das Stripe-Portal kann gerade nicht geöffnet werden."
+                    }
                 },
             "members-invitations-section": {
                 "title": "Mitglieder & Einladungen",
