@@ -46,8 +46,8 @@ export default function SignIn() {
     setIsSigningIn(true);
     try {
       const { data, error } = await authClient.signIn.email({
-        email: values.email, // required
-        password: values.password, // required
+        email: values.email,
+        password: values.password,
         rememberMe: true,
         callbackURL: "/me/dashboard",
       });
@@ -58,10 +58,15 @@ export default function SignIn() {
           toast.error(
             `Email not verified, please check your email for the verification link.`,
           );
-          const res = await authClient.sendVerificationEmail({
+          const { error } = await authClient.sendVerificationEmail({
             email: values.email,
           });
-          console.log("[email verification] sent verification email", res);
+
+          if (error) {
+            toast.error("Error sending verification email");
+            form.reset();
+            return;
+          }
         } else {
           toast.error(`Could not sign in: ${error.message}`);
         }
