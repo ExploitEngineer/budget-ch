@@ -1,6 +1,7 @@
 import SidebarHeader from "@/components/sidebar-header";
 import { ProfileHousehold } from "./_components/profile-household";
 import { PlansUpgrade } from "./_components/plans-upgrade";
+import { CurrentSubscription } from "./_components/current-subscription";
 import { MembersInvitations } from "./_components/members-and-invitations";
 import { LocalizationAppearance } from "./_components/localization-appearance";
 import { Notifications } from "./_components/notifications";
@@ -14,9 +15,19 @@ import { headers } from "next/headers";
 
 export default async function Settings() {
   const hdrs = await headers();
-  const { hubId,  user } = await getContext(hdrs, false);
+  const { hubId, user, subscription } = await getContext(hdrs, false);
 
   const subscriptionPrices = await fetchPrices();
+
+  const subscriptionInfo =
+    subscription === null
+      ? null
+      : {
+          plan: subscription.subscriptionPlan,
+          status: subscription.status,
+          currentPeriodStart: subscription.currentPeriodStart.toISOString(),
+          currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+        };
 
   return (
     <section>
@@ -26,6 +37,9 @@ export default async function Settings() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <ProfileHousehold />
+        {subscriptionInfo && (
+          <CurrentSubscription subscription={subscriptionInfo} />
+        )}
         <PlansUpgrade subscriptionPrices={subscriptionPrices} user={user} />
         <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />

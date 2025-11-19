@@ -1015,6 +1015,19 @@
                     "stripe-portal-button": "Manage Subscription (Stripe Portal)"
                 }
             },
+                "subscription-section": {
+                    "title": "Current subscription",
+                    "plan-label": "Plan",
+                    "plan-labels": {
+                        "individual": "Individual",
+                        "family": "Family"
+                    },
+                    "status-label": "Status",
+                    "started-label": "Started",
+                    "renewal-label": "Next renewal",
+                    "days-remaining-label": "Days remaining",
+                    "cancel-button": "Cancel subscription"
+                },
             "members-invitations-section": {
                 "title": "Members & Invitations",
                 "badge": "0 Members",

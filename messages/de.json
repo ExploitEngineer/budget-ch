@@ -994,6 +994,19 @@
                     "stripe-portal-button": "Abonnement verwalten (Stripe Portal)"
                 }
             },
+                "subscription-section": {
+                    "title": "Aktuelles Abonnement",
+                    "plan-label": "Plan",
+                    "plan-labels": {
+                        "individual": "Einzeln",
+                        "family": "Familie"
+                    },
+                    "status-label": "Status",
+                    "started-label": "Beginn",
+                    "renewal-label": "Nächste Verlängerung",
+                    "days-remaining-label": "Verbleibende Tage",
+                    "cancel-button": "Abonnement kündigen"
+                },
             "members-invitations-section": {
                 "title": "Mitglieder & Einladungen",
                 "badge": "0 Mitglieder",

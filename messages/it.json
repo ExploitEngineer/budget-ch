@@ -1016,6 +1016,19 @@
                     "stripe-portal-button": "Gestisci abbonamento (Stripe Portal)"
                 }
             },
+            "subscription-section": {
+                "title": "Abbonamento attuale",
+                "plan-label": "Piano",
+                "plan-labels": {
+                    "individual": "Individuale",
+                    "family": "Famiglia"
+                },
+                "status-label": "Stato",
+                "started-label": "Inizio",
+                "renewal-label": "Prossimo rinnovo",
+                "days-remaining-label": "Giorni rimanenti",
+                "cancel-button": "Annulla abbonamento"
+            },
             "members-invitations-section": {
                 "title": "Membri & Inviti",
                 "badge": "0 Membri",
