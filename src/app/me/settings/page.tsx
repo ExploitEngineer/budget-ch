@@ -1,6 +1,7 @@
 import SidebarHeader from "@/components/sidebar-header";
 import { ProfileHousehold } from "./_components/profile-household";
 import { PlansUpgrade } from "./_components/plans-upgrade";
+import { CurrentSubscription } from "./_components/current-subscription";
 import { MembersInvitations } from "./_components/members-and-invitations";
 import { LocalizationAppearance } from "./_components/localization-appearance";
 import { Notifications } from "./_components/notifications";
@@ -11,12 +12,25 @@ import { AboutSection } from "./_components/about";
 import { loadStripePrices } from "@/lib/stripe";
 import { getContext } from "@/lib/auth/actions";
 import { headers } from "next/headers";
+import type { SubscriptionDetails } from "./types";
 
 export default async function Settings() {
   const hdrs = await headers();
-  const { hubId } = await getContext(hdrs, false);
+  const { hubId, user, subscription } = await getContext(hdrs, false);
 
   const subscriptionPrices = await fetchPrices();
+
+  const subscriptionInfo: SubscriptionDetails | null =
+    subscription === null
+      ? null
+      : {
+          plan: subscription.subscriptionPlan,
+          status: subscription.status,
+          currentPeriodStart: subscription.currentPeriodStart.toISOString(),
+          currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+          cancelAt: subscription.cancelAt ? new Date(subscription.cancelAt).toISOString() : null,
+        };
 
   return (
     <section>
@@ -26,7 +40,14 @@ export default async function Settings() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <ProfileHousehold />
-        <PlansUpgrade subscriptionPrices={subscriptionPrices} />
+        {subscriptionInfo && (
+          <CurrentSubscription subscription={subscriptionInfo} />
+        )}
+        <PlansUpgrade
+          subscriptionPrices={subscriptionPrices}
+          user={user}
+          subscription={subscriptionInfo}
+        />
         <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />
         <Notifications />
