@@ -139,7 +139,6 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
-    sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
       const html = `
       <html>
@@ -153,14 +152,14 @@ export const auth = betterAuth({
             <p>Hi there!</p>
             <p>Thank you, ${user.name || user.email}, for signing up! To complete your registration, please verify your email by clicking the button below.</p>
             <p style="text-align: center; margin: 32px 0;">
-              <a href="${url}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Verify Email Address</a>
+              <a href="${url}email-verified" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Verify Email Address</a>
             </p>
             <p>If the button doesn’t work, copy and paste this link into your browser:</p>
-            <p style="color: #2563eb; word-break: break-all;">${url}</p>
+            <p style="color: #2563eb; word-break: break-all;">${url}email-verified</p>
             <p>This verification link will expire in 24 hours.</p>
             <p>If you didn’t create an account, you can ignore this email.</p>
             <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
-            <p style="text-align: center; font-size: 12px; color: #666;">© 2024 Your Company Name. All rights reserved.</p>
+            <p style="text-align: center; font-size: 12px; color: #666;">© 2025 Budget-ch. All rights reserved.</p>
           </div>
         </body>
       </html>

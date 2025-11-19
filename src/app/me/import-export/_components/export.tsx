@@ -42,8 +42,8 @@ export function Export() {
     try {
       const result = await getAccountTransfers();
 
-      if (!result || !result.status) {
-        throw new Error(result?.message || "Unknown error");
+      if (!result) {
+        throw new Error("Financial Account not found");
       }
 
       setTransfers((result.data as TransferData[]) || []);
@@ -167,7 +167,7 @@ export function Export() {
                     transfers,
                   })
                 }
-                className="btn-gradient dark:text-foreground w-[30%] cursor-pointer hover:text-white"
+                className="btn-gradient dark:text-foreground w-[38%] cursor-pointer hover:text-white"
               >
                 {t("export-json-card.button")}
               </Button>
