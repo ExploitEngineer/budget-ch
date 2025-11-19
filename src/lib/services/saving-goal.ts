@@ -10,6 +10,7 @@ import {
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 import type { SavingGoal } from "@/db/queries";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 export interface SavingGoalsSummary {
   totalTarget: number;
@@ -45,7 +46,12 @@ export async function createSavingGoal({
 }: Omit<savingGoalArgs, "financialAccountId" | "hubId" | "userId">) {
   try {
     const hdrs = await headers();
-    const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
+    const { userId, hubId, userRole, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+
+    requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return { success: false, message: "No financial account found" };
@@ -139,7 +145,9 @@ export async function updateSavingGoal({
 }: UpdateSavingGoalArgs): Promise<ActionResponse> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
 
     if (!hubId) {
       return { success: false, message: "Hub not found" };
@@ -173,7 +181,9 @@ export async function updateSavingGoal({
 export async function deleteSavingGoal(goalId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
 
     const result = await deleteSavingGoalDB({ hubId, goalId });
 

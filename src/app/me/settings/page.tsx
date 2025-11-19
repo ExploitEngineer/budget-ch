@@ -9,11 +9,14 @@ import { DataPrivacy } from "./_components/data-privacy";
 import { BillingDetails } from "./_components/billing-details";
 import { AboutSection } from "./_components/about";
 import { loadStripePrices } from "@/lib/stripe";
+import { getContext } from "@/lib/auth/actions";
+import { headers } from "next/headers";
 
 export default async function Settings() {
+  const hdrs = await headers();
+  const { hubId } = await getContext(hdrs, false);
 
   const subscriptionPrices = await fetchPrices();
-  console.log("Subscription Prices:", subscriptionPrices);
 
   return (
     <section>
@@ -24,7 +27,7 @@ export default async function Settings() {
       <div className="flex flex-1 flex-col gap-4 p-4">
         <ProfileHousehold />
         <PlansUpgrade subscriptionPrices={subscriptionPrices} />
-        <MembersInvitations />
+        <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />
         <Notifications />
         <Security />
@@ -37,7 +40,7 @@ export default async function Settings() {
 }
 
 async function fetchPrices() {
-  "use server"
+  "use server";
   const result = await loadStripePrices();
   if (result.success && result.prices) {
     const pricesData = result.prices.data;

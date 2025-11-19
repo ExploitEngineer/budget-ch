@@ -7,10 +7,12 @@
         "signup": "Sign up",
         "signin": "Sign in",
         "forgot-password": "Password reset",
+        "reset-password": "Reset Password",
         "labels": {
             "name": "Name",
             "email": "Email",
-            "password": "Password"
+            "password": "Password",
+            "confirm-password": "Confirm Password"
         },
         "placeholders": {
             "name": "Your name",
@@ -29,6 +31,7 @@
         },
         "already": "Already have an account?",
         "forgot-pass": "Forgot password?",
+        "remember-pass": "Remember password?",
         "no-account-yet": "No account yet?",
         "dark-mode": "Dark mode",
         "light-mode": "Light mode",
@@ -38,7 +41,8 @@
             "buttons": {
                 "resend": "Resend",
                 "change-email": "Change email",
-                "signin": "Back to sign in"
+                "signin": "Back to sign in",
+                "reset": "Reset"
             },
             "tip": "Tip: Check Spam/Promotions. Search subject “BudgetHub – Verify your email”.",
             "content": "After you click the link, we’ll sign you in automatically."

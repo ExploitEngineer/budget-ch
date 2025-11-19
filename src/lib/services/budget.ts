@@ -4,6 +4,7 @@ import { createBudgetDB } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 import { getBudgetsDB, updateBudgetDB, deleteBudgetDB } from "@/db/queries";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 export interface BaseBudgetFields {
   categoryName: string;
@@ -45,7 +46,11 @@ export async function createBudget(
 ): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
-    const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
+    const { userId, userRole, hubId, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+    requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return { success: false, message: "No financial account found" };
@@ -221,7 +226,9 @@ export async function updateBudget({
 }: Omit<UpdateBudgetInput, "hubId">): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
 
     const result = await updateBudgetDB({
       hubId,
@@ -243,7 +250,9 @@ export async function updateBudget({
 export async function deleteBudget(budgetId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
 
     const result = await deleteBudgetDB({ hubId, budgetId });
 

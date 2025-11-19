@@ -8,6 +8,7 @@ import {
   updateTaskDB,
   deleteTaskDB,
 } from "@/db/queries";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 // CREATE Task
 export async function createTask({
@@ -18,7 +19,9 @@ export async function createTask({
   checked: boolean;
 }) {
   const hdrs = await headers();
-  const { userId, hubId } = await getContext(hdrs, false);
+  const { userId, userRole, hubId } = await getContext(hdrs, false);
+
+  requireAdminRole(userRole);
 
   return await createTaskDB({ userId, hubId, name, checked });
 }
@@ -41,10 +44,20 @@ export async function updateTask({
   name?: string;
   checked?: boolean;
 }) {
+  const hdrs = await headers();
+  const { userRole } = await getContext(hdrs, false);
+
+  requireAdminRole(userRole);
+
   return await updateTaskDB({ taskId, name, checked });
 }
 
 // DELETE Task
 export async function deleteTask(taskId: string) {
+  const hdrs = await headers();
+  const { userRole } = await getContext(hdrs, false);
+
+  requireAdminRole(userRole);
+
   return await deleteTaskDB(taskId);
 }

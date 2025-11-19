@@ -10,7 +10,7 @@ import {
   pgEnum,
   integer,
 } from "drizzle-orm/pg-core";
-import { InferModel } from "drizzle-orm";
+import { InferSelectModel } from "drizzle-orm";
 
 export const accessRole = pgEnum("access_role", ["admin", "member"]);
 
@@ -32,9 +32,11 @@ export const BudgetColorMakerType = pgEnum("budgets_type", [
   "red",
 ]);
 
-export type QuickTask = InferModel<typeof quickTasks>;
+export type QuickTask = InferSelectModel<typeof quickTasks>;
 
 /* AUTH SCHEMAS */
+
+export type UserType = InferSelectModel<typeof users>;
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -42,6 +44,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
+  stripeCustomerId: text("stripe_customer_id"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -72,7 +75,7 @@ export const hubMembers = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     accessRole: accessRole().notNull().default("member"),
-    isOwner: boolean("is_owner").default(true).notNull(),
+    isOwner: boolean("is_owner").default(false).notNull(),
     joinedAt: timestamp(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
@@ -82,6 +85,19 @@ export const hubMembers = pgTable(
   },
   (table) => [primaryKey({ columns: [table.userId, table.hubId] })],
 );
+
+export const hubInvitations = pgTable("hub_invitations", {
+  id: uuid().primaryKey().defaultRandom(),
+  hubId: uuid("hub_id")
+    .notNull()
+    .references(() => hubs.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  role: accessRole().notNull().default("member"),
+  token: text("token").notNull(),
+  accepted: boolean("accepted").default(false).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
 
 export const sessions = pgTable("sessions", {
   id: text("id").primaryKey(),

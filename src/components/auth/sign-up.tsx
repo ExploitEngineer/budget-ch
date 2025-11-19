@@ -2,7 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userSignUpSchema, UserSignUpValues } from "@/lib/validations";
+import {
+  userSignUpSchema,
+  UserSignUpValues,
+} from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -29,6 +32,7 @@ import { useRouter } from "next/navigation";
 export default function SignUp() {
   const router = useRouter();
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const form = useForm<UserSignUpValues>({
     resolver: zodResolver(userSignUpSchema),
     defaultValues: {
@@ -51,9 +55,9 @@ export default function SignUp() {
         // callbackURL: "/signin",
         fetchOptions: {
           onSuccess(context) {
-              toast.success(`Signed up successfully!`);
-              form.reset();
-              router.push("/signin");
+            toast.success(`Signed up successfully!`);
+            form.reset();
+            router.push("/signin");
           },
           onError(context) {
             console.error(context.error);
@@ -69,9 +73,16 @@ export default function SignUp() {
   }
 
   const handleGoogleSignUp = async () => {
-    const result = await signInWithGoogle();
-    if (result.status === "error") {
-      toast.error("Error signing up with Google");
+    setLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      if (result.status === "error") {
+        toast.error("Error signing up with Google");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -194,15 +205,21 @@ export default function SignUp() {
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background flex w-full cursor-pointer items-center gap-3 rounded-xl py-5 font-bold"
           >
-            <Image
-              src="/assets/images/google.svg"
-              width={15}
-              height={15}
-              alt="google image"
-            />
-            <span>
-              {t("signup")} {t("buttons.google")}
-            </span>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <div className="flex items-center gap-3">
+                <Image
+                  src="/assets/images/google.svg"
+                  width={15}
+                  height={15}
+                  alt="google image"
+                />
+                <span>
+                  {t("signup")} {t("buttons.google")}
+                </span>
+              </div>
+            )}
           </Button>
 
           <Separator className="dark:bg-border-blue" />

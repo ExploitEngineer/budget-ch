@@ -9,6 +9,7 @@ import {
 import type { financialAccountArgs } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 // CREATE Financial Account [Action]
 export async function createFinancialAccount({
@@ -21,7 +22,9 @@ export async function createFinancialAccount({
   try {
     const hdrs = await headers();
 
-    const { userId, hubId } = await getContext(hdrs, false);
+    const { userId, hubId, userRole } = await getContext(hdrs, false);
+
+    requireAdminRole(userRole);
 
     await createFinancialAccountDB({
       userId,
@@ -44,9 +47,9 @@ export async function createFinancialAccount({
 export async function getFinancialAccounts() {
   try {
     const hdrs = await headers();
-    const { userId, hubId } = await getContext(hdrs, false);
+    const { hubId } = await getContext(hdrs, false);
 
-    const accounts = await getFinancialAccountsDB(userId, hubId);
+    const accounts = await getFinancialAccountsDB(hubId);
 
     const tableData = accounts.map((acc) => ({
       id: acc.id,
@@ -74,7 +77,9 @@ export async function updateFinancialAccount(
 ) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId, userRole } = await getContext(hdrs, false);
+
+    requireAdminRole(userRole);
 
     const result = await updateFinancialAccountDB({
       hubId,
@@ -97,7 +102,9 @@ export async function updateFinancialAccount(
 export async function deleteFinancialAccount(accountId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId, userRole } = await getContext(hdrs, false);
+
+    requireAdminRole(userRole);
 
     const result = await deleteFinancialAccountDB({ hubId, accountId });
 

@@ -10,7 +10,12 @@
 !.yarn/releases
 !.yarn/versions
 todos.md
+<<<<<<< HEAD
+.cursor/
+=======
+.cursor
 
+>>>>>>> stripe
 # testing
 /coverage
 
