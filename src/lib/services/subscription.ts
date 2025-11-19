@@ -1,5 +1,3 @@
-"use server";
-
 import {
   FAMILY_TIER_MONTHLY_LOOKUP_KEY,
   FAMILY_TIER_YEARLY_LOOKUP_KEY,
