@@ -3,9 +3,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "@/db/db";
 import * as schema from "@/db/schema";
 import { createAuthMiddleware, APIError } from "better-auth/api";
-import {
-  ensureUserOnboarding,
-} from "@/lib/services/user";
+import { ensureUserOnboarding } from "@/lib/services/user";
+import { mailer } from "@/lib/mailer";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -79,9 +78,7 @@ export const auth = betterAuth({
 
         try {
           // Create user onboarding (handles Stripe + DB operations)
-          const result = await ensureUserOnboarding(
-            user.email,
-          );
+          const result = await ensureUserOnboarding(user.email);
 
           if (!result.success) {
             console.error(
@@ -101,21 +98,84 @@ export const auth = betterAuth({
       }
     }),
   },
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {},
-      },
-    },
-  },
   emailAndPassword: {
     enabled: true,
-    // requireEmailVerification: true,
+    requireEmailVerification: true,
+    sendResetPassword: async ({ user, url }) => {
+      const html = `
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Reset Your Password</title>
+  </head>
+  <body style="font-family: sans-serif; background: #f4f4f4; padding: 40px;">
+    <div style="max-width: 600px; margin: auto; background: #fff; padding: 32px; border-radius: 8px;">
+      <h2 style="text-align: center; color: #111;">Reset Your Password</h2>
+      <p>Hi ${user.name || user.email},</p>
+      <p>We received a request to reset your password. Click the button below to choose a new one.</p>
+      <p style="text-align: center; margin: 32px 0;">
+        <a href="${url}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Reset Password</a>
+      </p>
+      <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+      <p style="color: #2563eb; word-break: break-all;">${url}</p>
+      <p>This password reset link will expire in 24 hours.</p>
+      <p>If you didn’t request a password reset, you can safely ignore this email.</p>
+      <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
+      <p style="text-align: center; font-size: 12px; color: #666;">© 2024 Your Company Name. All rights reserved.</p>
+    </div>
+  </body>
+</html>
+`;
+      try {
+        await mailer.sendMail({
+          from: `"Budget-ch" <${process.env.MAIL_USER!}`,
+          to: user.email,
+          subject: "Reset Your Password",
+          html,
+        });
+      } catch (err) {
+        console.error("Failed to send reset password email:", err);
+      }
+    },
   },
   emailVerification: {
-    // TODO: Add the email verification page
-    sendVerificationEmail: async ({ user, url, token }, request) => {
-      console.log(`EmailVerification: ${user.email} ${url} ${token}`);
+    sendOnSignUp: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      const html = `
+      <html>
+        <head>
+          <meta charset="UTF-8" />
+          <title>Verify your email</title>
+        </head>
+        <body style="font-family: sans-serif; background: #f4f4f4; padding: 40px;">
+          <div style="max-width: 600px; margin: auto; background: #fff; padding: 32px; border-radius: 8px;">
+            <h2 style="text-align: center; color: #111;">Verify Your Email Address</h2>
+            <p>Hi there!</p>
+            <p>Thank you, ${user.name || user.email}, for signing up! To complete your registration, please verify your email by clicking the button below.</p>
+            <p style="text-align: center; margin: 32px 0;">
+              <a href="${url}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Verify Email Address</a>
+            </p>
+            <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+            <p style="color: #2563eb; word-break: break-all;">${url}</p>
+            <p>This verification link will expire in 24 hours.</p>
+            <p>If you didn’t create an account, you can ignore this email.</p>
+            <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
+            <p style="text-align: center; font-size: 12px; color: #666;">© 2024 Your Company Name. All rights reserved.</p>
+          </div>
+        </body>
+      </html>
+    `;
+
+      try {
+        await mailer.sendMail({
+          from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
+          to: user.email,
+          subject: "Verify your email address",
+          html,
+        });
+      } catch (err) {
+        console.error("Failed to send verification email:", err);
+      }
     },
   },
   socialProviders: {

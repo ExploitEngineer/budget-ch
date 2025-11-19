@@ -8,10 +8,12 @@
         "signup": "Registrati",
         "signin": "Accedi",
         "forgot-password": "Reimposta password",
+        "reset-password": "Reimposta password",
         "labels": {
             "name": "Nome",
             "email": "E-mail",
-            "password": "Password"
+            "password": "Password",
+            "confirm-password": "Conferma password"
         },
         "placeholders": {
             "name": "Il tuo nome",
@@ -32,12 +34,14 @@
         "forgot-pass": "Password dimenticata?",
         "no-account-yet": "Non hai ancora un account?",
         "dark-mode": "Modalità scura",
+        "remember-pass": "Ricordare la password?",
         "light-mode": "Modalità chiara",
         "verify-email": {
             "title": "Verifica la tua e-mail",
             "sub-heading": "Abbiamo inviato un link di verifica a:",
             "buttons": {
                 "resend": "Invia di nuovo",
+                "reset": "Reimposta",
                 "change-email": "Cambia e-mail",
                 "signin": "Torna al login"
             },

@@ -2,7 +2,10 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userSignUpSchema, UserSignUpValues } from "@/lib/validations";
+import {
+  userSignUpSchema,
+  UserSignUpValues,
+} from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";

@@ -8,10 +8,12 @@
         "signup": "S’inscrire",
         "signin": "Se connecter",
         "forgot-password": "Réinitialiser le mot de passe",
+        "reset-password": "Réinitialiser le mot de passe",
         "labels": {
             "name": "Nom",
             "email": "E-mail",
-            "password": "Mot de passe"
+            "password": "Mot de passe",
+            "confirm-password": "Confirmer le mot de passe"
         },
         "placeholders": {
             "name": "Votre nom",
@@ -31,6 +33,7 @@
         "already": "Vous avez déjà un compte ?",
         "forgot-pass": "Mot de passe oublié ?",
         "no-account-yet": "Pas encore de compte ?",
+        "remember-pass": "Se souvenir du mot de passe ?",
         "dark-mode": "Mode sombre",
         "light-mode": "Mode clair",
         "verify-email": {
@@ -39,6 +42,7 @@
             "buttons": {
                 "resend": "Renvoyer",
                 "change-email": "Changer d’adresse e-mail",
+                "reset": "Réinitialiser",
                 "signin": "Retour à la connexion"
             },
             "tip": "Astuce : vérifiez les dossiers Spam/Promotions. Recherchez l’objet « BudgetHub – Verify your email ».",

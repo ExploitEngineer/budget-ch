@@ -10,6 +10,7 @@ import {
   savingGoals,
   quickTasks,
   accountTransfers,
+  hubInvitations,
 } from "./schema";
 import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
 import type { QuickTask, UserType } from "./schema";
@@ -18,15 +19,7 @@ import type {
   UpdateBudgetInput,
 } from "@/lib/services/budget";
 
-type AccessRole = "admin" | "member";
-
-export type createHubMemberArgs = {
-  userId: string;
-  hubId: string;
-  accessRole: AccessRole;
-  isOwner: boolean;
-  userName?: string;
-};
+export type AccessRole = "admin" | "member";
 
 export type AccountType = "checking" | "savings" | "credit-card" | "cash";
 
@@ -158,6 +151,20 @@ export type AccountTransferArgs = {
   amount: number;
   note?: string;
 };
+
+interface HubInvitationProps {
+  hubId: string;
+  email: string;
+  role: AccessRole;
+  token: string;
+  expiresAt: Date;
+}
+
+interface getHubsByUserDBProps {
+  success: boolean;
+  message?: string;
+  data?: any[];
+}
 
 export async function updateUser(
   userId: string,
@@ -315,7 +322,7 @@ export async function completeUserOnboardingDB({
         await tx.insert(hubMembers).values({
           userId,
           hubId,
-          accessRole: "member",
+          accessRole: "admin",
           isOwner: true,
         });
 
@@ -346,7 +353,7 @@ export async function completeUserOnboardingDB({
       await tx.insert(hubMembers).values({
         userId,
         hubId: hub.id,
-        accessRole: "member",
+        accessRole: "admin",
         isOwner: true,
       });
 
@@ -385,26 +392,6 @@ export async function createHubDB(userId: string, userName: string) {
   } catch (err) {
     console.error("Error creating Hub: ", err);
     throw new Error("Failed to create hub");
-  }
-}
-
-// CREATE Hub Member
-export async function createHubMemberDB({
-  userId,
-  hubId,
-  accessRole,
-  isOwner,
-}: createHubMemberArgs) {
-  try {
-    await db.insert(hubMembers).values({
-      userId,
-      hubId,
-      accessRole,
-      isOwner,
-    });
-  } catch (err) {
-    console.error("Error creating Hub Member: ", err);
-    throw Error("Failed to create Hub Member");
   }
 }
 
@@ -537,17 +524,12 @@ export async function deleteFinancialAccountDB({
 }
 
 // READ Financial Account
-export async function getFinancialAccountsDB(userId: string, hubId: string) {
+export async function getFinancialAccountsDB(hubId: string) {
   try {
     const results = await db
       .select()
       .from(financialAccounts)
-      .where(
-        and(
-          eq(financialAccounts.userId, userId),
-          eq(financialAccounts.hubId, hubId),
-        ),
-      );
+      .where(and(eq(financialAccounts.hubId, hubId)));
 
     return results.map((acc) => ({
       id: acc.id,
@@ -1640,4 +1622,233 @@ export async function getCategoriesByExpensesDB(hubId: string) {
       message: err.message || "Failed to fetch expense categories",
     };
   }
+}
+
+// GET HUBS for User
+export async function getHubsByUserDB(
+  userId: string,
+): Promise<getHubsByUserDBProps> {
+  try {
+    const rows = await db
+      .select({
+        id: hubs.id,
+        name: hubs.name,
+        createdAt: hubs.createdAt,
+      })
+      .from(hubs)
+      .leftJoin(hubMembers, eq(hubMembers.hubId, hubs.id))
+      .where(or(eq(hubs.userId, userId), eq(hubMembers.userId, userId)))
+      .orderBy(desc(hubs.createdAt));
+
+    const unique = Object.values(
+      rows.reduce(
+        (acc, hub) => {
+          acc[hub.id] = hub;
+          return acc;
+        },
+        {} as Record<string, (typeof rows)[number]>,
+      ),
+    );
+
+    return {
+      success: true,
+      data: unique.map((h) => ({
+        id: h.id,
+        name: h.name,
+      })),
+    };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: [] };
+  }
+}
+
+// CREATE Invitation
+export async function createHubInvitationDB({
+  hubId,
+  email,
+  role,
+  token,
+  expiresAt,
+}: HubInvitationProps) {
+  try {
+    const inserted = await db
+      .insert(hubInvitations)
+      .values({
+        hubId,
+        email,
+        role,
+        token,
+        expiresAt,
+      })
+      .returning();
+
+    return { success: true, data: inserted[0] };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+// GET INVITATIONS by HUB
+export async function getHubInvitationsByHubDB(hubId: string) {
+  try {
+    const rows = await db
+      .select({
+        id: hubInvitations.id,
+        email: hubInvitations.email,
+        role: hubInvitations.role,
+        accepted: hubInvitations.accepted,
+        expiresAt: hubInvitations.expiresAt,
+        createdAt: hubInvitations.createdAt,
+      })
+      .from(hubInvitations)
+      .where(eq(hubInvitations.hubId, hubId));
+
+    return { success: true, data: rows };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: [] };
+  }
+}
+
+// GET INVITE BY TOKEN
+export async function getInvitationByTokenDB(token: string) {
+  try {
+    const row = await db.query.hubInvitations.findFirst({
+      where: eq(hubInvitations.token, token),
+    });
+
+    if (!row) {
+      return { success: false, message: "Invalid token", data: null };
+    }
+
+    return { success: true, data: row };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: null };
+  }
+}
+
+// ACCEPT Invitation
+export async function acceptInvitationDB(token: string, userId: string) {
+  try {
+    const invite = await db.query.hubInvitations.findFirst({
+      where: eq(hubInvitations.token, token),
+    });
+
+    if (!invite) return { success: false, message: "Invitation not found" };
+
+    if (invite.accepted)
+      return { success: false, message: "Invitation already accepted" };
+
+    if (new Date(invite.expiresAt) < new Date())
+      return { success: false, message: "Invitation expired" };
+
+    // user email must match the invitation email
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+    });
+
+    if (!user) return { success: false, message: "User not found" };
+
+    if (user.email !== invite.email) {
+      return {
+        success: false,
+        message: "You cannot accept this invitation (email does not match)",
+      };
+    }
+
+    await db.transaction(async (tx) => {
+      const existingMember = await tx.query.hubMembers.findFirst({
+        where: and(
+          eq(hubMembers.userId, userId),
+          eq(hubMembers.hubId, invite.hubId),
+        ),
+      });
+
+      if (existingMember) {
+        return {
+          success: false,
+          message: "You are already a member of this hub",
+        };
+      } else {
+        await tx.insert(hubMembers).values({
+          hubId: invite.hubId,
+          userId,
+          accessRole: invite.role,
+          isOwner: false,
+          joinedAt: new Date(),
+        });
+      }
+
+      // Mark invitation as accepted
+      await tx
+        .update(hubInvitations)
+        .set({ accepted: true })
+        .where(eq(hubInvitations.id, invite.id));
+    });
+
+    return {
+      success: true,
+      message: "Invitation accepted",
+      data: { hubId: invite.hubId },
+    };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
+// GET MEMBERS FOR HUB
+export async function getHubMembersDB(hubId: string) {
+  try {
+    const rows = await db
+      .select({
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        role: hubMembers.accessRole,
+        isOwner: hubMembers.isOwner,
+        joinedAt: hubMembers.joinedAt,
+      })
+      .from(hubMembers)
+      .innerJoin(users, eq(hubMembers.userId, users.id))
+      .where(eq(hubMembers.hubId, hubId))
+      .orderBy(desc(hubMembers.joinedAt));
+
+    return { success: true, data: rows };
+  } catch (err: any) {
+    return { success: false, message: err.message, data: [] };
+  }
+}
+
+// Functions for getContext
+export async function getHubByIdDB(hubId: string) {
+  return await db.query.hubs.findFirst({
+    where: eq(hubs.id, hubId),
+    columns: { id: true },
+  });
+}
+
+export async function getFirstHubMemberDB(userId: string) {
+  return await db.query.hubMembers.findFirst({
+    where: eq(hubMembers.userId, userId),
+    columns: { hubId: true },
+  });
+}
+
+export async function getOwnedHubDB(userId: string) {
+  return await db.query.hubs.findFirst({
+    where: eq(hubs.userId, userId),
+    columns: { id: true },
+  });
+}
+
+export async function getHubMemberRoleDB(userId: string, hubId: string) {
+  return await db.query.hubMembers.findFirst({
+    where: and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)),
+    columns: { accessRole: true },
+  });
+}
+
+export async function getFinancialAccountDB(userId: string) {
+  return await db.query.financialAccounts.findFirst({
+    where: eq(financialAccounts.userId, userId),
+  });
 }

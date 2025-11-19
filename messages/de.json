@@ -8,10 +8,12 @@
         "signup": "Registrieren",
         "signin": "Anmelden",
         "forgot-password": "Passwort zurücksetzen",
+        "reset-password": "Passwort zurücksetzen",
         "labels": {
             "name": "Name",
             "email": "E-Mail",
-            "password": "Passwort"
+            "password": "Passwort",
+            "confirm-password": "Passwort bestätigen"
         },
         "placeholders": {
             "name": "Dein Name",
@@ -31,6 +33,7 @@
         "already": "Hast du bereits ein Konto?",
         "forgot-pass": "Passwort vergessen?",
         "no-account-yet": "Noch kein Konto?",
+        "remember-pass": "Passwort merken?",
         "dark-mode": "Dunkelmodus",
         "light-mode": "Hellmodus",
         "verify-email": {
@@ -39,6 +42,7 @@
             "buttons": {
                 "resend": "Erneut senden",
                 "change-email": "E-Mail ändern",
+                "reset": "Zurücksetzen",
                 "signin": "Zurück zur Anmeldung"
             },
             "tip": "Tipp: Überprüfe Spam-/Werbeordner. Suche nach dem Betreff „BudgetHub – Verify your email“.",

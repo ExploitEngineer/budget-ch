@@ -17,6 +17,7 @@ import { transactionCategories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import type { Transaction } from "../types/dashboard-types";
 import db from "@/db/db";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 // CREATE Transaction
 export async function createTransaction({
@@ -37,7 +38,12 @@ export async function createTransaction({
 >) {
   try {
     const hdrs = await headers();
-    const { userId, hubId, financialAccountId } = await getContext(hdrs, true);
+    const { userId, userRole, hubId, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+
+    requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return { success: false, reason: "NO_ACCOUNT" };
@@ -233,7 +239,12 @@ export async function updateTransaction(
 ) {
   try {
     const hdrs = await headers();
-    const { hubId, financialAccountId } = await getContext(hdrs, true);
+    const { hubId, userRole, financialAccountId } = await getContext(
+      hdrs,
+      true,
+    );
+
+    requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return {
@@ -319,7 +330,9 @@ export async function updateTransaction(
 export async function deleteTransaction(transactionId: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
 
     const res = await deleteTransactionDB({ hubId, transactionId });
 
@@ -347,7 +360,9 @@ export async function deleteTransaction(transactionId: string) {
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };
@@ -358,7 +373,8 @@ export async function deleteAllTransactionsAndCategories() {
     if (!res.success) {
       return {
         success: false,
-        message: res.message || "Failed to delete all transactions and categories.",
+        message:
+          res.message || "Failed to delete all transactions and categories.",
       };
     }
 
@@ -370,7 +386,9 @@ export async function deleteAllTransactionsAndCategories() {
     console.error("Error in deleteAllTransactionsAndCategories:", err);
     return {
       success: false,
-      message: err.message || "Unexpected error while deleting all transactions and categories.",
+      message:
+        err.message ||
+        "Unexpected error while deleting all transactions and categories.",
     };
   }
 }

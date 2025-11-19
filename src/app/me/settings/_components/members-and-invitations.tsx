@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState, useTransition } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -16,147 +17,231 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Table,
-  TableHeader,
-  TableHead,
-  TableRow,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { MainFormValues, mainFormSchema } from "@/lib/validations";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTranslations } from "next-intl";
+import { toast } from "sonner";
+import {
+  sendHubInvitation,
+  getHubInvitations,
+  getHubMembers,
+} from "@/lib/services/hub-invitation";
+import { Spinner } from "@/components/ui/spinner";
+import {
+  hubInvitesSchema,
+  HubInvitesValues,
+} from "@/lib/validations/hub-invites-validations";
 
-export function MembersInvitations() {
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
+interface MembersInvitationsProps {
+  hubId: string;
+}
+
+interface Invitation {
+  id: string;
+  email: string;
+  role: "admin" | "member";
+  accepted: boolean;
+  expiresAt: string | Date;
+  createdAt: string | Date;
+}
+
+interface Member {
+  id: string;
+  email: string;
+  name: string;
+  role: "admin" | "member";
+  isOwner: boolean;
+  joinedAt: string | Date;
+}
+
+export function MembersInvitations({ hubId }: MembersInvitationsProps) {
+  const [invitations, setInvitations] = useState<Invitation[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
+
+  const form = useForm<HubInvitesValues>({
+    resolver: zodResolver(hubInvitesSchema),
     defaultValues: {
-      text: "",
-      select: "",
+      email: "",
+      role: "member",
     },
   });
 
-  const t = useTranslations(
-    "main-dashboard.settings-page.members-invitations-section",
-  );
+  const loadData = async (): Promise<void> => {
+    try {
+      setLoading(true);
 
-  const tableHeadings: string[] = [
-    t("table.table-headings.email"),
-    t("table.table-headings.role"),
-    t("table.table-headings.status"),
-    t("table.table-headings.action"),
-  ];
+      const [invRes, membRes] = await Promise.all([
+        getHubInvitations(hubId),
+        getHubMembers(hubId),
+      ]);
+
+      if (invRes.success && Array.isArray(invRes.data)) {
+        setInvitations(invRes.data);
+      }
+
+      if (membRes.success && Array.isArray(membRes.data)) {
+        setMembers(membRes.data as Member[]);
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load invitations & members");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect((): void => {
+    loadData();
+  }, [hubId]);
+
+  const onSubmit = (values: HubInvitesValues): void => {
+    startTransition(async (): Promise<void> => {
+      try {
+        const result = await sendHubInvitation({
+          hubId,
+          email: values.email,
+          role: values.role,
+        });
+
+        if (result.success) {
+          toast.success(result.message || "Invitation sent");
+          form.reset();
+
+          const invRes = await getHubInvitations(hubId);
+          if (invRes.success && Array.isArray(invRes.data)) {
+            setInvitations(invRes.data);
+          }
+        } else {
+          toast.error(result.message || "Failed to send invitation");
+        }
+      } catch (e) {
+        console.error(e);
+        toast.error("Error sending invitation");
+      }
+    });
+  };
+
+  if (loading) {
+    return (
+      <Card className="bg-blue-background dark:border-border-blue">
+        <CardContent className="flex items-center justify-center py-8">
+          <Spinner />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const totalMembers =
+    members.length +
+    invitations.filter((i: Invitation): boolean => i.accepted === true).length;
 
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
-          <CardTitle>{t("title")}</CardTitle>
+          <CardTitle>Members & Invitations</CardTitle>
+
           <Badge
             variant="outline"
             className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
           >
-            {t("badge")}
+            {totalMembers} Members
           </Badge>
         </CardHeader>
+
         <Separator className="dark:bg-border-blue" />
-        <CardContent>
-          <Form {...form}>
-            <form className="space-y-4">
-              <div className="flex gap-4">
-                {/* Invite via Email */}
-                <FormField
-                  control={form.control}
-                  name="text"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>{t("labels.invite-email.title")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          className="dark:border-border-blue !bg-dark-blue-background"
-                          placeholder={t("labels.invite-email.placeholder")}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                {/* Role */}
-                <FormField
-                  control={form.control}
-                  name="account"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>{t("labels.role.title")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
-                            <SelectValue
-                              placeholder={t(
-                                "labels.role.select-options.member",
-                              )}
-                            />
-                          </SelectTrigger>
-                          <SelectContent className="!bg-dark-blue-background">
-                            <SelectItem value="member">
-                              {t("labels.role.select-options.member")}
-                            </SelectItem>
-                            <SelectItem value="admnin">
-                              {t("labels.role.select-options.admin")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+        <CardContent className="space-y-6 pt-6">
+          {/* INVITE FORM */}
+          <div>
+            <h3 className="mb-4 font-semibold">Send Invitation</h3>
 
-              {/* Button */}
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  type="button"
-                  className="btn-gradient cursor-pointer"
-                >
-                  {t("button")}
-                </Button>
-              </div>
-            </form>
-          </Form>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                <div className="flex gap-4">
+                  {/* EMAIL FIELD */}
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Email</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="user@example.com"
+                            disabled={isPending}
+                            className="dark:border-border-blue !bg-dark-blue-background"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-          <div className="dark:border-border-blue mt-8 overflow-x-auto rounded-lg border px-2 py-4">
-            <Table>
-              <TableHeader>
-                <TableRow className="dark:border-border-blue">
-                  {tableHeadings.map((heading) => (
-                    <TableHead
-                      className="font-bold text-gray-500 dark:text-gray-400/80"
-                      key={heading}
-                    >
-                      {heading}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell>{t("table.content")}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+                  {/* ROLE FIELD */}
+                  <FormField
+                    control={form.control}
+                    name="role"
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Role</FormLabel>
+                        <FormControl>
+                          <Select
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            disabled={isPending}
+                          >
+                            <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full">
+                              <SelectValue />
+                            </SelectTrigger>
+
+                            <SelectContent className="dark:!bg-dark-blue-background bg-white">
+                              <SelectItem value="member">Member</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={(): void => form.reset()}
+                    disabled={isPending}
+                  >
+                    Cancel
+                  </Button>
+
+                  <Button
+                    type="submit"
+                    disabled={isPending}
+                    className="btn-gradient cursor-pointer dark:text-white"
+                  >
+                    {isPending ? (
+                      <>
+                        <Spinner className="mr-2" /> Sending...
+                      </>
+                    ) : (
+                      "Send Invitation"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
         </CardContent>
       </Card>
