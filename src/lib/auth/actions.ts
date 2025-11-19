@@ -7,13 +7,16 @@ import {
   getOwnedHubDB,
   getHubMemberRoleDB,
   getFinancialAccountDB,
+  getSubscriptionByUserId,
 } from "@/db/queries";
+import { UserType } from "@/db/schema";
 
-export async function getContext(headersObj: Headers, requireAccount = true) {
+export async function getContext(headersObj: Headers, requireAccount = false) {
   const session = await auth.api.getSession({ headers: headersObj });
   if (!session?.user) throw new Error("Unauthorized");
 
   const userId = session.user.id;
+  const user = session.user as UserType;
 
   const cookieHeader = headersObj.get("cookie");
   let activeHubId =
@@ -52,5 +55,7 @@ export async function getContext(headersObj: Headers, requireAccount = true) {
     financialAccountId = account.id;
   }
 
-  return { userId, hubId: activeHubId, userRole, financialAccountId };
+  const subscription = await getSubscriptionByUserId(userId);
+
+  return { userId, hubId: activeHubId, userRole, financialAccountId, user, subscription: subscription ?? null };
 }

@@ -3,14 +3,12 @@
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "./ui/sidebar";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
   File,
   Download,
   ChevronRight,
-  Search,
   MessageSquare,
   Check,
 } from "lucide-react";
@@ -50,8 +48,6 @@ const monthNames: string[] = [
 export default function SidebarHeader() {
   const today = new Date();
   const t = useTranslations("main-dashboard");
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [transfers, setTransfers] = useState<TransferData[]>([]);
   const [date, setDate] = useState(
     new Date(today.getFullYear(), today.getMonth()),
@@ -70,8 +66,8 @@ export default function SidebarHeader() {
     try {
       const result = await getAccountTransfers();
 
-      if (!result || !result.status) {
-        throw new Error(result?.message || "Unknown error");
+      if (!result) {
+        throw new Error("Financial Account not found");
       }
 
       setTransfers((result.data as TransferData[]) || []);
@@ -91,17 +87,9 @@ export default function SidebarHeader() {
     setDate((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1));
   };
 
-  const handleSearchFocus = () => {
-    if (window.innerWidth < 640) setIsSearchExpanded(true);
-  };
-  const handleSearchBlur = () => {
-    if (window.innerWidth < 640 && searchQuery === "")
-      setIsSearchExpanded(false);
-  };
-
   return (
     <header className="relative mb-2 flex flex-col gap-2 px-2 pt-6">
-      <div className="flex w-full flex-wrap items-center px-4 sm:justify-between sm:gap-2">
+      <div className="flex w-full flex-wrap items-center justify-between px-4 sm:gap-2">
         <div className="flex shrink-0 items-center">
           <SidebarTrigger className="-ml-1 cursor-pointer lg:mt-0" />
           <Separator
@@ -111,48 +99,22 @@ export default function SidebarHeader() {
         </div>
 
         <div
-          className={`relative min-w-[2.5rem] flex-1 transition-all duration-300 ${
-            isSearchExpanded ? "max-sm:flex-1" : "max-sm:w-10"
-          }`}
+          className={`flex flex-wrap items-center justify-end gap-4 transition-all duration-300`}
         >
-          <Search
-            className="text-muted-foreground absolute top-1/2 left-1 h-[18px] w-[18px] -translate-y-1/2 cursor-pointer sm:left-3"
-            onClick={handleSearchFocus}
-          />
-          <Input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={handleSearchFocus}
-            onBlur={handleSearchBlur}
-            placeholder={t("sidebar.header.search")}
-            className={`!bg-blue-background dark:border-border-blue rounded-lg py-5 pr-3 pl-9 transition-all duration-300 ${
-              isSearchExpanded
-                ? "w-full opacity-100"
-                : "w-10 opacity-0 sm:w-full sm:opacity-100"
-            }`}
-          />
-        </div>
+          <div
+            className={`bg-blue-background hidden items-center gap-2 rounded-lg border px-2 transition-all duration-300 sm:flex`}
+          >
+            <Button variant="ghost" size="icon" onClick={goToPrevMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-center text-sm font-medium whitespace-nowrap sm:min-w-[120px]">
+              {monthNames[date.getMonth()]} {date.getFullYear()}
+            </span>
+            <Button variant="ghost" size="icon" onClick={goToNextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
 
-        <div
-          className={`bg-blue-background hidden items-center gap-2 rounded-lg border px-2 transition-all duration-300 sm:flex`}
-        >
-          <Button variant="ghost" size="icon" onClick={goToPrevMonth}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-center text-sm font-medium whitespace-nowrap sm:min-w-[120px]">
-            {monthNames[date.getMonth()]} {date.getFullYear()}
-          </span>
-          <Button variant="ghost" size="icon" onClick={goToNextMonth}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-
-        <div
-          className={`flex flex-wrap items-center justify-end gap-4 transition-all duration-300 ${
-            isSearchExpanded ? "hidden sm:flex" : "flex"
-          }`}
-        >
           {route === "dashboard" && <TransactionDialog />}
 
           {route === "transactions" && (

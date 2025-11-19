@@ -9,11 +9,12 @@ import {
   budgets,
   savingGoals,
   quickTasks,
+  subscriptions,
   accountTransfers,
   hubInvitations,
 } from "./schema";
 import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
-import type { QuickTask, UserType } from "./schema";
+import type { QuickTask, UserType, SubscriptionType } from "./schema";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
@@ -200,6 +201,111 @@ export async function updateUser(
       success: false,
       message: `Failed to update user: ${(err as Error).message}`,
     };
+  }
+}
+
+export async function getUserByStripeCustomerId(
+  stripeCustomerId: string,
+): Promise<UserType | null> {
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(users.stripeCustomerId, stripeCustomerId),
+    });
+    return user ?? null;
+  } catch (err) {
+    console.error("Error fetching user by Stripe customer ID: ", err);
+    throw err;
+  }
+}
+
+export async function getSubscriptionByUserId(
+  userId: string,
+): Promise<SubscriptionType | null> {
+  try {
+    const subscription = await db.query.subscriptions.findFirst({
+      where: eq(subscriptions.userId, userId),
+    });
+    return subscription ?? null;
+  } catch (err) {
+    console.error("Error fetching subscription by user ID: ", err);
+    throw err;
+  }
+}
+
+export async function getSubscriptionByStripeSubscriptionId(
+  stripeSubscriptionId: string,
+): Promise<SubscriptionType | null> {
+  try {
+    const subscription = await db.query.subscriptions.findFirst({
+      where: eq(subscriptions.stripeSubscriptionId, stripeSubscriptionId),
+    });
+    return subscription ?? null;
+  } catch (err) {
+    console.error("Error fetching subscription by Stripe subscription ID: ", err);
+    throw err;
+  }
+}
+
+export type SubscriptionInsertInput = Omit<
+  SubscriptionType,
+  "id" | "createdAt" | "updatedAt"
+>;
+
+export async function createSubscriptionRecord(
+  input: SubscriptionInsertInput,
+): Promise<SubscriptionType> {
+  try {
+    const [subscription] = await db
+      .insert(subscriptions)
+      .values({
+        ...input,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    return subscription;
+  } catch (err) {
+    console.error("Error creating subscription record: ", err);
+    throw err;
+  }
+}
+
+export type SubscriptionUpdateInput = Partial<
+  Omit<SubscriptionType, "id" | "userId" | "createdAt">
+>;
+
+export async function updateSubscriptionRecord(
+  subscriptionId: string,
+  updates: SubscriptionUpdateInput,
+): Promise<SubscriptionType | null> {
+  try {
+    const [subscription] = await db
+      .update(subscriptions)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(subscriptions.id, subscriptionId))
+      .returning();
+
+    return subscription ?? null;
+  } catch (err) {
+    console.error("Error updating subscription record: ", err);
+    throw err;
+  }
+}
+
+export async function deleteSubscriptionRecord(
+  subscriptionId: string,
+): Promise<void> {
+  try {
+    await db
+      .delete(subscriptions)
+      .where(eq(subscriptions.id, subscriptionId));
+  } catch (err) {
+    console.error("Error deleting subscription record: ", err);
+    throw err;
   }
 }
 

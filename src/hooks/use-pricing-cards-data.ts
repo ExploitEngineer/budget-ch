@@ -2,6 +2,8 @@ import { FAMILY_TIER_MONTHLY_LOOKUP_KEY, FAMILY_TIER_YEARLY_LOOKUP_KEY, INDIVIDU
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+export type PlanTier = "free" | "individual" | "family";
+
 export interface PlanCard {
   title: string;
   subTitle: string;
@@ -11,6 +13,7 @@ export interface PlanCard {
   lookupKeyYearly?: string;
   options: Record<string, string>;
   button: string;
+  planId: PlanTier;
 }
 
 interface Prices {
@@ -46,6 +49,7 @@ export function usePricingCardsData() {
         communitySupport: t("free-card.options.community-support"),
       },
       button: t("free-card.button"),
+      planId: "free",
     },
     {
       title: t("individual-card.title"),
@@ -61,7 +65,8 @@ export function usePricingCardsData() {
       },
       button: t("individual-card.button"),
       lookupKeyMonthly: INDIVIDUAL_TIER_MONTHLY_LOOKUP_KEY,
-      lookupKeyYearly: INDIVIDUAL_TIER_YEARLY_LOOKUP_KEY
+      lookupKeyYearly: INDIVIDUAL_TIER_YEARLY_LOOKUP_KEY,
+      planId: "individual",
     },
     {
       title: t("family-card.title"),
@@ -76,7 +81,8 @@ export function usePricingCardsData() {
       },
       button: t("family-card.button"),
       lookupKeyMonthly: FAMILY_TIER_MONTHLY_LOOKUP_KEY,
-      lookupKeyYearly: FAMILY_TIER_YEARLY_LOOKUP_KEY
+      lookupKeyYearly: FAMILY_TIER_YEARLY_LOOKUP_KEY,
+      planId: "family",
     },
   ];
 

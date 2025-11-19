@@ -53,20 +53,33 @@ export default function SignUp() {
         password: values.password,
         // image: "https://example.com/image.png",
         // callbackURL: "/signin",
-        fetchOptions: {
-          onSuccess(context) {
-            toast.success(`Signed up successfully!`);
-            form.reset();
-            router.push("/signin");
-          },
-          onError(context) {
-            console.error(context.error);
-            toast.error(`Could not sign up: ${context.error.message}`);
-          },
-        },
       });
+
+      if (error) {
+        toast.error(`Could not signup ${error.message}`);
+      }
+
+      if (data) {
+        const { error } = await authClient.sendVerificationEmail({
+          email: values.email,
+        });
+
+        if (error) {
+          toast.error("Error sending verification email");
+          form.reset();
+          router.push("/signin");
+          return;
+        }
+
+        toast.success(
+          "Account created! Please check your email for the verification link.",
+        );
+        form.reset();
+        router.push("/signin");
+      }
     } catch (err) {
       console.error(err);
+      toast.error("Something went wrong during signup");
     } finally {
       setIsSigningUp(false);
     }

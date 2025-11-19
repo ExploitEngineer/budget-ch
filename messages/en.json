@@ -1012,9 +1012,33 @@
                         },
                         "button": "Upgrade Now"
                     },
+            "errors": {
+                "no-price": "That plan is temporarily unavailable.",
+                "portal-failed": "Unable to open the Stripe portal right now."
+            },
+            "current-plan-badge": "Current plan",
+            "manage-plan-button": "Manage plan",
                     "stripe-portal-button": "Manage Subscription (Stripe Portal)"
                 }
             },
+                "current-subscription-section": {
+                    "title": "Current subscription",
+                    "plan-label": "Plan",
+                    "plan-labels": {
+                        "individual": "Individual",
+                        "family": "Family"
+                    },
+                    "status-label": "Status",
+                    "started-label": "Started",
+                    "renewal-label": "Renews at",
+                    "renews-label": "Renews at",
+                    "cancels-at-label": "Cancels at",
+                    "days-remaining-label": "Days remaining",
+                    "manage-button": "Manage subscription",
+                    "errors": {
+                        "portal-failed": "Unable to open the Stripe portal right now."
+                    }
+                },
             "members-invitations-section": {
                 "title": "Members & Invitations",
                 "badge": "0 Members",

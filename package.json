@@ -14,7 +14,8 @@
         "db:studio": "drizzle-kit studio",
         "db:purge": "tsx scripts/purge-db.ts",
         "db:seed": "tsx scripts/seed-db.ts",
-        "format:tailwindcss": "prettier --write ."
+        "format:tailwindcss": "prettier --write .",
+        "stripe:listen": "stripe listen --forward-to http://localhost:3000/api/webhooks/stripe"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.2.2",
