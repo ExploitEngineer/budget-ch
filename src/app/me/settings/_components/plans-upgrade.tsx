@@ -14,11 +14,17 @@ import { usePricingCardsData } from "@/hooks/use-pricing-cards-data";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { toast } from "sonner";
+import { createCheckoutSession } from "@/lib/stripe/stripe-utils";
+import { useRouter } from "next/navigation";
+import { UserType } from "@/db/schema";
 interface PlansUpgradeProps {
   subscriptionPrices: Record<string, number>;
+  user: UserType;
 }
 
-export function PlansUpgrade({ subscriptionPrices }: PlansUpgradeProps) {
+export function PlansUpgrade({ subscriptionPrices, user }: PlansUpgradeProps) {
+  const router = useRouter();
   const t = useTranslations(
     "main-dashboard.settings-page.plans-upgrade-section",
   );
@@ -26,6 +32,20 @@ export function PlansUpgrade({ subscriptionPrices }: PlansUpgradeProps) {
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly",
   );
+
+  async function handleNewSubscription(lookupKey: string) {
+    const { success, data, message } = await createCheckoutSession({
+      lookupKey,
+      customerId: user.stripeCustomerId!,
+      userId: user.id,
+      returnUrlOnly: true,
+    });
+    if (data?.url) {
+      router.push(data.url);
+    } else {
+      toast.error(message || "Failed to create checkout session");
+    }
+  }
 
   return (
     <section className="space-y-4">
@@ -91,11 +111,18 @@ export function PlansUpgrade({ subscriptionPrices }: PlansUpgradeProps) {
               <CardFooter className="flex justify-end">
                 <Button
                   variant="outline"
-                  className={cn(
+                  className={cn("cursor-pointer",
                     idx === 0
                       ? "!bg-dark-blue-background dark:border-border-blue"
                       : "btn-gradient",
                   )}
+                  onClick={() =>
+                    handleNewSubscription(
+                      planDuration === "monthly"
+                        ? card.lookupKeyMonthly!
+                        : card.lookupKeyYearly!,
+                    )
+                  }
                 >
                   {card.button}
                 </Button>

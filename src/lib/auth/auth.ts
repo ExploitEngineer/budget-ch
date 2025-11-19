@@ -17,6 +17,15 @@ export const auth = betterAuth({
       verifications: schema.verifications,
     },
   }),
+  user: {
+    additionalFields: {
+      stripeCustomerId: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+    },
+  },
 
   hooks: {
     before: createAuthMiddleware(async (ctx) => {

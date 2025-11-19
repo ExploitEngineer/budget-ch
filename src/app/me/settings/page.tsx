@@ -14,7 +14,7 @@ import { headers } from "next/headers";
 
 export default async function Settings() {
   const hdrs = await headers();
-  const { hubId } = await getContext(hdrs, false);
+  const { hubId,  user } = await getContext(hdrs, false);
 
   const subscriptionPrices = await fetchPrices();
 
@@ -26,7 +26,7 @@ export default async function Settings() {
 
       <div className="flex flex-1 flex-col gap-4 p-4">
         <ProfileHousehold />
-        <PlansUpgrade subscriptionPrices={subscriptionPrices} />
+        <PlansUpgrade subscriptionPrices={subscriptionPrices} user={user} />
         <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />
         <Notifications />
