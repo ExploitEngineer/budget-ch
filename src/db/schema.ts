@@ -32,6 +32,25 @@ export const BudgetColorMakerType = pgEnum("budgets_type", [
   "red",
 ]);
 
+export const subscriptionPlanValues = ["individual", "family"] as const;
+export type SubscriptionPlan = (typeof subscriptionPlanValues)[number];
+export const subscriptionPlanEnum = pgEnum("subscription_plan", subscriptionPlanValues);
+
+export const subscriptionStatusValues = [
+  "active",
+  "canceled",
+  "incomplete",
+  "incomplete_expired",
+  "past_due",
+  "trialing",
+  "unpaid",
+] as const;
+export type SubscriptionStatus = (typeof subscriptionStatusValues)[number];
+export const subscriptionStatusEnum = pgEnum(
+  "subscription_status",
+  subscriptionStatusValues,
+);
+
 export type QuickTask = InferSelectModel<typeof quickTasks>;
 
 /* AUTH SCHEMAS */
@@ -51,6 +70,35 @@ export const users = pgTable("users", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  stripeSubscriptionId: varchar("stripe_subscription_id", { length: 255 })
+    .notNull()
+    .unique(),
+  stripeCustomerId: varchar("stripe_customer_id", { length: 255 }).notNull(),
+  stripePriceId: varchar("stripe_price_id", { length: 255 }).notNull(),
+  subscriptionPlan: subscriptionPlanEnum().notNull().default("individual"),
+  status: subscriptionStatusEnum().notNull().default("active"),
+  currentPeriodStart: timestamp("current_period_start", {
+    withTimezone: true,
+  }).notNull(),
+  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true })
+    .notNull(),
+  canceledAt: timestamp("canceled_at", { withTimezone: true }),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export type SubscriptionType = InferSelectModel<typeof subscriptions>;
 
 export const hubs = pgTable("hubs", {
   id: uuid().notNull().primaryKey().defaultRandom(),
