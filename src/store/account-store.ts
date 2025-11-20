@@ -88,7 +88,6 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     } catch (err: any) {
       if (!err.message?.includes("Failed to create account")) {
         console.error("Error creating account:", err);
-        toast.error("Something went wrong while creating the account.");
       }
       throw err;
     } finally {

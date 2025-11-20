@@ -13,7 +13,7 @@ import {
   accountTransfers,
   hubInvitations,
 } from "./schema";
-import { eq, desc, sql, inArray, and, or } from "drizzle-orm";
+import { eq, desc, gte, lte, sql, inArray, and, or } from "drizzle-orm";
 import type { QuickTask, UserType, SubscriptionType } from "./schema";
 import type {
   CreateBudgetInput,
@@ -241,7 +241,10 @@ export async function getSubscriptionByStripeSubscriptionId(
     });
     return subscription ?? null;
   } catch (err) {
-    console.error("Error fetching subscription by Stripe subscription ID: ", err);
+    console.error(
+      "Error fetching subscription by Stripe subscription ID: ",
+      err,
+    );
     throw err;
   }
 }
@@ -300,9 +303,7 @@ export async function deleteSubscriptionRecord(
   subscriptionId: string,
 ): Promise<void> {
   try {
-    await db
-      .delete(subscriptions)
-      .where(eq(subscriptions.id, subscriptionId));
+    await db.delete(subscriptions).where(eq(subscriptions.id, subscriptionId));
   } catch (err) {
     console.error("Error deleting subscription record: ", err);
     throw err;
@@ -1957,4 +1958,35 @@ export async function getFinancialAccountDB(userId: string) {
   return await db.query.financialAccounts.findFirst({
     where: eq(financialAccounts.userId, userId),
   });
+}
+
+// GET Users Financial Account Count in Hub
+export async function getAccountCountForHub(
+  userId: string,
+  hubId: string,
+): Promise<number> {
+  return await db.$count(
+    financialAccounts,
+    and(
+      eq(financialAccounts.userId, userId),
+      eq(financialAccounts.hubId, hubId),
+    ),
+  );
+}
+
+// GET Monthyl Transactions Count
+export async function getMonthlyTransactionCount(
+  userId: string,
+): Promise<number> {
+  const now = new Date();
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  return await db.$count(
+    transactions,
+    and(
+      eq(transactions.userId, userId),
+      gte(transactions.addedAt, firstDayOfMonth),
+      lte(transactions.addedAt, now),
+    ),
+  );
 }

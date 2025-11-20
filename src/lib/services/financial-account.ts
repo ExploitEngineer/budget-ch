@@ -5,6 +5,8 @@ import {
   getFinancialAccountsDB,
   updateFinancialAccountDB,
   deleteFinancialAccountDB,
+  getSubscriptionByUserId,
+  getAccountCountForHub,
 } from "@/db/queries";
 import type { financialAccountArgs } from "@/db/queries";
 import { getContext } from "../auth/actions";
@@ -25,6 +27,20 @@ export async function createFinancialAccount({
     const { userId, hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
+
+    const subscription = await getSubscriptionByUserId(userId);
+
+    if (!subscription) {
+      const existingCount = await getAccountCountForHub(userId, hubId);
+
+      if (existingCount >= 2) {
+        return {
+          success: false,
+          message:
+            "The free plan allows only 2 financial accounts. Please upgrade to Individual or Family.",
+        };
+      }
+    }
 
     await createFinancialAccountDB({
       userId,

@@ -160,7 +160,7 @@ export async function syncStripeSubscription(
   }
 
   const existingSubscription = await getSubscriptionByUserId(userId);
-  
+
   // console.log(
   //   `[syncStripeSubscription] Stripe Subscription:\n${JSON.stringify(stripeSubscription, null, 2)}\nExisting subscription:\n${JSON.stringify(existingSubscription, null, 2)}\nPayload:\n${JSON.stringify(payload, null, 2)}`,
   // );
@@ -224,3 +224,4 @@ export async function refreshSubscriptionPeriodFromInvoice(
 
   return updated;
 }
+
