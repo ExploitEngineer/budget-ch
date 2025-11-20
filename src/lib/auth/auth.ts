@@ -28,7 +28,7 @@ export const auth = betterAuth({
   },
 
   hooks: {
-    before: createAuthMiddleware(async (ctx) => {
+    before: createAuthMiddleware(async (ctx): Promise<void> => {
       if (ctx.path.startsWith("/sign-in")) {
         // Get user from request body (before session is created)
         if (!ctx.request) {
@@ -75,7 +75,7 @@ export const auth = betterAuth({
         }
       }
     }),
-    after: createAuthMiddleware(async (ctx) => {
+    after: createAuthMiddleware(async (ctx): Promise<void> => {
       if (ctx.path.startsWith("/sign-up")) {
         // access .body to get the user data
         const user = ctx.context.newSession?.user;

@@ -44,10 +44,10 @@ export default function SignUp() {
 
   const t = useTranslations("authpages");
 
-  async function onSubmit(values: UserSignUpValues) {
+  async function onSubmit(values: UserSignUpValues): Promise<void> {
     setIsSigningUp(true);
     try {
-      const { data, error } = await authClient.signUp.email({
+      const { error } = await authClient.signUp.email({
         name: values.name,
         email: values.email,
         password: values.password,
@@ -57,26 +57,14 @@ export default function SignUp() {
 
       if (error) {
         toast.error(`Could not signup ${error.message}`);
+        return;
       }
 
-      if (data) {
-        const { error } = await authClient.sendVerificationEmail({
-          email: values.email,
-        });
-
-        if (error) {
-          toast.error("Error sending verification email");
-          form.reset();
-          router.push("/signin");
-          return;
-        }
-
-        toast.success(
-          "Account created! Please check your email for the verification link.",
-        );
-        form.reset();
-        router.push("/signin");
-      }
+      form.reset();
+      toast.success(
+        "Account created! Please check your email for the verification link.",
+      );
+      router.push("/signin");
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong during signup");
