@@ -34,6 +34,7 @@ import {
   hubInvitesSchema,
   HubInvitesValues,
 } from "@/lib/validations/hub-invites-validations";
+import { canAccessFeature } from "@/lib/services/features-permission";
 
 interface MembersInvitationsProps {
   hubId: string;
@@ -61,6 +62,9 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [members, setMembers] = useState<Member[]>([]);
   const [loading, setLoading] = useState(true);
+  const [canSend, setCanSend] = useState<boolean>(true);
+  const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
+
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<HubInvitesValues>({
@@ -70,6 +74,14 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
       role: "member",
     },
   });
+
+  useEffect((): void => {
+    (async (): Promise<void> => {
+      const res = await canAccessFeature("collaborative");
+      setCanSend(res.canAccess);
+      setSubscriptionPlan(res.subscriptionPlan);
+    })();
+  }, []);
 
   const loadData = async (): Promise<void> => {
     try {
@@ -99,7 +111,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
     loadData();
   }, [hubId]);
 
-  const onSubmit = (values: HubInvitesValues): void => {
+  const onSubmit = async (values: HubInvitesValues): Promise<void> => {
     startTransition(async (): Promise<void> => {
       try {
         const result = await sendHubInvitation({
@@ -160,6 +172,15 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
           {/* INVITE FORM */}
           <div>
             <h3 className="mb-4 font-semibold">Send Invitation</h3>
+
+            {!canSend && (
+              <p className="mb-4 text-sm text-red-500">
+                {subscriptionPlan === null
+                  ? "You are on the free plan."
+                  : "You are on the individual plan."}{" "}
+                Upgrade to use this feature.
+              </p>
+            )}
 
             <Form {...form}>
               <form
@@ -228,13 +249,15 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
 
                   <Button
                     type="submit"
-                    disabled={isPending}
+                    disabled={isPending || !canSend}
                     className="btn-gradient cursor-pointer dark:text-white"
                   >
                     {isPending ? (
                       <>
                         <Spinner className="mr-2" /> Sending...
                       </>
+                    ) : !canSend ? (
+                      "Upgrade to Invite"
                     ) : (
                       "Send Invitation"
                     )}

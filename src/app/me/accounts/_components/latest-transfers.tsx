@@ -39,8 +39,8 @@ export function LatestTransfers() {
     try {
       const result = await getAccountTransfers();
 
-      if (!result || !result.status) {
-        throw new Error(result?.message || "Unknown error");
+      if (!result) {
+        throw new Error("No Financial Account Found");
       }
 
       setTransfers((result.data as TransferData[]) || []);

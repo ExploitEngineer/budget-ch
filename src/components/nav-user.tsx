@@ -13,10 +13,28 @@ import {
 import { MoreHorizontal, Heart } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { HubDisplay } from "./hub-display";
+import { useState, useEffect } from "react";
+import { canAccessFeature } from "@/lib/services/features-permission";
 
 export function NavUser() {
   const t = useTranslations("main-dashboard.sidebar.footer");
   const { open } = useSidebar();
+
+  const [plan, setPlan] = useState<string>("Family");
+
+  useEffect(() => {
+    (async () => {
+      const res = await canAccessFeature("reports");
+
+      if (!res.subscriptionPlan) {
+        setPlan("Free");
+      } else if (res.subscriptionPlan === "individual") {
+        setPlan("Individual");
+      } else if (res.subscriptionPlan === "family") {
+        setPlan("Family");
+      }
+    })();
+  }, []);
 
   return (
     <SidebarMenu>
@@ -27,7 +45,7 @@ export function NavUser() {
               <LangSwitcherDefault />
               <ThemeToggleDropdown />
               <div className="flex cursor-pointer items-center rounded-full border bg-gray-100 px-4 py-3 text-xs dark:bg-transparent">
-                Plan: <span className="ml-1 font-medium">Free</span>
+                Plan: <span className="ml-1 font-medium">{plan}</span>
               </div>
             </div>
             <div className="dark:border-border-blue border-b p-4">
@@ -68,7 +86,7 @@ export function NavUser() {
               </div>
               <DropdownMenuItem>
                 <div className="flex cursor-pointer items-center rounded-full border px-4 py-3 text-xs">
-                  Plan: <span className="ml-1 font-medium">Free</span>
+                  Plan: <span className="ml-1 font-medium">{plan}</span>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
