@@ -4,11 +4,12 @@ import { createStripeCustomer } from "@/lib/stripe";
 import {
   getUserByEmailDB,
   completeUserOnboardingDB,
+  getUserEmailDB,
 } from "@/db/queries";
+import { getContext } from "../auth/actions";
+import { headers } from "next/headers";
 
-export async function ensureUserOnboarding(
-  email: string,
-) {
+export async function ensureUserOnboarding(email: string) {
   try {
     // Get user by email
     const user = await getUserByEmailDB(email);
@@ -18,7 +19,7 @@ export async function ensureUserOnboarding(
         message: "User not found",
       };
     }
-    
+
     let stripeCustomerId = user.stripeCustomerId;
     if (!stripeCustomerId) {
       const stripeResult = await createStripeCustomer(email);
@@ -48,3 +49,27 @@ export async function ensureUserOnboarding(
   }
 }
 
+// GET user email
+export async function getUserEmail() {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    const res = await getUserEmailDB(userId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Error fetching user email",
+      };
+    }
+
+    return { success: true, data: res.data };
+  } catch (err: any) {
+    console.error("Error fetching user email: ", err);
+    return {
+      success: false,
+      message: `Failed to fetch user email: ${err.message}`,
+    };
+  }
+}

@@ -103,7 +103,7 @@ export function Notifications() {
                           placeholder={t("labels.monthly-report.options.off")}
                         />
                       </SelectTrigger>
-                      <SelectContent className="!dark:bg-dark-blue-background bg-white">
+                      <SelectContent className="dark:!bg-dark-blue-background bg-white">
                         <SelectItem value="off">
                           {t("labels.monthly-report.options.off")}
                         </SelectItem>

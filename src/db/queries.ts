@@ -329,6 +329,26 @@ export async function getUserByEmailDB(email: string) {
   }
 }
 
+// GET user email
+export async function getUserEmailDB(userId: string) {
+  try {
+    const userEmail = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        email: true,
+      },
+    });
+
+    return { success: true, data: userEmail };
+  } catch (err: any) {
+    console.error("Error fetching user email: ", err);
+    return {
+      success: false,
+      message: err.message || "Error fetching user email",
+    };
+  }
+}
+
 // CHECK if user onboarding is complete
 export async function isUserOnboardingCompleteDB(
   userId: string,

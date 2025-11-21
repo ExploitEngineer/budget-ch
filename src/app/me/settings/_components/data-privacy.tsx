@@ -102,7 +102,7 @@ export function DataPrivacy() {
                     transfers,
                   })
                 }
-                className="dark:border-border-blue !bg-dark-blue-background"
+                className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
               >
                 {t("labels.data-export.buttons.json")}
               </Button>
