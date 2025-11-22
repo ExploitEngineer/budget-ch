@@ -49,7 +49,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
   updateLoading: false,
   deleteLoading: false,
 
-  fetchAccounts: async () => {
+  fetchAccounts: async (): Promise<void> => {
     try {
       set({ accountsLoading: true, accountsError: null });
       const res = await getFinancialAccounts();
@@ -67,11 +67,11 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     }
   },
 
-  refreshAccounts: async () => {
+  refreshAccounts: async (): Promise<void> => {
     await get().fetchAccounts();
   },
 
-  createAccountAndSync: async (data) => {
+  createAccountAndSync: async (data): Promise<void> => {
     try {
       set({ createLoading: true });
 
@@ -88,7 +88,6 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     } catch (err: any) {
       if (!err.message?.includes("Failed to create account")) {
         console.error("Error creating account:", err);
-        toast.error("Something went wrong while creating the account.");
       }
       throw err;
     } finally {
@@ -96,7 +95,10 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     }
   },
 
-  updateAccountAndSync: async (accountId, updatedData) => {
+  updateAccountAndSync: async (
+    accountId: string,
+    updatedData,
+  ): Promise<void> => {
     try {
       set({ updateLoading: true });
 
@@ -121,7 +123,7 @@ export const useAccountStore = create<AccountState>((set, get) => ({
     }
   },
 
-  deleteAccountAndSync: async (accountId) => {
+  deleteAccountAndSync: async (accountId: string): Promise<void> => {
     try {
       set({ deleteLoading: true });
 

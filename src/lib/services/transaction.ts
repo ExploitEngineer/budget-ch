@@ -9,6 +9,8 @@ import {
   getFinancialAccountByType,
   updateFinancialAccountDB,
   deleteAllTransactionsAndCategoriesDB,
+  getSubscriptionByUserId,
+  getMonthlyTransactionCount,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -44,6 +46,19 @@ export async function createTransaction({
     );
 
     requireAdminRole(userRole);
+
+    const subscription = await getSubscriptionByUserId(userId);
+
+    if (!subscription) {
+      const txCount = await getMonthlyTransactionCount(userId);
+      if (txCount >= 300) {
+        return {
+          success: false,
+          message:
+            "Free plan limit reached: You can only create 300 transactions per month.",
+        };
+      }
+    }
 
     if (!financialAccountId) {
       return { success: false, reason: "NO_ACCOUNT" };

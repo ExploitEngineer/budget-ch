@@ -34,7 +34,10 @@ export const BudgetColorMakerType = pgEnum("budgets_type", [
 
 export const subscriptionPlanValues = ["individual", "family"] as const;
 export type SubscriptionPlan = (typeof subscriptionPlanValues)[number];
-export const subscriptionPlanEnum = pgEnum("subscription_plan", subscriptionPlanValues);
+export const subscriptionPlanEnum = pgEnum(
+  "subscription_plan",
+  subscriptionPlanValues,
+);
 
 export const subscriptionStatusValues = [
   "active",
@@ -87,8 +90,9 @@ export const subscriptions = pgTable("subscriptions", {
   currentPeriodStart: timestamp("current_period_start", {
     withTimezone: true,
   }).notNull(),
-  currentPeriodEnd: timestamp("current_period_end", { withTimezone: true })
-    .notNull(),
+  currentPeriodEnd: timestamp("current_period_end", {
+    withTimezone: true,
+  }).notNull(),
   canceledAt: timestamp("canceled_at", { withTimezone: true }),
   cancelAt: timestamp("cancel_at", { withTimezone: true }),
   cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),

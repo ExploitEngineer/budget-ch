@@ -22,6 +22,11 @@ import { useForm } from "react-hook-form";
 import { MainFormValues, mainFormSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import { getUserEmail } from "@/lib/services/user";
+import { authClient } from "@/lib/auth/auth-client";
+import { toast } from "sonner";
+import { useState } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 export function Security() {
   const form = useForm<MainFormValues>({
@@ -31,6 +36,38 @@ export function Security() {
     },
   });
   const t = useTranslations("main-dashboard.settings-page.security-section");
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleResetEmailSend = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      const res = await getUserEmail();
+
+      if (!res.success) {
+        toast.error(res.message || "Error fetching user email");
+        return;
+      }
+
+      if (res?.data) {
+        const userEmail = res.data.email;
+
+        const { error } = await authClient.requestPasswordReset({
+          email: userEmail,
+          redirectTo: "/reset-password",
+        });
+
+        if (error) {
+          toast.error(error.message);
+        }
+        toast.success("Password reset email sent");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section>
@@ -113,9 +150,15 @@ export function Security() {
                 </Button>
                 <Button
                   variant="outline"
+                  disabled={loading}
+                  onClick={handleResetEmailSend}
                   className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
                 >
-                  {t("labels.password.buttons.reset-password")}
+                  {loading ? (
+                    <Spinner />
+                  ) : (
+                    t("labels.password.buttons.reset-password")
+                  )}
                 </Button>
               </div>
               <p className="text-sm opacity-80">
