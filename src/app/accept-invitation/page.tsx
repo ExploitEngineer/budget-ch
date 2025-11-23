@@ -17,6 +17,7 @@ export default function AcceptInvitationPage() {
 
   const [status, setStatus] = useState<StatusType>("pending");
   const [countdown, setCountdown] = useState<number>(3);
+  const [acceptedHubId, setAcceptedHubId] = useState<string | null>(null);
 
   useEffect((): void => {
     if (!token) {
@@ -28,30 +29,22 @@ export default function AcceptInvitationPage() {
       const res = await acceptHubInvitation(token);
 
       if (res.success && res.data?.hubId) {
-        try {
-          await fetch("/api/switch-hub", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ hubId: res.data.hubId }),
+        toast.success("Invitation accepted!");
+        setStatus("accepted");
+        setAcceptedHubId(res.data.hubId);
+
+        // Navigate to dashboard with hub query parameter
+        const dashboardUrl = `/me/dashboard?hub=${res.data.hubId}`;
+
+        const interval = setInterval((): void => {
+          setCountdown((prev: number): number => {
+            if (prev === 1) {
+              clearInterval(interval);
+              router.push(dashboardUrl);
+            }
+            return prev - 1;
           });
-
-          toast.success("Invitation accepted!");
-          setStatus("accepted");
-
-          const interval = setInterval((): void => {
-            setCountdown((prev: number): number => {
-              if (prev === 1) {
-                clearInterval(interval);
-                router.push("/me/dashboard");
-              }
-              return prev - 1;
-            });
-          }, 1000);
-        } catch (err) {
-          console.error("Failed to set active hub cookie", err);
-          toast.error("Invitation accepted but failed to set active hub");
-          setStatus("error");
-        }
+        }, 1000);
       } else {
         toast.error(res.message);
         setStatus("error");
@@ -84,7 +77,14 @@ export default function AcceptInvitationPage() {
             </p>
             <Button
               variant="outline"
-              onClick={() => router.push("/me/dashboard")}
+              onClick={() => {
+                // Navigate to dashboard with hub query parameter
+                if (acceptedHubId) {
+                  router.push(`/me/dashboard?hub=${acceptedHubId}`);
+                } else {
+                  router.push("/me/dashboard");
+                }
+              }}
               className="mt-2"
             >
               Go Now

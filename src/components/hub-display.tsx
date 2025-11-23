@@ -19,14 +19,13 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./ui/spinner";
-import { useHubStore } from "@/store/hub-store";
-import { useRouter } from "next/navigation";
-import { switchHub } from "@/lib/services/hub-switch";
+import { useHubNavigation } from "@/hooks/use-hub-navigation";
+import { useSearchParams } from "next/navigation";
 
 export function HubDisplay() {
-  const router = useRouter();
-
-  const { activeHubId, setActiveHubId } = useHubStore();
+  const searchParams = useSearchParams();
+  const currentHubId = searchParams.get("hub");
+  const { switchHub } = useHubNavigation();
 
   const [hubs, setHubs] = useState<Hub[]>([]);
   const [selectedHub, setSelectedHub] = useState<Hub | null>(null);
@@ -43,8 +42,9 @@ export function HubDisplay() {
         if (res.success && res.data?.length) {
           setHubs(res.data);
 
+          // Find current hub from URL param, or default to first hub
           const current =
-            res.data.find((h: Hub): boolean => h.id === activeHubId) ??
+            res.data.find((h: Hub): boolean => h.id === currentHubId) ??
             res.data[0];
 
           setSelectedHub(current);
@@ -58,7 +58,17 @@ export function HubDisplay() {
     };
 
     fetchHubs();
-  }, []);
+  }, [currentHubId]);
+
+  // Update selected hub when URL param changes
+  useEffect(() => {
+    if (currentHubId && hubs.length > 0) {
+      const hub = hubs.find((h) => h.id === currentHubId);
+      if (hub) {
+        setSelectedHub(hub);
+      }
+    }
+  }, [currentHubId, hubs]);
 
   if (loading) {
     return (
@@ -102,19 +112,11 @@ export function HubDisplay() {
               <CommandItem
                 key={hub.id}
                 value={hub.name}
-                onSelect={async (): Promise<void> => {
+                onSelect={(): void => {
                   setSelectedHub(hub);
                   setOpen(false);
-
-                  setActiveHubId(hub.id);
-
-                  try {
-                    await switchHub(hub.id);
-                    router.refresh();
-                  } catch (err) {
-                    console.error("Failed to switch hub on server", err);
-                    toast.error("Failed to switch hub");
-                  }
+                  // Switch hub by updating URL query parameter
+                  switchHub(hub.id);
                 }}
                 className={cn(
                   "cursor-pointer",

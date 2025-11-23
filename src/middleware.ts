@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 export async function middleware(request: NextRequest) {
-  
   const sessionCookie = getSessionCookie(request);
 
   if (!sessionCookie) {
@@ -10,8 +9,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/signin", request.url));
   }
 
-  // Continue to the requested route if the session cookie exists
-  return NextResponse.next();
+  // Sync URL query parameter (?hub=id) to cookie for server-side access
+  const hubId = request.nextUrl.searchParams.get("hub");
+  const response = NextResponse.next();
+
+  if (hubId) {
+    // Validate hub ID format (basic check)
+    if (hubId.match(/^[a-zA-Z0-9-_]+$/)) {
+      response.cookies.set("activeHubId", hubId, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: "/",
+      });
+    }
+  }
+
+  return response;
 }
 
 export const config = {

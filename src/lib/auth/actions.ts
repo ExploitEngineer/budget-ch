@@ -10,6 +10,7 @@ import {
   getSubscriptionByUserId,
 } from "@/db/queries";
 import { UserType } from "@/db/schema";
+import { getDefaultHubId } from "@/lib/services/hub";
 
 export async function getContext(headersObj: Headers, requireAccount = false) {
   const session = await auth.api.getSession({ headers: headersObj });
@@ -18,6 +19,7 @@ export async function getContext(headersObj: Headers, requireAccount = false) {
   const userId = session.user.id;
   const user = session.user as UserType;
 
+  // Read hub ID from cookie (which middleware syncs from URL query param)
   const cookieHeader = headersObj.get("cookie");
   let activeHubId =
     cookieHeader
@@ -25,19 +27,26 @@ export async function getContext(headersObj: Headers, requireAccount = false) {
       .find((c) => c.startsWith("activeHubId="))
       ?.split("=")[1] ?? null;
 
-  // Validate cookie hub exists in DB
+  // Validate cookie hub exists in DB and user has access
   if (activeHubId) {
     const hubExists = await getHubByIdDB(activeHubId);
-    if (!hubExists) activeHubId = null; // reset if invalid
+    if (!hubExists) {
+      activeHubId = null; // reset if invalid
+    } else {
+      // Verify user has access to this hub
+      const hubMember = await getHubMemberRoleDB(userId, activeHubId);
+      const ownedHub = await getOwnedHubDB(userId);
+      
+      if (!hubMember && ownedHub?.id !== activeHubId) {
+        // User doesn't have access, reset to default
+        activeHubId = null;
+      }
+    }
   }
 
-  // Fallback: first hub where user is member or owner
+  // Fallback: get user's default hub (owned hub or first member hub)
   if (!activeHubId) {
-    const hubMemberRow = await getFirstHubMemberDB(userId);
-    const ownedHub = await getOwnedHubDB(userId);
-
-    // Prefer member hub first, then owned hub
-    activeHubId = hubMemberRow?.hubId ?? ownedHub?.id ?? null;
+    activeHubId = await getDefaultHubId(userId);
   }
 
   if (!activeHubId) throw new Error("No hub selected for this user");

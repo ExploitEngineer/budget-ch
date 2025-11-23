@@ -1,3 +1,8 @@
+/**
+ * @deprecated Hub state is now managed via URL query parameter (?hub=id)
+ * Use useHubNavigation hook instead for hub-related navigation
+ * This store is kept for backward compatibility but should not be used in new code
+ */
 import { create } from "zustand";
 
 interface HubState {
@@ -7,17 +12,9 @@ interface HubState {
 
 export const useHubStore = create<HubState>((set) => ({
   activeHubId: null,
-  setActiveHubId: async (hubId: string): Promise<void> => {
+  setActiveHubId: (hubId: string): void => {
+    // No-op: Hub is now managed via URL query parameter
+    // This is kept for backward compatibility only
     set({ activeHubId: hubId });
-
-    try {
-      await fetch("/api/switch-hub", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ hubId }),
-      });
-    } catch (err) {
-      console.error("Failed to update active hub on server", err);
-    }
   },
 }));
