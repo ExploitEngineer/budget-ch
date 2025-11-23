@@ -34,7 +34,7 @@ import {
   FeatureAccessResult,
 } from "@/lib/services/features-permission";
 import { toast } from "sonner";
-import { useHubNavigation } from "@/hooks/use-hub-navigation";
+import { getUrlWithHubFromCookie } from "@/hooks/use-hub-sync";
 
 interface Items {
   title: string;
@@ -52,7 +52,6 @@ export function NavMain() {
   const router = useRouter();
   const t = useTranslations("main-dashboard");
   const pathname = usePathname();
-  const { getUrlWithHub } = useHubNavigation();
 
   useEffect((): void => {
     canAccessFeature("reports").then((res: FeatureAccessResult): void => {
@@ -153,7 +152,7 @@ export function NavMain() {
             >
               <Link
                 key={item.title}
-                href={isRestricted ? "#" : (item.url ? getUrlWithHub(item.url) : "")}
+                href={isRestricted ? "#" : (item.url ? getUrlWithHubFromCookie(item.url) : "")}
                 onClick={(e): false | void =>
                   isRestricted && e.preventDefault()
                 }

@@ -9,23 +9,30 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/signin", request.url));
   }
 
-  // Sync URL query parameter (?hub=id) to cookie for server-side access
-  const hubId = request.nextUrl.searchParams.get("hub");
   const response = NextResponse.next();
+  const urlHubId = request.nextUrl.searchParams.get("hub");
+  const cookieHubId = request.cookies.get("activeHubId")?.value;
 
-  if (hubId) {
-    // Validate hub ID format (basic check)
-    if (hubId.match(/^[a-zA-Z0-9-_]+$/)) {
-      response.cookies.set("activeHubId", hubId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 30, // 30 days
-        path: "/",
-      });
-    }
+  // Priority 1: If URL has hub param, sync it to cookie
+  if (urlHubId && urlHubId.match(/^[a-zA-Z0-9-_]+$/)) {
+    response.cookies.set("activeHubId", urlHubId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: "/",
+    });
+    return response;
   }
 
+  // Priority 2: If cookie exists but URL doesn't have hub param, add it to URL
+  if (cookieHubId && !urlHubId) {
+    const url = request.nextUrl.clone();
+    url.searchParams.set("hub", cookieHubId);
+    return NextResponse.redirect(url);
+  }
+
+  // No cookie and no URL param - let client component handle default hub
   return response;
 }
 

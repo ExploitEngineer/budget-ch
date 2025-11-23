@@ -19,13 +19,14 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./ui/spinner";
-import { useHubNavigation } from "@/hooks/use-hub-navigation";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
+import { switchHub } from "@/lib/services/hub-switch";
 
 export function HubDisplay() {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
   const currentHubId = searchParams.get("hub");
-  const { switchHub } = useHubNavigation();
 
   const [hubs, setHubs] = useState<Hub[]>([]);
   const [selectedHub, setSelectedHub] = useState<Hub | null>(null);
@@ -112,11 +113,21 @@ export function HubDisplay() {
               <CommandItem
                 key={hub.id}
                 value={hub.name}
-                onSelect={(): void => {
+                onSelect={async (): Promise<void> => {
                   setSelectedHub(hub);
                   setOpen(false);
-                  // Switch hub by updating URL query parameter
-                  switchHub(hub.id);
+                  
+                  // Update cookie via server action
+                  try {
+                    await switchHub(hub.id);
+                    // Update URL with hub param
+                    const url = new URL(pathname, window.location.origin);
+                    url.searchParams.set("hub", hub.id);
+                    router.push(url.pathname + url.search);
+                  } catch (err) {
+                    console.error("Failed to switch hub", err);
+                    toast.error("Failed to switch hub");
+                  }
                 }}
                 className={cn(
                   "cursor-pointer",

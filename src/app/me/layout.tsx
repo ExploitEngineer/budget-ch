@@ -3,7 +3,7 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { getDefaultHubId } from "@/lib/services/hub";
+import { HubSync } from "@/components/hub-sync";
 
 export default async function DashboardLayout({
   children,
@@ -18,13 +18,14 @@ export default async function DashboardLayout({
     redirect("/signin");
   }
 
-  // Note: Hub ID is now managed via URL query parameter (?hub=id)
-  // Middleware syncs it to cookie for server-side access
-  // getContext() handles fallback to default hub if no param provided
+  // Note: Hub ID is managed via cookie (source of truth)
+  // Middleware syncs cookie to URL when navigating
+  // HubSync component handles default hub when no cookie/URL param exists
 
   return (
     <SidebarProvider>
       <AppSidebar />
+      <HubSync />
       <SidebarInset className="bg-gray-100/55 dark:![background:var(--fancy-gradient)]">
         {children}
       </SidebarInset>

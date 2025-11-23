@@ -29,6 +29,36 @@ export async function getDefaultHubId(userId: string): Promise<string | null> {
   }
 }
 
+// GET Default Hub ID for Current User [Action]
+export async function getDefaultHubIdAction(): Promise<{
+  success: boolean;
+  data?: string | null;
+  message?: string;
+}> {
+  try {
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs });
+    
+    if (!session?.user) {
+      return { success: false, message: "User not found" };
+    }
+
+    const userId = session.user.id;
+    const defaultHubId = await getDefaultHubId(userId);
+
+    return {
+      success: true,
+      data: defaultHubId,
+    };
+  } catch (error) {
+    console.error("Error in getDefaultHubIdAction:", error);
+    return {
+      success: false,
+      message: (error as Error).message || "Failed to get default hub",
+    };
+  }
+}
+
 // GET Hubs for Current User [Action]
 export async function getHubs(): Promise<GetHubsResponse> {
   try {

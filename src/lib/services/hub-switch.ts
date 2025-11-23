@@ -1,12 +1,11 @@
-/**
- * @deprecated Hub switching is now handled via URL query parameter (?hub=id)
- * Use useHubNavigation hook's switchHub function instead
- * This server action is kept for backward compatibility but should not be used in new code
- */
 "use server";
 
 import { cookies } from "next/headers";
 
+/**
+ * Switch hub by updating cookie (source of truth)
+ * Middleware will sync cookie to URL when navigating
+ */
 export async function switchHub(hubId: string) {
   const cookieStore = await cookies();
 

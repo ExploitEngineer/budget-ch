@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { acceptHubInvitation } from "@/lib/services/hub-invitation";
+import { switchHub } from "@/lib/services/hub-switch";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,18 +34,27 @@ export default function AcceptInvitationPage() {
         setStatus("accepted");
         setAcceptedHubId(res.data.hubId);
 
-        // Navigate to dashboard with hub query parameter
-        const dashboardUrl = `/me/dashboard?hub=${res.data.hubId}`;
+        // Set cookie via server action, then navigate
+        try {
+          await switchHub(res.data.hubId);
 
-        const interval = setInterval((): void => {
-          setCountdown((prev: number): number => {
-            if (prev === 1) {
-              clearInterval(interval);
-              router.push(dashboardUrl);
-            }
-            return prev - 1;
-          });
-        }, 1000);
+          // Navigate to dashboard with hub query parameter
+          const dashboardUrl = `/me/dashboard?hub=${res.data.hubId}`;
+
+          const interval = setInterval((): void => {
+            setCountdown((prev: number): number => {
+              if (prev === 1) {
+                clearInterval(interval);
+                router.push(dashboardUrl);
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        } catch (err) {
+          console.error("Failed to set hub cookie:", err);
+          toast.error("Invitation accepted but failed to set active hub");
+          setStatus("error");
+        }
       } else {
         toast.error(res.message);
         setStatus("error");
