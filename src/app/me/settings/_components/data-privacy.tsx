@@ -13,9 +13,12 @@ import { useExportCSV } from "@/hooks/use-export-csv";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
 import { useDashboardStore } from "@/store/dashboard-store";
 import { useBudgetStore } from "@/store/budget-store";
-import { useAccountStore } from "@/store/account-store";
 import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 import {
   Dialog,
   DialogTrigger,
@@ -37,7 +40,18 @@ export function DataPrivacy() {
 
   const { transactions } = useDashboardStore();
   const { budgets } = useBudgetStore();
-  const { accounts } = useAccountStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+  const { data: accounts } = useQuery({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+  });
   const { goals } = useSavingGoalStore();
 
   const { exportAllDataJSON } = useExportCSV();

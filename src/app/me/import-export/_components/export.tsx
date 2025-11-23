@@ -9,8 +9,11 @@ import { useDashboardStore } from "@/store/dashboard-store";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useEffect, useState } from "react";
 import { useBudgetStore } from "@/store/budget-store";
-import { useAccountStore } from "@/store/account-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
 import { useSavingGoalStore } from "@/store/saving-goal-store";
@@ -22,7 +25,18 @@ export function Export() {
 
   const { transactions, fetchTransactions } = useDashboardStore();
   const { budgets, fetchBudgets } = useBudgetStore();
-  const { accounts, fetchAccounts } = useAccountStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+  const { data: accounts } = useQuery({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+  });
   const { goals, fetchGoals } = useSavingGoalStore();
   const {
     exportTransactions,
@@ -55,7 +69,6 @@ export function Export() {
   useEffect(() => {
     fetchTransactions();
     fetchBudgets();
-    fetchAccounts();
     fetchGoals();
     fetchTransfers();
   }, []);
@@ -83,7 +96,7 @@ export function Export() {
     },
     {
       title: t("export-card.buttons.accounts"),
-      onClick: () => exportAccounts({ accounts }),
+      onClick: () => exportAccounts({ accounts: accounts ?? null }),
     },
     {
       title: t("export-card.buttons.transfers"),

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -14,8 +13,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import EditAccountDialog from "./edit-account-dialog";
-import { useAccountStore } from "@/store/account-store";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 import { useExportCSV } from "@/hooks/use-export-csv";
+import type { AccountRow } from "@/lib/types/row-types";
 
 export interface AccountData {
   id: string;
@@ -31,18 +34,23 @@ export function ContentDataTable() {
   const t = useTranslations("main-dashboard.content-page.data-table");
 
   const { exportAccounts } = useExportCSV();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    accounts,
-    accountsLoading,
-    accountsError,
-    fetchAccounts,
-    refreshAccounts,
-  } = useAccountStore();
-
-  useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
+    data: accounts,
+    isLoading: accountsLoading,
+    error: accountsError,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+  });
 
   const totalBalance = (accounts ?? []).reduce((sum, acc) => {
     const amount =
@@ -74,7 +82,7 @@ export function ContentDataTable() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => exportAccounts({ accounts })}
+              onClick={() => exportAccounts({ accounts: accounts ?? null })}
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.export")}
@@ -107,10 +115,12 @@ export function ContentDataTable() {
               {accountsError ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-red-500">
-                    {accountsError}
+                    {accountsError instanceof Error
+                      ? accountsError.message
+                      : "Failed to load accounts"}
                   </TableCell>
                 </TableRow>
-              ) : accountsLoading || accounts === null ? (
+              ) : accountsLoading || !accounts ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
                     {t("loading")}
@@ -137,7 +147,6 @@ export function ContentDataTable() {
                         <EditAccountDialog
                           variant="outline"
                           accountData={data}
-                          fetchData={() => refreshAccounts()}
                         />
                       </TableCell>
                     </TableRow>

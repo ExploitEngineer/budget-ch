@@ -36,31 +36,73 @@ import {
   FinancialAccountDialogValues,
 } from "@/lib/validations/financial-account-dialog-validations";
 import { cn } from "@/lib/utils";
-import { useAccountStore } from "@/store/account-store";
-import type { AccountRow } from "@/store/account-store";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  updateFinancialAccount,
+  deleteFinancialAccount,
+} from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import type { AccountRow } from "@/lib/types/row-types";
 
 interface EditAccountDialogProps {
   accountData: AccountRow;
-  fetchData: () => Promise<void>;
   variant?: "gradient" | "outline";
 }
 
 export default function EditAccountDialog({
   accountData,
-  fetchData,
   variant,
 }: EditAccountDialogProps) {
   const t = useTranslations(
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
-  const {
-    updateAccountAndSync,
-    deleteAccountAndSync,
-    updateLoading,
-    deleteLoading,
-  } = useAccountStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
   const [open, setOpen] = useState(false);
+
+  const updateAccount = useMutation({
+    mutationFn: async ({
+      accountId,
+      updatedData,
+    }: {
+      accountId: string;
+      updatedData: any;
+    }) => {
+      const result = await updateFinancialAccount(accountId, updatedData);
+      if (!result.status) {
+        throw new Error(result.message || "Failed to update account");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Account updated successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update account");
+    },
+  });
+
+  const deleteAccount = useMutation({
+    mutationFn: async (accountId: string) => {
+      const result = await deleteFinancialAccount(accountId);
+      if (!result.status) {
+        throw new Error(result.message || "Failed to delete account");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Account deleted successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to delete account");
+    },
+  });
 
   const form = useForm<FinancialAccountDialogValues>({
     resolver: zodResolver(FinancialAccountDialogSchema) as any,
@@ -75,20 +117,23 @@ export default function EditAccountDialog({
 
   async function onSubmit(values: FinancialAccountDialogValues) {
     try {
-      await updateAccountAndSync(accountData.id, values);
-      await fetchData();
+      await updateAccount.mutateAsync({
+        accountId: accountData.id,
+        updatedData: values,
+      });
       setOpen(false);
     } catch (err: any) {
+      // Error is already handled by the mutation (toast)
       console.error("Error submitting form:", err);
     }
   }
 
   async function handleDelete() {
     try {
-      await deleteAccountAndSync(accountData.id);
-      await fetchData();
+      await deleteAccount.mutateAsync(accountData.id);
       setOpen(false);
     } catch (err: any) {
+      // Error is already handled by the mutation (toast)
       console.error("Error deleting account:", err);
     }
   }
@@ -249,16 +294,16 @@ export default function EditAccountDialog({
                 variant="outline"
                 className="cursor-pointer"
                 onClick={handleDelete}
-                disabled={deleteLoading}
+                disabled={deleteAccount.isPending}
               >
-                {deleteLoading ? <Spinner /> : t("delete")}
+                {deleteAccount.isPending ? <Spinner /> : t("delete")}
               </Button>
               <Button
                 type="submit"
                 className="cursor-pointer"
-                disabled={updateLoading}
+                disabled={updateAccount.isPending}
               >
-                {updateLoading ? <Spinner /> : t("save")}
+                {updateAccount.isPending ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

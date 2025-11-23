@@ -10,18 +10,31 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
-import { useAccountStore } from "@/store/account-store";
-import type { AccountRow } from "@/store/account-store";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { AccountRow } from "@/lib/types/row-types";
 
 export function ContentCardsSection() {
   const t = useTranslations("main-dashboard.content-page");
-  const { accounts, accountsLoading, accountsError, fetchAccounts } =
-    useAccountStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
-  useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+    error: accountsError,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+  });
 
   const parsedAccounts = (accounts ?? []).map((acc) => ({
     ...acc,
