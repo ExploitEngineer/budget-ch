@@ -1,4 +1,9 @@
 {
+    "common": {
+        "updating": "Updating...",
+        "update": "Update",
+        "add": "Add"
+    },
     "greeting": {
         "cta": "Dashboard"
     },
@@ -630,7 +635,8 @@
                             "checking-account": "Checking Account",
                             "button": "Allocation",
                             "new-balance": "New Balance",
-                            "placeholder": "Amount"
+                            "placeholder": "Amount",
+                            "updating": "Updating..."
                         }
                     }
                 }

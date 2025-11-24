@@ -39,7 +39,7 @@ export default async function Settings() {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <ProfileHousehold />
+        <ProfileHousehold user={user} subscription={subscription} />
         {subscriptionInfo && (
           <CurrentSubscription subscription={subscriptionInfo} />
         )}

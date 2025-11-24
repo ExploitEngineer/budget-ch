@@ -1,4 +1,9 @@
 {
+    "common": {
+        "updating": "Aggiornamento...",
+        "update": "Aggiorna",
+        "add": "Aggiungi"
+    },
     "greeting": {
         "title": "Come stai?",
         "cta": "Cliccami"

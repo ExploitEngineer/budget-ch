@@ -1,4 +1,9 @@
 {
+    "common": {
+        "updating": "Aktualisieren...",
+        "update": "Aktualisieren",
+        "add": "Hinzufügen"
+    },
     "greeting": {
         "title": "Wie geht es dir?",
         "cta": "Klick mich"

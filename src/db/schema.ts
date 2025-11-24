@@ -337,3 +337,20 @@ export const accountTransfers = pgTable("account_transfers", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
 });
+
+export const userSettings = pgTable("user_settings", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  userId: text("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  householdSize: text("household_size"),
+  address: text("address"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => /* @__PURE__ */ new Date())
+    .notNull(),
+});
+
+export type UserSettingsType = InferSelectModel<typeof userSettings>;

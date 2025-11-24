@@ -32,7 +32,7 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.active-goals-section",
   );
-
+  const tc = useTranslations("common");
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -88,11 +88,11 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
           className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-3"
         >
           {updateGoalMutation.isPending ? (
-            "Updating..."
+            tc("updating")
           ) : (
             <>
               <Plus />
-              <span>{t("cards.tax-reserves.content.button")}</span>
+              <span>{tc("add")}</span>
             </>
           )}
         </Button>

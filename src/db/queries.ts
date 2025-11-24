@@ -12,9 +12,10 @@ import {
   subscriptions,
   accountTransfers,
   hubInvitations,
+  userSettings,
 } from "./schema";
 import { eq, desc, gte, lte, sql, inArray, and, or } from "drizzle-orm";
-import type { QuickTask, UserType, SubscriptionType } from "./schema";
+import type { QuickTask, UserType, SubscriptionType, UserSettingsType } from "./schema";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
@@ -2057,4 +2058,81 @@ export async function getMonthlyTransactionCount(
       lte(transactions.addedAt, now),
     ),
   );
+}
+
+// GET User Settings
+export async function getUserSettingsDB(
+  userId: string,
+): Promise<{ success: boolean; message: string; data?: UserSettingsType | null }> {
+  try {
+    const settings = await db.query.userSettings.findFirst({
+      where: eq(userSettings.userId, userId),
+    });
+
+    return {
+      success: true,
+      message: "User settings retrieved successfully",
+      data: settings ?? null,
+    };
+  } catch (err) {
+    console.error("Error fetching user settings: ", err);
+    return {
+      success: false,
+      message: `Failed to fetch user settings: ${(err as Error).message}`,
+    };
+  }
+}
+
+// CREATE or UPDATE User Settings
+export async function upsertUserSettingsDB(
+  userId: string,
+  updateData: {
+    householdSize?: string | null;
+    address?: string | null;
+  },
+): Promise<{ success: boolean; message: string; data?: UserSettingsType }> {
+  try {
+    const existingSettings = await db.query.userSettings.findFirst({
+      where: eq(userSettings.userId, userId),
+    });
+
+    if (existingSettings) {
+      // Update existing settings
+      const [updatedSettings] = await db
+        .update(userSettings)
+        .set({
+          ...updateData,
+          updatedAt: new Date(),
+        })
+        .where(eq(userSettings.userId, userId))
+        .returning();
+
+      return {
+        success: true,
+        message: "User settings updated successfully",
+        data: updatedSettings,
+      };
+    } else {
+      // Create new settings
+      const [newSettings] = await db
+        .insert(userSettings)
+        .values({
+          userId,
+          ...updateData,
+        })
+        .returning();
+
+      return {
+        success: true,
+        message: "User settings created successfully",
+        data: newSettings,
+      };
+    }
+  } catch (err) {
+    console.error("Error upserting user settings: ", err);
+    return {
+      success: false,
+      message: `Failed to upsert user settings: ${(err as Error).message}`,
+    };
+  }
 }

@@ -39,7 +39,7 @@ export const mainFormSchema = z.object({
 
 export type MainFormValues = z.infer<typeof mainFormSchema>;
 
-const householdSizes = ["single", "couple", "family"] as const;
+const householdSizes = ["single", "2", "3", "4", "5+"] as const;
 const subscriptionPlans = ["free", "individual", "family"] as const;
 
 export const profileHouseholdSchema = z.object({

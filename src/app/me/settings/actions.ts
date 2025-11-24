@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 
 import { auth } from "@/lib/auth/auth";
 import { createCustomerPortalSession } from "@/lib/stripe/stripe-utils";
+import { updateProfileHousehold } from "@/lib/services/user";
 
 export async function createStripePortalSession() {
   const hdrs = await headers();
@@ -22,5 +23,13 @@ export async function createStripePortalSession() {
     customerId: stripeCustomerId,
     returnUrl: `${process.env.NEXT_PUBLIC_APP_URL}/me/settings`,
   });
+}
+
+export async function updateProfileHouseholdAction(data: {
+  name: string;
+  householdSize?: string | null;
+  address?: string | null;
+}) {
+  return await updateProfileHousehold(data);
 }
 
