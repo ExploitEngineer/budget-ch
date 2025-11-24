@@ -11,13 +11,13 @@ import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { useDashboardStore } from "@/store/dashboard-store";
 import { useBudgetStore } from "@/store/budget-store";
 import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { accountKeys } from "@/lib/query-keys";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { accountKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import {
   Dialog,
@@ -38,7 +38,6 @@ export function DataPrivacy() {
     "main-dashboard.settings-page.data-privacy-section",
   );
 
-  const { transactions } = useDashboardStore();
   const { budgets } = useBudgetStore();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -50,6 +49,16 @@ export function DataPrivacy() {
         throw new Error("Failed to fetch accounts");
       }
       return res.tableData ?? [];
+    },
+  });
+  const { data: transactions } = useQuery({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
     },
   });
   const { goals } = useSavingGoalStore();

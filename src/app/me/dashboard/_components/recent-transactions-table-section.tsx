@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -13,21 +12,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import { useDashboardStore } from "@/store/dashboard-store";
+import { useQuery } from "@tanstack/react-query";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { Transaction } from "@/lib/types/dashboard-types";
 
 export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    transactions,
-    transactionError,
-    transactionLoading,
-    fetchTransactions,
-  } = useDashboardStore();
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
+    data: transactions,
+    isLoading: transactionLoading,
+    error: transactionError,
+  } = useQuery<Partial<Transaction>[]>({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const headings = [
     t("recent-transactions-table.table-headings.date"),

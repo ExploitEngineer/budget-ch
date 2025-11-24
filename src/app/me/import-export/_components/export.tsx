@@ -5,14 +5,14 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { useDashboardStore } from "@/store/dashboard-store";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useEffect, useState } from "react";
 import { useBudgetStore } from "@/store/budget-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { accountKeys } from "@/lib/query-keys";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { accountKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
@@ -23,7 +23,6 @@ export function Export() {
 
   const [transfers, setTransfers] = useState<TransferData[]>([]);
 
-  const { transactions, fetchTransactions } = useDashboardStore();
   const { budgets, fetchBudgets } = useBudgetStore();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -35,6 +34,16 @@ export function Export() {
         throw new Error("Failed to fetch accounts");
       }
       return res.tableData ?? [];
+    },
+  });
+  const { data: transactions } = useQuery({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
     },
   });
   const { goals, fetchGoals } = useSavingGoalStore();
@@ -67,7 +76,6 @@ export function Export() {
   }
 
   useEffect(() => {
-    fetchTransactions();
     fetchBudgets();
     fetchGoals();
     fetchTransfers();

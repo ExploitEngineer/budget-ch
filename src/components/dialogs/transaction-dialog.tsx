@@ -44,7 +44,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import AddCategory from "@/app/me/dashboard/_components/add-category-dialog";
-import { useDashboardStore } from "@/store/dashboard-store";
+import { useQueryClient } from "@tanstack/react-query";
+import { transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 
 export default function TransactionDialog() {
   const [open, setOpen] = useState<boolean>(false);
@@ -53,7 +55,9 @@ export default function TransactionDialog() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { refreshTransactions } = useDashboardStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const form = useForm<TransactionDialogValues>({
     resolver: zodResolver(TransactionDialogSchema) as any,
@@ -97,7 +101,8 @@ export default function TransactionDialog() {
       form.reset();
       setSelectedCategory(null);
       setCategories([]);
-      refreshTransactions()
+      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
 
       setOpen(false);
     } catch (err: any) {

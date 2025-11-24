@@ -6,21 +6,31 @@ import { CalculationSection } from "./calculations-section";
 import { DataTable } from "./data-table";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import type { CalculationFormValues } from "@/lib/validations/calculation-section-validations";
-import { useDashboardStore } from "@/store/dashboard-store";
+import { useQuery } from "@tanstack/react-query";
+import { getTransactions } from "@/lib/services/transaction";
+import { transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 
 export default function TransactionsClient() {
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+
   const {
-    transactions,
-    transactionLoading,
-    transactionError,
-    fetchTransactions,
-  } = useDashboardStore();
+    data: transactions,
+    isLoading: transactionLoading,
+    error: transactionError,
+  } = useQuery<Transaction[]>({
+    queryKey: transactionKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transactions");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const [filtered, setFiltered] = useState<Omit<Transaction, "type">[]>([]);
-
-  useEffect(() => {
-    fetchTransactions?.();
-  }, [fetchTransactions]);
 
   useEffect(() => {
     const sanitized = (transactions ?? []).map(
@@ -100,7 +110,7 @@ export default function TransactionsClient() {
         <DataTable
           transactions={filtered}
           loading={transactionLoading}
-          error={transactionError}
+          error={transactionError?.message ?? null}
         />
       </div>
     </section>

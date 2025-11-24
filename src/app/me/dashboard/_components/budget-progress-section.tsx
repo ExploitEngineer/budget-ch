@@ -9,49 +9,126 @@ import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Plus, X } from "lucide-react";
-import { useDashboardStore } from "@/store/dashboard-store";
-import { useState, useRef, useEffect } from "react";
-import Link from "next/link"
+import { useState, useRef } from "react";
+import Link from "next/link";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getTasks, createTask, updateTask, deleteTask } from "@/lib/services/tasks";
+import { getTopCategories } from "@/lib/services/budget";
+import { taskKeys, budgetKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import type { QuickTask } from "@/db/schema";
+import type { DashboardSavingsGoalsCards } from "@/lib/types/dashboard-types";
 
 export function BudgetProgressSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
-
-  const {
-    tasks,
-    tasksError,
-    tasksLoading,
-    fetchTasks,
-    createNewTask,
-    toggleTask,
-    deleteTaskById,
-    editTaskName,
-    topCategories,
-    fetchTopCategories,
-    categoriesLoading,
-    categoriesError,
-  } = useDashboardStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
   const editInputRef = useRef<HTMLInputElement | null>(null);
 
-  useEffect(() => {
-    fetchTasks();
-    fetchTopCategories();
-  }, [fetchTasks, fetchTopCategories]);
+  // Tasks query
+  const {
+    data: tasks,
+    isLoading: tasksLoading,
+    error: tasksError,
+  } = useQuery<QuickTask[]>({
+    queryKey: taskKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getTasks();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch tasks");
+      }
+      return res.data ?? [];
+    },
+  });
+
+  // Top categories query
+  const {
+    data: topCategories,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useQuery<DashboardSavingsGoalsCards[]>({
+    queryKey: budgetKeys.topCategories(hubId),
+    queryFn: async () => {
+      const res = await getTopCategories();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data ?? [];
+    },
+  });
+
+  // Create task mutation
+  const createTaskMutation = useMutation({
+    mutationFn: async (name: string) => {
+      if (!name.trim()) return;
+      const res = await createTask({ name, checked: false });
+      if (!res.success) {
+        throw new Error(res.message || "Failed to create task");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) });
+      toast.success("Task created");
+      setNewTask("");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create task");
+    },
+  });
+
+  // Update task mutation
+  const updateTaskMutation = useMutation({
+    mutationFn: async ({ taskId, name, checked }: { taskId: string; name?: string; checked?: boolean }) => {
+      const res = await updateTask({ taskId, name, checked });
+      if (!res.success) {
+        throw new Error(res.message || "Failed to update task");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update task");
+    },
+  });
+
+  // Delete task mutation
+  const deleteTaskMutation = useMutation({
+    mutationFn: async (taskId: string) => {
+      const res = await deleteTask(taskId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to delete task");
+      }
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) });
+      toast.success("Task deleted");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to delete task");
+    },
+  });
 
   const handleAddTask = async () => {
-    await createNewTask(newTask);
-    setNewTask("");
+    if (!newTask.trim()) return;
+    await createTaskMutation.mutateAsync(newTask);
   };
 
   const handleToggle = async (taskId: string, checked: boolean) => {
-    await toggleTask(taskId, checked);
+    await updateTaskMutation.mutateAsync({ taskId, checked });
   };
 
   const handleDelete = async (taskId: string) => {
-    await deleteTaskById(taskId);
+    await deleteTaskMutation.mutateAsync(taskId);
   };
 
   const startEditing = (taskId: string, name: string) => {
@@ -61,7 +138,16 @@ export function BudgetProgressSection() {
   };
 
   const saveEdit = async (taskId: string) => {
-    await editTaskName(taskId, editingText);
+    if (!editingText.trim()) {
+      cancelEdit();
+      return;
+    }
+    const task = tasks?.find((t) => t.id === taskId);
+    if (task && task.name === editingText) {
+      cancelEdit();
+      return;
+    }
+    await updateTaskMutation.mutateAsync({ taskId, name: editingText });
     setEditingId(null);
     setEditingText("");
   };
@@ -197,13 +283,13 @@ export function BudgetProgressSection() {
             value={newTask}
             onChange={(e) => setNewTask(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
-            disabled={tasksLoading}
+            disabled={createTaskMutation.isPending || tasksLoading}
             className="!bg-dark-blue-background dark:border-border-blue"
             placeholder={t("todos.placeholder")}
           />
           <Button
             onClick={handleAddTask}
-            disabled={tasksLoading}
+            disabled={createTaskMutation.isPending || tasksLoading}
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
           >

@@ -31,7 +31,32 @@ export const transactionKeys = {
   recent: (hubId: string | null) => [...transactionKeys.all, "recent", hubId] as const,
 };
 
-// Future query keys can be added here:
-// export const budgetKeys = { ... }
-// etc.
+/**
+ * Query key factory for budgets
+ */
+export const budgetKeys = {
+  all: ["budgets"] as const,
+  lists: () => [...budgetKeys.all, "list"] as const,
+  list: (hubId: string | null) => [...budgetKeys.lists(), hubId] as const,
+  amounts: (hubId: string | null) => [...budgetKeys.all, "amounts", hubId] as const,
+  topCategories: (hubId: string | null) => [...budgetKeys.all, "top-categories", hubId] as const,
+};
+
+/**
+ * Query key factory for tasks
+ */
+export const taskKeys = {
+  all: ["tasks"] as const,
+  lists: () => [...taskKeys.all, "list"] as const,
+  list: (hubId: string | null) => [...taskKeys.lists(), hubId] as const,
+};
+
+/**
+ * Query key factory for saving goals
+ */
+export const savingGoalKeys = {
+  all: ["saving-goals"] as const,
+  lists: () => [...savingGoalKeys.all, "list"] as const,
+  list: (hubId: string | null, limit?: number) => [...savingGoalKeys.lists(), hubId, limit] as const,
+};
 

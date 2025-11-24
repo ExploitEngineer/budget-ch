@@ -9,30 +9,42 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { useDashboardStore } from "@/store/dashboard-store";
+import { useQuery } from "@tanstack/react-query";
+import { getBudgetsAmounts } from "@/lib/services/budget";
+import { budgetKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 import type { DashboardCards } from "@/lib/types/dashboard-types";
 
 export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    allocated,
-    spent,
-    available,
-    percent,
-    budgetLoading,
-    budgetError,
-    fetchBudgets,
-  } = useDashboardStore();
+    data: budgetAmounts,
+    isLoading: budgetLoading,
+    error: budgetError,
+  } = useQuery({
+    queryKey: budgetKeys.amounts(hubId),
+    queryFn: async () => {
+      const res = await getBudgetsAmounts();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data;
+    },
+  });
 
-  useEffect(() => {
-    fetchBudgets();
-  }, []);
+  const totalAllocated = budgetAmounts?.totalAllocated ?? 0;
+  const totalSpent = budgetAmounts?.totalSpent ?? 0;
+  const allocated = totalAllocated;
+  const spent = totalSpent;
+  const available = totalAllocated - totalSpent;
+  const percent =
+    totalAllocated > 0 ? Math.min((totalSpent / totalAllocated) * 100, 100) : 0;
 
-  const isLoading =
-    budgetLoading || allocated === null || spent === null || available === null;
+  const isLoading = budgetLoading || budgetAmounts === undefined;
 
   const cards: DashboardCards[] = [
     {
