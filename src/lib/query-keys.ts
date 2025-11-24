@@ -40,6 +40,7 @@ export const budgetKeys = {
   list: (hubId: string | null) => [...budgetKeys.lists(), hubId] as const,
   amounts: (hubId: string | null) => [...budgetKeys.all, "amounts", hubId] as const,
   topCategories: (hubId: string | null) => [...budgetKeys.all, "top-categories", hubId] as const,
+  categoriesCount: (hubId: string | null) => [...budgetKeys.all, "categories-count", hubId] as const,
 };
 
 /**

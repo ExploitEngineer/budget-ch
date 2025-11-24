@@ -9,9 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-import { useBudgetStore } from "@/store/budget-store";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { getBudgetsAmounts } from "@/lib/services/budget";
+import { getCategoriesCount } from "@/lib/services/category";
+import { budgetKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 
 interface CardsContent {
   title: string;
@@ -21,25 +24,53 @@ interface CardsContent {
 
 export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.budgets-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    allocated,
-    spent,
-    available,
-    percent,
-    amountsLoading,
-    amountsError,
-    fetchBudgetsAmounts,
-    categoriesCount,
-    categoriesLoading,
-    categoriesError,
-    fetchCategoriesCount,
-  } = useBudgetStore();
+    data: amounts,
+    isLoading: amountsLoading,
+    error: amountsError,
+  } = useQuery({
+    queryKey: budgetKeys.amounts(hubId),
+    queryFn: async () => {
+      const res = await getBudgetsAmounts();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budget amounts");
+      }
+      const totalAllocated = res.data?.totalAllocated ?? 0;
+      const totalSpent = res.data?.totalSpent ?? 0;
+      return {
+        allocated: totalAllocated,
+        spent: totalSpent,
+        available: totalAllocated - totalSpent,
+        percent:
+          totalAllocated > 0
+            ? Math.min((totalSpent / totalAllocated) * 100, 100)
+            : 0,
+      };
+    },
+  });
 
-  useEffect(() => {
-    fetchBudgetsAmounts();
-    fetchCategoriesCount();
-  }, [fetchBudgetsAmounts, fetchCategoriesCount]);
+  const {
+    data: categoriesCount,
+    isLoading: categoriesLoading,
+    error: categoriesError,
+  } = useQuery({
+    queryKey: budgetKeys.categoriesCount(hubId),
+    queryFn: async () => {
+      const res = await getCategoriesCount();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch categories count");
+      }
+      return Number(res.data?.count ?? 0);
+    },
+  });
+
+  const allocated = amounts?.allocated ?? null;
+  const spent = amounts?.spent ?? null;
+  const available = amounts?.available ?? null;
+  const percent = amounts?.percent ?? 0;
 
   const cards: CardsContent[] = [
     {

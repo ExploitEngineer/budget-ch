@@ -5,6 +5,7 @@ import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 import { getBudgetsDB, updateBudgetDB, deleteBudgetDB } from "@/db/queries";
 import { requireAdminRole } from "@/lib/auth/permissions";
+import type { BudgetRow } from "@/lib/types/row-types";
 
 export interface BaseBudgetFields {
   categoryName: string;
@@ -23,15 +24,6 @@ export interface UpdateBudgetInput {
   hubId: string;
   budgetId: string;
   updatedData: Partial<BaseBudgetFields>;
-}
-
-export interface BudgetRow {
-  id: string;
-  category: string;
-  allocated: number;
-  spent: number;
-  remaining: number;
-  progress: number;
 }
 
 export interface BudgetResponse<T = unknown> {

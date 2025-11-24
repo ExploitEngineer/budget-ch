@@ -931,7 +931,8 @@ export async function createBudgetDB({
   try {
     const normalizedName = categoryName.trim().toLowerCase();
 
-    const existingCategory = await db.query.transactionCategories.findFirst({
+    // Find or create the category
+    let category = await db.query.transactionCategories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
           sql`LOWER(${categories.name}) = ${normalizedName}`,
@@ -939,18 +940,35 @@ export async function createBudgetDB({
         ),
     });
 
-    if (existingCategory) {
-      throw new Error(`Category "${normalizedName}" already exists`);
+    // If category doesn't exist, create it
+    if (!category) {
+      const [newCategory] = await db
+        .insert(transactionCategories)
+        .values({
+          name: normalizedName,
+          hubId,
+        })
+        .returning();
+      category = newCategory;
     }
 
-    const [category] = await db
-      .insert(transactionCategories)
-      .values({
-        name: normalizedName,
-        hubId,
-      })
-      .returning();
+    // Check if a budget already exists for this category in this hub
+    const existingBudget = await db.query.budgets.findFirst({
+      where: (b, { and, eq }) =>
+        and(
+          eq(b.hubId, hubId),
+          eq(b.transactionCategoryId, category!.id),
+        ),
+    });
 
+    if (existingBudget) {
+      return {
+        success: false,
+        message: `A budget already exists for category "${categoryName}"`,
+      };
+    }
+
+    // Create the budget
     await db.insert(budgets).values({
       hubId,
       userId,

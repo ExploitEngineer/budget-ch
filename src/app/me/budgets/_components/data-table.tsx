@@ -22,31 +22,60 @@ import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
 import BudgetEditDialog from "./budget-edit-dialog";
-import { useEffect, useState, useMemo } from "react";
-import { useBudgetStore } from "@/store/budget-store";
+import { useState, useMemo } from "react";
 import { useExportCSV } from "@/hooks/use-export-csv";
+import { useQuery } from "@tanstack/react-query";
+import { getBudgets, getBudgetsAmounts } from "@/lib/services/budget";
+import { budgetKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { BudgetRow } from "@/lib/types/row-types";
 
 export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const { exportBudgets } = useExportCSV();
 
   const {
-    budgets,
-    budgetsLoading,
-    budgetsError,
-    allocated,
-    available,
-    fetchBudgets,
-    fetchBudgetsAmounts,
-  } = useBudgetStore();
+    data: budgets,
+    isLoading: budgetsLoading,
+    error: budgetsError,
+  } = useQuery<BudgetRow[]>({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
+    },
+  });
+
+  const {
+    data: amounts,
+    isLoading: amountsLoading,
+  } = useQuery({
+    queryKey: budgetKeys.amounts(hubId),
+    queryFn: async () => {
+      const res = await getBudgetsAmounts();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budget amounts");
+      }
+      const totalAllocated = res.data?.totalAllocated ?? 0;
+      const totalSpent = res.data?.totalSpent ?? 0;
+      return {
+        allocated: totalAllocated,
+        spent: totalSpent,
+        available: totalAllocated - totalSpent,
+      };
+    },
+  });
+
+  const allocated = amounts?.allocated ?? null;
+  const available = amounts?.available ?? null;
 
   const [warnFilter, setWarnFilter] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchBudgets();
-    fetchBudgetsAmounts();
-  }, [fetchBudgets, fetchBudgetsAmounts]);
 
   const budgetDataTableHeadings: string[] = [
     t("data-table.headings.category"),
@@ -126,10 +155,10 @@ export function BudgetDataTable() {
               {budgetsError ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center text-red-500">
-                    {budgetsError}
+                    {budgetsError.message || "Failed to load budgets"}
                   </TableCell>
                 </TableRow>
-              ) : budgetsLoading || budgets === null ? (
+              ) : budgetsLoading || budgets === undefined ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center">
                     Loading...

@@ -18,8 +18,19 @@ export interface AccountRow {
   note: string | null;
 }
 
+/**
+ * Budget row type for budgets table
+ */
+export interface BudgetRow {
+  id: string;
+  category: string;
+  allocated: number;
+  spent: number;
+  remaining: number;
+  progress: number;
+}
+
 // Future row types can be added here:
-// export interface BudgetRow { ... }
 // export interface TransactionRow { ... }
 // export interface SavingGoalRow { ... }
 // etc.

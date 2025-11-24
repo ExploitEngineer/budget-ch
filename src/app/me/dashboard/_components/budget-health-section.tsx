@@ -4,26 +4,53 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { useTranslations } from "next-intl";
-import { useBudgetStore } from "@/store/budget-store";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getBudgetsAmounts } from "@/lib/services/budget";
+import { getCategoriesCount } from "@/lib/services/category";
+import { budgetKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 
 export function BudgetHealthSection() {
   const t = useTranslations("main-dashboard.dashboard-page.budget-health");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    allocated,
-    spent,
-    categoriesCount,
-    amountsLoading,
-    categoriesLoading,
-    fetchBudgetsAmounts,
-    fetchCategoriesCount,
-  } = useBudgetStore();
+    data: amounts,
+    isLoading: amountsLoading,
+  } = useQuery({
+    queryKey: budgetKeys.amounts(hubId),
+    queryFn: async () => {
+      const res = await getBudgetsAmounts();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budget amounts");
+      }
+      const totalAllocated = res.data?.totalAllocated ?? 0;
+      const totalSpent = res.data?.totalSpent ?? 0;
+      return {
+        allocated: totalAllocated,
+        spent: totalSpent,
+        available: totalAllocated - totalSpent,
+      };
+    },
+  });
 
-  useEffect(() => {
-    fetchBudgetsAmounts();
-    fetchCategoriesCount();
-  }, [fetchBudgetsAmounts, fetchCategoriesCount]);
+  const {
+    data: categoriesCount,
+    isLoading: categoriesLoading,
+  } = useQuery({
+    queryKey: budgetKeys.categoriesCount(hubId),
+    queryFn: async () => {
+      const res = await getCategoriesCount();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch categories count");
+      }
+      return Number(res.data?.count ?? 0);
+    },
+  });
+
+  const allocated = amounts?.allocated ?? null;
+  const spent = amounts?.spent ?? null;
 
   const progress =
     allocated && allocated > 0 && spent !== null

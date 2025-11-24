@@ -32,10 +32,15 @@ import {
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useBudgetStore } from "@/store/budget-store";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import AddCategory from "../../dashboard/_components/add-category-dialog";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createBudget } from "@/lib/services/budget";
+import { getCategories } from "@/lib/services/category";
+import { budgetKeys, categoryKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 export default function BudgetDialog({
   variant = "gradient",
@@ -48,11 +53,56 @@ export default function BudgetDialog({
     "main-dashboard.budgets-page.sidebar-header.dialog",
   );
 
-  const { createBudgetAndSync, createLoading } = useBudgetStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
+
+  // Fetch categories for the current hub
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId && open, // Only fetch when dialog is open and hubId exists
+  });
+
+  const categories = categoriesData?.map((cat) => cat.name) ?? [];
+
+  const createBudgetMutation = useMutation({
+    mutationFn: async (data: {
+      categoryName: string;
+      allocatedAmount: number;
+      spentAmount: number;
+      warningPercentage: number;
+      markerColor: string;
+    }) => {
+      const result = await createBudget(data);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create budget");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
+      queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
+      toast.success("Budget created successfully!");
+      form.reset();
+      setOpen(false);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create budget");
+    },
+  });
 
   const form = useForm<BudgetDialogValues>({
     resolver: zodResolver(BudgetDialogSchema) as any,
@@ -67,24 +117,21 @@ export default function BudgetDialog({
 
   async function onSubmit(values: BudgetDialogValues) {
     try {
-      await createBudgetAndSync({
+      await createBudgetMutation.mutateAsync({
         categoryName: values.category,
         allocatedAmount: values.budgetChf,
         spentAmount: values.istChf,
         warningPercentage: values.warning,
         markerColor: values.colorMarker.toLowerCase(),
       });
-
-      form.reset();
-      setOpen(false);
     } catch (err: any) {
-      console.error("Error submitting form:", err);
+      // Error already handled in onError
     }
   }
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
-    setSelectedCategory(newCategory);
+    // Invalidate categories query to refetch and show new category
+    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
     form.setValue("category", newCategory);
   }
   return (
@@ -93,9 +140,19 @@ export default function BudgetDialog({
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog
+        open={open}
+        onOpenChange={(isOpen) => {
+          setOpen(isOpen);
+          if (!isOpen) {
+            // Reset form when dialog closes
+            form.reset();
+          }
+        }}
+      >
         <DialogTrigger className="cursor-pointer" asChild>
           <Button
             className={
@@ -142,9 +199,8 @@ export default function BudgetDialog({
                     <FormLabel>{t("labels.category.title")}</FormLabel>
                     <FormControl>
                       <Select
-                        value={selectedCategory || ""}
+                        value={field.value || ""}
                         onValueChange={(value) => {
-                          setSelectedCategory(value);
                           field.onChange(value);
                         }}
                       >
@@ -164,7 +220,11 @@ export default function BudgetDialog({
                             </Button>
                           </div>
 
-                          {categories.length === 0 ? (
+                          {categoriesLoading ? (
+                            <SelectItem value="loading" disabled>
+                              Loading categories...
+                            </SelectItem>
+                          ) : categories.length === 0 ? (
                             <SelectItem value="none" disabled>
                               {t("no-category")}
                             </SelectItem>
@@ -297,10 +357,10 @@ export default function BudgetDialog({
                 </Button>
                 <Button
                   className="cursor-pointer"
-                  disabled={createLoading}
+                  disabled={createBudgetMutation.isPending}
                   type="submit"
                 >
-                  {createLoading ? <Spinner /> : t("save")}
+                  {createBudgetMutation.isPending ? <Spinner /> : t("save")}
                 </Button>
               </div>
             </form>

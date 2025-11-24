@@ -23,15 +23,16 @@ import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
 import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { useBudgetStore } from "@/store/budget-store";
 import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
 import { getRecentTransactions } from "@/lib/services/transaction";
-import { accountKeys, transactionKeys } from "@/lib/query-keys";
+import { getBudgets } from "@/lib/services/budget";
+import { accountKeys, transactionKeys, budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
+import type { BudgetRow } from "@/lib/types/row-types";
 
 const monthNames: string[] = [
   "January",
@@ -58,9 +59,18 @@ export default function SidebarHeader() {
   const pathname = usePathname();
   const route = pathname.split("/").pop();
 
-  const { budgets } = useBudgetStore();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const { data: budgets } = useQuery<BudgetRow[]>({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
+    },
+  });
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
