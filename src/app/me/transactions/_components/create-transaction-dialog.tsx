@@ -47,11 +47,12 @@ import {
 } from "@/lib/validations/transaction-dialog-validations";
 import { Spinner } from "@/components/ui/spinner";
 import { useTransactionStore } from "@/store/transaction-store";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { accountKeys } from "@/lib/query-keys";
+import { accountKeys, categoryKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { AccountRow } from "@/lib/types/row-types";
+import { getCategories } from "@/lib/services/category";
 
 export default function CreateTransactionDialog({
   variant,
@@ -62,12 +63,12 @@ export default function CreateTransactionDialog({
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { createTransactionAndSync, createLoading } = useTransactionStore();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const queryClient = useQueryClient();
 
   const {
     data: accounts,
@@ -83,6 +84,26 @@ export default function CreateTransactionDialog({
     },
     enabled: open, // Only fetch when dialog is open
   });
+
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+  } = useQuery<{ id: string; name: string }[]>({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data;
+    },
+    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
+  });
+
+  const categories = categoriesData?.map((cat) => cat.name) ?? [];
 
   const t = useTranslations(
     "main-dashboard.transactions-page.transaction-edit-dialog",
@@ -114,7 +135,6 @@ export default function CreateTransactionDialog({
 
       form.reset();
       setSelectedCategory(null);
-      setCategories([]);
       setOpen(false);
     } catch (err: any) {
       console.error("Error submitting form:", err);
@@ -122,9 +142,10 @@ export default function CreateTransactionDialog({
   }
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
+    // Refetch categories to get the updated list
+    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
   }
 
   const { fields, append, remove } = useFieldArray({
@@ -138,6 +159,7 @@ export default function CreateTransactionDialog({
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer" asChild>
@@ -336,7 +358,7 @@ export default function CreateTransactionDialog({
                         <FormLabel>{t("dialog.labels.category")}</FormLabel>
                         <FormControl>
                           <Select
-                            value={selectedCategory || ""}
+                            value={field.value}
                             onValueChange={(value) => {
                               setSelectedCategory(value);
                               field.onChange(value);
@@ -358,7 +380,11 @@ export default function CreateTransactionDialog({
                                 </Button>
                               </div>
 
-                              {categories.length === 0 ? (
+                              {categoriesLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading categories...
+                                </SelectItem>
+                              ) : categories.length === 0 ? (
                                 <SelectItem value="none" disabled>
                                   {t("dialog.no-category")}
                                 </SelectItem>

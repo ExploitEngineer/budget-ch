@@ -12,6 +12,8 @@ import {
   deleteAllTransactionsAndCategoriesDB,
   getSubscriptionByUserId,
   getMonthlyTransactionCount,
+  getHubMemberRoleDB,
+  getOwnedHubDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -129,10 +131,24 @@ export async function createTransaction({
 }
 
 // CREATE Transaction Category
-export async function createTransactionCategory(categoryName: string) {
+export async function createTransactionCategory(
+  categoryName: string,
+  hubId: string,
+) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, true);
+    const { userId } = await getContext(hdrs, false);
+
+    // Verify user has access to this hub
+    const hubMember = await getHubMemberRoleDB(userId, hubId);
+    const ownedHub = await getOwnedHubDB(userId);
+
+    if (!hubMember && ownedHub?.id !== hubId) {
+      return {
+        success: false,
+        message: "You don't have access to this hub",
+      };
+    }
 
     const normalized = categoryName.trim().toLowerCase();
     const category = await createTransactionCategoryDB(normalized, hubId);

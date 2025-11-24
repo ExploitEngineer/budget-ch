@@ -23,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { createTransactionCategory } from "@/lib/services/transaction";
 
 const CategorySchema = z.object({
   name: z.string().min(1, "Category name is required"),
@@ -34,10 +35,12 @@ export default function AddCategory({
   open,
   onOpenChangeAction,
   onCategoryAddedAction,
+  hubId,
 }: {
   open: boolean;
   onOpenChangeAction: (open: boolean) => void;
   onCategoryAddedAction: (category: string) => void;
+  hubId: string | null;
 }) {
   const form = useForm<CategoryValues>({
     resolver: zodResolver(CategorySchema),
@@ -51,16 +54,31 @@ export default function AddCategory({
     const newCategory = values.name.trim();
     if (!newCategory) return;
 
+    if (!hubId) {
+      toast.error("Hub ID is required");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      setTimeout(() => {
-        onCategoryAddedAction(newCategory);
-        toast.success(`Category "${newCategory}" added `);
-        onOpenChangeAction(false);
-        form.reset();
+      const result = await createTransactionCategory(newCategory, hubId);
+      
+      if (!result.success) {
+        if (result.reason === "DUPLICATE_CATEGORY") {
+          toast.error(`Category "${newCategory}" already exists`);
+        } else {
+          toast.error(result.message || "Something went wrong while adding category.");
+        }
         setIsLoading(false);
-      }, 1500);
+        return;
+      }
+
+      onCategoryAddedAction(newCategory);
+      toast.success(`Category "${newCategory}" added`);
+      onOpenChangeAction(false);
+      form.reset();
+      setIsLoading(false);
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while adding category.");

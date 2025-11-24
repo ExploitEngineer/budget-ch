@@ -1568,6 +1568,32 @@ export async function getAccountTransfersDB(financialAccountId: string) {
   }
 }
 
+// GET All Transaction Categories for a Hub
+export async function getTransactionCategoriesDB(hubId: string) {
+  try {
+    const result = await db
+      .select({
+        id: transactionCategories.id,
+        name: transactionCategories.name,
+      })
+      .from(transactionCategories)
+      .where(eq(transactionCategories.hubId, hubId))
+      .orderBy(transactionCategories.name);
+
+    return {
+      success: true,
+      message: "Fetched transaction categories",
+      data: result,
+    };
+  } catch (err: any) {
+    console.error("DB Error: getTransactionCategoriesDB Error:", err);
+    return {
+      success: false,
+      message: "Failed to fetch transaction categories",
+    };
+  }
+}
+
 // GET Transaction & Budget Categories with Amount
 export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
   try {
