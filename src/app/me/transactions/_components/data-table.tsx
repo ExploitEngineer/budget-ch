@@ -33,9 +33,13 @@ import {
 import { useTranslations } from "next-intl";
 import TransactionEditDialog from "./transactions-edit-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
-import { useTransactionStore } from "@/store/transaction-store";
 import { Spinner } from "@/components/ui/spinner";
 import { useExportCSV } from "@/hooks/use-export-csv";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteAllTransactionsAndCategories } from "@/lib/services/transaction";
+import { transactionKeys, accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 interface DataTableProps {
   transactions: Omit<Transaction, "type">[];
@@ -45,6 +49,9 @@ interface DataTableProps {
 
 export function DataTable({ transactions, loading, error }: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const { exportTransactions } = useExportCSV();
 
@@ -56,8 +63,24 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const { deleteAllTransactionsAndCategoriesAndSync, deleteAllLoading } =
-    useTransactionStore();
+  const deleteAllTransactionsMutation = useMutation({
+    mutationFn: async () => {
+      const result = await deleteAllTransactionsAndCategories();
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete all transactions and categories");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("All transactions and related categories deleted!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Something went wrong while deleting all transactions and categories.");
+    },
+  });
 
   const title = t("transaction-edit-dialog.title-1");
 
@@ -224,10 +247,10 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
             <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-              onClick={deleteAllTransactionsAndCategoriesAndSync}
-              disabled={deleteAllLoading}
+              onClick={() => deleteAllTransactionsMutation.mutate()}
+              disabled={deleteAllTransactionsMutation.isPending}
             >
-              {deleteAllLoading ? (
+              {deleteAllTransactionsMutation.isPending ? (
                 <Spinner />
               ) : (
                 t("data-table.header.buttons.delete")

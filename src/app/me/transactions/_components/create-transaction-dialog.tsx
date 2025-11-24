@@ -46,13 +46,14 @@ import {
   TransactionDialogSchema,
 } from "@/lib/validations/transaction-dialog-validations";
 import { Spinner } from "@/components/ui/spinner";
-import { useTransactionStore } from "@/store/transaction-store";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { accountKeys, categoryKeys } from "@/lib/query-keys";
+import { accountKeys, categoryKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { AccountRow } from "@/lib/types/row-types";
 import { getCategories } from "@/lib/services/category";
+import { createTransaction } from "@/lib/services/transaction";
+import { toast } from "sonner";
 
 export default function CreateTransactionDialog({
   variant,
@@ -65,10 +66,53 @@ export default function CreateTransactionDialog({
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { createTransactionAndSync, createLoading } = useTransactionStore();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
+
+  const createTransactionMutation = useMutation({
+    mutationFn: async (data: {
+      category: string;
+      amount: number;
+      note?: string;
+      source: string;
+      transactionType: "income" | "expense";
+      accountId: string;
+    }) => {
+      const result = await createTransaction({
+        categoryName: data.category.trim(),
+        amount: data.amount,
+        note: data.note,
+        source: data.source,
+        transactionType: data.transactionType,
+        accountId: data.accountId,
+      });
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create transaction");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      // Invalidate transaction queries
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      // Invalidate account queries since balance changes
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Transaction created successfully!");
+    },
+    onError: (error: Error) => {
+      // Only show error if it's not already handled by the service
+      if (
+        !error.message?.includes("already exists") &&
+        !error.message?.includes("financial account") &&
+        !error.message?.includes("Failed to create transaction")
+      ) {
+        toast.error(error.message || "Something went wrong while creating the transaction.");
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
 
   const {
     data: accounts,
@@ -124,7 +168,7 @@ export default function CreateTransactionDialog({
 
   async function onSubmit(values: TransactionDialogValues) {
     try {
-      await createTransactionAndSync({
+      await createTransactionMutation.mutateAsync({
         category: values.category.trim(),
         amount: values.amount,
         note: values.note,
@@ -137,6 +181,7 @@ export default function CreateTransactionDialog({
       setSelectedCategory(null);
       setOpen(false);
     } catch (err: any) {
+      // Error already handled in onError
       console.error("Error submitting form:", err);
     }
   }
@@ -570,10 +615,10 @@ export default function CreateTransactionDialog({
                   </Button>
                   <Button
                     type="submit"
-                    disabled={createLoading}
+                    disabled={createTransactionMutation.isPending}
                     className="cursor-pointer"
                   >
-                    {createLoading ? <Spinner /> : t("dialog.buttons.save")}
+                    {createTransactionMutation.isPending ? <Spinner /> : t("dialog.buttons.save")}
                   </Button>
                 </div>
               </form>

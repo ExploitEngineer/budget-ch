@@ -21,8 +21,17 @@ export const categoryKeys = {
   list: (hubId: string | null) => [...categoryKeys.lists(), hubId] as const,
 };
 
+/**
+ * Query key factory for transactions
+ */
+export const transactionKeys = {
+  all: ["transactions"] as const,
+  lists: () => [...transactionKeys.all, "list"] as const,
+  list: (hubId: string | null) => [...transactionKeys.lists(), hubId] as const,
+  recent: (hubId: string | null) => [...transactionKeys.all, "recent", hubId] as const,
+};
+
 // Future query keys can be added here:
 // export const budgetKeys = { ... }
-// export const transactionKeys = { ... }
 // etc.
 

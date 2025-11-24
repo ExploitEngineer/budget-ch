@@ -50,7 +50,13 @@ import AddCategory from "../../dashboard/_components/add-category-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import { useEffect } from "react";
 import { parse } from "date-fns";
-import { useTransactionStore } from "@/store/transaction-store";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createTransaction, updateTransaction, deleteTransaction } from "@/lib/services/transaction";
+import { transactionKeys, accountKeys, categoryKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getCategories } from "@/lib/services/category";
+import type { AccountRow } from "@/lib/types/row-types";
 
 interface TransactionEditDialogProps {
   variant?: "outline" | "default" | "gradient";
@@ -63,20 +69,136 @@ export default function TransactionEditDialog({
   text = "Add Transaction",
   transaction,
 }: TransactionEditDialogProps) {
-  const {
-    createTransactionAndSync,
-    updateTransactionAndSync,
-    deleteTransactionAndSync,
-    createLoading,
-    updateLoading,
-    deleteLoading,
-  } = useTransactionStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const [open, setOpen] = useState<boolean>(false);
   const isEditMode = !!transaction;
 
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+    enabled: open, // Only fetch when dialog is open
+  });
+
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+  } = useQuery<{ id: string; name: string }[]>({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data;
+    },
+    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
+  });
+
+  const categories = categoriesData?.map((cat) => cat.name) ?? [];
+
+  const createTransactionMutation = useMutation({
+    mutationFn: async (data: {
+      category: string;
+      amount: number;
+      note?: string;
+      source: string;
+      transactionType: "income" | "expense";
+      accountId: string;
+    }) => {
+      const result = await createTransaction({
+        categoryName: data.category.trim(),
+        amount: data.amount,
+        note: data.note,
+        source: data.source,
+        transactionType: data.transactionType,
+        accountId: data.accountId,
+      });
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create transaction");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Transaction created successfully!");
+    },
+    onError: (error: Error) => {
+      if (
+        !error.message?.includes("already exists") &&
+        !error.message?.includes("financial account") &&
+        !error.message?.includes("Failed to create transaction")
+      ) {
+        toast.error(error.message || "Something went wrong while creating the transaction.");
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
+
+  const updateTransactionMutation = useMutation({
+    mutationFn: async ({ id, formData }: { id: string; formData: FormData }) => {
+      const result = await updateTransaction(id, formData);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to update transaction");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Transaction updated successfully!");
+    },
+    onError: (error: Error) => {
+      if (!error.message?.includes("Failed to update transaction")) {
+        toast.error(error.message || "Something went wrong while updating.");
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
+
+  const deleteTransactionMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const result = await deleteTransaction(id);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete transaction");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Transaction deleted successfully!");
+    },
+    onError: (error: Error) => {
+      if (!error.message?.includes("Failed to delete transaction")) {
+        toast.error(error.message || "Something went wrong while deleting.");
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
+
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const t = useTranslations(
@@ -89,12 +211,13 @@ export default function TransactionEditDialog({
       date: transaction
         ? parse(transaction.date, "dd/MM/yyyy", new Date())
         : new Date(),
-      account: transaction?.accountType || "savings",
+      accountId: "",
       recipient: transaction?.recipient || "",
       category: transaction?.category || "",
       amount: transaction?.amount || 0,
       note: transaction?.note || "",
       splits: [],
+      transactionType: "expense",
     },
   });
 
@@ -106,11 +229,6 @@ export default function TransactionEditDialog({
   useEffect(() => {
     if (transaction?.category) {
       setSelectedCategory(transaction.category);
-      setCategories((prev) =>
-        prev.includes(transaction.category)
-          ? prev
-          : [...prev, transaction.category],
-      );
     }
   }, [transaction]);
 
@@ -121,7 +239,6 @@ export default function TransactionEditDialog({
       note: values.note,
       source: values.recipient,
       transactionType: values.transactionType,
-      accountType: values.account,
     };
 
     try {
@@ -133,16 +250,26 @@ export default function TransactionEditDialog({
           categoryName: payload.category,
         }).forEach(([k, v]) => fd.append(k, String(v)));
 
-        await updateTransactionAndSync(transaction!.id, fd);
+        await updateTransactionMutation.mutateAsync({
+          id: transaction!.id,
+          formData: fd,
+        });
       } else {
-        await createTransactionAndSync(payload);
+        await createTransactionMutation.mutateAsync({
+          category: payload.category,
+          amount: payload.amount,
+          note: payload.note,
+          source: payload.source,
+          transactionType: payload.transactionType,
+          accountId: values.accountId,
+        });
       }
 
       form.reset();
       setSelectedCategory(null);
-      setCategories([]);
       setOpen(false);
     } catch (err: any) {
+      // Error already handled in onError
       console.error("Error submitting form:", err);
     }
   }
@@ -150,20 +277,21 @@ export default function TransactionEditDialog({
   async function handleDelete() {
     if (!transaction || !isEditMode) return;
     try {
-      await deleteTransactionAndSync(transaction.id);
+      await deleteTransactionMutation.mutateAsync(transaction.id);
       form.reset();
       setSelectedCategory(null);
-      setCategories([]);
       setOpen(false);
     } catch (err: any) {
+      // Error already handled in onError
       console.error("Error deleting transaction:", err);
     }
   }
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
+    // Refetch categories to get the updated list
+    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
   }
   return (
     <>
@@ -171,6 +299,7 @@ export default function TransactionEditDialog({
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -257,7 +386,7 @@ export default function TransactionEditDialog({
 
                   <FormField
                     control={form.control}
-                    name="account"
+                    name="accountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
                         <FormLabel>{t("dialog.labels.account")}</FormLabel>
@@ -265,25 +394,33 @@ export default function TransactionEditDialog({
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
+                            disabled={accountsLoading}
                           >
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="w-full cursor-pointer">
                               <SelectValue
-                                placeholder={t("dialog.placeholders.account")}
+                                placeholder={
+                                  accountsLoading
+                                    ? "Loading accounts..."
+                                    : t("dialog.placeholders.account")
+                                }
                               />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="checking">
-                                {t("dialog.options.checking")}
-                              </SelectItem>
-                              <SelectItem value="savings">
-                                {t("dialog.options.savings")}
-                              </SelectItem>
-                              <SelectItem value="credit-card">
-                                {t("dialog.options.credit-card")}
-                              </SelectItem>
-                              <SelectItem value="cash">
-                                {t("dialog.options.cash")}
-                              </SelectItem>
+                              {accountsLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading accounts...
+                                </SelectItem>
+                              ) : accounts && accounts.length > 0 ? (
+                                accounts.map((account) => (
+                                  <SelectItem key={account.id} value={account.id}>
+                                    {account.name} ({account.type})
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="no-accounts" disabled>
+                                  No accounts available
+                                </SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -384,7 +521,11 @@ export default function TransactionEditDialog({
                                 </Button>
                               </div>
 
-                              {categories.length === 0 ? (
+                              {categoriesLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading categories...
+                                </SelectItem>
+                              ) : categories.length === 0 ? (
                                 <SelectItem value="none" disabled>
                                   {t("dialog.no-category")}
                                 </SelectItem>
@@ -564,17 +705,17 @@ export default function TransactionEditDialog({
                     variant="outline"
                     className="cursor-pointer"
                     type="button"
-                    disabled={deleteLoading}
+                    disabled={deleteTransactionMutation.isPending}
                     onClick={handleDelete}
                   >
-                    {deleteLoading ? <Spinner /> : t("dialog.buttons.delete")}
+                    {deleteTransactionMutation.isPending ? <Spinner /> : t("dialog.buttons.delete")}
                   </Button>
                   <Button
                     type="submit"
-                    disabled={isEditMode ? updateLoading : createLoading}
+                    disabled={isEditMode ? updateTransactionMutation.isPending : createTransactionMutation.isPending}
                     className="cursor-pointer"
                   >
-                    {(isEditMode ? updateLoading : createLoading) ? (
+                    {(isEditMode ? updateTransactionMutation.isPending : createTransactionMutation.isPending) ? (
                       <Spinner />
                     ) : (
                       t("dialog.buttons.save")
