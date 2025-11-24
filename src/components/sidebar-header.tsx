@@ -12,7 +12,6 @@ import {
   MessageSquare,
   Check,
 } from "lucide-react";
-import TransactionDialog from "./dialogs/transaction-dialog";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
@@ -148,9 +147,7 @@ export default function SidebarHeader() {
             </Button>
           </div>
 
-          {route === "dashboard" && <TransactionDialog />}
-
-          {route === "transactions" && (
+          {(route === "dashboard" || route === "transactions") && (
             <CreateTransactionDialog variant="gradient" />
           )}
 
