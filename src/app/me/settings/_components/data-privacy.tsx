@@ -72,8 +72,6 @@ export function DataPrivacy() {
       return res.data ?? [];
     },
   });
-  const searchParams = useSearchParams();
-  const hubId = searchParams.get("hub");
 
   const { data: goals } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId),
