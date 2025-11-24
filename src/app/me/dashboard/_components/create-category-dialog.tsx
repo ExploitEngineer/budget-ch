@@ -31,7 +31,7 @@ const CategorySchema = z.object({
 
 type CategoryValues = z.infer<typeof CategorySchema>;
 
-export default function AddCategory({
+export default function CreateCategoryDialog({
   open,
   onOpenChangeAction,
   onCategoryAddedAction,

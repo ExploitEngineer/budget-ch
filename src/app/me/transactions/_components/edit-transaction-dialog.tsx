@@ -46,7 +46,7 @@ import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import AddCategory from "../../dashboard/_components/add-category-dialog";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import { useEffect } from "react";
 import { parse } from "date-fns";
@@ -58,17 +58,17 @@ import { getFinancialAccounts } from "@/lib/services/financial-account";
 import { getCategories } from "@/lib/services/category";
 import type { AccountRow } from "@/lib/types/row-types";
 
-interface TransactionEditDialogProps {
+interface EditTransactionDialogProps {
   variant?: "outline" | "default" | "gradient";
   text?: string;
   transaction?: Omit<Transaction, "type">;
 }
 
-export default function TransactionEditDialog({
+export default function EditTransactionDialog({
   variant = "default",
   text = "Add Transaction",
   transaction,
-}: TransactionEditDialogProps) {
+}: EditTransactionDialogProps) {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -295,7 +295,7 @@ export default function TransactionEditDialog({
   }
   return (
     <>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}

@@ -39,7 +39,7 @@ import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import AddCategory from "../../dashboard/_components/add-category-dialog";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { useState } from "react";
 import {
   TransactionDialogValues,
@@ -200,7 +200,7 @@ export default function CreateTransactionDialog({
 
   return (
     <>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}

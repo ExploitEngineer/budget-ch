@@ -31,7 +31,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import TransactionEditDialog from "./transactions-edit-dialog";
+import EditTransactionDialog from "@/app/me/transactions/_components/edit-transaction-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import { Spinner } from "@/components/ui/spinner";
 import { useExportCSV } from "@/hooks/use-export-csv";
@@ -160,7 +160,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
       cell: ({ row }) => {
         const transaction = row.original;
         return (
-          <TransactionEditDialog
+          <EditTransactionDialog
             variant="outline"
             text={title}
             transaction={{

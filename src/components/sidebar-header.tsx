@@ -17,8 +17,8 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
-import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
-import SavingGoalDialog from "@/app/me/saving-goals/_components/saving-goal-dialog";
+import CreateBudgetDialog from "@/app/me/budgets/_components/create-budget-dialog";
+import CreateSavingGoalDialog from "@/app/me/saving-goals/_components/create-saving-goal-dialog";
 import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
 import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
@@ -154,9 +154,9 @@ export default function SidebarHeader() {
             <CreateTransactionDialog variant="gradient" />
           )}
 
-          {route === "budgets" && <BudgetDialog />}
+          {route === "budgets" && <CreateBudgetDialog />}
 
-          {route === "saving-goals" && <SavingGoalDialog />}
+          {route === "saving-goals" && <CreateSavingGoalDialog />}
 
           {route === "accounts" && (
             <div className="flex items-center gap-2">

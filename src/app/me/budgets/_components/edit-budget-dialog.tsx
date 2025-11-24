@@ -41,17 +41,17 @@ import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-interface BudgetEditDialogProps {
+interface EditBudgetDialogProps {
   variant?: "gradient" | "outline";
   text?: string;
   budget?: BudgetRow;
 }
 
-export default function BudgetEditDialog({
+export default function EditBudgetDialog({
   variant = "gradient",
   text,
   budget,
-}: BudgetEditDialogProps) {
+}: EditBudgetDialogProps) {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");

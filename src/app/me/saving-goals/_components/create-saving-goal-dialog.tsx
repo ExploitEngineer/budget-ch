@@ -32,7 +32,7 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
@@ -43,57 +43,41 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { Spinner } from "@/components/ui/spinner";
-import type { SavingGoal } from "@/db/queries";
 
-export default function SavingGoalEditDialog({
-  goalData,
-}: {
-  goalData: SavingGoal;
-}) {
+export default function CreateSavingGoalDialog() {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
-  const { updateGoalAndSync, deleteGoalAndSync, updateLoading, deleteLoading } =
-    useSavingGoalStore();
-  const [open, setOpen] = useState(false);
+  const { createGoalAndSync, createLoading } = useSavingGoalStore();
+  const [open, setOpen] = useState<boolean>(false);
 
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
     defaultValues: {
-      name: goalData?.name ?? "",
-      goalAmount: goalData?.goalAmount ?? 0,
-      savedAmount: goalData?.amountSaved ?? 0,
-      dueDate: goalData?.dueDate ? new Date(goalData.dueDate) : new Date(),
-      account: goalData?.accountType ?? "savings",
-      monthlyAllocation: goalData?.monthlyAllocation ?? 0,
+      name: "",
+      goalAmount: 0,
+      savedAmount: 0,
+      dueDate: undefined,
+      account: "savings",
+      monthlyAllocation: 0,
     },
   });
 
   async function onSubmit(values: SavingsGoalDialogValues) {
     try {
-      await updateGoalAndSync(goalData.id, {
+      await createGoalAndSync({
         name: values.name,
         goalAmount: values.goalAmount,
         amountSaved: values.savedAmount,
         monthlyAllocation: values.monthlyAllocation,
         accountType: values.account,
-        dueDate: values.dueDate ?? null,
       });
 
+      form.reset();
       setOpen(false);
-      form.reset(values);
     } catch (err: any) {
       console.error("Error submitting form:", err);
-    }
-  }
-
-  async function handleDelete() {
-    try {
-      await deleteGoalAndSync(goalData.id);
-      setOpen(false);
-    } catch (err: any) {
-      console.error("Error deleting saving goal:", err);
     }
   }
 
@@ -101,17 +85,18 @@ export default function SavingGoalEditDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          variant="outline"
-          className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+          className="btn-gradient flex cursor-pointer items-center gap-2 dark:text-white"
+          variant="default"
         >
-          {t("edit")}
+          <Plus className="h-5 w-5" />
+          <span className="hidden text-sm sm:block">{t("title")}</span>
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
         <DialogHeader className="flex flex-row items-center justify-between border-b pb-3">
           <DialogTitle className="text-lg font-semibold">
-            {t("edit-dialog")}
+            {t("subtitle")}
           </DialogTitle>
           <DialogClose asChild>
             <Button
@@ -124,12 +109,13 @@ export default function SavingGoalEditDialog({
           </DialogClose>
         </DialogHeader>
 
+        {/* Form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6 pt-4"
           >
-            {/* Name */}
+            {/* Row 1: Name */}
             <FormField
               control={form.control}
               name="name"
@@ -147,16 +133,22 @@ export default function SavingGoalEditDialog({
               )}
             />
 
-            {/* Goal + Saved */}
+            {/* Row 2: Target + Already Saved */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="goalAmount"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="flex flex-1 flex-col">
                     <FormLabel>{t("labels.goal-amount")}</FormLabel>
                     <FormControl>
-                      <Input type="number" step={0.5} min={0} {...field} />
+                      <Input
+                        type="number"
+                        step={0.5}
+                        min={0}
+                        placeholder="0.00"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -166,10 +158,16 @@ export default function SavingGoalEditDialog({
                 control={form.control}
                 name="savedAmount"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="flex flex-1 flex-col">
                     <FormLabel>{t("labels.saved-amount")}</FormLabel>
                     <FormControl>
-                      <Input type="number" step={0.5} min={0} {...field} />
+                      <Input
+                        type="number"
+                        step={0.5}
+                        min={0}
+                        placeholder="0.00"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -177,13 +175,13 @@ export default function SavingGoalEditDialog({
               />
             </div>
 
-            {/* Due Date + Account */}
+            {/* Row 3: Due Date + Account */}
             <div className="flex items-center justify-between gap-3">
               <FormField
                 control={form.control}
                 name="dueDate"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="flex flex-1 flex-col">
                     <FormLabel>{t("labels.due-date.title")}</FormLabel>
                     <FormControl>
                       <Popover>
@@ -216,7 +214,7 @@ export default function SavingGoalEditDialog({
                 control={form.control}
                 name="account"
                 render={({ field }) => (
-                  <FormItem className="flex-1">
+                  <FormItem className="flex flex-1 flex-col">
                     <FormLabel>{t("labels.account.title")}</FormLabel>
                     <FormControl>
                       <Select
@@ -250,7 +248,7 @@ export default function SavingGoalEditDialog({
               />
             </div>
 
-            {/* Monthly Allocation */}
+            {/* Row 4: Monthly Allocation */}
             <FormField
               control={form.control}
               name="monthlyAllocation"
@@ -258,30 +256,27 @@ export default function SavingGoalEditDialog({
                 <FormItem className="w-1/2">
                   <FormLabel>{t("labels.monthly-allocation")}</FormLabel>
                   <FormControl>
-                    <Input type="number" step={0.5} min={0} {...field} />
+                    <Input
+                      type="number"
+                      step={0.5}
+                      min={0}
+                      placeholder="0.00"
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            {/* Footer */}
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                type="button"
-                className="cursor-pointer"
-                variant="outline"
-                onClick={handleDelete}
-                disabled={deleteLoading}
-              >
-                {deleteLoading ? <Spinner /> : t("delete")}
-              </Button>
+            {/* Footer Buttons */}
+            <div className="flex justify-end pt-4">
               <Button
                 type="submit"
+                disabled={createLoading}
                 className="cursor-pointer"
-                disabled={updateLoading}
               >
-                {updateLoading ? <Spinner /> : t("save")}
+                {createLoading ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

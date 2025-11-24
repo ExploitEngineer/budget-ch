@@ -36,7 +36,7 @@ import {
   calculationFormSchema,
 } from "@/lib/validations/calculation-section-validations";
 import { useState } from "react";
-import AddCategory from "../../dashboard/_components/add-category-dialog";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { Spinner } from "@/components/ui/spinner";
 
 interface CalculationSectionProps {
@@ -85,7 +85,7 @@ export function CalculationSection({
 
   return (
     <section>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}

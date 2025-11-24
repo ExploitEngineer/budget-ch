@@ -3,7 +3,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useTranslations } from "next-intl";
-import BudgetDialog from "./budget-dialog";
+import CreateBudgetDialog from "./create-budget-dialog";
 
 export function Settings() {
   const t = useTranslations(
@@ -16,7 +16,7 @@ export function Settings() {
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <BudgetDialog variant="outline" text={title} />
+          <CreateBudgetDialog variant="outline" text={title} />
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="flex flex-wrap items-center gap-2">

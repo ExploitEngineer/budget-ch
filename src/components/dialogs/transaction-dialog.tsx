@@ -43,7 +43,7 @@ import { createTransaction } from "@/lib/services/transaction";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
-import AddCategory from "@/app/me/dashboard/_components/add-category-dialog";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
@@ -120,7 +120,7 @@ export default function TransactionDialog() {
   }
   return (
     <>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}

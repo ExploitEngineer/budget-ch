@@ -34,7 +34,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import AddCategory from "../../dashboard/_components/add-category-dialog";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createBudget } from "@/lib/services/budget";
 import { getCategories } from "@/lib/services/category";
@@ -42,7 +42,7 @@ import { budgetKeys, categoryKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
-export default function BudgetDialog({
+export default function CreateBudgetDialog({
   variant = "gradient",
   text,
 }: {
@@ -136,7 +136,7 @@ export default function BudgetDialog({
   }
   return (
     <>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}

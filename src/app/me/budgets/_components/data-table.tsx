@@ -21,7 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
-import BudgetEditDialog from "./budget-edit-dialog";
+import EditBudgetDialog from "./edit-budget-dialog";
 import { useState, useMemo } from "react";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
@@ -181,7 +181,7 @@ export function BudgetDataTable() {
                       <Progress value={data.progress} />
                     </TableCell>
                     <TableCell>
-                      <BudgetEditDialog
+                      <EditBudgetDialog
                         variant="outline"
                         text="Edit"
                         budget={data}
