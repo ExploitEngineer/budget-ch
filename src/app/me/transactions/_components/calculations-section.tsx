@@ -64,7 +64,6 @@ export function CalculationSection({
       dateFrom: undefined,
       dateTo: undefined,
       category: "",
-      accountType: "all",
       amountMax: 0,
       amountMin: 0,
       text: "",
@@ -160,47 +159,6 @@ export function CalculationSection({
                             />
                           </PopoverContent>
                         </Popover>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="accountType"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>{t("labels.account.title")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
-                            <SelectValue
-                              placeholder={t(
-                                "labels.account.data.current-account",
-                              )}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="current-account">
-                              {t("labels.account.data.current-account")}
-                            </SelectItem>
-                            <SelectItem value="credit-card">
-                              {t("labels.account.data.credit-card")}
-                            </SelectItem>
-                            <SelectItem value="savings">
-                              {t("labels.account.data.savings")}
-                            </SelectItem>
-                            <SelectItem value="cash">
-                              {t("labels.account.data.cash")}
-                            </SelectItem>
-                            <SelectItem value="all">
-                              {t("labels.account.data.all")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
                       </FormControl>
                     </FormItem>
                   )}

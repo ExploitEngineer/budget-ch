@@ -161,14 +161,6 @@ export function ActiveGoalsSection() {
                         variant="outline"
                         className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                       >
-                        {t("cards.tax-reserves.content.account.title")}:{" "}
-                        {goal.accountType || "—"}
-                      </Badge>
-
-                      <Badge
-                        variant="outline"
-                        className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
-                      >
                         {t("cards.tax-reserves.content.auto")}: CHF{" "}
                         {goal.goalAmount?.toLocaleString("de-CH", {
                           minimumFractionDigits: 2,

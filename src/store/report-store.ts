@@ -23,7 +23,6 @@ interface MonthlyReport {
 interface ExpenseCategoryProgress {
   category: string;
   amount: number;
-  accountType: string;
   accountBalance: number;
   percent: number;
 }

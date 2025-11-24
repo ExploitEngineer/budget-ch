@@ -65,10 +65,6 @@ export default function TransactionsClient() {
         matchDate = matchDate && txDate <= toDate;
       }
 
-      const matchAccount =
-        !filters.accountType ||
-        filters.accountType === "all" ||
-        tx.accountType === filters.accountType;
 
       const matchCategory =
         !filters.category || tx.category === filters.category;
@@ -81,11 +77,10 @@ export default function TransactionsClient() {
         !filters.text ||
         tx.recipient?.toLowerCase().includes(filters.text.toLowerCase()) ||
         tx.note?.toLowerCase().includes(filters.text.toLowerCase()) ||
-        tx.accountType?.toLowerCase().includes(filters.text.toLowerCase()) ||
         tx.category?.toLowerCase().includes(filters.text.toLowerCase());
 
       return (
-        matchDate && matchAccount && matchCategory && matchAmount && matchText
+        matchDate && matchCategory && matchAmount && matchText
       );
     });
 

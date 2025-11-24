@@ -61,7 +61,6 @@ export type createTransactionArgs = {
   source: string;
   categoryName: string;
   transactionType: "income" | "expense";
-  accountType: AccountType;
 };
 
 export type updateTransactionArgs = {
@@ -74,7 +73,6 @@ export type updateTransactionArgs = {
     addedAt?: Date | string;
     transactionCategoryId?: string | null;
     financialAccountId?: string | null;
-    accountType?: AccountType;
     transactionType?: "income" | "expense";
   };
 };
@@ -97,7 +95,6 @@ export type savingGoalArgs = {
   goalAmount: number;
   amountSaved: number;
   monthlyAllocation: number;
-  accountType: AccountType;
   financialAccountId?: string | null;
 };
 
@@ -108,7 +105,6 @@ export interface SavingGoal {
   amountSaved: number;
   monthlyAllocation?: number;
   value: number;
-  accountType: AccountType;
   financialAccountId?: string | null;
   dueDate?: Date | null;
   remaining?: number;
@@ -141,7 +137,6 @@ interface UpdateSavingGoalArgs {
     goalAmount?: number;
     amountSaved?: number;
     monthlyAllocation?: number;
-    accountType?: string;
     financialAccountId?: string | null;
     dueDate?: Date | null;
   };
@@ -717,7 +712,6 @@ export async function createTransactionDB({
   source,
   note,
   transactionType,
-  accountType,
 }: Omit<createTransactionArgs, "categoryName">) {
   try {
     await db.insert(transactions).values({
@@ -729,7 +723,6 @@ export async function createTransactionDB({
       source,
       note,
       type: transactionType,
-      accountType,
     });
 
     return { success: true, message: "Transaction created successfully" };
@@ -753,7 +746,6 @@ export async function getTransactionsDB(
       id: transactions.id,
       date: transactions.addedAt,
       recipient: transactions.source,
-      accountType: transactions.accountType,
       type: transactions.type,
       category: transactionCategories.name,
       note: transactions.note,
@@ -826,7 +818,6 @@ export async function updateTransactionDB({
           : updatedData.addedAt,
       transactionCategoryId: updatedData.transactionCategoryId,
       financialAccountId: updatedData.financialAccountId,
-      accountType: updatedData.accountType,
     };
 
     const cleanData = Object.fromEntries(
@@ -1000,7 +991,6 @@ export async function createSavingGoalDB({
   goalAmount,
   amountSaved,
   monthlyAllocation,
-  accountType,
   financialAccountId,
 }: savingGoalArgs) {
   try {
@@ -1011,7 +1001,6 @@ export async function createSavingGoalDB({
       goalAmount,
       amountSaved,
       monthlyAllocation,
-      accountType,
       financialAccountId: financialAccountId || null,
     });
 
@@ -1044,7 +1033,6 @@ export async function getSavingGoalsDB(
         goalAmount: savingGoals.goalAmount,
         amountSaved: savingGoals.amountSaved,
         monthlyAllocation: savingGoals.monthlyAllocation,
-        accountType: savingGoals.accountType,
         financialAccountId: savingGoals.financialAccountId,
         dueDate: savingGoals.dueDate,
       })
@@ -1091,7 +1079,6 @@ export async function getSavingGoalsDB(
         amountSaved: g.amountSaved,
         monthlyAllocation: g.monthlyAllocation,
         value: Math.round(progress),
-        accountType: g.accountType,
         dueDate: g.dueDate,
       };
     });
@@ -1132,7 +1119,6 @@ export async function updateSavingGoalDB({
         goalAmount: updatedData.goalAmount,
         amountSaved: updatedData.amountSaved,
         monthlyAllocation: updatedData.monthlyAllocation,
-        accountType: updatedData.accountType,
         financialAccountId: updatedData.financialAccountId ?? null,
         dueDate: updatedData.dueDate ?? null,
       }).filter(([_, v]) => v !== undefined),
@@ -1754,7 +1740,6 @@ export async function getCategoriesByExpensesDB(hubId: string) {
     const expenseTxs = await db
       .select({
         categoryId: transactions.transactionCategoryId,
-        accountType: transactions.accountType,
         amount: transactions.amount,
         financialAccountId: transactions.financialAccountId,
       })
@@ -1765,15 +1750,14 @@ export async function getCategoriesByExpensesDB(hubId: string) {
 
     const grouped: Record<
       string,
-      { amount: number; accountType: string; financialAccountId: string }
+      { amount: number; financialAccountId: string }
     > = {};
 
     for (const tx of expenseTxs) {
-      const key = `${tx.categoryId}:${tx.accountType}`;
+      const key = `${tx.categoryId}:${tx.financialAccountId}`;
       if (!grouped[key]) {
         grouped[key] = {
           amount: 0,
-          accountType: tx.accountType,
           financialAccountId: tx.financialAccountId,
         };
       }
@@ -1783,26 +1767,24 @@ export async function getCategoriesByExpensesDB(hubId: string) {
     const results: {
       category: string;
       amount: number;
-      accountType: string;
       accountBalance: number;
     }[] = [];
 
     for (const [key, value] of Object.entries(grouped)) {
-      const [categoryId, accountType] = key.split(":");
+      const [categoryId, financialAccountId] = key.split(":");
       const categoryRow = await db.query.transactionCategories.findFirst({
         where: (cat) => eq(cat.id, categoryId),
         columns: { name: true },
       });
       const accountRow = await db.query.financialAccounts.findFirst({
         where: (acc) =>
-          and(eq(acc.hubId, hubId), eq(acc.type, accountType as any)),
+          and(eq(acc.hubId, hubId), eq(acc.id, financialAccountId)),
         columns: { initialBalance: true },
       });
 
       results.push({
         category: categoryRow?.name ?? "Unknown",
         amount: Math.abs(value.amount),
-        accountType: value.accountType,
         accountBalance: accountRow?.initialBalance ?? 0,
       });
     }

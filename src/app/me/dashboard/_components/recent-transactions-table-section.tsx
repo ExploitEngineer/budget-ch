@@ -41,7 +41,6 @@ export function RecentTransactionsTableSection() {
   const headings = [
     t("recent-transactions-table.table-headings.date"),
     t("recent-transactions-table.table-headings.recipient.title"),
-    t("recent-transactions-table.table-headings.account.title"),
     t("recent-transactions-table.table-headings.category.title"),
     t("recent-transactions-table.table-headings.note.title"),
     t("recent-transactions-table.table-headings.amount"),
@@ -87,9 +86,6 @@ export function RecentTransactionsTableSection() {
                     <TableRow className="dark:border-border-blue" key={tx.id}>
                       <TableCell>{tx.date}</TableCell>
                       <TableCell>{tx.recipient}</TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {tx.accountType}
-                      </TableCell>
                       <TableCell>{tx.category}</TableCell>
                       <TableCell>{tx.note}</TableCell>
                       <TableCell>{`CHF ${tx.amount}`}</TableCell>
@@ -98,7 +94,7 @@ export function RecentTransactionsTableSection() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={5}
                       className="text-center text-gray-500"
                     >
                       {t("upcoming-cards.no-transactions")}

@@ -217,7 +217,6 @@ export const transactions = pgTable("transactions", {
   addedAt: timestamp("transaction_added_at", { withTimezone: true })
     .defaultNow()
     .notNull(),
-  accountType: accountType().notNull().default("cash"),
   type: transactionType().notNull().default("income"),
   source: text("source"),
   amount: doublePrecision("amount").notNull().default(0),
@@ -262,7 +261,6 @@ export const savingGoals = pgTable("saving_goals", {
   goalAmount: doublePrecision("goal_amount").notNull().default(0),
   amountSaved: doublePrecision("amount_saved").notNull().default(0),
   monthlyAllocation: doublePrecision("monthly_allocation").notNull().default(0),
-  accountType: accountType().notNull().default("cash"),
   financialAccountId: uuid("financial_account_id").references(
     () => financialAccounts.id,
     { onDelete: "set null" },

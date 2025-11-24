@@ -114,14 +114,6 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
       cell: ({ row }) => row.original.recipient || "—",
     },
     {
-      accessorKey: "accountType",
-      header: t("data-table.headings.account"),
-      cell: ({ row }) => {
-        const account = row.original.accountType || "—";
-        return <span className="capitalize">{account}</span>;
-      },
-    },
-    {
       accessorKey: "category",
       header: t("data-table.headings.category"),
       cell: ({ row }) => {
@@ -167,7 +159,6 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
               id: transaction.id || "",
               date: transaction.date || "-",
               recipient: transaction.recipient || "-",
-              accountType: transaction.accountType || "cash",
               category: transaction.category || "-",
               note: transaction.note || "-",
               amount: transaction.amount || 0,

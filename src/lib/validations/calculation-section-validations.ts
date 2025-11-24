@@ -1,18 +1,9 @@
 import { z } from "zod";
 
-const accountType = [
-  "current-account",
-  "credit-card",
-  "savings",
-  "cash",
-  "all",
-] as const;
-
 export const calculationFormSchema = z
   .object({
     dateFrom: z.date().optional(),
     dateTo: z.date().optional(),
-    accountType: z.enum(accountType, { message: "Account is required" }),
     category: z.string({ message: "Category is required" }),
     amountMin: z.coerce
       .number()

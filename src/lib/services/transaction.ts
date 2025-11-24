@@ -122,8 +122,6 @@ export async function createTransaction({
       source,
       note,
       transactionType,
-      // TODO this account type maybe redundant, should remove later if not needed.
-      accountType: account.type,
     });
 
     return { success: true };
@@ -183,7 +181,6 @@ export async function getTransactions(): Promise<{
       id: true,
       date: true,
       recipient: true,
-      accountType: true,
       type: true,
       category: true,
       note: true,
@@ -202,7 +199,6 @@ export async function getTransactions(): Promise<{
       id: tx.id,
       date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
       recipient: tx.recipient || "—",
-      accountType: tx.accountType || "—",
       type: tx.type,
       category: tx.category || "—",
       note: tx.note ?? null,
@@ -232,7 +228,6 @@ export async function getRecentTransactions() {
         id: true,
         date: true,
         recipient: true,
-        accountType: true,
         category: true,
         note: true,
         amount: true,
@@ -251,7 +246,6 @@ export async function getRecentTransactions() {
       id: tx.id,
       date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
       recipient: tx.recipient || "—",
-      accountType: tx.accountType || "—",
       category: tx.category || "—",
       note: tx.note ?? null,
       amount: tx.amount ?? 0,
@@ -293,7 +287,6 @@ export async function updateTransaction(
     const note = formData.get("note")?.toString() || null;
     const addedAtStr = formData.get("addedAt")?.toString() || "";
     const addedAt = addedAtStr ? new Date(addedAtStr) : new Date();
-    const accountType = formData.get("accountType")?.toString() || null;
 
     const categoryName =
       formData.get("categoryName")?.toString().trim().toLowerCase() || null;
@@ -332,7 +325,6 @@ export async function updateTransaction(
         amount,
         note,
         addedAt,
-        accountType: accountType as any,
         financialAccountId,
         transactionCategoryId,
       },

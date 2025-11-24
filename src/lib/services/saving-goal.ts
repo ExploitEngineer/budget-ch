@@ -1,6 +1,6 @@
 "use server";
 
-import type { savingGoalArgs, AccountType } from "@/db/queries";
+import type { savingGoalArgs } from "@/db/queries";
 import {
   createSavingGoalDB,
   getSavingGoalsDB,
@@ -32,7 +32,6 @@ export interface UpdateSavingGoalArgs {
     goalAmount?: number;
     amountSaved?: number;
     monthlyAllocation?: number;
-    accountType?: string;
     financialAccountId?: string | null;
     dueDate?: Date | null;
   };
@@ -45,7 +44,7 @@ export async function createSavingGoal({
   amountSaved,
   monthlyAllocation,
   financialAccountId,
-}: Omit<savingGoalArgs, "hubId" | "userId" | "accountType"> & {
+}: Omit<savingGoalArgs, "hubId" | "userId"> & {
   financialAccountId: string;
 }) {
   try {
@@ -75,7 +74,6 @@ export async function createSavingGoal({
       goalAmount,
       amountSaved,
       monthlyAllocation,
-      accountType: account.type,
       financialAccountId,
     });
 
@@ -179,17 +177,12 @@ export async function updateSavingGoal({
         };
       }
 
-      // Update accountType based on the selected account
-      updatedData.accountType = account.type;
     }
 
     const result = await updateSavingGoalDB({
       hubId,
       goalId,
-      updatedData: {
-        ...updatedData,
-        accountType: updatedData.accountType as AccountType | undefined,
-      },
+      updatedData,
     });
 
     if (!result.success) {
