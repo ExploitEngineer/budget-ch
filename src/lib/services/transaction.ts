@@ -7,6 +7,7 @@ import {
   updateTransactionDB,
   deleteTransactionDB,
   getFinancialAccountByType,
+  getFinancialAccountById,
   updateFinancialAccountDB,
   deleteAllTransactionsAndCategoriesDB,
   getSubscriptionByUserId,
@@ -28,7 +29,7 @@ export async function createTransaction({
   note,
   source,
   transactionType,
-  accountType,
+  accountId,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -36,14 +37,10 @@ export async function createTransaction({
   | "note"
   | "source"
   | "transactionType"
-  | "accountType"
->) {
+> & { accountId: string }) {
   try {
     const hdrs = await headers();
-    const { userId, userRole, hubId, financialAccountId } = await getContext(
-      hdrs,
-      true,
-    );
+    const { userId, userRole, hubId } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -60,20 +57,20 @@ export async function createTransaction({
       }
     }
 
-    if (!financialAccountId) {
-      return { success: false, reason: "NO_ACCOUNT" };
+    // Get account by ID
+    const account = await getFinancialAccountById(accountId, hubId);
+    if (!account) {
+      return {
+        success: false,
+        message: "Account not found or you don't have access to it.",
+      };
     }
 
     // Balance check and update logic
-    const account = await getFinancialAccountByType(userId, hubId, accountType);
-    if (!account) {
-      throw new Error(`No ${accountType} account found for this user.`);
-    }
-
     let newBalance = Number(account.initialBalance ?? 0);
     if (transactionType === "expense") {
       if (newBalance < amount) {
-        throw new Error("Insufficient funds in selected account type.");
+        throw new Error("Insufficient funds in selected account.");
       }
       newBalance -= amount;
     } else if (transactionType === "income") {
@@ -117,7 +114,8 @@ export async function createTransaction({
       source,
       note,
       transactionType,
-      accountType,
+      // TODO this account type maybe redundant, should remove later if not needed.
+      accountType: account.type,
     });
 
     return { success: true };

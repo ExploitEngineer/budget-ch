@@ -689,6 +689,21 @@ export async function getFinancialAccountByType(
   }
 }
 
+// GET financial account by ID
+export async function getFinancialAccountById(
+  accountId: string,
+  hubId: string,
+) {
+  try {
+    return await db.query.financialAccounts.findFirst({
+      where: (a) => and(eq(a.id, accountId), eq(a.hubId, hubId)),
+    });
+  } catch (err) {
+    console.error("Error fetching account by ID:", err);
+    return null;
+  }
+}
+
 // CREATE Transaction
 export async function createTransactionDB({
   financialAccountId,

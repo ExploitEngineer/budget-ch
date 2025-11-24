@@ -47,6 +47,11 @@ import {
 } from "@/lib/validations/transaction-dialog-validations";
 import { Spinner } from "@/components/ui/spinner";
 import { useTransactionStore } from "@/store/transaction-store";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { AccountRow } from "@/lib/types/row-types";
 
 export default function CreateTransactionDialog({
   variant,
@@ -61,6 +66,23 @@ export default function CreateTransactionDialog({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const { createTransactionAndSync, createLoading } = useTransactionStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+    enabled: open, // Only fetch when dialog is open
+  });
 
   const t = useTranslations(
     "main-dashboard.transactions-page.transaction-edit-dialog",
@@ -70,7 +92,7 @@ export default function CreateTransactionDialog({
     resolver: zodResolver(TransactionDialogSchema) as any,
     defaultValues: {
       date: new Date(),
-      account: "savings",
+      accountId: "",
       recipient: "",
       category: "",
       amount: 0,
@@ -87,7 +109,7 @@ export default function CreateTransactionDialog({
         note: values.note,
         source: values.recipient,
         transactionType: values.transactionType,
-        accountType: values.account,
+        accountId: values.accountId,
       });
 
       form.reset();
@@ -201,7 +223,7 @@ export default function CreateTransactionDialog({
 
                   <FormField
                     control={form.control}
-                    name="account"
+                    name="accountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
                         <FormLabel>{t("dialog.labels.account")}</FormLabel>
@@ -209,25 +231,33 @@ export default function CreateTransactionDialog({
                           <Select
                             onValueChange={field.onChange}
                             value={field.value}
+                            disabled={accountsLoading}
                           >
                             <SelectTrigger className="w-full cursor-pointer">
                               <SelectValue
-                                placeholder={t("dialog.placeholders.account")}
+                                placeholder={
+                                  accountsLoading
+                                    ? "Loading accounts..."
+                                    : t("dialog.placeholders.account")
+                                }
                               />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="checking">
-                                {t("dialog.options.checking")}
-                              </SelectItem>
-                              <SelectItem value="savings">
-                                {t("dialog.options.savings")}
-                              </SelectItem>
-                              <SelectItem value="credit-card">
-                                {t("dialog.options.credit-card")}
-                              </SelectItem>
-                              <SelectItem value="cash">
-                                {t("dialog.options.cash")}
-                              </SelectItem>
+                              {accountsLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading accounts...
+                                </SelectItem>
+                              ) : accounts && accounts.length > 0 ? (
+                                accounts.map((account) => (
+                                  <SelectItem key={account.id} value={account.id}>
+                                    {account.name} ({account.type})
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="no-accounts" disabled>
+                                  No accounts available
+                                </SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                         </FormControl>

@@ -1,7 +1,5 @@
 import { z } from "zod";
 
-const accountType = ["checking", "savings", "credit-card", "cash"] as const;
-
 const transactionType = ["income", "expense"] as const;
 
 const splitSchema = z.object({
@@ -14,7 +12,7 @@ export const TransactionDialogSchema = z.object({
   date: z.coerce
     .date()
     .refine((d) => !isNaN(d.getTime()), { message: "Date is required" }),
-  account: z.enum(accountType, { message: "Account is required" }),
+  accountId: z.string().min(1, { message: "Account is required" }),
   transactionType: z.enum(transactionType, {
     message: "Transaction Type is required",
   }),

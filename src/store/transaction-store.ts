@@ -6,7 +6,6 @@ import {
   deleteAllTransactionsAndCategories,
 } from "@/lib/services/transaction";
 import { toast } from "sonner";
-import type { AccountType } from "@/db/queries";
 import { useDashboardStore } from "./dashboard-store";
 
 interface CreateTransactionProps {
@@ -15,7 +14,7 @@ interface CreateTransactionProps {
   note?: string;
   source: string;
   transactionType: "income" | "expense";
-  accountType: AccountType;
+  accountId: string;
 }
 
 interface TransactionState {
@@ -46,14 +45,10 @@ export const useTransactionStore = create<TransactionState>((set) => ({
         note: data.note,
         source: data.source,
         transactionType: data.transactionType,
-        accountType: data.accountType,
+        accountId: data.accountId,
       });
 
       if (!result.success) {
-        if (result.reason === "NO_ACCOUNT") {
-          toast.error("Please create a financial account first!");
-          throw new Error("Please create a financial account first!");
-        }
         const errorMessage = result.message || "Failed to create transaction.";
         toast.error(errorMessage);
         throw new Error(errorMessage);
