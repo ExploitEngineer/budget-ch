@@ -95,23 +95,29 @@ export async function createTransaction({
         ),
     });
 
-    if (existingCategory) {
-      throw new Error(`Category "${normalizedName}" already exists`);
-    }
+    let transactionCategoryId: string;
 
-    const [newCategory] = await db
-      .insert(transactionCategories)
-      .values({
-        hubId,
-        name: normalizedName,
-      })
-      .returning({ id: transactionCategories.id });
+    if (existingCategory) {
+      // Use existing category
+      transactionCategoryId = existingCategory.id;
+    } else {
+      // Create new category
+      const [newCategory] = await db
+        .insert(transactionCategories)
+        .values({
+          hubId,
+          name: normalizedName,
+        })
+        .returning({ id: transactionCategories.id });
+
+      transactionCategoryId = newCategory.id;
+    }
 
     await createTransactionDB({
       financialAccountId: account.id,
       hubId,
       userId,
-      transactionCategoryId: newCategory.id,
+      transactionCategoryId,
       amount,
       source,
       note,
