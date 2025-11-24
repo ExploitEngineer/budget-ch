@@ -38,6 +38,7 @@ import {
 import { useState } from "react";
 import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { Spinner } from "@/components/ui/spinner";
+import { useSearchParams } from "next/navigation";
 
 interface CalculationSectionProps {
   onFilter: (filters: CalculationFormValues) => void;
@@ -49,6 +50,8 @@ export function CalculationSection({
   onReset,
 }: CalculationSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [categories, setCategories] = useState<string[]>([]);
@@ -89,6 +92,7 @@ export function CalculationSection({
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
 
       <FormProvider {...form}>

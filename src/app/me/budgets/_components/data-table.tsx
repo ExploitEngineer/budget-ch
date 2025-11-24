@@ -120,7 +120,7 @@ export function BudgetDataTable() {
               variant="outline"
               onClick={() =>
                 exportBudgets({
-                  budgets,
+                  budgets: budgets ?? null,
                 })
               }
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"

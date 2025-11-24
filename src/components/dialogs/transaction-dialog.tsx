@@ -44,26 +44,63 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Spinner } from "../ui/spinner";
 import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
-import { useQueryClient } from "@tanstack/react-query";
-import { transactionKeys } from "@/lib/query-keys";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { transactionKeys, accountKeys, categoryKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getCategories } from "@/lib/services/category";
+import type { AccountRow } from "@/lib/types/row-types";
 
 export default function TransactionDialog() {
   const [open, setOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+    enabled: open, // Only fetch when dialog is open
+  });
+
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+  } = useQuery<{ id: string; name: string }[]>({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data;
+    },
+    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
+  });
+
+  const categories = categoriesData?.map((cat) => cat.name) ?? [];
+
   const form = useForm<TransactionDialogValues>({
     resolver: zodResolver(TransactionDialogSchema) as any,
     defaultValues: {
       date: new Date(),
-      account: "checking",
+      accountId: "",
       transactionType: "income",
       recipient: "",
       category: "",
@@ -83,40 +120,37 @@ export default function TransactionDialog() {
         note: values.note,
         source: values.recipient,
         transactionType: values.transactionType,
-        accountType: values.account,
+        accountId: values.accountId,
       });
 
       if (!result.success) {
-        if (result.reason === "CATEGORY_ALREADY_EXISTS") {
-          toast.error("This category already exists. Transaction not created!");
-        } else if (result.reason === "NO_ACCOUNT") {
-          toast.error("Please create a financial account first!");
-        } else {
-          toast.error(result.message || "Failed to create transaction.");
-        }
+        toast.error(result.message || "Failed to create transaction.");
+        setIsLoading(false);
         return;
       }
 
-      toast.success("Transaction and category created successfully!");
+      toast.success("Transaction created successfully!");
       form.reset();
       setSelectedCategory(null);
-      setCategories([]);
       queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
 
       setOpen(false);
     } catch (err: any) {
       console.error(err);
-      toast.error("Something went wrong while creating the transaction.");
+      toast.error(err.message || "Something went wrong while creating the transaction.");
     } finally {
       setIsLoading(false);
     }
   }
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
+    // Refetch categories to get the updated list
+    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
   }
   return (
     <>
@@ -124,6 +158,7 @@ export default function TransactionDialog() {
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -193,7 +228,7 @@ export default function TransactionDialog() {
 
                 <FormField
                   control={form.control}
-                  name="account"
+                  name="accountId"
                   render={({ field }) => (
                     <FormItem className="flex !flex-1 flex-col">
                       <FormLabel>
@@ -203,29 +238,33 @@ export default function TransactionDialog() {
                         <Select
                           onValueChange={field.onChange}
                           value={field.value}
+                          disabled={accountsLoading}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue
-                              placeholder={t(
-                                "dialog-box.labels.account.placeholder",
-                              )}
+                              placeholder={
+                                accountsLoading
+                                  ? "Loading accounts..."
+                                  : t("dialog-box.labels.account.placeholder")
+                              }
                             />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="checking">
-                              {t("dialog-box.labels.account.options.checking")}
-                            </SelectItem>
-                            <SelectItem value="savings">
-                              {t("dialog-box.labels.account.options.save")}
-                            </SelectItem>
-                            <SelectItem value="credit-card">
-                              {t(
-                                "dialog-box.labels.account.options.credit-card",
-                              )}
-                            </SelectItem>
-                            <SelectItem value="cash">
-                              {t("dialog-box.labels.account.options.cash")}
-                            </SelectItem>
+                            {accountsLoading ? (
+                              <SelectItem value="loading" disabled>
+                                Loading accounts...
+                              </SelectItem>
+                            ) : accounts && accounts.length > 0 ? (
+                              accounts.map((account) => (
+                                <SelectItem key={account.id} value={account.id}>
+                                  {account.name} ({account.type})
+                                </SelectItem>
+                              ))
+                            ) : (
+                              <SelectItem value="no-accounts" disabled>
+                                No accounts available
+                              </SelectItem>
+                            )}
                           </SelectContent>
                         </Select>
                       </FormControl>
@@ -333,7 +372,11 @@ export default function TransactionDialog() {
                               </Button>
                             </div>
 
-                            {categories.length === 0 ? (
+                            {categoriesLoading ? (
+                              <SelectItem value="loading" disabled>
+                                Loading categories...
+                              </SelectItem>
+                            ) : categories.length === 0 ? (
                               <SelectItem value="none" disabled>
                                 {t("dialog-box.no-categories-yet")}
                               </SelectItem>
