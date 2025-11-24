@@ -41,9 +41,15 @@ import {
   SavingsGoalDialogValues,
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { Spinner } from "@/components/ui/spinner";
 import type { SavingGoal } from "@/db/queries";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { updateSavingGoal, deleteSavingGoal } from "@/lib/services/saving-goal";
+import { savingGoalKeys, accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import type { AccountRow } from "@/lib/types/row-types";
 
 export default function EditSavingGoalDialog({
   goalData,
@@ -54,9 +60,25 @@ export default function EditSavingGoalDialog({
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
-  const { updateGoalAndSync, deleteGoalAndSync, updateLoading, deleteLoading } =
-    useSavingGoalStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
   const [open, setOpen] = useState(false);
+
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+    enabled: open, // Only fetch when dialog is open
+  });
 
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
@@ -64,36 +86,81 @@ export default function EditSavingGoalDialog({
       name: goalData?.name ?? "",
       goalAmount: goalData?.goalAmount ?? 0,
       savedAmount: goalData?.amountSaved ?? 0,
-      dueDate: goalData?.dueDate ? new Date(goalData.dueDate) : new Date(),
-      account: goalData?.accountType ?? "savings",
+      dueDate: goalData?.dueDate ? new Date(goalData.dueDate) : undefined,
+      accountId: goalData?.financialAccountId ?? "",
       monthlyAllocation: goalData?.monthlyAllocation ?? 0,
+    },
+  });
+
+  const updateGoalMutation = useMutation({
+    mutationFn: async (updatedData: {
+      name?: string;
+      goalAmount?: number;
+      amountSaved?: number;
+      monthlyAllocation?: number;
+      financialAccountId?: string | null;
+      dueDate?: Date | null;
+    }) => {
+      const result = await updateSavingGoal({
+        goalId: goalData.id,
+        updatedData,
+      });
+      if (!result.success) {
+        throw new Error(result.message || "Failed to update saving goal");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
+      toast.success("Saving goal updated successfully!");
+      setOpen(false);
+      form.reset();
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update saving goal");
+    },
+  });
+
+  const deleteGoalMutation = useMutation({
+    mutationFn: async () => {
+      const result = await deleteSavingGoal(goalData.id);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete saving goal");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
+      toast.success("Saving goal deleted successfully!");
+      setOpen(false);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to delete saving goal");
     },
   });
 
   async function onSubmit(values: SavingsGoalDialogValues) {
     try {
-      await updateGoalAndSync(goalData.id, {
+      await updateGoalMutation.mutateAsync({
         name: values.name,
         goalAmount: values.goalAmount,
         amountSaved: values.savedAmount,
         monthlyAllocation: values.monthlyAllocation,
-        accountType: values.account,
+        financialAccountId: values.accountId,
         dueDate: values.dueDate ?? null,
       });
-
-      setOpen(false);
-      form.reset(values);
     } catch (err: any) {
-      console.error("Error submitting form:", err);
+      // Error already handled in onError
     }
   }
 
   async function handleDelete() {
     try {
-      await deleteGoalAndSync(goalData.id);
-      setOpen(false);
+      await deleteGoalMutation.mutateAsync();
     } catch (err: any) {
-      console.error("Error deleting saving goal:", err);
+      // Error already handled in onError
     }
   }
 
@@ -214,7 +281,7 @@ export default function EditSavingGoalDialog({
 
               <FormField
                 control={form.control}
-                name="account"
+                name="accountId"
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormLabel>{t("labels.account.title")}</FormLabel>
@@ -222,25 +289,33 @@ export default function EditSavingGoalDialog({
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
+                        disabled={accountsLoading}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue
-                            placeholder={t("labels.account.title")}
+                            placeholder={
+                              accountsLoading
+                                ? "Loading accounts..."
+                                : t("labels.account.title")
+                            }
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="checking">
-                            {t("labels.account.options.checking")}
-                          </SelectItem>
-                          <SelectItem value="savings">
-                            {t("labels.account.options.save")}
-                          </SelectItem>
-                          <SelectItem value="credit-card">
-                            {t("labels.account.options.credit-card")}
-                          </SelectItem>
-                          <SelectItem value="cash">
-                            {t("labels.account.options.cash")}
-                          </SelectItem>
+                          {accountsLoading ? (
+                            <SelectItem value="loading" disabled>
+                              Loading accounts...
+                            </SelectItem>
+                          ) : accounts && accounts.length > 0 ? (
+                            accounts.map((account) => (
+                              <SelectItem key={account.id} value={account.id}>
+                                {account.name} ({account.type})
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-accounts" disabled>
+                              No accounts available
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -272,16 +347,16 @@ export default function EditSavingGoalDialog({
                 className="cursor-pointer"
                 variant="outline"
                 onClick={handleDelete}
-                disabled={deleteLoading}
+                disabled={deleteGoalMutation.isPending}
               >
-                {deleteLoading ? <Spinner /> : t("delete")}
+                {deleteGoalMutation.isPending ? <Spinner /> : t("delete")}
               </Button>
               <Button
                 type="submit"
                 className="cursor-pointer"
-                disabled={updateLoading}
+                disabled={updateGoalMutation.isPending}
               >
-                {updateLoading ? <Spinner /> : t("save")}
+                {updateGoalMutation.isPending ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

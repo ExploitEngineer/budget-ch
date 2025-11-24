@@ -6,21 +6,36 @@ import { Badge } from "@/components/ui/badge";
 import EditSavingGoalDialog from "./edit-saving-goal-dialog";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { AllocateForm } from "./allocate-form";
 import { useTranslations } from "next-intl";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { savingGoalKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { SavingGoal } from "@/db/queries";
 
 export function ActiveGoalsSection() {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.active-goals-section",
   );
 
-  const { goals, goalsLoading, goalsError, fetchGoals } = useSavingGoalStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
-  useEffect(() => {
-    fetchGoals();
-  }, [fetchGoals]);
+  const {
+    data: goals,
+    isLoading: goalsLoading,
+    error: goalsError,
+  } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const activeGoalsData = goals ?? [];
 
@@ -70,8 +85,10 @@ export function ActiveGoalsSection() {
 
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
           {goalsError ? (
-            <p className="text-muted-foreground p-4 text-sm">{goalsError}</p>
-          ) : goals === null || goalsLoading ? (
+            <p className="text-muted-foreground p-4 text-sm">
+              {goalsError.message || "Failed to load saving goals"}
+            </p>
+          ) : goalsLoading ? (
             <p className="text-muted-foreground p-4 text-sm">{t("loading")}</p>
           ) : activeGoalsData.length === 0 ? (
             <p className="text-muted-foreground p-4 text-sm">{t("no-goals")}</p>

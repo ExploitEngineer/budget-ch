@@ -12,12 +12,18 @@ import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
 import { getRecentTransactions } from "@/lib/services/transaction";
 import { getBudgets } from "@/lib/services/budget";
-import { accountKeys, transactionKeys, budgetKeys } from "@/lib/query-keys";
+import {
+  accountKeys,
+  transactionKeys,
+  budgetKeys,
+  savingGoalKeys,
+} from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
+import { getSavingGoals } from "@/lib/services/saving-goal";
 import type { BudgetRow } from "@/lib/types/row-types";
+import type { SavingGoal } from "@/db/queries";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
@@ -56,7 +62,17 @@ export function Export() {
       return res.data ?? [];
     },
   });
-  const { goals, fetchGoals } = useSavingGoalStore();
+
+  const { data: goals } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+  });
   const {
     exportTransactions,
     exportBudgets,
@@ -86,7 +102,6 @@ export function Export() {
   }
 
   useEffect(() => {
-    fetchGoals();
     fetchTransfers();
   }, []);
 
@@ -105,11 +120,11 @@ export function Export() {
     },
     {
       title: t("export-card.buttons.budgets"),
-      onClick: () => exportBudgets({ budgets }),
+      onClick: () => exportBudgets({ budgets: budgets ?? null }),
     },
     {
       title: t("export-card.buttons.savings-goals"),
-      onClick: () => exportSavingGoals({ goals }),
+      onClick: () => exportSavingGoals({ goals: goals ?? null }),
     },
     {
       title: t("export-card.buttons.accounts"),

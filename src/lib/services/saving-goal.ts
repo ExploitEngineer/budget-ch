@@ -1,11 +1,12 @@
 "use server";
 
-import type { savingGoalArgs } from "@/db/queries";
+import type { savingGoalArgs, AccountType } from "@/db/queries";
 import {
   createSavingGoalDB,
   getSavingGoalsDB,
   updateSavingGoalDB,
   deleteSavingGoalDB,
+  getFinancialAccountById,
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
@@ -32,6 +33,7 @@ export interface UpdateSavingGoalArgs {
     amountSaved?: number;
     monthlyAllocation?: number;
     accountType?: string;
+    financialAccountId?: string | null;
     dueDate?: Date | null;
   };
 }
@@ -42,19 +44,28 @@ export async function createSavingGoal({
   goalAmount,
   amountSaved,
   monthlyAllocation,
-  accountType,
-}: Omit<savingGoalArgs, "financialAccountId" | "hubId" | "userId">) {
+  financialAccountId,
+}: Omit<savingGoalArgs, "hubId" | "userId" | "accountType"> & {
+  financialAccountId: string;
+}) {
   try {
     const hdrs = await headers();
-    const { userId, hubId, userRole, financialAccountId } = await getContext(
-      hdrs,
-      true,
-    );
+    const { userId, hubId, userRole } = await getContext(hdrs, true);
 
     requireAdminRole(userRole);
 
-    if (!financialAccountId) {
-      return { success: false, message: "No financial account found" };
+    if (!hubId) {
+      return { success: false, message: "Hub not found" };
+    }
+
+    // Verify the account exists and belongs to the hub
+    const account = await getFinancialAccountById(financialAccountId, hubId);
+
+    if (!account) {
+      return {
+        success: false,
+        message: "Selected account not found or access denied.",
+      };
     }
 
     const result = await createSavingGoalDB({
@@ -64,7 +75,8 @@ export async function createSavingGoal({
       goalAmount,
       amountSaved,
       monthlyAllocation,
-      accountType,
+      accountType: account.type,
+      financialAccountId,
     });
 
     return result;
@@ -153,10 +165,31 @@ export async function updateSavingGoal({
       return { success: false, message: "Hub not found" };
     }
 
+    // If financialAccountId is being updated, validate the account exists
+    if (updatedData.financialAccountId) {
+      const account = await getFinancialAccountById(
+        updatedData.financialAccountId,
+        hubId,
+      );
+
+      if (!account) {
+        return {
+          success: false,
+          message: "Selected account not found or access denied.",
+        };
+      }
+
+      // Update accountType based on the selected account
+      updatedData.accountType = account.type;
+    }
+
     const result = await updateSavingGoalDB({
       hubId,
       goalId,
-      updatedData,
+      updatedData: {
+        ...updatedData,
+        accountType: updatedData.accountType as AccountType | undefined,
+      },
     });
 
     if (!result.success) {

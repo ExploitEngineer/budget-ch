@@ -22,16 +22,17 @@ import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
 import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
 import { getRecentTransactions } from "@/lib/services/transaction";
 import { getBudgets } from "@/lib/services/budget";
-import { accountKeys, transactionKeys, budgetKeys } from "@/lib/query-keys";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { BudgetRow } from "@/lib/types/row-types";
+import type { SavingGoal } from "@/db/queries";
 
 const monthNames: string[] = [
   "January",
@@ -90,7 +91,16 @@ export default function SidebarHeader() {
       return res.data ?? [];
     },
   });
-  const { goals } = useSavingGoalStore();
+  const { data: goals } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
 

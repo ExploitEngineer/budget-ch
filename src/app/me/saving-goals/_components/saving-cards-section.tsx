@@ -9,8 +9,11 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
+import { useQuery } from "@tanstack/react-query";
+import { getSavingGoalsSummary } from "@/lib/services/saving-goal";
+import { savingGoalKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { SavingGoalsSummary } from "@/lib/services/saving-goal";
 
 interface CardsContent {
   title: string;
@@ -23,12 +26,23 @@ interface SavingCardsSectionProps {
 }
 
 export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
-  const { summary, summaryLoading, summaryError, fetchSummary } =
-    useSavingGoalStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
-  useEffect(() => {
-    fetchSummary();
-  }, [fetchSummary]);
+  const {
+    data: summary,
+    isLoading: summaryLoading,
+    error: summaryError,
+  } = useQuery<SavingGoalsSummary>({
+    queryKey: savingGoalKeys.summary(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoalsSummary();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals summary");
+      }
+      return res.data!;
+    },
+  });
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-4">
@@ -70,7 +84,11 @@ export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
             </CardHeader>
             <CardContent>
               <h1 className="text-2xl font-bold">
-                {summaryLoading ? "..." : summaryError ? "—" : content}
+                {summaryLoading
+                  ? "..."
+                  : summaryError
+                    ? "—"
+                    : content}
               </h1>
             </CardContent>
             <CardFooter className="mt-2">

@@ -263,6 +263,10 @@ export const savingGoals = pgTable("saving_goals", {
   amountSaved: doublePrecision("amount_saved").notNull().default(0),
   monthlyAllocation: doublePrecision("monthly_allocation").notNull().default(0),
   accountType: accountType().notNull().default("cash"),
+  financialAccountId: uuid("financial_account_id").references(
+    () => financialAccounts.id,
+    { onDelete: "set null" },
+  ),
   dueDate: timestamp("due_date"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")

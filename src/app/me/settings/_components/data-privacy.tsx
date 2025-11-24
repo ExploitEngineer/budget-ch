@@ -11,14 +11,15 @@ import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
 import { getRecentTransactions } from "@/lib/services/transaction";
 import { getBudgets } from "@/lib/services/budget";
-import { accountKeys, transactionKeys, budgetKeys } from "@/lib/query-keys";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
+import type { SavingGoal } from "@/db/queries";
 import type { BudgetRow } from "@/lib/types/row-types";
 import {
   Dialog,
@@ -71,7 +72,19 @@ export function DataPrivacy() {
       return res.data ?? [];
     },
   });
-  const { goals } = useSavingGoalStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+
+  const { data: goals } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const { exportAllDataJSON } = useExportCSV();
 

@@ -17,8 +17,11 @@ import { Input } from "@/components/ui/input";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { updateSavingGoal } from "@/lib/services/saving-goal";
+import { savingGoalKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 type AllocateFormProps = {
   amountSaved: number;
@@ -30,11 +33,35 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
     "main-dashboard.saving-goals-page.active-goals-section",
   );
 
-  const { updateGoalAndSync, updateLoading } = useSavingGoalStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const form = useForm<AllocateAmountValues>({
     resolver: zodResolver(AllocateAmountSchema) as any,
     defaultValues: { amount: undefined },
+  });
+
+  const updateGoalMutation = useMutation({
+    mutationFn: async (updatedData: { amountSaved: number }) => {
+      const result = await updateSavingGoal({
+        goalId,
+        updatedData,
+      });
+      if (!result.success) {
+        throw new Error(result.message || "Failed to update saving goal");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
+      toast.success("Saving goal updated successfully!");
+      form.reset({ amount: undefined });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update saving goal");
+    },
   });
 
   const handleSubmit = form.handleSubmit(async (values) => {
@@ -43,13 +70,11 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
     try {
       const newAmount = (amountSaved || 0) + values.amount;
 
-      await updateGoalAndSync(goalId, {
+      await updateGoalMutation.mutateAsync({
         amountSaved: newAmount,
       });
-
-      form.reset({ amount: undefined });
     } catch (err: any) {
-      console.error("Error updating saving goal:", err);
+      // Error already handled in onError
     }
   });
 
@@ -59,10 +84,10 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
         <Button
           variant="outline"
           type="submit"
-          disabled={updateLoading}
+          disabled={updateGoalMutation.isPending}
           className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-3"
         >
-          {updateLoading ? (
+          {updateGoalMutation.isPending ? (
             "Updating..."
           ) : (
             <>
@@ -85,7 +110,7 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
                   )} (CHF)`}
                   step={0.5}
                   {...field}
-                  disabled={updateLoading}
+                  disabled={updateGoalMutation.isPending}
                 />
               </FormControl>
               <FormMessage />

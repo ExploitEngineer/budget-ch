@@ -59,5 +59,6 @@ export const savingGoalKeys = {
   all: ["saving-goals"] as const,
   lists: () => [...savingGoalKeys.all, "list"] as const,
   list: (hubId: string | null, limit?: number) => [...savingGoalKeys.lists(), hubId, limit] as const,
+  summary: (hubId: string | null) => [...savingGoalKeys.all, "summary", hubId] as const,
 };
 

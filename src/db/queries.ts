@@ -98,6 +98,7 @@ export type savingGoalArgs = {
   amountSaved: number;
   monthlyAllocation: number;
   accountType: AccountType;
+  financialAccountId?: string | null;
 };
 
 export interface SavingGoal {
@@ -108,6 +109,7 @@ export interface SavingGoal {
   monthlyAllocation?: number;
   value: number;
   accountType: AccountType;
+  financialAccountId?: string | null;
   dueDate?: Date | null;
   remaining?: number;
 }
@@ -140,6 +142,7 @@ interface UpdateSavingGoalArgs {
     amountSaved?: number;
     monthlyAllocation?: number;
     accountType?: string;
+    financialAccountId?: string | null;
     dueDate?: Date | null;
   };
 }
@@ -998,6 +1001,7 @@ export async function createSavingGoalDB({
   amountSaved,
   monthlyAllocation,
   accountType,
+  financialAccountId,
 }: savingGoalArgs) {
   try {
     await db.insert(savingGoals).values({
@@ -1008,6 +1012,7 @@ export async function createSavingGoalDB({
       amountSaved,
       monthlyAllocation,
       accountType,
+      financialAccountId: financialAccountId || null,
     });
 
     return { success: true, message: "Saving goal created successfully" };
@@ -1040,6 +1045,7 @@ export async function getSavingGoalsDB(
         amountSaved: savingGoals.amountSaved,
         monthlyAllocation: savingGoals.monthlyAllocation,
         accountType: savingGoals.accountType,
+        financialAccountId: savingGoals.financialAccountId,
         dueDate: savingGoals.dueDate,
       })
       .from(savingGoals)
@@ -1127,6 +1133,7 @@ export async function updateSavingGoalDB({
         amountSaved: updatedData.amountSaved,
         monthlyAllocation: updatedData.monthlyAllocation,
         accountType: updatedData.accountType,
+        financialAccountId: updatedData.financialAccountId ?? null,
         dueDate: updatedData.dueDate ?? null,
       }).filter(([_, v]) => v !== undefined),
     );
