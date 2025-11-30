@@ -313,9 +313,11 @@
                             "title": "Transaktionstyp",
                             "options": {
                                 "income": "Einnahme",
-                                "expense": "Ausgabe"
+                                "expense": "Ausgabe",
+                                "transfer": "Überweisung"
                             }
-                        }
+                        },
+                        "destinationAccount": "Zielkonto"
                     },
                     "placeholders": {
                         "date": "21.09.2025",
@@ -323,7 +325,8 @@
                         "recipient": "Empfänger eingeben",
                         "category": "Kategorie auswählen",
                         "note": "Notiz eingeben",
-                        "note-optional": "Notiz (optional)"
+                        "note-optional": "Notiz (optional)",
+                        "destinationAccount": "Zielkonto auswählen"
                     },
                     "options": {
                         "checking": "Checking",

@@ -10,7 +10,6 @@ import {
   savingGoals,
   quickTasks,
   subscriptions,
-  accountTransfers,
   hubInvitations,
   userSettings,
 } from "./schema";
@@ -20,6 +19,8 @@ import type {
   CreateBudgetInput,
   UpdateBudgetInput,
 } from "@/lib/services/budget";
+import type { SavingGoalsSummary } from "@/lib/services/saving-goal";
+import type { TransactionType } from "@/lib/types/common-types";
 
 export type AccessRole = "admin" | "member";
 
@@ -56,12 +57,13 @@ export type createTransactionArgs = {
   financialAccountId: string;
   hubId: string;
   userId: string;
-  transactionCategoryId: string;
+  transactionCategoryId: string | null;
   amount: number;
   note?: string;
   source: string;
   categoryName: string;
-  transactionType: "income" | "expense";
+  transactionType: TransactionType;
+  destinationAccountId?: string | null;
 };
 
 export type updateTransactionArgs = {
@@ -74,7 +76,8 @@ export type updateTransactionArgs = {
     addedAt?: Date | string;
     transactionCategoryId?: string | null;
     financialAccountId?: string | null;
-    transactionType?: "income" | "expense";
+    destinationAccountId?: string | null;
+    transactionType?: TransactionType;
   };
 };
 
@@ -111,13 +114,6 @@ export interface SavingGoal {
   remaining?: number;
 }
 
-export interface SavingGoalsSummary {
-  totalTarget: number;
-  totalSaved: number;
-  remainingToSave: number;
-  totalGoals: number;
-}
-
 export type quickTasksArgs = {
   userId: string;
   hubId: string;
@@ -142,15 +138,6 @@ interface UpdateSavingGoalArgs {
     dueDate?: Date | null;
   };
 }
-
-export type AccountTransferArgs = {
-  financialAccountId: string;
-  fromAccountType: AccountType;
-  toAccountType: AccountType;
-  hubId: string;
-  amount: number;
-  note?: string;
-};
 
 interface HubInvitationProps {
   hubId: string;
@@ -713,6 +700,7 @@ export async function createTransactionDB({
   source,
   note,
   transactionType,
+  destinationAccountId,
 }: Omit<createTransactionArgs, "categoryName">) {
   try {
     await db.insert(transactions).values({
@@ -724,6 +712,7 @@ export async function createTransactionDB({
       source,
       note,
       type: transactionType,
+      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
     });
 
     return { success: true, message: "Transaction created successfully" };
@@ -819,6 +808,8 @@ export async function updateTransactionDB({
           : updatedData.addedAt,
       transactionCategoryId: updatedData.transactionCategoryId,
       financialAccountId: updatedData.financialAccountId,
+      destinationAccountId: updatedData.destinationAccountId,
+      type: updatedData.transactionType,
     };
 
     const cleanData = Object.fromEntries(
@@ -1486,119 +1477,66 @@ export async function deleteBudgetDB({
   }
 }
 
-// CREATE Account Transfer
-export async function createAccountTransferDB({
-  financialAccountId,
-  fromAccountType,
-  toAccountType,
-  hubId,
-  amount,
-  note,
-}: AccountTransferArgs) {
-  try {
-    const from = await db.query.financialAccounts.findFirst({
-      where: (a) => and(eq(a.type, fromAccountType), eq(a.hubId, hubId)),
-      columns: {
-        id: true,
-        hubId: true,
-        initialBalance: true,
-        name: true,
-        type: true,
-      },
-    });
-
-    const to = await db.query.financialAccounts.findFirst({
-      where: (a) => and(eq(a.type, toAccountType), eq(a.hubId, hubId)),
-      columns: {
-        id: true,
-        hubId: true,
-        initialBalance: true,
-        name: true,
-        type: true,
-      },
-    });
-
-    if (!from) return { success: false, message: "Source account not found." };
-    if (!to)
-      return { success: false, message: "Destination account not found." };
-
-    if (from.hubId !== hubId || to.hubId !== hubId)
-      return { success: false, message: "Access denied." };
-
-    if (from.id === to.id)
-      return {
-        success: false,
-        message: "Cannot transfer to the same account.",
-      };
-
-    const fromBalance = Number(from.initialBalance ?? 0);
-    if (fromBalance < amount)
-      return {
-        success: false,
-        message: "Insufficient funds in source account.",
-      };
-
-    const newFromBalance = fromBalance - amount;
-    const newToBalance = Number(to.initialBalance ?? 0) + amount;
-
-    await db
-      .update(financialAccounts)
-      .set({ initialBalance: newFromBalance })
-      .where(eq(financialAccounts.id, from.id));
-
-    await db
-      .update(financialAccounts)
-      .set({ initialBalance: newToBalance })
-      .where(eq(financialAccounts.id, to.id));
-
-    const [transfer] = await db
-      .insert(accountTransfers)
-      .values({
-        financialAccountId,
-        sourceAccount: from.type,
-        destinationAccount: to.type,
-        note,
-        transferAmount: amount,
-      })
-      .returning();
-
-    return { success: true, data: transfer };
-  } catch (err: any) {
-    console.error("Error creating latest transfer:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to create transfer",
-    };
-  }
-}
-
-// GET Account Transfers
+// GET Account Transfers (now queries transactions with type="transfer")
 export async function getAccountTransfersDB(financialAccountId: string) {
   try {
     const account = await db.query.financialAccounts.findFirst({
       where: eq(financialAccounts.id, financialAccountId),
-      columns: { type: true },
+      columns: { id: true, name: true },
     });
 
     if (!account) {
       return { status: false, message: "Account not found.", data: [] };
     }
+
     const results = await db
-      .select()
-      .from(accountTransfers)
+      .select({
+        id: transactions.id,
+        date: transactions.createdAt,
+        amount: transactions.amount,
+        note: transactions.note,
+        sourceAccountId: transactions.financialAccountId,
+        destinationAccountId: transactions.destinationAccountId,
+      })
+      .from(transactions)
       .where(
-        or(
-          eq(accountTransfers.sourceAccount, account.type),
-          eq(accountTransfers.destinationAccount, account.type),
+        and(
+          eq(transactions.type, "transfer"),
+          or(
+            eq(transactions.financialAccountId, account.id),
+            eq(transactions.destinationAccountId, account.id),
+          ),
         ),
       )
-      .orderBy(desc(accountTransfers.updatedAt));
+      .orderBy(desc(transactions.createdAt));
+
+    // Fetch account names separately
+    const accountIds = new Set<string>();
+    results.forEach((tx) => {
+      if (tx.sourceAccountId) accountIds.add(tx.sourceAccountId);
+      if (tx.destinationAccountId) accountIds.add(tx.destinationAccountId);
+    });
+
+    const accountsMap = new Map<string, string>();
+    if (accountIds.size > 0) {
+      const accounts = await db
+        .select({
+          id: financialAccounts.id,
+          name: financialAccounts.name,
+        })
+        .from(financialAccounts)
+        .where(inArray(financialAccounts.id, Array.from(accountIds)));
+
+      accounts.forEach((acc) => {
+        accountsMap.set(acc.id, acc.name);
+      });
+    }
 
     const formatted = results.map((tx) => ({
-      date: tx.updatedAt,
-      source: tx.sourceAccount,
-      destination: tx.destinationAccount,
-      amount: Number(tx.transferAmount),
+      date: tx.date,
+      source: accountsMap.get(tx.sourceAccountId) || "",
+      destination: accountsMap.get(tx.destinationAccountId || "") || "",
+      amount: Number(tx.amount),
       note: tx.note || "",
     }));
 

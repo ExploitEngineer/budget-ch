@@ -21,7 +21,7 @@ export type DashboardSavingsGoals = {
   remaining?: number;
 };
 
-type TransactionType = "income" | "expense";
+import type { TransactionType } from "./common-types";
 
 export type Transaction = {
   id: string;

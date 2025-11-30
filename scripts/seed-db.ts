@@ -10,8 +10,7 @@ import {
   savingGoals,
   quickTasks,
 } from "../src/db/schema";
-
-type AccountType = "checking" | "savings" | "credit-card" | "cash";
+import type { AccountType } from "../src/db/queries";
 
 async function main() {
   if (!process.env.DATABASE_URL) {

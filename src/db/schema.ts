@@ -17,6 +17,7 @@ export const accessRole = pgEnum("access_role", ["admin", "member"]);
 export const transactionType = pgEnum("transaction_type", [
   "income",
   "expense",
+  "transfer",
 ]);
 export const accountType = pgEnum("account_type", [
   "checking",
@@ -283,6 +284,10 @@ export const transactions = pgTable("transactions", {
   financialAccountId: uuid("financial_account_id")
     .notNull()
     .references(() => financialAccounts.id, { onDelete: "cascade" }),
+  destinationAccountId: uuid("destination_account_id").references(
+    () => financialAccounts.id,
+    { onDelete: "cascade" },
+  ),
   transactionCategoryId: uuid("transaction_category_id").references(
     () => transactionCategories.id,
     { onDelete: "set null" },
@@ -356,22 +361,6 @@ export const quickTasks = pgTable("quick_tasks", {
   userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
   name: text("name").notNull(),
   checked: boolean().default(false),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .$onUpdate(() => /* @__PURE__ */ new Date())
-    .notNull(),
-});
-
-export const accountTransfers = pgTable("account_transfers", {
-  id: uuid("id").notNull().primaryKey().defaultRandom(),
-  financialAccountId: uuid("financial_account_id")
-    .notNull()
-    .references(() => financialAccounts.id, { onDelete: "cascade" }),
-  sourceAccount: accountType().notNull(),
-  destinationAccount: accountType().notNull(),
-  note: text("note"),
-  transferAmount: doublePrecision("transfer_amount").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

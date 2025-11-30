@@ -1,12 +1,12 @@
 import { useTranslations } from "next-intl";
 
-interface UpComingTables {
+export interface UpComingTables {
   name: string;
   account: string;
   amount: string;
 }
 
-interface WarningCards {
+export interface WarningCards {
   title: string;
   badge?: string;
 }

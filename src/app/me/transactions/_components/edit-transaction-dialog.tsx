@@ -51,12 +51,17 @@ import type { Transaction } from "@/lib/types/dashboard-types";
 import { useEffect } from "react";
 import { parse } from "date-fns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createTransaction, updateTransaction, deleteTransaction } from "@/lib/services/transaction";
+import {
+  createTransaction,
+  updateTransaction,
+  deleteTransaction,
+} from "@/lib/services/transaction";
 import { transactionKeys, accountKeys, categoryKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
 import { getCategories } from "@/lib/services/category";
 import type { AccountRow } from "@/lib/types/row-types";
+import type { TransactionType } from "@/lib/types/common-types";
 
 interface EditTransactionDialogProps {
   variant?: "outline" | "default" | "gradient";
@@ -76,25 +81,23 @@ export default function EditTransactionDialog({
   const [open, setOpen] = useState<boolean>(false);
   const isEditMode = !!transaction;
 
-  const {
-    data: accounts,
-    isLoading: accountsLoading,
-  } = useQuery<AccountRow[]>({
-    queryKey: accountKeys.list(hubId),
-    queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
-      }
-      return res.tableData ?? [];
+  const { data: accounts, isLoading: accountsLoading } = useQuery<AccountRow[]>(
+    {
+      queryKey: accountKeys.list(hubId),
+      queryFn: async () => {
+        const res = await getFinancialAccounts();
+        if (!res.status) {
+          throw new Error("Failed to fetch accounts");
+        }
+        return res.tableData ?? [];
+      },
+      enabled: open, // Only fetch when dialog is open
     },
-    enabled: open, // Only fetch when dialog is open
-  });
+  );
 
-  const {
-    data: categoriesData,
-    isLoading: categoriesLoading,
-  } = useQuery<{ id: string; name: string }[]>({
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery<
+    { id: string; name: string }[]
+  >({
     queryKey: categoryKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -117,8 +120,9 @@ export default function EditTransactionDialog({
       amount: number;
       note?: string;
       source: string;
-      transactionType: "income" | "expense";
+      transactionType: TransactionType;
       accountId: string;
+      destinationAccountId?: string;
     }) => {
       const result = await createTransaction({
         categoryName: data.category.trim(),
@@ -127,6 +131,7 @@ export default function EditTransactionDialog({
         source: data.source,
         transactionType: data.transactionType,
         accountId: data.accountId,
+        destinationAccountId: data.destinationAccountId,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -135,7 +140,9 @@ export default function EditTransactionDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
-      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       toast.success("Transaction created successfully!");
     },
@@ -145,7 +152,10 @@ export default function EditTransactionDialog({
         !error.message?.includes("financial account") &&
         !error.message?.includes("Failed to create transaction")
       ) {
-        toast.error(error.message || "Something went wrong while creating the transaction.");
+        toast.error(
+          error.message ||
+            "Something went wrong while creating the transaction.",
+        );
       } else {
         toast.error(error.message);
       }
@@ -153,7 +163,13 @@ export default function EditTransactionDialog({
   });
 
   const updateTransactionMutation = useMutation({
-    mutationFn: async ({ id, formData }: { id: string; formData: FormData }) => {
+    mutationFn: async ({
+      id,
+      formData,
+    }: {
+      id: string;
+      formData: FormData;
+    }) => {
       const result = await updateTransaction(id, formData);
       if (!result.success) {
         throw new Error(result.message || "Failed to update transaction");
@@ -162,7 +178,9 @@ export default function EditTransactionDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
-      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       toast.success("Transaction updated successfully!");
     },
@@ -185,7 +203,9 @@ export default function EditTransactionDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
-      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       toast.success("Transaction deleted successfully!");
     },
@@ -214,12 +234,15 @@ export default function EditTransactionDialog({
       accountId: "",
       recipient: transaction?.recipient || "",
       category: transaction?.category || "",
+      destinationAccountId: "",
       amount: transaction?.amount || 0,
       note: transaction?.note || "",
       splits: [],
-      transactionType: "expense",
+      transactionType: "expense" as TransactionType,
     },
   });
+
+  const transactionType = form.watch("transactionType");
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -234,11 +257,12 @@ export default function EditTransactionDialog({
 
   async function onSubmit(values: TransactionDialogValues) {
     const payload = {
-      category: selectedCategory || values.category.trim(),
+      category: selectedCategory || values.category?.trim(),
       amount: values.amount,
       note: values.note,
       source: values.recipient,
       transactionType: values.transactionType,
+      destinationAccountId: values.destinationAccountId,
     };
 
     try {
@@ -247,8 +271,13 @@ export default function EditTransactionDialog({
         Object.entries({
           ...payload,
           addedAt: values.date.toISOString(),
-          categoryName: payload.category,
-        }).forEach(([k, v]) => fd.append(k, String(v)));
+          categoryName: payload.category || "",
+          destinationAccountId: payload.destinationAccountId || "",
+        }).forEach(([k, v]) => {
+          if (v !== undefined && v !== null) {
+            fd.append(k, String(v));
+          }
+        });
 
         await updateTransactionMutation.mutateAsync({
           id: transaction!.id,
@@ -256,12 +285,13 @@ export default function EditTransactionDialog({
         });
       } else {
         await createTransactionMutation.mutateAsync({
-          category: payload.category,
+          category: payload.category || "",
           amount: payload.amount,
           note: payload.note,
           source: payload.source,
           transactionType: payload.transactionType,
           accountId: values.accountId,
+          destinationAccountId: payload.destinationAccountId,
         });
       }
 
@@ -412,7 +442,10 @@ export default function EditTransactionDialog({
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts.map((account) => (
-                                  <SelectItem key={account.id} value={account.id}>
+                                  <SelectItem
+                                    key={account.id}
+                                    value={account.id}
+                                  >
                                     {account.name} ({account.type})
                                   </SelectItem>
                                 ))
@@ -462,6 +495,11 @@ export default function EditTransactionDialog({
                                   "dialog.labels.transactionType.options.expense",
                                 )}
                               </SelectItem>
+                              <SelectItem value="transfer">
+                                {t(
+                                  "dialog.labels.transactionType.options.transfer",
+                                )}
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -489,52 +527,57 @@ export default function EditTransactionDialog({
                   />
                 </div>
 
-                {/* 3️⃣ Category + Amount */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                {/* Destination Account (for transfers) */}
+                {transactionType === "transfer" && (
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="destinationAccountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
-                        <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                        <FormLabel>
+                          {t("dialog.labels.destinationAccount")}
+                        </FormLabel>
                         <FormControl>
                           <Select
-                            value={selectedCategory || ""}
-                            onValueChange={(value) => {
-                              setSelectedCategory(value);
-                              field.onChange(value);
-                            }}
+                            onValueChange={field.onChange}
+                            value={field.value}
+                            disabled={accountsLoading}
                           >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select or add a category" />
+                            <SelectTrigger className="w-full cursor-pointer">
+                              <SelectValue
+                                placeholder={
+                                  accountsLoading
+                                    ? "Loading accounts..."
+                                    : t(
+                                        "dialog.placeholders.destinationAccount",
+                                      )
+                                }
+                              />
                             </SelectTrigger>
-
                             <SelectContent>
-                              <div className="flex items-center justify-between border-b px-2 py-1.5">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="w-full cursor-pointer justify-center text-sm"
-                                  onClick={() => setIsAddCategoryOpen(true)}
-                                >
-                                  + {t("dialog.new-category")}
-                                </Button>
-                              </div>
-
-                              {categoriesLoading ? (
+                              {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading categories...
+                                  Loading accounts...
                                 </SelectItem>
-                              ) : categories.length === 0 ? (
-                                <SelectItem value="none" disabled>
-                                  {t("dialog.no-category")}
-                                </SelectItem>
+                              ) : accounts && accounts.length > 0 ? (
+                                accounts
+                                  .filter(
+                                    (account) =>
+                                      account.id !==
+                                      form.getValues("accountId"),
+                                  )
+                                  .map((account) => (
+                                    <SelectItem
+                                      key={account.id}
+                                      value={account.id}
+                                    >
+                                      {account.name} ({account.type})
+                                    </SelectItem>
+                                  ))
                               ) : (
-                                categories.map((category) => (
-                                  <SelectItem key={category} value={category}>
-                                    {category}
-                                  </SelectItem>
-                                ))
+                                <SelectItem value="no-accounts" disabled>
+                                  No accounts available
+                                </SelectItem>
                               )}
                             </SelectContent>
                           </Select>
@@ -543,6 +586,64 @@ export default function EditTransactionDialog({
                       </FormItem>
                     )}
                   />
+                )}
+
+                {/* 3️⃣ Category + Amount */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                  {transactionType !== "transfer" && (
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-1 flex-col">
+                          <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={selectedCategory || ""}
+                              onValueChange={(value) => {
+                                setSelectedCategory(value);
+                                field.onChange(value);
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select or add a category" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <div className="flex items-center justify-between border-b px-2 py-1.5">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full cursor-pointer justify-center text-sm"
+                                    onClick={() => setIsAddCategoryOpen(true)}
+                                  >
+                                    + {t("dialog.new-category")}
+                                  </Button>
+                                </div>
+
+                                {categoriesLoading ? (
+                                  <SelectItem value="loading" disabled>
+                                    Loading categories...
+                                  </SelectItem>
+                                ) : categories.length === 0 ? (
+                                  <SelectItem value="none" disabled>
+                                    {t("dialog.no-category")}
+                                  </SelectItem>
+                                ) : (
+                                  categories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}
@@ -708,14 +809,26 @@ export default function EditTransactionDialog({
                     disabled={deleteTransactionMutation.isPending}
                     onClick={handleDelete}
                   >
-                    {deleteTransactionMutation.isPending ? <Spinner /> : t("dialog.buttons.delete")}
+                    {deleteTransactionMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("dialog.buttons.delete")
+                    )}
                   </Button>
                   <Button
                     type="submit"
-                    disabled={isEditMode ? updateTransactionMutation.isPending : createTransactionMutation.isPending}
+                    disabled={
+                      isEditMode
+                        ? updateTransactionMutation.isPending
+                        : createTransactionMutation.isPending
+                    }
                     className="cursor-pointer"
                   >
-                    {(isEditMode ? updateTransactionMutation.isPending : createTransactionMutation.isPending) ? (
+                    {(
+                      isEditMode
+                        ? updateTransactionMutation.isPending
+                        : createTransactionMutation.isPending
+                    ) ? (
                       <Spinner />
                     ) : (
                       t("dialog.buttons.save")

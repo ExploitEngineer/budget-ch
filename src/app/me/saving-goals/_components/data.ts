@@ -1,10 +1,5 @@
 import { useTranslations } from "next-intl";
-
-export interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
+import type { CardsContent } from "@/lib/types/common-types";
 
 export interface ActiveGoalsData {
   title: string;

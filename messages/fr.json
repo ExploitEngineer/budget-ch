@@ -313,9 +313,11 @@
                             "title": "Type de transaction",
                             "options": {
                                 "income": "revenu",
-                                "expense": "dépense"
+                                "expense": "dépense",
+                                "transfer": "transfert"
                             }
-                        }
+                        },
+                        "destinationAccount": "Compte de destination"
                     },
                     "placeholders": {
                         "date": "21/09/2025",
@@ -323,7 +325,8 @@
                         "recipient": "Saisir le bénéficiaire",
                         "category": "Choisir une catégorie",
                         "note": "Saisir une remarque",
-                        "note-optional": "Remarque (optionnelle)"
+                        "note-optional": "Remarque (optionnelle)",
+                        "destinationAccount": "Choisir le compte de destination"
                     },
                     "options": {
                         "checking": "Compte courant",

@@ -14,12 +14,7 @@ import { getSavingGoalsSummary } from "@/lib/services/saving-goal";
 import { savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { SavingGoalsSummary } from "@/lib/services/saving-goal";
-
-interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
+import type { CardsContent } from "@/lib/types/common-types";
 
 interface SavingCardsSectionProps {
   cards: CardsContent[];

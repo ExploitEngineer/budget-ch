@@ -13,17 +13,7 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import DashboardTableAdjustDialog from "./dashboard-table-dialog";
-
-interface UpComingTables {
-  name: string;
-  account: string;
-  amount: string;
-}
-
-interface WarningCards {
-  title: string;
-  badge?: string;
-}
+import type { UpComingTables, WarningCards } from "./data";
 
 interface WarningSectionProps {
   upComingTables: UpComingTables[];

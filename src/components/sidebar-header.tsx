@@ -14,7 +14,6 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
 import CreateBudgetDialog from "@/app/me/budgets/_components/create-budget-dialog";
 import CreateSavingGoalDialog from "@/app/me/saving-goals/_components/create-saving-goal-dialog";
@@ -167,7 +166,6 @@ export default function SidebarHeader() {
 
           {route === "accounts" && (
             <div className="flex items-center gap-2">
-              <TransferDialog />
               <NewAccountDialog variant="gradient" />
             </div>
           )}

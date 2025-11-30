@@ -311,9 +311,11 @@
                             "title": "Transaction Type",
                             "options": {
                                 "income": "income",
-                                "expense": "expense"
+                                "expense": "expense",
+                                "transfer": "transfer"
                             }
-                        }
+                        },
+                        "destinationAccount": "Destination Account"
                     },
                     "placeholders": {
                         "date": "09/21/2025",
@@ -321,7 +323,8 @@
                         "recipient": "Enter recipient",
                         "category": "Choose a category",
                         "note": "Enter your note",
-                        "note-optional": "Note (optional)"
+                        "note-optional": "Note (optional)",
+                        "destinationAccount": "Choose destination account"
                     },
                     "options": {
                         "checking": "Checking",

@@ -54,6 +54,7 @@ import type { AccountRow } from "@/lib/types/row-types";
 import { getCategories } from "@/lib/services/category";
 import { createTransaction } from "@/lib/services/transaction";
 import { toast } from "sonner";
+import type { TransactionType } from "@/lib/types/common-types";
 
 export default function CreateTransactionDialog({
   variant,
@@ -72,20 +73,22 @@ export default function CreateTransactionDialog({
 
   const createTransactionMutation = useMutation({
     mutationFn: async (data: {
-      category: string;
+      category?: string;
       amount: number;
       note?: string;
       source: string;
-      transactionType: "income" | "expense";
+      transactionType: TransactionType;
       accountId: string;
+      destinationAccountId?: string;
     }) => {
       const result = await createTransaction({
-        categoryName: data.category.trim(),
+        categoryName: data.category?.trim() || "",
         amount: data.amount,
         note: data.note,
         source: data.source,
         transactionType: data.transactionType,
         accountId: data.accountId,
+        destinationAccountId: data.destinationAccountId,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -160,21 +163,26 @@ export default function CreateTransactionDialog({
       accountId: "",
       recipient: "",
       category: "",
+      destinationAccountId: "",
       amount: 0,
       note: "",
       splits: [],
+      transactionType: "expense",
     },
   });
+
+  const transactionType = form.watch("transactionType");
 
   async function onSubmit(values: TransactionDialogValues) {
     try {
       await createTransactionMutation.mutateAsync({
-        category: values.category.trim(),
+        category: values.category?.trim(),
         amount: values.amount,
         note: values.note,
         source: values.recipient,
         transactionType: values.transactionType,
         accountId: values.accountId,
+        destinationAccountId: values.destinationAccountId,
       });
 
       form.reset();
@@ -366,6 +374,11 @@ export default function CreateTransactionDialog({
                                   "dialog.labels.transactionType.options.expense",
                                 )}
                               </SelectItem>
+                              <SelectItem value="transfer">
+                                {t(
+                                  "dialog.labels.transactionType.options.transfer",
+                                )}
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -393,52 +406,46 @@ export default function CreateTransactionDialog({
                   />
                 </div>
 
-                {/* 3️⃣ Category + Amount */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                {/* Destination Account (for transfers) */}
+                {transactionType === "transfer" && (
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="destinationAccountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
-                        <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                        <FormLabel>{t("dialog.labels.destinationAccount")}</FormLabel>
                         <FormControl>
                           <Select
+                            onValueChange={field.onChange}
                             value={field.value}
-                            onValueChange={(value) => {
-                              setSelectedCategory(value);
-                              field.onChange(value);
-                            }}
+                            disabled={accountsLoading}
                           >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select or add a category" />
+                            <SelectTrigger className="w-full cursor-pointer">
+                              <SelectValue
+                                placeholder={
+                                  accountsLoading
+                                    ? "Loading accounts..."
+                                    : t("dialog.placeholders.destinationAccount")
+                                }
+                              />
                             </SelectTrigger>
-
                             <SelectContent>
-                              <div className="flex items-center justify-between border-b px-2 py-1.5">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="w-full cursor-pointer justify-center text-sm"
-                                  onClick={() => setIsAddCategoryOpen(true)}
-                                >
-                                  + {t("dialog.new-category")}
-                                </Button>
-                              </div>
-
-                              {categoriesLoading ? (
+                              {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading categories...
+                                  Loading accounts...
                                 </SelectItem>
-                              ) : categories.length === 0 ? (
-                                <SelectItem value="none" disabled>
-                                  {t("dialog.no-category")}
-                                </SelectItem>
+                              ) : accounts && accounts.length > 0 ? (
+                                accounts
+                                  .filter((account) => account.id !== form.getValues("accountId"))
+                                  .map((account) => (
+                                    <SelectItem key={account.id} value={account.id}>
+                                      {account.name} ({account.type})
+                                    </SelectItem>
+                                  ))
                               ) : (
-                                categories.map((category) => (
-                                  <SelectItem key={category} value={category}>
-                                    {category}
-                                  </SelectItem>
-                                ))
+                                <SelectItem value="no-accounts" disabled>
+                                  No accounts available
+                                </SelectItem>
                               )}
                             </SelectContent>
                           </Select>
@@ -447,6 +454,64 @@ export default function CreateTransactionDialog({
                       </FormItem>
                     )}
                   />
+                )}
+
+                {/* 3️⃣ Category + Amount */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                  {transactionType !== "transfer" && (
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-1 flex-col">
+                          <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={(value) => {
+                                setSelectedCategory(value);
+                                field.onChange(value);
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select or add a category" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <div className="flex items-center justify-between border-b px-2 py-1.5">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full cursor-pointer justify-center text-sm"
+                                    onClick={() => setIsAddCategoryOpen(true)}
+                                  >
+                                    + {t("dialog.new-category")}
+                                  </Button>
+                                </div>
+
+                                {categoriesLoading ? (
+                                  <SelectItem value="loading" disabled>
+                                    Loading categories...
+                                  </SelectItem>
+                                ) : categories.length === 0 ? (
+                                  <SelectItem value="none" disabled>
+                                    {t("dialog.no-category")}
+                                  </SelectItem>
+                                ) : (
+                                  categories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}

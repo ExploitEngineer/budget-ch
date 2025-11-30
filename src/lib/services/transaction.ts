@@ -21,6 +21,7 @@ import { getContext } from "../auth/actions";
 import { transactionCategories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import type { Transaction } from "../types/dashboard-types";
+import type { TransactionType } from "../types/common-types";
 import db from "@/db/db";
 import { requireAdminRole } from "@/lib/auth/permissions";
 
@@ -32,6 +33,7 @@ export async function createTransaction({
   source,
   transactionType,
   accountId,
+  destinationAccountId,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -39,6 +41,7 @@ export async function createTransaction({
   | "note"
   | "source"
   | "transactionType"
+  | "destinationAccountId"
 > & { accountId: string }) {
   try {
     const hdrs = await headers();
@@ -59,13 +62,39 @@ export async function createTransaction({
       }
     }
 
-    // Get account by ID
+    // Get source account by ID
     const account = await getFinancialAccountById(accountId, hubId);
     if (!account) {
       return {
         success: false,
-        message: "Account not found or you don't have access to it.",
+        message: "Source account not found or you don't have access to it.",
       };
+    }
+
+    // For transfers, validate destination account
+    let destinationAccount = null;
+    if (transactionType === "transfer") {
+      if (!destinationAccountId) {
+        return {
+          success: false,
+          message: "Destination account is required for transfers.",
+        };
+      }
+
+      destinationAccount = await getFinancialAccountById(destinationAccountId, hubId);
+      if (!destinationAccount) {
+        return {
+          success: false,
+          message: "Destination account not found or you don't have access to it.",
+        };
+      }
+
+      if (account.id === destinationAccount.id) {
+        return {
+          success: false,
+          message: "Cannot transfer to the same account.",
+        };
+      }
     }
 
     // Balance check and update logic
@@ -77,6 +106,15 @@ export async function createTransaction({
       newBalance -= amount;
     } else if (transactionType === "income") {
       newBalance += amount;
+    } else if (transactionType === "transfer") {
+      // For transfers, deduct from source account
+      if (newBalance < amount) {
+        return {
+          success: false,
+          message: "Insufficient funds in source account.",
+        };
+      }
+      newBalance -= amount;
     }
 
     await updateFinancialAccountDB({
@@ -85,32 +123,45 @@ export async function createTransaction({
       updatedData: { balance: newBalance },
     });
 
-    const normalizedName = categoryName.trim().toLowerCase();
+    // For transfers, also update destination account balance
+    if (transactionType === "transfer" && destinationAccount) {
+      const destinationBalance = Number(destinationAccount.initialBalance ?? 0) + amount;
+      await updateFinancialAccountDB({
+        hubId,
+        accountId: destinationAccount.id,
+        updatedData: { balance: destinationBalance },
+      });
+    }
 
-    const existingCategory = await db.query.transactionCategories.findFirst({
-      where: (categories, { and, eq, sql }) =>
-        and(
-          sql`LOWER(${categories.name}) = ${normalizedName}`,
-          eq(categories.hubId, hubId),
-        ),
-    });
+    // For transfers, category is optional (can be null)
+    let transactionCategoryId: string | null = null;
+    
+    if (transactionType !== "transfer" && categoryName) {
+      const normalizedName = categoryName.trim().toLowerCase();
 
-    let transactionCategoryId: string;
+      const existingCategory = await db.query.transactionCategories.findFirst({
+        where: (categories, { and, eq, sql }) =>
+          and(
+            sql`LOWER(${categories.name}) = ${normalizedName}`,
+            eq(categories.hubId, hubId),
+          ),
+      });
 
-    if (existingCategory) {
-      // Use existing category
-      transactionCategoryId = existingCategory.id;
-    } else {
-      // Create new category
-      const [newCategory] = await db
-        .insert(transactionCategories)
-        .values({
-          hubId,
-          name: normalizedName,
-        })
-        .returning({ id: transactionCategories.id });
+      if (existingCategory) {
+        // Use existing category
+        transactionCategoryId = existingCategory.id;
+      } else {
+        // Create new category
+        const [newCategory] = await db
+          .insert(transactionCategories)
+          .values({
+            hubId,
+            name: normalizedName,
+          })
+          .returning({ id: transactionCategories.id });
 
-      transactionCategoryId = newCategory.id;
+        transactionCategoryId = newCategory.id;
+      }
     }
 
     await createTransactionDB({
@@ -122,6 +173,7 @@ export async function createTransaction({
       source,
       note,
       transactionType,
+      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
     });
 
     return { success: true };
@@ -287,13 +339,15 @@ export async function updateTransaction(
     const note = formData.get("note")?.toString() || null;
     const addedAtStr = formData.get("addedAt")?.toString() || "";
     const addedAt = addedAtStr ? new Date(addedAtStr) : new Date();
+    const transactionType = formData.get("transactionType")?.toString() as TransactionType | undefined;
+    const destinationAccountId = formData.get("destinationAccountId")?.toString() || null;
 
     const categoryName =
       formData.get("categoryName")?.toString().trim().toLowerCase() || null;
 
     let transactionCategoryId: string | null = null;
 
-    if (categoryName) {
+    if (categoryName && transactionType !== "transfer") {
       const existingCategory = await db.query.transactionCategories.findFirst({
         where: (categories, { and, eq, sql }) =>
           and(
@@ -327,6 +381,8 @@ export async function updateTransaction(
         addedAt,
         financialAccountId,
         transactionCategoryId,
+        destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+        transactionType,
       },
     });
 

@@ -15,12 +15,7 @@ import { getBudgetsAmounts } from "@/lib/services/budget";
 import { getCategoriesCount } from "@/lib/services/category";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-
-interface CardsContent {
-  title: string;
-  content: string;
-  badge: string;
-}
+import type { CardsContent } from "@/lib/types/common-types";
 
 export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.budgets-page");
