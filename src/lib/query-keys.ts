@@ -29,6 +29,7 @@ export const transactionKeys = {
   lists: () => [...transactionKeys.all, "list"] as const,
   list: (hubId: string | null) => [...transactionKeys.lists(), hubId] as const,
   recent: (hubId: string | null) => [...transactionKeys.all, "recent", hubId] as const,
+  upcomingRecurring: (hubId: string | null) => [...transactionKeys.all, "upcoming-recurring", hubId] as const,
 };
 
 /**

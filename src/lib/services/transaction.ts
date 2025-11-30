@@ -15,6 +15,7 @@ import {
   getHubMemberRoleDB,
   getOwnedHubDB,
   createRecurringTransactionTemplateDB,
+  getRecurringTransactionTemplatesDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -25,6 +26,7 @@ import type { Transaction } from "../types/dashboard-types";
 import type { TransactionType } from "../types/common-types";
 import db from "@/db/db";
 import { requireAdminRole } from "@/lib/auth/permissions";
+import { addDays, format, isBefore, isAfter, startOfDay, isSameDay } from "date-fns";
 
 // CREATE Transaction
 export async function createTransaction({
@@ -347,6 +349,115 @@ export async function getRecentTransactions() {
     return { success: true, data: transactions };
   } catch (err: any) {
     console.error("Server action error in getRecentTransactions:", err);
+    return {
+      success: false,
+      message: err?.message || "Unexpected server error.",
+    };
+  }
+}
+
+// GET Upcoming Recurring Transactions
+export interface UpcomingRecurringTransaction {
+  id: string;
+  name: string;
+  account: string;
+  amount: string;
+  date: string;
+  templateId: string;
+}
+
+export async function getUpcomingRecurringTransactions(
+  days: number = 14,
+): Promise<{
+  success: boolean;
+  data?: UpcomingRecurringTransaction[];
+  message?: string;
+}> {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    const templates = await getRecurringTransactionTemplatesDB(hubId);
+
+    const today = startOfDay(new Date());
+    const nextDays = addDays(today, days);
+    const upcomingTransactions: UpcomingRecurringTransaction[] = [];
+
+    for (const template of templates) {
+      const startDate = startOfDay(new Date(template.startDate));
+      let currentDate = startDate;
+
+      // If start date is in the past, calculate next occurrence
+      if (isBefore(startDate, today)) {
+        // Calculate next occurrence after today
+        const daysSinceStart = Math.floor(
+          (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        const occurrencesSinceStart = Math.floor(
+          daysSinceStart / template.frequencyDays,
+        );
+        currentDate = startOfDay(
+          addDays(startDate, (occurrencesSinceStart + 1) * template.frequencyDays),
+        );
+      }
+
+      // Generate occurrences up to specified days ahead
+      let iterations = 0;
+      const maxIterations = 100; // Safety limit
+      
+      while (
+        (isBefore(currentDate, nextDays) || isSameDay(currentDate, nextDays)) &&
+        iterations < maxIterations
+      ) {
+        iterations++;
+
+        // Check if endDate exists and if currentDate is after endDate
+        if (template.endDate) {
+          const endDate = startOfDay(new Date(template.endDate));
+          if (isAfter(currentDate, endDate)) {
+            break;
+          }
+        }
+
+        // Only add if date is today or in the future (within specified days)
+        if (
+          (isSameDay(currentDate, today) || isAfter(currentDate, today)) &&
+          (isBefore(currentDate, nextDays) || isSameDay(currentDate, nextDays))
+        ) {
+          upcomingTransactions.push({
+            id: `${template.id}-${currentDate.getTime()}`,
+            name: template.source || template.categoryName || "—",
+            account: template.accountName || "—",
+            amount: `CHF ${template.amount.toFixed(2)}`,
+            date: format(currentDate, "d.M.yyyy"),
+            templateId: template.id,
+          });
+        }
+
+        // Move to next occurrence
+        currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+
+        // Stop if we've gone past the specified day window
+        if (isAfter(currentDate, nextDays)) {
+          break;
+        }
+      }
+    }
+
+    // Sort by date
+    upcomingTransactions.sort((a, b) => {
+      const dateA = new Date(a.date.split(".").reverse().join("-"));
+      const dateB = new Date(b.date.split(".").reverse().join("-"));
+      return dateA.getTime() - dateB.getTime();
+    });
+
+    // Limit to first 10 upcoming transactions
+    return {
+      success: true,
+      data: upcomingTransactions.slice(0, 10),
+    };
+  } catch (err: any) {
+    console.error("Server action error in getUpcomingRecurringTransactions:", err);
     return {
       success: false,
       message: err?.message || "Unexpected server error.",
