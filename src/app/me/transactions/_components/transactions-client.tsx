@@ -30,21 +30,14 @@ export default function TransactionsClient() {
     },
   });
 
-  const [filtered, setFiltered] = useState<Omit<Transaction, "type">[]>([]);
+  const [filtered, setFiltered] = useState<Transaction[]>([]);
 
   useEffect(() => {
-    const sanitized = (transactions ?? []).map(
-      ({ type, ...rest }) => rest,
-    ) as Omit<Transaction, "type">[];
-    setFiltered(sanitized);
+    setFiltered(transactions ?? []);
   }, [transactions]);
 
   const handleFilter = (filters: CalculationFormValues) => {
-    const sanitized = (transactions ?? []).map(
-      ({ type, ...rest }) => rest,
-    ) as Omit<Transaction, "type">[];
-
-    const filteredData = sanitized.filter((tx) => {
+    const filteredData = (transactions ?? []).filter((tx) => {
       if (!tx.date) return false;
 
       const [day, month, year] = tx.date.split("/").map(Number);
@@ -93,14 +86,7 @@ export default function TransactionsClient() {
       <div className="flex flex-1 flex-col gap-4 p-4">
         <CalculationSection
           onFilter={handleFilter}
-          onReset={() =>
-            setFiltered(
-              (transactions ?? []).map(({ type, ...rest }) => rest) as Omit<
-                Transaction,
-                "type"
-              >[],
-            )
-          }
+          onReset={() => setFiltered(transactions ?? [])}
         />
         <DataTable
           transactions={filtered}

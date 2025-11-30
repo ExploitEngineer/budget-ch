@@ -42,7 +42,7 @@ import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 interface DataTableProps {
-  transactions: Omit<Transaction, "type">[];
+  transactions: Transaction[];
   loading?: boolean;
   error?: string | null;
 }
@@ -84,7 +84,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
 
   const title = t("transaction-edit-dialog.title-1");
 
-  const columns: ColumnDef<Omit<Transaction, "type">>[] = [
+  const columns: ColumnDef<Transaction>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -155,14 +155,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
           <EditTransactionDialog
             variant="outline"
             text={title}
-            transaction={{
-              id: transaction.id || "",
-              date: transaction.date || "-",
-              recipient: transaction.recipient || "-",
-              category: transaction.category || "-",
-              note: transaction.note || "-",
-              amount: transaction.amount || 0,
-            }}
+            transaction={transaction}
           />
         );
       },

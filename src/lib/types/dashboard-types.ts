@@ -31,4 +31,6 @@ export type Transaction = {
   category: string;
   note: string;
   amount: number;
+  accountId?: string | null;
+  destinationAccountId?: string | null;
 };

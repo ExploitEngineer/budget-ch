@@ -237,6 +237,8 @@ export async function getTransactions(): Promise<{
       category: true,
       note: true,
       amount: true,
+      accountId: true,
+      destinationAccountId: true,
     });
 
     if (!res.success || !res.data) {
@@ -255,6 +257,8 @@ export async function getTransactions(): Promise<{
       category: tx.category || "—",
       note: tx.note ?? null,
       amount: tx.amount ?? 0,
+      accountId: tx.accountId || null,
+      destinationAccountId: tx.destinationAccountId || null,
     }));
 
     return { success: true, data: transactions };

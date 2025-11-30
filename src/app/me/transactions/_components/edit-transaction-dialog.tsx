@@ -66,7 +66,7 @@ import type { TransactionType } from "@/lib/types/common-types";
 interface EditTransactionDialogProps {
   variant?: "outline" | "default" | "gradient";
   text?: string;
-  transaction?: Omit<Transaction, "type">;
+  transaction?: Transaction;
 }
 
 export default function EditTransactionDialog({
@@ -231,14 +231,14 @@ export default function EditTransactionDialog({
       date: transaction
         ? parse(transaction.date, "dd/MM/yyyy", new Date())
         : new Date(),
-      accountId: "",
+      accountId: transaction?.accountId || "",
       recipient: transaction?.recipient || "",
       category: transaction?.category || "",
-      destinationAccountId: "",
+      destinationAccountId: transaction?.destinationAccountId || "",
       amount: transaction?.amount || 0,
       note: transaction?.note || "",
       splits: [],
-      transactionType: "expense" as TransactionType,
+      transactionType: (transaction?.type || "expense") as TransactionType,
     },
   });
 
@@ -249,11 +249,44 @@ export default function EditTransactionDialog({
     name: "splits",
   });
 
+  // Reset form when transaction changes or dialog opens (for edit mode)
   useEffect(() => {
-    if (transaction?.category) {
-      setSelectedCategory(transaction.category);
+    if (transaction && isEditMode && open) {
+      const parsedDate = parse(transaction.date, "dd/MM/yyyy", new Date());
+      // Check if date parsing was successful
+      const dateValue = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+      
+      form.reset({
+        date: dateValue,
+        accountId: transaction.accountId || "",
+        recipient: transaction.recipient || "",
+        category: transaction.category || "",
+        destinationAccountId: transaction.destinationAccountId || "",
+        amount: transaction.amount || 0,
+        note: transaction.note || "",
+        splits: [],
+        transactionType: (transaction.type || "expense") as TransactionType,
+      });
+      
+      if (transaction.category) {
+        setSelectedCategory(transaction.category);
+      }
+    } else if (!isEditMode && open) {
+      // Reset to defaults when creating new transaction
+      form.reset({
+        date: new Date(),
+        accountId: "",
+        recipient: "",
+        category: "",
+        destinationAccountId: "",
+        amount: 0,
+        note: "",
+        splits: [],
+        transactionType: "expense" as TransactionType,
+      });
+      setSelectedCategory(null);
     }
-  }, [transaction]);
+  }, [transaction, isEditMode, open, form]);
 
   async function onSubmit(values: TransactionDialogValues) {
     const payload = {
