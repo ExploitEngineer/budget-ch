@@ -315,7 +315,12 @@
                                 "transfer": "transfer"
                             }
                         },
-                        "destinationAccount": "Destination Account"
+                        "destinationAccount": "Destination Account",
+                        "recurring": "Recurring Transaction",
+                        "frequencyDays": "Frequency (days)",
+                        "startDate": "Start Date",
+                        "endDate": "End Date (optional)",
+                        "recurringStatus": "Status"
                     },
                     "placeholders": {
                         "date": "09/21/2025",
@@ -324,7 +329,9 @@
                         "category": "Choose a category",
                         "note": "Enter your note",
                         "note-optional": "Note (optional)",
-                        "destinationAccount": "Choose destination account"
+                        "destinationAccount": "Choose destination account",
+                        "startDate": "Select start date",
+                        "endDate": "No end date"
                     },
                     "options": {
                         "checking": "Checking",
@@ -335,7 +342,9 @@
                         "restaurant": "Restaurant & Café",
                         "oev": "Public Transport & Mobility",
                         "haushalt": "Household",
-                        "einnahmen": "Income"
+                        "einnahmen": "Income",
+                        "active": "Active",
+                        "inactive": "Inactive"
                     },
                     "badges": {
                         "row": "Row",

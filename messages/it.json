@@ -317,7 +317,12 @@
                                 "transfer": "bonifico"
                             }
                         },
-                        "destinationAccount": "Conto di destinazione"
+                        "destinationAccount": "Conto di destinazione",
+                        "recurring": "Transazione ricorrente",
+                        "frequencyDays": "Frequenza (giorni)",
+                        "startDate": "Data di inizio",
+                        "endDate": "Data di fine (opzionale)",
+                        "recurringStatus": "Stato"
                     },
                     "placeholders": {
                         "date": "21/09/2025",
@@ -326,7 +331,9 @@
                         "category": "Scegli una categoria",
                         "note": "Inserisci una nota",
                         "note-optional": "Nota (facoltativa)",
-                        "destinationAccount": "Scegli il conto di destinazione"
+                        "destinationAccount": "Scegli il conto di destinazione",
+                        "startDate": "Seleziona data di inizio",
+                        "endDate": "Nessuna data di fine"
                     },
                     "options": {
                         "checking": "Conto corrente",
@@ -337,7 +344,9 @@
                         "restaurant": "Ristorante & Caffè",
                         "oev": "Trasporto pubblico & mobilità",
                         "haushalt": "Casa",
-                        "einnahmen": "Entrate"
+                        "einnahmen": "Entrate",
+                        "active": "Attivo",
+                        "inactive": "Inattivo"
                     },
                     "badges": {
                         "row": "Riga",

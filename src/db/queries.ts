@@ -12,6 +12,7 @@ import {
   subscriptions,
   hubInvitations,
   userSettings,
+  recurringTransactionTemplates,
 } from "./schema";
 import { eq, desc, gte, lte, sql, inArray, and, or } from "drizzle-orm";
 import type { QuickTask, UserType, SubscriptionType, UserSettingsType } from "./schema";
@@ -903,6 +904,125 @@ export async function createTransactionCategoryDB(name: string, hubId: string) {
   } catch (err) {
     console.error("Error creating Transaction category ", err);
     throw err;
+  }
+}
+
+// CREATE Recurring Transaction Template
+export type CreateRecurringTransactionTemplateArgs = {
+  hubId: string;
+  userId: string;
+  financialAccountId: string;
+  transactionCategoryId: string | null;
+  type: TransactionType;
+  source: string | null;
+  amount: number;
+  note: string | null;
+  frequencyDays: number;
+  startDate: Date;
+  endDate: Date | null;
+  status: "active" | "inactive";
+  destinationAccountId?: string | null;
+};
+
+export async function createRecurringTransactionTemplateDB({
+  hubId,
+  userId,
+  financialAccountId,
+  transactionCategoryId,
+  type,
+  source,
+  amount,
+  note,
+  frequencyDays,
+  startDate,
+  endDate,
+  status,
+  destinationAccountId,
+}: CreateRecurringTransactionTemplateArgs) {
+  try {
+    const [template] = await db
+      .insert(recurringTransactionTemplates)
+      .values({
+        hubId,
+        userId,
+        financialAccountId,
+        destinationAccountId: type === "transfer" ? destinationAccountId : null,
+        transactionCategoryId,
+        type,
+        source,
+        amount,
+        note,
+        frequencyDays,
+        startDate,
+        endDate,
+        status,
+      })
+      .returning();
+
+    return { success: true, data: template };
+  } catch (err: any) {
+    console.error("Error creating recurring transaction template:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to create recurring transaction template",
+    };
+  }
+}
+
+// UPDATE Recurring Transaction Template
+export type UpdateRecurringTransactionTemplateArgs = {
+  templateId: string;
+  hubId: string;
+  updatedData: {
+    financialAccountId?: string;
+    transactionCategoryId?: string | null;
+    type?: TransactionType;
+    source?: string | null;
+    amount?: number;
+    note?: string | null;
+    frequencyDays?: number;
+    startDate?: Date;
+    endDate?: Date | null;
+    status?: "active" | "inactive";
+    destinationAccountId?: string | null;
+  };
+};
+
+export async function updateRecurringTransactionTemplateDB({
+  templateId,
+  hubId,
+  updatedData,
+}: UpdateRecurringTransactionTemplateArgs) {
+  try {
+    // Verify template exists and belongs to hub
+    const template = await db.query.recurringTransactionTemplates.findFirst({
+      where: (templates, { and, eq }) =>
+        and(eq(templates.id, templateId), eq(templates.hubId, hubId)),
+    });
+
+    if (!template) {
+      return {
+        success: false,
+        message: "Recurring transaction template not found",
+      };
+    }
+
+    const [updated] = await db
+      .update(recurringTransactionTemplates)
+      .set({
+        ...updatedData,
+        updatedAt: new Date(),
+      })
+      .where(eq(recurringTransactionTemplates.id, templateId))
+      .returning();
+
+    return { success: true, data: updated };
+  } catch (err: any) {
+    console.error("Error updating recurring transaction template:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update recurring transaction template",
+    };
   }
 }
 

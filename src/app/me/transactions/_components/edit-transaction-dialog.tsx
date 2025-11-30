@@ -34,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Plus, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import {
@@ -123,6 +124,11 @@ export default function EditTransactionDialog({
       transactionType: TransactionType;
       accountId: string;
       destinationAccountId?: string;
+      isRecurring?: boolean;
+      frequencyDays?: number;
+      startDate?: Date | null;
+      endDate?: Date | null;
+      recurringStatus?: "active" | "inactive";
     }) => {
       const result = await createTransaction({
         categoryName: data.category.trim(),
@@ -132,6 +138,11 @@ export default function EditTransactionDialog({
         transactionType: data.transactionType,
         accountId: data.accountId,
         destinationAccountId: data.destinationAccountId,
+        isRecurring: data.isRecurring,
+        frequencyDays: data.frequencyDays,
+        startDate: data.startDate || undefined,
+        endDate: data.endDate,
+        recurringStatus: data.recurringStatus,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -239,10 +250,24 @@ export default function EditTransactionDialog({
       note: transaction?.note || "",
       splits: [],
       transactionType: (transaction?.type || "expense") as TransactionType,
+      isRecurring: false,
+      frequencyDays: 30,
+      startDate: null,
+      endDate: null,
+      recurringStatus: "active",
     },
   });
 
   const transactionType = form.watch("transactionType");
+  const isRecurring = form.watch("isRecurring");
+  const date = form.watch("date");
+
+  // Set startDate to transaction date when recurring is enabled and startDate is not set
+  useEffect(() => {
+    if (isRecurring && !form.getValues("startDate") && date) {
+      form.setValue("startDate", date);
+    }
+  }, [isRecurring, date, form]);
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
@@ -266,6 +291,11 @@ export default function EditTransactionDialog({
         note: transaction.note || "",
         splits: [],
         transactionType: (transaction.type || "expense") as TransactionType,
+        isRecurring: false,
+        frequencyDays: 30,
+        startDate: null,
+        endDate: null,
+        recurringStatus: "active",
       });
       
       if (transaction.category) {
@@ -325,6 +355,11 @@ export default function EditTransactionDialog({
           transactionType: payload.transactionType,
           accountId: values.accountId,
           destinationAccountId: payload.destinationAccountId,
+          isRecurring: values.isRecurring,
+          frequencyDays: values.isRecurring ? values.frequencyDays : undefined,
+          startDate: values.isRecurring ? values.startDate : undefined,
+          endDate: values.isRecurring ? values.endDate : undefined,
+          recurringStatus: values.isRecurring ? values.recurringStatus : undefined,
         });
       }
 
@@ -733,6 +768,148 @@ export default function EditTransactionDialog({
                     </FormItem>
                   )}
                 />
+
+                {/* Recurring Transaction Section */}
+                <div className="flex flex-col gap-4 pt-2">
+                  <FormField
+                    control={form.control}
+                    name="isRecurring"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="cursor-pointer">
+                            {t("dialog.labels.recurring")}
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {isRecurring && (
+                    <div className="flex flex-col gap-4 pl-7 sm:flex-row sm:gap-3">
+                      <FormField
+                        control={form.control}
+                        name="frequencyDays"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>{t("dialog.labels.frequencyDays")}</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={1}
+                                placeholder="30"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>{t("dialog.labels.startDate")}</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value
+                                      ? format(field.value, "dd/MM/yyyy")
+                                      : t("dialog.placeholders.startDate")}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value || undefined}
+                                    onSelect={field.onChange}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="endDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>{t("dialog.labels.endDate")}</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value
+                                      ? format(field.value, "dd/MM/yyyy")
+                                      : t("dialog.placeholders.endDate")}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value || undefined}
+                                    onSelect={field.onChange}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="recurringStatus"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>{t("dialog.labels.recurringStatus")}</FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="active">
+                                    {t("dialog.options.active")}
+                                  </SelectItem>
+                                  <SelectItem value="inactive">
+                                    {t("dialog.options.inactive")}
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                </div>
 
                 {/* Split Rows Section */}
                 <div className="flex flex-col gap-3 pt-2">

@@ -22,6 +22,12 @@ export const TransactionDialogSchema = z.object({
   amount: z.coerce.number({ message: "Amount must be 0 or more" }),
   note: z.string().optional(),
   splits: z.array(splitSchema).optional(),
+  // Recurring transaction fields
+  isRecurring: z.boolean().default(false),
+  frequencyDays: z.coerce.number().min(1, { message: "Frequency must be at least 1 day" }).optional(),
+  startDate: z.coerce.date().optional().nullable(),
+  endDate: z.coerce.date().optional().nullable(),
+  recurringStatus: z.enum(["active", "inactive"]).optional(),
 })
   .refine(
     (data) => {
@@ -47,6 +53,32 @@ export const TransactionDialogSchema = z.object({
     {
       message: "Category is required for income and expense transactions.",
       path: ["category"],
+    }
+  )
+  .refine(
+    (data) => {
+      // If recurring, frequencyDays is required
+      if (data.isRecurring) {
+        return !!data.frequencyDays && data.frequencyDays >= 1;
+      }
+      return true;
+    },
+    {
+      message: "Frequency is required for recurring transactions.",
+      path: ["frequencyDays"],
+    }
+  )
+  .refine(
+    (data) => {
+      // If recurring, startDate is required
+      if (data.isRecurring) {
+        return !!data.startDate && !isNaN(data.startDate.getTime());
+      }
+      return true;
+    },
+    {
+      message: "Start date is required for recurring transactions.",
+      path: ["startDate"],
     }
   );
 

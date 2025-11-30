@@ -14,6 +14,7 @@ import {
   getMonthlyTransactionCount,
   getHubMemberRoleDB,
   getOwnedHubDB,
+  createRecurringTransactionTemplateDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -34,6 +35,11 @@ export async function createTransaction({
   transactionType,
   accountId,
   destinationAccountId,
+  isRecurring,
+  frequencyDays,
+  startDate,
+  endDate,
+  recurringStatus,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -42,7 +48,14 @@ export async function createTransaction({
   | "source"
   | "transactionType"
   | "destinationAccountId"
-> & { accountId: string }) {
+> & {
+  accountId: string;
+  isRecurring?: boolean;
+  frequencyDays?: number;
+  startDate?: Date;
+  endDate?: Date | null;
+  recurringStatus?: "active" | "inactive";
+}) {
   try {
     const hdrs = await headers();
     const { userId, userRole, hubId } = await getContext(hdrs, false);
@@ -175,6 +188,30 @@ export async function createTransaction({
       transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
     });
+
+    // Create recurring transaction template if isRecurring is true
+    if (isRecurring && frequencyDays && startDate) {
+      const templateResult = await createRecurringTransactionTemplateDB({
+        hubId,
+        userId,
+        financialAccountId: account.id,
+        transactionCategoryId,
+        type: transactionType,
+        source: source || null,
+        amount,
+        note: note || null,
+        frequencyDays,
+        startDate,
+        endDate: endDate || null,
+        status: recurringStatus || "active",
+        destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+      });
+
+      if (!templateResult.success) {
+        console.error("Failed to create recurring template:", templateResult.message);
+        // Don't fail the transaction creation if template creation fails
+      }
+    }
 
     return { success: true };
   } catch (err: any) {

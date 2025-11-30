@@ -248,6 +248,10 @@ export const recurringTransactionTemplates = pgTable(
     financialAccountId: uuid("financial_account_id")
       .notNull()
       .references(() => financialAccounts.id, { onDelete: "cascade" }),
+    destinationAccountId: uuid("destination_account_id").references(
+      () => financialAccounts.id,
+      { onDelete: "cascade" },
+    ),
     transactionCategoryId: uuid("transaction_category_id").references(
       () => transactionCategories.id,
       { onDelete: "set null" },
