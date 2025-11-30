@@ -61,8 +61,12 @@ export function RecentTransactionsTableSection() {
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
           {transactionError ? (
-            <p className="px-6 text-sm text-red-500">{transactionError}</p>
-          ) : transactions === null || transactionLoading ? (
+            <p className="px-6 text-sm text-red-500">
+              {transactionError instanceof Error
+                ? transactionError.message
+                : String(transactionError)}
+            </p>
+          ) : transactionLoading || !transactions ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("upcoming-cards.loading")}
             </p>

@@ -745,7 +745,7 @@ export async function getTransactionsDB(
   try {
     const allFields = {
       id: transactions.id,
-      date: transactions.addedAt,
+      date: transactions.createdAt,
       recipient: transactions.source,
       type: transactions.type,
       category: transactionCategories.name,
@@ -778,7 +778,7 @@ export async function getTransactionsDB(
       )
       .leftJoin(users, eq(transactions.userId, users.id))
       .where(eq(transactions.hubId, hubId))
-      .orderBy(desc(transactions.addedAt));
+      .orderBy(desc(transactions.createdAt));
 
     if (limit) query.limit(limit);
 
@@ -1341,41 +1341,74 @@ export async function updateBudgetDB({
     let transactionCategoryId = budget.transactionCategoryId;
 
     if (updatedData.categoryName) {
-      const newName = updatedData.categoryName.trim();
+      const newName = updatedData.categoryName.trim().toLowerCase();
 
-      const currentCategory = await db.query.transactionCategories.findFirst({
-        where: (cat) => eq(cat.id, budget.transactionCategoryId),
-      });
-
-      if (!currentCategory) {
-        return {
-          success: false,
-          message: "Current category not found.",
-        };
-      }
-
-      if (currentCategory.name === newName) {
-        transactionCategoryId = currentCategory.id;
-      } else {
+      // If budget doesn't have a category associated, find or create one
+      if (!budget.transactionCategoryId) {
         const existingCategory = await db.query.transactionCategories.findFirst(
           {
-            where: (cat) => and(eq(cat.hubId, hubId), eq(cat.name, newName)),
+            where: (cat, { and, eq, sql }) =>
+              and(
+                eq(cat.hubId, hubId),
+                sql`LOWER(${cat.name}) = ${newName}`,
+              ),
           },
         );
 
         if (existingCategory) {
+          transactionCategoryId = existingCategory.id;
+        } else {
+          // Create new category
+          const [newCategory] = await db
+            .insert(transactionCategories)
+            .values({
+              hubId,
+              name: newName,
+            })
+            .returning({ id: transactionCategories.id });
+
+          transactionCategoryId = newCategory.id;
+        }
+      } else {
+        // Budget has an existing category, update it if needed
+        const currentCategory = await db.query.transactionCategories.findFirst({
+          where: (cat) => eq(cat.id, budget.transactionCategoryId!),
+        });
+
+        if (!currentCategory) {
           return {
             success: false,
-            message: "A category with this name already exists in your hub.",
+            message: "Current category not found.",
           };
         }
 
-        await db
-          .update(transactionCategories)
-          .set({ name: newName })
-          .where(eq(transactionCategories.id, currentCategory.id));
+        if (currentCategory.name.toLowerCase() === newName) {
+          transactionCategoryId = currentCategory.id;
+        } else {
+          const existingCategory = await db.query.transactionCategories.findFirst(
+            {
+              where: (cat, { and, eq, sql }) =>
+                and(
+                  eq(cat.hubId, hubId),
+                  sql`LOWER(${cat.name}) = ${newName}`,
+                ),
+            },
+          );
 
-        transactionCategoryId = currentCategory.id;
+          if (existingCategory) {
+            return {
+              success: false,
+              message: "A category with this name already exists in your hub.",
+            };
+          }
+
+          await db
+            .update(transactionCategories)
+            .set({ name: newName })
+            .where(eq(transactionCategories.id, currentCategory.id));
+
+          transactionCategoryId = currentCategory.id;
+        }
       }
     }
     const cleanData = Object.fromEntries(
@@ -1684,15 +1717,15 @@ export async function getMonthlyReportDB(hubId: string) {
   try {
     const result = await db
       .select({
-        month: sql<string>`TO_CHAR(${transactions.addedAt}, 'Month')`,
+        month: sql<string>`TO_CHAR(${transactions.createdAt}, 'Month')`,
         income: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0)`,
         expenses: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`,
         balance: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE -${transactions.amount} END), 0)`,
       })
       .from(transactions)
       .where(eq(transactions.hubId, hubId))
-      .groupBy(sql`TO_CHAR(${transactions.addedAt}, 'Month')`)
-      .orderBy(sql`MIN(${transactions.addedAt})`);
+      .groupBy(sql`TO_CHAR(${transactions.createdAt}, 'Month')`)
+      .orderBy(sql`MIN(${transactions.createdAt})`);
 
     return { success: true, data: result };
   } catch (err: any) {
@@ -2054,8 +2087,8 @@ export async function getMonthlyTransactionCount(
     transactions,
     and(
       eq(transactions.userId, userId),
-      gte(transactions.addedAt, firstDayOfMonth),
-      lte(transactions.addedAt, now),
+      gte(transactions.createdAt, firstDayOfMonth),
+      lte(transactions.createdAt, now),
     ),
   );
 }
