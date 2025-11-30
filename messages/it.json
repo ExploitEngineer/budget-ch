@@ -141,25 +141,45 @@
                 "dialog": {
                     "title": "Modifica pagamento ricorrente",
                     "close": "Chiudi",
+                    "loading": "Caricamento...",
+                    "read-only": {
+                        "title": "Dettagli transazione"
+                    },
                     "labels": {
                         "date": "Data",
                         "account": "Conto",
                         "name": "Nome",
-                        "amount": "Importo (CHF)"
+                        "amount": "Importo (CHF)",
+                        "frequency-days": "Frequenza (Giorni)",
+                        "start-date": "Data di inizio",
+                        "end-date": "Data di fine",
+                        "has-end-date": "Imposta data di fine",
+                        "status": "Stato"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Frequenza di ripetizione di questa transazione (in giorni)",
+                        "has-end-date": "Seleziona per impostare una data di fine per questa transazione ricorrente"
                     },
                     "placeholders": {
                         "date": "25/09/2025",
                         "account": "Scegli un conto",
-                        "name": "Inserisci nome"
+                        "name": "Inserisci nome",
+                        "start-date": "Seleziona data di inizio",
+                        "end-date": "Seleziona data di fine"
                     },
                     "options": {
                         "giro": "Conto corrente",
                         "credit-card": "Carta di credito",
-                        "sparen": "Conto risparmio"
+                        "sparen": "Conto risparmio",
+                        "status": {
+                            "active": "Attivo",
+                            "inactive": "Inattivo"
+                        }
                     },
                     "buttons": {
                         "delete": "Elimina",
-                        "save": "Salva"
+                        "save": "Salva",
+                        "saving": "Salvataggio..."
                     }
                 }
             },

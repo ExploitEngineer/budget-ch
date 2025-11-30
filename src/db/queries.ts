@@ -1099,6 +1099,83 @@ export async function getRecurringTransactionTemplatesDB(hubId: string) {
   }
 }
 
+// GET Single Recurring Transaction Template by ID
+export async function getRecurringTransactionTemplateByIdDB(
+  templateId: string,
+  hubId: string,
+) {
+  try {
+    const template = await db
+      .select({
+        id: recurringTransactionTemplates.id,
+        hubId: recurringTransactionTemplates.hubId,
+        userId: recurringTransactionTemplates.userId,
+        financialAccountId: recurringTransactionTemplates.financialAccountId,
+        destinationAccountId: recurringTransactionTemplates.destinationAccountId,
+        transactionCategoryId: recurringTransactionTemplates.transactionCategoryId,
+        type: recurringTransactionTemplates.type,
+        source: recurringTransactionTemplates.source,
+        amount: recurringTransactionTemplates.amount,
+        note: recurringTransactionTemplates.note,
+        frequencyDays: recurringTransactionTemplates.frequencyDays,
+        startDate: recurringTransactionTemplates.startDate,
+        endDate: recurringTransactionTemplates.endDate,
+        status: recurringTransactionTemplates.status,
+        createdAt: recurringTransactionTemplates.createdAt,
+        updatedAt: recurringTransactionTemplates.updatedAt,
+        // Related data
+        accountName: financialAccounts.name,
+        accountType: financialAccounts.type,
+        categoryName: transactionCategories.name,
+      })
+      .from(recurringTransactionTemplates)
+      .leftJoin(
+        financialAccounts,
+        eq(
+          recurringTransactionTemplates.financialAccountId,
+          financialAccounts.id,
+        ),
+      )
+      .leftJoin(
+        transactionCategories,
+        eq(
+          recurringTransactionTemplates.transactionCategoryId,
+          transactionCategories.id,
+        ),
+      )
+      .where(
+        and(
+          eq(recurringTransactionTemplates.id, templateId),
+          eq(recurringTransactionTemplates.hubId, hubId),
+        ),
+      )
+      .limit(1);
+
+    if (!template || template.length === 0) {
+      return null;
+    }
+
+    const result = template[0];
+
+    // Fetch destination account name if needed
+    if (result.destinationAccountId) {
+      const destAccount = await db.query.financialAccounts.findFirst({
+        where: (accounts, { eq }) => eq(accounts.id, result.destinationAccountId!),
+        columns: { name: true },
+      });
+      return {
+        ...result,
+        destinationAccountName: destAccount?.name ?? null,
+      };
+    }
+
+    return { ...result, destinationAccountName: null };
+  } catch (err: any) {
+    console.error("Error fetching recurring transaction template:", err);
+    throw err;
+  }
+}
+
 // CREATE Budget
 export async function createBudgetDB({
   hubId,

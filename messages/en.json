@@ -140,25 +140,45 @@
                 "dialog": {
                     "title": "Adjust Recurring Payment",
                     "close": "Close",
+                    "loading": "Loading...",
+                    "read-only": {
+                        "title": "Transaction Details"
+                    },
                     "labels": {
                         "date": "Date",
                         "account": "Account",
                         "name": "Name",
-                        "amount": "Amount (CHF)"
+                        "amount": "Amount (CHF)",
+                        "frequency-days": "Frequency (Days)",
+                        "start-date": "Start Date",
+                        "end-date": "End Date",
+                        "has-end-date": "Set End Date",
+                        "status": "Status"
+                    },
+                    "descriptions": {
+                        "frequency-days": "How often this transaction repeats (in days)",
+                        "has-end-date": "Check to set an end date for this recurring transaction"
                     },
                     "placeholders": {
                         "date": "09/25/2025",
                         "account": "Choose an account",
-                        "name": "Enter name"
+                        "name": "Enter name",
+                        "start-date": "Select start date",
+                        "end-date": "Select end date"
                     },
                     "options": {
                         "giro": "Giro",
                         "credit-card": "Credit Card",
-                        "sparen": "Savings"
+                        "sparen": "Savings",
+                        "status": {
+                            "active": "Active",
+                            "inactive": "Inactive"
+                        }
                     },
                     "buttons": {
                         "delete": "Delete",
-                        "save": "Save"
+                        "save": "Save",
+                        "saving": "Saving..."
                     }
                 }
             },

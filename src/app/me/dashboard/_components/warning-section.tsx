@@ -49,7 +49,7 @@ export function WarningSection({
 
   const upComingTableHeadings: string[] = [
     t("upcoming-cards.table-data.table-heading.date"),
-    t("upcoming-cards.table-data.table-heading.name.title"),
+    // t("upcoming-cards.table-data.table-heading.name.title"),
     t("upcoming-cards.table-data.table-heading.account.title"),
     t("upcoming-cards.table-data.table-heading.amount"),
   ];
@@ -98,13 +98,12 @@ export function WarningSection({
                     upcomingTransactions.map((data) => (
                       <TableRow className="dark:border-border-blue" key={data.id}>
                         <TableCell>{data.date}</TableCell>
-                    <TableCell>{data.name}</TableCell>
-                    <TableCell>{data.account}</TableCell>
-                    <TableCell>{data.amount}</TableCell>
-                    <TableCell>
-                      <DashboardTableAdjustDialog />
-                    </TableCell>
-                  </TableRow>
+                        <TableCell>{data.account}</TableCell>
+                        <TableCell>{data.amount}</TableCell>
+                        <TableCell>
+                          <DashboardTableAdjustDialog templateId={data.templateId} />
+                        </TableCell>
+                      </TableRow>
                     ))
                   ) : (
                     <TableRow>

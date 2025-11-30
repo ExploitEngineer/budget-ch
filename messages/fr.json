@@ -141,25 +141,45 @@
                 "dialog": {
                     "title": "Ajuster le paiement récurrent",
                     "close": "Fermer",
+                    "loading": "Chargement...",
+                    "read-only": {
+                        "title": "Détails de la transaction"
+                    },
                     "labels": {
                         "date": "Date",
                         "account": "Compte",
                         "name": "Nom",
-                        "amount": "Montant (CHF)"
+                        "amount": "Montant (CHF)",
+                        "frequency-days": "Fréquence (Jours)",
+                        "start-date": "Date de début",
+                        "end-date": "Date de fin",
+                        "has-end-date": "Définir une date de fin",
+                        "status": "Statut"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Fréquence de répétition de cette transaction (en jours)",
+                        "has-end-date": "Cocher pour définir une date de fin pour cette transaction récurrente"
                     },
                     "placeholders": {
                         "date": "25/09/2025",
                         "account": "Choisir un compte",
-                        "name": "Saisir le nom"
+                        "name": "Saisir le nom",
+                        "start-date": "Sélectionner la date de début",
+                        "end-date": "Sélectionner la date de fin"
                     },
                     "options": {
                         "giro": "Compte courant",
                         "credit-card": "Carte de crédit",
-                        "sparen": "Compte épargne"
+                        "sparen": "Compte épargne",
+                        "status": {
+                            "active": "Actif",
+                            "inactive": "Inactif"
+                        }
                     },
                     "buttons": {
                         "delete": "Supprimer",
-                        "save": "Enregistrer"
+                        "save": "Enregistrer",
+                        "saving": "Enregistrement..."
                     }
                 }
             },

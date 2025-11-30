@@ -16,6 +16,8 @@ import {
   getOwnedHubDB,
   createRecurringTransactionTemplateDB,
   getRecurringTransactionTemplatesDB,
+  getRecurringTransactionTemplateByIdDB,
+  updateRecurringTransactionTemplateDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -461,6 +463,84 @@ export async function getUpcomingRecurringTransactions(
     return {
       success: false,
       message: err?.message || "Unexpected server error.",
+    };
+  }
+}
+
+// GET Single Recurring Transaction Template
+export async function getRecurringTransactionTemplate(templateId: string): Promise<{
+  success: boolean;
+  data?: any;
+  message?: string;
+}> {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    const template = await getRecurringTransactionTemplateByIdDB(templateId, hubId);
+
+    if (!template) {
+      return {
+        success: false,
+        message: "Recurring transaction template not found",
+      };
+    }
+
+    return { success: true, data: template };
+  } catch (err: any) {
+    console.error("Server action error in getRecurringTransactionTemplate:", err);
+    return {
+      success: false,
+      message: err?.message || "Unexpected server error.",
+    };
+  }
+}
+
+// UPDATE Recurring Transaction Template
+export async function updateRecurringTransactionTemplate(
+  templateId: string,
+  updatedData: {
+    frequencyDays?: number;
+    startDate?: Date;
+    endDate?: Date | null;
+    status?: "active" | "inactive";
+  },
+): Promise<{
+  success: boolean;
+  message?: string;
+  data?: any;
+}> {
+  try {
+    const hdrs = await headers();
+    const { hubId, userRole } = await getContext(hdrs, false);
+
+    requireAdminRole(userRole);
+
+    const res = await updateRecurringTransactionTemplateDB({
+      templateId,
+      hubId,
+      updatedData,
+    });
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to update recurring transaction template.",
+      };
+    }
+
+    revalidatePath("/me/dashboard");
+
+    return {
+      success: true,
+      message: "Recurring transaction template updated successfully!",
+      data: res.data,
+    };
+  } catch (err: any) {
+    console.error("Error in updateRecurringTransactionTemplate:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while updating recurring transaction template.",
     };
   }
 }

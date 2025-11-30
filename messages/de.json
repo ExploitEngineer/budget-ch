@@ -141,25 +141,45 @@
                 "dialog": {
                     "title": "Wiederkehrende Zahlung anpassen",
                     "close": "Schließen",
+                    "loading": "Lädt...",
+                    "read-only": {
+                        "title": "Transaktionsdetails"
+                    },
                     "labels": {
                         "date": "Datum",
                         "account": "Konto",
                         "name": "Name",
-                        "amount": "Betrag (CHF)"
+                        "amount": "Betrag (CHF)",
+                        "frequency-days": "Häufigkeit (Tage)",
+                        "start-date": "Startdatum",
+                        "end-date": "Enddatum",
+                        "has-end-date": "Enddatum setzen",
+                        "status": "Status"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Wie oft sich diese Transaktion wiederholt (in Tagen)",
+                        "has-end-date": "Aktivieren, um ein Enddatum für diese wiederkehrende Transaktion festzulegen"
                     },
                     "placeholders": {
                         "date": "25.09.2025",
                         "account": "Konto auswählen",
-                        "name": "Name eingeben"
+                        "name": "Name eingeben",
+                        "start-date": "Startdatum auswählen",
+                        "end-date": "Enddatum auswählen"
                     },
                     "options": {
                         "giro": "Girokonto",
                         "credit-card": "Kreditkarte",
-                        "sparen": "Sparkonto"
+                        "sparen": "Sparkonto",
+                        "status": {
+                            "active": "Aktiv",
+                            "inactive": "Inaktiv"
+                        }
                     },
                     "buttons": {
                         "delete": "Löschen",
-                        "save": "Speichern"
+                        "save": "Speichern",
+                        "saving": "Speichert..."
                     }
                 }
             },
