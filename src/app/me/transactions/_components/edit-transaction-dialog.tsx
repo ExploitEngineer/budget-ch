@@ -422,7 +422,16 @@ export default function EditTransactionDialog({
                         <FormLabel>{t("dialog.labels.account")}</FormLabel>
                         <FormControl>
                           <Select
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Clear destination if it matches the new source account
+                              if (
+                                transactionType === "transfer" &&
+                                form.getValues("destinationAccountId") === value
+                              ) {
+                                form.setValue("destinationAccountId", "");
+                              }
+                            }}
                             value={field.value}
                             disabled={accountsLoading}
                           >
@@ -539,7 +548,16 @@ export default function EditTransactionDialog({
                         </FormLabel>
                         <FormControl>
                           <Select
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Clear destination if it matches the source account
+                              if (
+                                transactionType === "transfer" &&
+                                form.getValues("accountId") === value
+                              ) {
+                                form.setValue("destinationAccountId", "");
+                              }
+                            }}
                             value={field.value}
                             disabled={accountsLoading}
                           >

@@ -40,7 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   TransactionDialogValues,
   TransactionDialogSchema,
@@ -304,7 +304,16 @@ export default function CreateTransactionDialog({
                         <FormLabel>{t("dialog.labels.account")}</FormLabel>
                         <FormControl>
                           <Select
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Clear destination if it matches the new source account
+                              if (
+                                transactionType === "transfer" &&
+                                form.getValues("destinationAccountId") === value
+                              ) {
+                                form.setValue("destinationAccountId", "");
+                              }
+                            }}
                             value={field.value}
                             disabled={accountsLoading}
                           >
@@ -416,7 +425,16 @@ export default function CreateTransactionDialog({
                         <FormLabel>{t("dialog.labels.destinationAccount")}</FormLabel>
                         <FormControl>
                           <Select
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Clear destination if it matches the source account
+                              if (
+                                transactionType === "transfer" &&
+                                form.getValues("accountId") === value
+                              ) {
+                                form.setValue("destinationAccountId", "");
+                              }
+                            }}
                             value={field.value}
                             disabled={accountsLoading}
                           >
