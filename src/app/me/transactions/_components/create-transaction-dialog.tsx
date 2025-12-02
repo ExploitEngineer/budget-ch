@@ -109,7 +109,9 @@ export default function CreateTransactionDialog({
     onSuccess: () => {
       // Invalidate transaction queries
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
-      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
       // Invalidate account queries since balance changes
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       toast.success("Transaction created successfully!");
@@ -121,32 +123,33 @@ export default function CreateTransactionDialog({
         !error.message?.includes("financial account") &&
         !error.message?.includes("Failed to create transaction")
       ) {
-        toast.error(error.message || "Something went wrong while creating the transaction.");
+        toast.error(
+          error.message ||
+            "Something went wrong while creating the transaction.",
+        );
       } else {
         toast.error(error.message);
       }
     },
   });
 
-  const {
-    data: accounts,
-    isLoading: accountsLoading,
-  } = useQuery<AccountRow[]>({
-    queryKey: accountKeys.list(hubId),
-    queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
-      }
-      return res.tableData ?? [];
+  const { data: accounts, isLoading: accountsLoading } = useQuery<AccountRow[]>(
+    {
+      queryKey: accountKeys.list(hubId),
+      queryFn: async () => {
+        const res = await getFinancialAccounts();
+        if (!res.status) {
+          throw new Error("Failed to fetch accounts");
+        }
+        return res.tableData ?? [];
+      },
+      enabled: open, // Only fetch when dialog is open
     },
-    enabled: open, // Only fetch when dialog is open
-  });
+  );
 
-  const {
-    data: categoriesData,
-    isLoading: categoriesLoading,
-  } = useQuery<{ id: string; name: string }[]>({
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery<
+    { id: string; name: string }[]
+  >({
     queryKey: categoryKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -210,9 +213,13 @@ export default function CreateTransactionDialog({
         destinationAccountId: values.destinationAccountId,
         isRecurring: values.isRecurring,
         frequencyDays: values.isRecurring ? values.frequencyDays : undefined,
-        startDate: values.isRecurring ? (values.startDate || undefined) : undefined,
+        startDate: values.isRecurring
+          ? values.startDate || undefined
+          : undefined,
         endDate: values.isRecurring ? values.endDate : undefined,
-        recurringStatus: values.isRecurring ? values.recurringStatus : undefined,
+        recurringStatus: values.isRecurring
+          ? values.recurringStatus
+          : undefined,
       });
 
       form.reset();
@@ -363,7 +370,10 @@ export default function CreateTransactionDialog({
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts.map((account) => (
-                                  <SelectItem key={account.id} value={account.id}>
+                                  <SelectItem
+                                    key={account.id}
+                                    value={account.id}
+                                  >
                                     {account.name} ({account.type})
                                   </SelectItem>
                                 ))
@@ -452,7 +462,9 @@ export default function CreateTransactionDialog({
                     name="destinationAccountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
-                        <FormLabel>{t("dialog.labels.destinationAccount")}</FormLabel>
+                        <FormLabel>
+                          {t("dialog.labels.destinationAccount")}
+                        </FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={(value) => {
@@ -473,7 +485,9 @@ export default function CreateTransactionDialog({
                                 placeholder={
                                   accountsLoading
                                     ? "Loading accounts..."
-                                    : t("dialog.placeholders.destinationAccount")
+                                    : t(
+                                        "dialog.placeholders.destinationAccount",
+                                      )
                                 }
                               />
                             </SelectTrigger>
@@ -484,9 +498,16 @@ export default function CreateTransactionDialog({
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts
-                                  .filter((account) => account.id !== form.getValues("accountId"))
+                                  .filter(
+                                    (account) =>
+                                      account.id !==
+                                      form.getValues("accountId"),
+                                  )
                                   .map((account) => (
-                                    <SelectItem key={account.id} value={account.id}>
+                                    <SelectItem
+                                      key={account.id}
+                                      value={account.id}
+                                    >
                                       {account.name} ({account.type})
                                     </SelectItem>
                                   ))
@@ -605,7 +626,7 @@ export default function CreateTransactionDialog({
                     control={form.control}
                     name="isRecurring"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormItem className="flex flex-row items-start space-y-0 space-x-3">
                         <FormControl>
                           <Checkbox
                             checked={field.value}
@@ -628,14 +649,18 @@ export default function CreateTransactionDialog({
                         name="frequencyDays"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.frequencyDays")}</FormLabel>
+                            <FormLabel>
+                              {t("dialog.labels.frequencyDays")}
+                            </FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
                                 min={1}
                                 placeholder="30"
                                 {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value) || 0)}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
                               />
                             </FormControl>
                             <FormMessage />
@@ -648,7 +673,9 @@ export default function CreateTransactionDialog({
                         name="startDate"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.startDate")}</FormLabel>
+                            <FormLabel>
+                              {t("dialog.labels.startDate")}
+                            </FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -714,7 +741,9 @@ export default function CreateTransactionDialog({
                         name="recurringStatus"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.recurringStatus")}</FormLabel>
+                            <FormLabel>
+                              {t("dialog.labels.recurringStatus")}
+                            </FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -742,6 +771,7 @@ export default function CreateTransactionDialog({
                 </div>
 
                 {/* Split Rows Section */}
+                {/* 
                 <div className="flex flex-col gap-3 pt-2">
                   <FormLabel>{t("dialog.labels.splitSum")}</FormLabel>
 
@@ -750,7 +780,6 @@ export default function CreateTransactionDialog({
                       key={item.id}
                       className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3"
                     >
-                      {/* Category Select */}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.category`}
@@ -787,8 +816,6 @@ export default function CreateTransactionDialog({
                           </FormItem>
                         )}
                       />
-
-                      {/* Amount Input */}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.amount`}
@@ -805,8 +832,6 @@ export default function CreateTransactionDialog({
                           </FormItem>
                         )}
                       />
-
-                      {/* Description Input */}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.description`}
@@ -823,8 +848,6 @@ export default function CreateTransactionDialog({
                           </FormItem>
                         )}
                       />
-
-                      {/* Remove Button */}
                       <Button
                         type="button"
                         variant="outline"
@@ -834,8 +857,6 @@ export default function CreateTransactionDialog({
                       </Button>
                     </div>
                   ))}
-
-                  {/* Add Row Badge */}
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="secondary"
@@ -856,7 +877,8 @@ export default function CreateTransactionDialog({
                       {t("dialog.badges.splitTotal")}
                     </Badge>
                   </div>
-                </div>
+                </div> 
+                */}
 
                 {/* 7️⃣ Buttons */}
                 <div className="flex justify-end gap-3 pt-4">
@@ -873,7 +895,11 @@ export default function CreateTransactionDialog({
                     disabled={createTransactionMutation.isPending}
                     className="cursor-pointer"
                   >
-                    {createTransactionMutation.isPending ? <Spinner /> : t("dialog.buttons.save")}
+                    {createTransactionMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("dialog.buttons.save")
+                    )}
                   </Button>
                 </div>
               </form>
