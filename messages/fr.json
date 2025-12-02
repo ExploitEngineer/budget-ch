@@ -1,4 +1,36 @@
 {   
+    "two-factor": {
+        "title": "Authentification à deux facteurs",
+        "description": "Veuillez entrer votre code de vérification pour continuer",
+        "tabs": {
+            "totp": "Code TOTP",
+            "backup-code": "Code de secours"
+        },
+        "labels": {
+            "totp-code": "Entrer le code à 6 chiffres",
+            "backup-code": "Entrer le code de secours",
+            "trust-device": "Faire confiance à cet appareil pendant 30 jours"
+        },
+        "placeholders": {
+            "backup-code": "Entrez votre code de secours"
+        },
+        "hints": {
+            "totp-code": "Entrez le code à 6 chiffres de votre application d'authentification",
+            "backup-code": "Entrez l'un de vos codes de secours"
+        },
+        "buttons": {
+            "verify": "Vérifier",
+            "use-backup-code": "Utiliser le code de secours"
+        },
+        "messages": {
+            "invalid-code": "Veuillez entrer un code à 6 chiffres valide",
+            "backup-code-required": "Veuillez entrer un code de secours",
+            "verify-error": "Code de vérification invalide. Veuillez réessayer.",
+            "verify-success": "Vérification réussie. Redirection...",
+            "backup-code-error": "Code de secours invalide. Veuillez réessayer.",
+            "backup-code-success": "Code de secours accepté. Redirection..."
+        }
+    },
     "common": {
         "updating": "Mise à jour...",
         "update": "Mettre à jour",
@@ -1189,15 +1221,76 @@
                 "labels": {
                     "two-factor": {
                         "title": "Authentification à deux facteurs",
-                        "content": "Compatible TOTP avec les applications d'authentification courantes. (Demo)",
+                        "content": "Compatible TOTP avec les applications d'authentification courantes comme Google Authenticator, Authy ou Microsoft Authenticator.",
+                        "status": {
+                            "enabled": "Activé",
+                            "disabled": "Désactivé",
+                            "pending": "Vérification en attente"
+                        },
                         "options": {
                             "off": "Désactivé",
                             "totp-app": "Application TOTP",
                             "email-code": "Code e-mail"
                         },
                         "buttons": {
+                            "enable": "Activer 2FA",
+                            "disable": "Désactiver 2FA",
+                            "verify": "Vérifier le code",
                             "show-backup-codes": "Afficher les codes de secours",
                             "regenerate-backup-codes": "Regénérer les codes de secours"
+                        },
+                        "messages": {
+                            "password-required": "Le mot de passe est requis",
+                            "invalid-code": "Veuillez entrer un code à 6 chiffres valide",
+                            "enable-error": "Échec de l'activation de l'authentification à deux facteurs",
+                            "verify-error": "Code de vérification invalide",
+                            "disabled-success": "Authentification à deux facteurs désactivée avec succès",
+                            "enabled-success": "Authentification à deux facteurs activée avec succès",
+                            "setup-started": "Configuration de l'authentification à deux facteurs démarrée",
+                            "view-codes-error": "Échec de l'affichage des codes de secours",
+                            "regenerate-error": "Échec de la régénération des codes de secours",
+                            "disable-error": "Échec de la désactivation de l'authentification à deux facteurs",
+                            "get-uri-error": "Échec de la récupération de l'URI TOTP",
+                            "copied": "Copié dans le presse-papiers"
+                        },
+                        "dialogs": {
+                            "cancel": "Annuler",
+                            "continue": "Continuer",
+                            "close": "Fermer",
+                            "copy": "Copier",
+                            "password": {
+                                "title": "Confirmer le mot de passe",
+                                "description": "Veuillez entrer votre mot de passe pour continuer",
+                                "label": "Mot de passe",
+                                "placeholder": "Entrez votre mot de passe"
+                            },
+                            "qr": {
+                                "title": "Scanner le code QR",
+                                "description": "Scannez ce code QR avec votre application d'authentification",
+                                "secret-label": "Ou entrez cette clé manuellement",
+                                "next": "Suivant : Vérifier le code"
+                            },
+                            "verify": {
+                                "title": "Vérifier le code",
+                                "description": "Entrez le code à 6 chiffres de votre application d'authentification",
+                                "label": "Code de vérification",
+                                "submit": "Vérifier et activer"
+                            },
+                            "backup-codes": {
+                                "title": "Codes de secours",
+                                "description": "Enregistrez ces codes de secours dans un endroit sûr. Vous pouvez les utiliser pour accéder à votre compte si vous perdez l'accès à votre application d'authentification.",
+                                "warning": "Chaque code ne peut être utilisé qu'une seule fois. Gardez-les en sécurité."
+                            },
+                            "disable": {
+                                "title": "Désactiver l'authentification à deux facteurs",
+                                "description": "Veuillez entrer votre mot de passe pour désactiver l'authentification à deux facteurs",
+                                "confirm": "Désactiver 2FA"
+                            },
+                            "regenerate": {
+                                "title": "Regénérer les codes de secours",
+                                "description": "Cela invalidera vos codes de secours existants et en générera de nouveaux. Veuillez entrer votre mot de passe pour continuer.",
+                                "confirm": "Regénérer les codes"
+                            }
                         }
                     },
                     "password": {
@@ -1206,6 +1299,10 @@
                         "buttons": {
                             "change-password": "Changer le mot de passe",
                             "reset-password": "Réinitialiser le mot de passe"
+                        },
+                        "messages": {
+                            "reset-email-sent": "E-mail de réinitialisation du mot de passe envoyé",
+                            "error": "Une erreur s'est produite"
                         }
                     }
                 }
