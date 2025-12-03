@@ -1111,7 +1111,11 @@
             },
             "members-invitations-section": {
                 "title": "Membri & Inviti",
-                "badge": "0 Membri",
+                "badge": "{count} Membri",
+                "plan-warning": {
+                    "free": "Sei sul piano gratuito. Effettua l'upgrade per usare questa funzione.",
+                    "individual": "Sei sul piano individuale. Effettua l'upgrade per usare questa funzione."
+                },
                 "labels": {
                     "invite-email": {
                         "title": "Invita via email",
@@ -1126,6 +1130,38 @@
                     }
                 },
                 "button": "Invia invito",
+                "buttons": {
+                    "cancel": "Annulla",
+                    "send": "Invia invito",
+                    "sending": "Invio...",
+                    "upgrade": "Effettua l'upgrade per invitare"
+                },
+                "members-table": {
+                    "title": "Membri dell'hub",
+                    "badge": "{count} Membri",
+                    "empty": "Nessun membro per ora.",
+                    "table-headings": {
+                        "name": "Nome",
+                        "email": "Email",
+                        "role": "Ruolo",
+                        "joined": "Entrato il"
+                    }
+                },
+                "invitations-table": {
+                    "title": "Inviti all'hub",
+                    "badge": "{count} Inviti",
+                    "empty": "Nessun invito per ora.",
+                    "table-headings": {
+                        "email": "Email",
+                        "role": "Ruolo",
+                        "status": "Stato",
+                        "expires": "Scade il"
+                    },
+                    "statuses": {
+                        "accepted": "Accettato",
+                        "pending": "In attesa"
+                    }
+                },
                 "table": {
                     "table-headings": {
                         "email": "E-MAIL",

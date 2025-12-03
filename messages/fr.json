@@ -1111,11 +1111,15 @@
             },
             "members-invitations-section": {
                 "title": "Membres & Invitations",
-                "badge": "0 Membres",
+                "badge": "{count} Membres",
+                "plan-warning": {
+                    "free": "Vous êtes sur le plan gratuit. Passez à un plan supérieur pour utiliser cette fonctionnalité.",
+                    "individual": "Vous êtes sur le plan individuel. Passez à un plan supérieur pour utiliser cette fonctionnalité."
+                },
                 "labels": {
                     "invite-email": {
                         "title": "Inviter par email",
-                        "placeholder": "personne@exemple.ch"
+                        "placeholder": "personne@example.ch"
                     },
                     "role": {
                         "title": "Rôle",
@@ -1126,6 +1130,38 @@
                     }
                 },
                 "button": "Envoyer l'invitation",
+                "buttons": {
+                    "cancel": "Annuler",
+                    "send": "Envoyer l'invitation",
+                    "sending": "Envoi...",
+                    "upgrade": "Passer à la version supérieure pour inviter"
+                },
+                "members-table": {
+                    "title": "Membres du hub",
+                    "badge": "{count} Membres",
+                    "empty": "Aucun membre pour le moment.",
+                    "table-headings": {
+                        "name": "Nom",
+                        "email": "Email",
+                        "role": "Rôle",
+                        "joined": "Rejoint le"
+                    }
+                },
+                "invitations-table": {
+                    "title": "Invitations au hub",
+                    "badge": "{count} Invitations",
+                    "empty": "Aucune invitation pour le moment.",
+                    "table-headings": {
+                        "email": "Email",
+                        "role": "Rôle",
+                        "status": "Statut",
+                        "expires": "Expire le"
+                    },
+                    "statuses": {
+                        "accepted": "Acceptée",
+                        "pending": "En attente"
+                    }
+                },
                 "table": {
                     "table-headings": {
                         "email": "E-MAIL",

@@ -1111,7 +1111,11 @@
             },
             "members-invitations-section": {
                 "title": "Members & Invitations",
-                "badge": "0 Members",
+                "badge": "{count} Members",
+                "plan-warning": {
+                    "free": "You are on the free plan. Upgrade to use this feature.",
+                    "individual": "You are on the individual plan. Upgrade to use this feature."
+                },
                 "labels": {
                     "invite-email": {
                         "title": "Invite via Email",
@@ -1126,6 +1130,38 @@
                     }
                 },
                 "button": "Send Invitation",
+                "buttons": {
+                    "cancel": "Cancel",
+                    "send": "Send Invitation",
+                    "sending": "Sending...",
+                    "upgrade": "Upgrade to Invite"
+                },
+                "members-table": {
+                    "title": "Hub Members",
+                    "badge": "{count} Members",
+                    "empty": "No members yet.",
+                    "table-headings": {
+                        "name": "Name",
+                        "email": "Email",
+                        "role": "Role",
+                        "joined": "Joined"
+                    }
+                },
+                "invitations-table": {
+                    "title": "Hub Invitations",
+                    "badge": "{count} Invitations",
+                    "empty": "No invitations yet.",
+                    "table-headings": {
+                        "email": "Email",
+                        "role": "Role",
+                        "status": "Status",
+                        "expires": "Expires"
+                    },
+                    "statuses": {
+                        "accepted": "Accepted",
+                        "pending": "Pending"
+                    }
+                },
                 "table": {
                     "table-headings": {
                         "email": "E-MAIL",
