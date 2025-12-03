@@ -20,12 +20,12 @@ export function PasswordSection({
     <div className="flex flex-col gap-6">
       <Label>{t("labels.password.title")}</Label>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
+        {/* <Button
           variant="outline"
           className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
         >
           {t("labels.password.buttons.change-password")}
-        </Button>
+        </Button> */}
         <Button
           variant="outline"
           disabled={loading}
@@ -39,7 +39,7 @@ export function PasswordSection({
           )}
         </Button>
       </div>
-      <p className="text-sm opacity-80">{t("labels.password.content")}</p>
+      {/* <p className="text-sm opacity-80">{t("labels.password.content")}</p> */}
     </div>
   );
 }
