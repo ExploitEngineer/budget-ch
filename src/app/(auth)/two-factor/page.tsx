@@ -80,7 +80,7 @@ export default function TwoFactorPage() {
   };
 
   return (
-    <Card className="w-full max-w-md bg-blue-background dark:border-border-blue">
+    <Card className="w-full max-w-md dark:border-border-blue">
       <CardHeader>
         <CardTitle>{t("title")}</CardTitle>
         <CardDescription>{t("description")}</CardDescription>
