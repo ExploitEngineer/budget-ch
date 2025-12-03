@@ -78,9 +78,9 @@ export const appearanceSchema = z.object({
   language: z.enum(languages),
   currency: z.enum(currencies),
   theme: z.enum(themes),
-  firstDay: z.enum(firstDays),
-  density: z.enum(densities),
-  rounding: z.enum(roundings),
+  firstDay: z.enum(firstDays).optional(),
+  density: z.enum(densities).optional(),
+  rounding: z.enum(roundings).optional(),
 });
 
 export type AppearanceValues = z.infer<typeof appearanceSchema>;

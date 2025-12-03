@@ -26,11 +26,11 @@ import { toast } from "sonner";
 const STORAGE_KEY = "budget-ch-user-preferences";
 
 function savePreferencesLocally(preferences: AppearanceValues) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
 }
 
 function loadPreferencesLocally() {
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = window.localStorage.getItem(STORAGE_KEY);
   if (!stored) {
     return null;
   }
@@ -58,8 +58,7 @@ export function LocalizationAppearance() {
   });
 
   const onSubmit = (values: AppearanceValues) => {
-    console.log("Saving preferences:", values);
-    // savePreferencesLocally(values);
+    savePreferencesLocally(values);
     toast.success(t("messages.preferences-saved"));
   };
 
@@ -157,7 +156,7 @@ export function LocalizationAppearance() {
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="cursor-pointer"
+                className="btn-gradient cursor-pointer dark:text-white"
                 disabled={form.formState.isSubmitting}
               >
                 {t("buttons.save-preferences")}
