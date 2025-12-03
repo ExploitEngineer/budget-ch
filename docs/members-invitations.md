@@ -1,6 +1,6 @@
 # Members & Invitations
 
-The `MembersInvitations` component under `/src/app/me/settings/_components` now surfaces every hub member and invitation inside two dedicated tables while keeping the invite form intact.
+The `MembersInvitations` component under `/src/app/me/settings/_components` now surfaces every hub member and invitation inside a single card after the invite form.
 
 ## Fetch flow
 
@@ -9,9 +9,9 @@ The `MembersInvitations` component under `/src/app/me/settings/_components` now 
 
 ## Tables
 
-- **Hub Members**: renders `name`, `email`, `role`, and `joined` columns using `@tanstack/react-table`. When no members are returned, a localized empty message replaces the table.
 - **Hub Invitations**: renders `email`, `role`, `status` (accepted vs pending), and `expires` columns. Status badges reuse the shared `Badge` component and the dates are formatted with `date-fns`.
-- Both tables sit in their own cards beneath the invite form so users can clearly see who is already in the hub and which invitations are still outstanding.
+- **Hub Members**: renders `name`, `email`, `role`, and `joined` columns using `@tanstack/react-table`. When no members are returned, a localized empty message replaces the table.
+- The card now stacks the invite form first, followed by the invitations table, and then the members table.
 
 ## Translations
 

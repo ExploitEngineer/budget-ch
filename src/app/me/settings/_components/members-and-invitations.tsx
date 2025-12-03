@@ -258,7 +258,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
       : t("plan-warning.individual");
 
   return (
-    <section className="space-y-6">
+    <section>
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex flex-wrap items-center justify-between gap-2">
           <CardTitle>{t("title")}</CardTitle>
@@ -273,7 +273,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
 
         <Separator className="dark:bg-border-blue" />
 
-        <CardContent className="space-y-6 pt-6">
+        <CardContent className="space-y-8 pt-6">
           {/* INVITE FORM */}
           <div>
             <h3 className="mb-4 font-semibold">{t("button")}</h3>
@@ -373,162 +373,163 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
               </form>
             </Form>
           </div>
+
+          {/* TABLES */}
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-foreground">
+                  {t("invitations-table.title")}
+                </p>
+                <Badge
+                  variant="outline"
+                  className="bg-badge-background dark:border-border-blue rounded-full px-3 py-1 text-xs"
+                >
+                  {t("invitations-table.badge", { count: invitations.length })}
+                </Badge>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-border transition-colors">
+                {invitations.length === 0 ? (
+                  <div className="p-4 text-sm text-muted-foreground">
+                    {t("invitations-table.empty")}
+                  </div>
+                ) : (
+                  <Table className="min-w-[560px]">
+                    <TableHeader>
+                      {invitationsTable.getHeaderGroups().map((headerGroup) => (
+                        <TableRow
+                          key={headerGroup.id}
+                          className="dark:border-border-blue"
+                        >
+                          {headerGroup.headers.map((header) => (
+                            <TableHead
+                              key={header.id}
+                              className="font-bold text-gray-500 uppercase dark:text-gray-400/80"
+                            >
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+
+                    <TableBody>
+                      {invitationsTable.getRowModel().rows.length ? (
+                        invitationsTable.getRowModel().rows.map((row) => (
+                          <TableRow
+                            key={row.id}
+                            className="dark:border-border-blue"
+                          >
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={invitationColumns.length}
+                            className="text-center text-sm"
+                          >
+                            {t("invitations-table.empty")}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold text-foreground">
+                  {t("members-table.title")}
+                </p>
+                <Badge
+                  variant="outline"
+                  className="bg-badge-background dark:border-border-blue rounded-full px-3 py-1 text-xs"
+                >
+                  {t("members-table.badge", { count: members.length })}
+                </Badge>
+              </div>
+
+              <div className="overflow-x-auto rounded-xl border border-border transition-colors">
+                {members.length === 0 ? (
+                  <div className="p-4 text-sm text-muted-foreground">
+                    {t("members-table.empty")}
+                  </div>
+                ) : (
+                  <Table className="min-w-[560px]">
+                    <TableHeader>
+                      {membersTable.getHeaderGroups().map((headerGroup) => (
+                        <TableRow
+                          key={headerGroup.id}
+                          className="dark:border-border-blue"
+                        >
+                          {headerGroup.headers.map((header) => (
+                            <TableHead
+                              key={header.id}
+                              className="font-bold text-gray-500 uppercase dark:text-gray-400/80"
+                            >
+                              {header.isPlaceholder
+                                ? null
+                                : flexRender(
+                                    header.column.columnDef.header,
+                                    header.getContext(),
+                                  )}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableHeader>
+
+                    <TableBody>
+                      {membersTable.getRowModel().rows.length ? (
+                        membersTable.getRowModel().rows.map((row) => (
+                          <TableRow
+                            key={row.id}
+                            className="dark:border-border-blue"
+                          >
+                            {row.getVisibleCells().map((cell) => (
+                              <TableCell key={cell.id}>
+                                {flexRender(
+                                  cell.column.columnDef.cell,
+                                  cell.getContext(),
+                                )}
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        ))
+                      ) : (
+                        <TableRow>
+                          <TableCell
+                            colSpan={memberColumns.length}
+                            className="text-center text-sm"
+                          >
+                            {t("members-table.empty")}
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
-
-      <div className="space-y-4">
-        <Card className="bg-blue-background dark:border-border-blue">
-          <CardHeader className="flex items-center justify-between gap-2">
-            <CardTitle>{t("members-table.title")}</CardTitle>
-            <Badge
-              variant="outline"
-              className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2 text-xs"
-            >
-              {t("members-table.badge", { count: members.length })}
-            </Badge>
-          </CardHeader>
-
-          <Separator className="dark:bg-border-blue" />
-
-          <CardContent>
-            {members.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {t("members-table.empty")}
-              </p>
-            ) : (
-              <Table className="min-w-[560px]">
-                <TableHeader>
-                  {membersTable.getHeaderGroups().map((headerGroup) => (
-                    <TableRow
-                      key={headerGroup.id}
-                      className="dark:border-border-blue"
-                    >
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          className="font-bold text-gray-500 uppercase dark:text-gray-400/80"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-
-                <TableBody>
-                  {membersTable.getRowModel().rows.length ? (
-                    membersTable.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        className="dark:border-border-blue"
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={memberColumns.length}
-                        className="text-center text-sm"
-                      >
-                        {t("members-table.empty")}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="bg-blue-background dark:border-border-blue">
-          <CardHeader className="flex items-center justify-between gap-2">
-            <CardTitle>{t("invitations-table.title")}</CardTitle>
-            <Badge
-              variant="outline"
-              className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2 text-xs"
-            >
-              {t("invitations-table.badge", { count: invitations.length })}
-            </Badge>
-          </CardHeader>
-
-          <Separator className="dark:bg-border-blue" />
-
-          <CardContent>
-            {invitations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                {t("invitations-table.empty")}
-              </p>
-            ) : (
-              <Table className="min-w-[560px]">
-                <TableHeader>
-                  {invitationsTable.getHeaderGroups().map((headerGroup) => (
-                    <TableRow
-                      key={headerGroup.id}
-                      className="dark:border-border-blue"
-                    >
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          className="font-bold text-gray-500 uppercase dark:text-gray-400/80"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableHeader>
-
-                <TableBody>
-                  {invitationsTable.getRowModel().rows.length ? (
-                    invitationsTable.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        className="dark:border-border-blue"
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={invitationColumns.length}
-                        className="text-center text-sm"
-                      >
-                        {t("invitations-table.empty")}
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </section>
   );
 }
