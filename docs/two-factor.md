@@ -73,6 +73,12 @@ The two-factor plugin is configured in `src/lib/auth/auth.ts`:
 1. Click "Disable 2FA" in settings
 2. Enter password for verification
 3. 2FA is disabled
+4. The settings dialog calls `authClient.twoFactor.disable({ password })` so the request reuses the client session cookies and avoids logging the user out.
+
+## UI Status Tracking
+
+- The Security settings card tracks a single `twoFactorStatus` value (`disabled`, `pending`, or `enabled`) instead of separate booleans. This keeps the state in sync with the server and controls the label plus which action buttons (enable, verify, disable) are shown.
+- Starting setup switches the status to `pending`, successful verification flips it to `enabled`, and disabling or reloading the view resets it to `disabled`.
 
 ## API Endpoints
 
@@ -88,11 +94,9 @@ All 2FA operations are handled through Better Auth's built-in endpoints:
 
 ## Server Actions
 
-Server actions are available in `src/app/me/settings/actions.ts`:
+Server actions are available in `src/app/me/settings/actions.ts` for the flows that require server-side secrets or status (enable flow, TOTP URI retrieval, backup codes, and status polling). 2FA verification and disabling are handled on the client with the `authClient.twoFactor` plugin so the cookies stay in sync and the user remains signed in.
 
 - `enableTwoFactorAction(password)` - Start 2FA setup
-- `verifyTotpCodeAction(code)` - Verify and complete 2FA setup
-- `disableTwoFactorAction(password)` - Disable 2FA
 - `getTotpUriAction(password)` - Get TOTP URI
 - `viewBackupCodesAction()` - View backup codes
 - `regenerateBackupCodesAction(password)` - Regenerate backup codes

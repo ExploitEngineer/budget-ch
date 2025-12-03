@@ -1,4 +1,4 @@
-{   
+{
     "two-factor": {
         "title": "Authentification à deux facteurs",
         "description": "Veuillez entrer votre code de vérification pour continuer",
@@ -1098,16 +1098,16 @@
                     "individual": "Individuel",
                     "family": "Famille"
                 },
-                    "status-label": "Statut",
-                    "started-label": "Début",
-                    "renewal-label": "Se renouvelle le",
-                    "renews-label": "Se renouvelle le",
-                    "cancels-at-label": "Annule le",
-                    "days-remaining-label": "Jours restants",
-                    "manage-button": "Gérer l'abonnement",
-                    "errors": {
-                        "portal-failed": "Impossible d'ouvrir le portail Stripe pour le moment."
-                    }
+                "status-label": "Statut",
+                "started-label": "Début",
+                "renewal-label": "Se renouvelle le",
+                "renews-label": "Se renouvelle le",
+                "cancels-at-label": "Annule le",
+                "days-remaining-label": "Jours restants",
+                "manage-button": "Gérer l'abonnement",
+                "errors": {
+                    "portal-failed": "Impossible d'ouvrir le portail Stripe pour le moment."
+                }
             },
             "members-invitations-section": {
                 "title": "Membres & Invitations",
@@ -1268,6 +1268,8 @@
                                 "title": "Scanner le code QR",
                                 "description": "Scannez ce code QR avec votre application d'authentification",
                                 "secret-label": "Ou entrez cette clé manuellement",
+                                "secret-key": "Clé secrète",
+                                "copy-secret": "Copier la clé secrète",
                                 "next": "Suivant : Vérifier le code"
                             },
                             "verify": {
@@ -1279,7 +1281,8 @@
                             "backup-codes": {
                                 "title": "Codes de secours",
                                 "description": "Enregistrez ces codes de secours dans un endroit sûr. Vous pouvez les utiliser pour accéder à votre compte si vous perdez l'accès à votre application d'authentification.",
-                                "warning": "Chaque code ne peut être utilisé qu'une seule fois. Gardez-les en sécurité."
+                                "warning": "Chaque code ne peut être utilisé qu'une seule fois. Gardez-les en sécurité.",
+                                "copy-all": "Copier tous les codes"
                             },
                             "disable": {
                                 "title": "Désactiver l'authentification à deux facteurs",

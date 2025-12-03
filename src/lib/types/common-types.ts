@@ -17,3 +17,8 @@ export interface CardsContent {
   badge: string;
 }
 
+/**
+ * Status of the two-factor authentication workflow in the UI
+ */
+export type TwoFactorStatus = "enabled" | "pending" | "disabled";
+

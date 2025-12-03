@@ -1069,24 +1069,24 @@
                     "stripe-portal-button": "Abonnement verwalten (Stripe Portal)"
                 }
             },
-                "current-subscription-section": {
-                    "title": "Aktuelles Abonnement",
-                    "plan-label": "Plan",
-                    "plan-labels": {
-                        "individual": "Einzeln",
-                        "family": "Familie"
-                    },
-                    "status-label": "Status",
-                    "started-label": "Beginn",
-                    "renewal-label": "Erneuert am",
-                    "renews-label": "Erneuert am",
-                    "cancels-at-label": "Wird beendet am",
-                    "days-remaining-label": "Verbleibende Tage",
-                    "manage-button": "Abonnement verwalten",
-                    "errors": {
-                        "portal-failed": "Das Stripe-Portal kann gerade nicht geöffnet werden."
-                    }
+            "current-subscription-section": {
+                "title": "Aktuelles Abonnement",
+                "plan-label": "Plan",
+                "plan-labels": {
+                    "individual": "Einzeln",
+                    "family": "Familie"
                 },
+                "status-label": "Status",
+                "started-label": "Beginn",
+                "renewal-label": "Erneuert am",
+                "renews-label": "Erneuert am",
+                "cancels-at-label": "Wird beendet am",
+                "days-remaining-label": "Verbleibende Tage",
+                "manage-button": "Abonnement verwalten",
+                "errors": {
+                    "portal-failed": "Das Stripe-Portal kann gerade nicht geöffnet werden."
+                }
+            },
             "members-invitations-section": {
                 "title": "Mitglieder & Einladungen",
                 "badge": "0 Mitglieder",
@@ -1246,6 +1246,8 @@
                                 "title": "QR-Code scannen",
                                 "description": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App",
                                 "secret-label": "Oder geben Sie diesen Schlüssel manuell ein",
+                                "secret-key": "Geheimschlüssel",
+                                "copy-secret": "Kopieer geheime sleutel",
                                 "next": "Weiter: Code bestätigen"
                             },
                             "verify": {
@@ -1257,7 +1259,8 @@
                             "backup-codes": {
                                 "title": "Backup-Codes",
                                 "description": "Speichern Sie diese Backup-Codes an einem sicheren Ort. Sie können sie verwenden, um auf Ihr Konto zuzugreifen, wenn Sie keinen Zugriff mehr auf Ihre Authenticator-App haben.",
-                                "warning": "Jeder Code kann nur einmal verwendet werden. Bewahren Sie sie sicher auf."
+                                "warning": "Jeder Code kann nur einmal verwendet werden. Bewahren Sie sie sicher auf.",
+                                "copy-all": "Alle Codes kopieren"
                             },
                             "disable": {
                                 "title": "Zwei-Faktor-Authentifizierung deaktivieren",

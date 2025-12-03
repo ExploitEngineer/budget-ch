@@ -1082,33 +1082,33 @@
                         },
                         "button": "Upgrade Now"
                     },
-            "errors": {
-                "no-price": "That plan is temporarily unavailable.",
-                "portal-failed": "Unable to open the Stripe portal right now."
-            },
-            "current-plan-badge": "Current plan",
-            "manage-plan-button": "Manage plan",
+                    "errors": {
+                        "no-price": "That plan is temporarily unavailable.",
+                        "portal-failed": "Unable to open the Stripe portal right now."
+                    },
+                    "current-plan-badge": "Current plan",
+                    "manage-plan-button": "Manage plan",
                     "stripe-portal-button": "Manage Subscription (Stripe Portal)"
                 }
             },
-                "current-subscription-section": {
-                    "title": "Current subscription",
-                    "plan-label": "Plan",
-                    "plan-labels": {
-                        "individual": "Individual",
-                        "family": "Family"
-                    },
-                    "status-label": "Status",
-                    "started-label": "Started",
-                    "renewal-label": "Renews at",
-                    "renews-label": "Renews at",
-                    "cancels-at-label": "Cancels at",
-                    "days-remaining-label": "Days remaining",
-                    "manage-button": "Manage subscription",
-                    "errors": {
-                        "portal-failed": "Unable to open the Stripe portal right now."
-                    }
+            "current-subscription-section": {
+                "title": "Current subscription",
+                "plan-label": "Plan",
+                "plan-labels": {
+                    "individual": "Individual",
+                    "family": "Family"
                 },
+                "status-label": "Status",
+                "started-label": "Started",
+                "renewal-label": "Renews at",
+                "renews-label": "Renews at",
+                "cancels-at-label": "Cancels at",
+                "days-remaining-label": "Days remaining",
+                "manage-button": "Manage subscription",
+                "errors": {
+                    "portal-failed": "Unable to open the Stripe portal right now."
+                }
+            },
             "members-invitations-section": {
                 "title": "Members & Invitations",
                 "badge": "0 Members",
@@ -1268,6 +1268,8 @@
                                 "title": "Scan QR Code",
                                 "description": "Scan this QR code with your authenticator app",
                                 "secret-label": "Or enter this secret manually",
+                                "secret-key": "Secret Key",
+                                "copy-secret": "Copy Secret Key",
                                 "next": "Next: Verify Code"
                             },
                             "verify": {
@@ -1279,7 +1281,8 @@
                             "backup-codes": {
                                 "title": "Backup Codes",
                                 "description": "Save these backup codes in a safe place. You can use them to access your account if you lose access to your authenticator app.",
-                                "warning": "Each code can only be used once. Keep them secure."
+                                "warning": "Each code can only be used once. Keep them secure.",
+                                "copy-all": "Copy All Codes"
                             },
                             "disable": {
                                 "title": "Disable Two-Factor Authentication",

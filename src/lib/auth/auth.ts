@@ -202,10 +202,13 @@ export const auth = betterAuth({
   plugins: [
     twoFactor({
       issuer: "Budget-ch",
-      backupCodes: {
-        amount: 10,
+      /*
+      backupCodeOptions: {
         length: 10,
+        amount: 10,
       },
+      */
+      /*
       otpOptions: {
         async sendOTP({ user, otp }) {
           const html = `
@@ -243,6 +246,7 @@ export const auth = betterAuth({
         },
         period: 3, // 3 minutes (in minutes for OTP)
       },
+      */
     }),
   ],
 });

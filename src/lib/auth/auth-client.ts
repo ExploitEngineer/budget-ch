@@ -7,7 +7,7 @@ export const authClient = createAuthClient({
   plugins: [
     nextCookies(),
     twoFactorClient({
-      twoFactorPage: "/two-factor",
+      // twoFactorPage: "/two-factor",
       onTwoFactorRedirect() {
         if (typeof window !== "undefined") {
           window.location.href = "/two-factor";
