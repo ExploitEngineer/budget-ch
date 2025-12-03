@@ -51,6 +51,7 @@ export function DataPrivacy() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
@@ -61,6 +62,7 @@ export function DataPrivacy() {
       }
       return res.tableData ?? [];
     },
+    enabled: !!hubId,
   });
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
@@ -71,6 +73,7 @@ export function DataPrivacy() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const { data: goals } = useQuery<SavingGoal[]>({
@@ -82,6 +85,7 @@ export function DataPrivacy() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const { exportAllDataJSON } = useExportCSV();

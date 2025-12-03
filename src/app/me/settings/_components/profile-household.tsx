@@ -87,7 +87,8 @@ export function ProfileHousehold({
     };
 
     loadData();
-  }, [user, subscription, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id, user.name, user.email, subscription?.subscriptionPlan]);
 
   const onSubmit = async (values: ProfileHouseholdValues) => {
     setLoading(true);
