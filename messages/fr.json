@@ -1236,6 +1236,7 @@
                             "enable": "Activer 2FA",
                             "disable": "Désactiver 2FA",
                             "verify": "Vérifier le code",
+                            "restart-setup": "Recommencer l'installation",
                             "show-backup-codes": "Afficher les codes de secours",
                             "regenerate-backup-codes": "Regénérer les codes de secours"
                         },
@@ -1249,6 +1250,7 @@
                             "setup-started": "Configuration de l'authentification à deux facteurs démarrée",
                             "view-codes-error": "Échec de l'affichage des codes de secours",
                             "regenerate-error": "Échec de la régénération des codes de secours",
+                            "regenerate-success": "Les codes de secours ont été régénérés avec succès",
                             "disable-error": "Échec de la désactivation de l'authentification à deux facteurs",
                             "get-uri-error": "Échec de la récupération de l'URI TOTP",
                             "copied": "Copié dans le presse-papiers"

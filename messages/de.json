@@ -1214,6 +1214,7 @@
                             "enable": "2FA aktivieren",
                             "disable": "2FA deaktivieren",
                             "verify": "Code bestätigen",
+                            "restart-setup": "Setup zurücksetzen",
                             "show-backup-codes": "Backup-Codes anzeigen",
                             "regenerate-backup-codes": "Backup-Codes neu erzeugen"
                         },
@@ -1227,6 +1228,7 @@
                             "setup-started": "Einrichtung der Zwei-Faktor-Authentifizierung gestartet",
                             "view-codes-error": "Backup-Codes konnten nicht angezeigt werden",
                             "regenerate-error": "Backup-Codes konnten nicht neu erzeugt werden",
+                            "regenerate-success": "Backup-Codes wurden erfolgreich neu erzeugt",
                             "disable-error": "Zwei-Faktor-Authentifizierung konnte nicht deaktiviert werden",
                             "get-uri-error": "TOTP-URI konnte nicht abgerufen werden",
                             "copied": "In Zwischenablage kopiert"

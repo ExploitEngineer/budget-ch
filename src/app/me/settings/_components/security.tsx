@@ -24,6 +24,7 @@ import {
   enableTwoFactorAction,
   getTotpUriAction,
   getTwoFactorStatusAction,
+  regenerateBackupCodesAction,
 } from "../actions";
 import type { TwoFactorStatus } from "@/lib/types/common-types";
 
@@ -44,13 +45,28 @@ export function Security() {
   const [disableDialogOpen, setDisableDialogOpen] = useState(false);
   const [showBackupCodesAfterVerify, setShowBackupCodesAfterVerify] =
     useState(false);
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
 
   // Form states
   const [password, setPassword] = useState("");
+  const [regeneratePassword, setRegeneratePassword] = useState("");
   const [totpCode, setTotpCode] = useState("");
   const [totpUri, setTotpUri] = useState<string | null>(null);
   const [totpSecret, setTotpSecret] = useState<string | null>(null);
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
+
+  const resetTwoFactorSetup = () => {
+    setPassword("");
+    setTotpCode("");
+    setTotpUri(null);
+    setTotpSecret(null);
+    setBackupCodes([]);
+    setShowBackupCodesAfterVerify(false);
+    setPasswordDialogOpen(false);
+    setQrDialogOpen(false);
+    setVerifyDialogOpen(false);
+    setTwoFactorStatus("disabled");
+  };
 
   useEffect(() => {
     loadTwoFactorStatus();
@@ -209,6 +225,38 @@ export function Security() {
     }
   };
 
+  const handleRegenerateBackupCodes = async () => {
+    if (!regeneratePassword) {
+      toast.error(t("labels.two-factor.messages.password-required"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await regenerateBackupCodesAction(regeneratePassword);
+      if (result.success && result.data) {
+        const newCodes = result.data?.backupCodes ?? [];
+        setBackupCodes(newCodes);
+        setShowBackupCodesAfterVerify(true);
+        setVerifyDialogOpen(true);
+        setRegenerateDialogOpen(false);
+        setRegeneratePassword("");
+        toast.success(t("labels.two-factor.messages.regenerate-success"));
+      } else {
+        toast.error(
+          result.message || t("labels.two-factor.messages.regenerate-error"),
+        );
+      }
+    } catch (err: any) {
+      console.error("Error regenerating backup codes:", err);
+      toast.error(
+        err.message || t("labels.two-factor.messages.regenerate-error"),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGetTotpUri = async () => {
     if (!password) {
       toast.error(t("labels.two-factor.messages.password-required"));
@@ -304,24 +352,46 @@ export function Security() {
                     </Button>
                   )}
                   {isTwoFactorPending && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setVerifyDialogOpen(true)}
-                      disabled={loading}
-                      className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                    >
-                      {t("labels.two-factor.buttons.verify")}
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => setVerifyDialogOpen(true)}
+                        disabled={loading}
+                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                      >
+                        {t("labels.two-factor.buttons.verify")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        onClick={resetTwoFactorSetup}
+                        disabled={loading}
+                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                      >
+                        {t("labels.two-factor.buttons.restart-setup")}
+                      </Button>
+                    </>
                   )}
                   {isTwoFactorEnabled && (
-                    <Button
-                      variant="destructive"
-                      onClick={() => setDisableDialogOpen(true)}
-                      disabled={loading}
-                      className="cursor-pointer"
-                    >
-                      {t("labels.two-factor.buttons.disable")}
-                    </Button>
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => setRegenerateDialogOpen(true)}
+                        disabled={loading}
+                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+                      >
+                        {t(
+                          "labels.two-factor.buttons.regenerate-backup-codes",
+                        )}
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        onClick={() => setDisableDialogOpen(true)}
+                        disabled={loading}
+                        className="cursor-pointer"
+                      >
+                        {t("labels.two-factor.buttons.disable")}
+                      </Button>
+                    </>
                   )}
                 </div>
               )}
@@ -582,6 +652,70 @@ export function Security() {
                 </Button>
               </>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Regenerate Backup Codes Dialog */}
+      <Dialog
+        open={regenerateDialogOpen}
+        onOpenChange={(open) => {
+          setRegenerateDialogOpen(open);
+          if (!open) {
+            setRegeneratePassword("");
+          }
+        }}
+      >
+        <DialogContent className="dark:!bg-dark-blue-background">
+          <DialogHeader>
+            <DialogTitle>
+              {t("labels.two-factor.dialogs.regenerate.title")}
+            </DialogTitle>
+            <DialogDescription>
+              {t("labels.two-factor.dialogs.regenerate.description")}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="regenerate-password">
+                {t("labels.two-factor.dialogs.password.label")}
+              </Label>
+              <Input
+                id="regenerate-password"
+                type="password"
+                value={regeneratePassword}
+                onChange={(e) => setRegeneratePassword(e.target.value)}
+                placeholder={t(
+                  "labels.two-factor.dialogs.password.placeholder",
+                )}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && regeneratePassword) {
+                    handleRegenerateBackupCodes();
+                  }
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setRegenerateDialogOpen(false);
+                setRegeneratePassword("");
+              }}
+            >
+              {t("labels.two-factor.dialogs.cancel")}
+            </Button>
+            <Button
+              onClick={handleRegenerateBackupCodes}
+              disabled={loading || !regeneratePassword}
+            >
+              {loading ? (
+                <Spinner />
+              ) : (
+                t("labels.two-factor.dialogs.regenerate.confirm")
+              )}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

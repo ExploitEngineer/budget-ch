@@ -1236,6 +1236,7 @@
                             "enable": "Enable 2FA",
                             "disable": "Disable 2FA",
                             "verify": "Verify Code",
+                            "restart-setup": "Restart Setup",
                             "show-backup-codes": "Show Backup Codes",
                             "regenerate-backup-codes": "Regenerate Backup Codes"
                         },
@@ -1249,6 +1250,7 @@
                             "setup-started": "Two-factor authentication setup started",
                             "view-codes-error": "Failed to view backup codes",
                             "regenerate-error": "Failed to regenerate backup codes",
+                            "regenerate-success": "Backup codes regenerated successfully",
                             "disable-error": "Failed to disable two-factor authentication",
                             "get-uri-error": "Failed to get TOTP URI",
                             "copied": "Copied to clipboard"

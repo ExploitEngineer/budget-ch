@@ -1236,6 +1236,7 @@
                             "enable": "Attiva 2FA",
                             "disable": "Disattiva 2FA",
                             "verify": "Verifica codice",
+                            "restart-setup": "Riavvia la configurazione",
                             "show-backup-codes": "Mostra codici di backup",
                             "regenerate-backup-codes": "Rigenera codici di backup"
                         },
@@ -1249,6 +1250,7 @@
                             "setup-started": "Configurazione dell'autenticazione a due fattori avviata",
                             "view-codes-error": "Impossibile visualizzare i codici di backup",
                             "regenerate-error": "Impossibile rigenerare i codici di backup",
+                            "regenerate-success": "I codici di backup sono stati rigenerati con successo",
                             "disable-error": "Impossibile disattivare l'autenticazione a due fattori",
                             "get-uri-error": "Impossibile ottenere l'URI TOTP",
                             "copied": "Copiato negli appunti"

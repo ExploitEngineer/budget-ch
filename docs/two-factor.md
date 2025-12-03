@@ -54,6 +54,7 @@ The two-factor plugin is configured in `src/lib/auth/auth.ts`:
 5. User scans QR code with authenticator app
 6. User enters 6-digit verification code
 7. 2FA is enabled
+8. If the QR dialog is closed before verification completes, the Security card keeps showing "Pending Verification" and exposes a **Restart Setup** button so the user can clear the temporary state and start over without reloading the page.
 
 ### Signing In with 2FA
 
@@ -67,6 +68,8 @@ The two-factor plugin is configured in `src/lib/auth/auth.ts`:
 
 - **View Codes**: Click "Show Backup Codes" in settings (only works immediately after generation)
 - **Regenerate Codes**: Click "Regenerate Backup Codes" and enter password (invalidates old codes)
+
+When 2FA is enabled the Security card exposes the **Regenerate Backup Codes** button next to the disable action. The button opens a password confirmation dialog and, on success, reuses the backup code dialog so the user can copy the newly issued codes before closing it. Generating a new set explicitly invalidates every existing code, so this flow is the recommended way to rotate backup codes.
 
 ### Disabling 2FA
 
