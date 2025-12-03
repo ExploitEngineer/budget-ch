@@ -20,24 +20,47 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AppearanceValues, appearanceSchema } from "@/lib/validations";
 import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
+const STORAGE_KEY = "budget-ch-user-preferences";
+
+function savePreferencesLocally(preferences: AppearanceValues) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+}
+
+function loadPreferencesLocally() {
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (!stored) {
+    return null;
+  }
+  return JSON.parse(stored) as AppearanceValues;
+}
+
+function getInitialDefaultValues() {
+  const stored = loadPreferencesLocally();
+  if (!stored) {
+    return {
+      language: "en" as const,
+      currency: "chf" as const,
+      theme: "auto" as const,
+    };
+  }
+  return stored;
+}
 
 export function LocalizationAppearance() {
   const t = useTranslations("main-dashboard.settings-page.appearance-section");
 
   const form = useForm<AppearanceValues>({
     resolver: zodResolver(appearanceSchema),
-    defaultValues: {
-      language: "English",
-      currency: "CHF",
-      theme: "Auto",
-      firstDay: "Monday",
-      density: "Comfort",
-      rounding: "5-rappen",
-    },
+    defaultValues: getInitialDefaultValues(),
   });
 
   const onSubmit = (values: AppearanceValues) => {
-    console.log("Appearance settings:", values);
+    console.log("Saving preferences:", values);
+    // savePreferencesLocally(values);
+    toast.success(t("messages.preferences-saved"));
   };
 
   return (
@@ -130,6 +153,15 @@ export function LocalizationAppearance() {
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                className="cursor-pointer"
+                disabled={form.formState.isSubmitting}
+              >
+                {t("buttons.save-preferences")}
+              </Button>
             </div>
 
             {/* Content / Description */}

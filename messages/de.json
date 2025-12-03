@@ -1164,6 +1164,12 @@
                             "1-rappen": "1 Rappen"
                         }
                     }
+                },
+                "messages": {
+                    "preferences-saved": "Präferenzen gespeichert"
+                },
+                "buttons": {
+                    "save-preferences": "Präferenzen speichern"
                 }
             },
             "notifications-section": {

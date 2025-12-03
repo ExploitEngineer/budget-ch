@@ -1186,6 +1186,12 @@
                             "1-rappen": "1 centime"
                         }
                     }
+                },
+                "messages": {
+                    "preferences-saved": "Préférences enregistrées"
+                },
+                "buttons": {
+                    "save-preferences": "Enregistrer les préférences"
                 }
             },
             "notifications-section": {
