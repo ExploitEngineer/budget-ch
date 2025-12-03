@@ -2,24 +2,11 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { getUserEmail } from "@/lib/services/user";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Spinner } from "@/components/ui/spinner";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import QRCode from "react-qr-code";
 import {
   enableTwoFactorAction,
   getTotpUriAction,
@@ -27,6 +14,13 @@ import {
   regenerateBackupCodesAction,
 } from "../actions";
 import type { TwoFactorStatus } from "@/lib/types/common-types";
+import { PasswordConfirmationDialog } from "./security/password-confirmation-dialog";
+import { QrCodeDialog } from "./security/qr-code-dialog";
+import { VerifyTotpDialog } from "./security/verify-totp-dialog";
+import { RegenerateBackupCodesDialog } from "./security/regenerate-backup-codes-dialog";
+import { DisableTwoFactorDialog } from "./security/disable-two-factor-dialog";
+import { TwoFactorSection } from "./security/two-factor-section";
+import { PasswordSection } from "./security/password-section";
 
 export function Security() {
   const t = useTranslations("main-dashboard.settings-page.security-section");
@@ -34,9 +28,6 @@ export function Security() {
   const [twoFactorStatus, setTwoFactorStatus] =
     useState<TwoFactorStatus>("disabled");
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
-
-  const isTwoFactorEnabled = twoFactorStatus === "enabled";
-  const isTwoFactorPending = twoFactorStatus === "pending";
 
   // Dialog states
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -290,17 +281,6 @@ export function Security() {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success(t("labels.two-factor.messages.copied"));
-  };
-
-  const copyAllBackupCodes = () => {
-    if (backupCodes.length === 0) return;
-    const allCodes = backupCodes.join("\n");
-    navigator.clipboard.writeText(allCodes);
-    toast.success(t("labels.two-factor.messages.copied"));
-  };
 
   return (
     <section>
@@ -311,471 +291,79 @@ export function Security() {
         <Separator className="dark:bg-border-blue" />
         <CardContent>
           <div className="mb-5 grid grid-cols-2 gap-5">
-            <div className="flex flex-col gap-6">
-              <div className="flex flex-col gap-2">
-                <Label className="text-sm">
-                  {t("labels.two-factor.title")}
-                </Label>
-                {loadingStatus ? (
-                  <Spinner />
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm">
-                      {isTwoFactorEnabled
-                        ? t("labels.two-factor.status.enabled")
-                        : isTwoFactorPending
-                          ? t("labels.two-factor.status.pending")
-                          : t("labels.two-factor.status.disabled")}
-                    </span>
-                  </div>
-                )}
-              </div>
+            <TwoFactorSection
+              loadingStatus={loadingStatus}
+              twoFactorStatus={twoFactorStatus}
+              loading={loading}
+              onEnableClick={() => setPasswordDialogOpen(true)}
+              onVerifyClick={() => setVerifyDialogOpen(true)}
+              onRestartSetup={resetTwoFactorSetup}
+              onRegenerateBackupCodesClick={() => setRegenerateDialogOpen(true)}
+              onDisableClick={() => setDisableDialogOpen(true)}
+            />
 
-              <p className="text-sm opacity-80">
-                {t("labels.two-factor.content")}
-              </p>
-
-              {!loadingStatus && (
-                <div className="flex flex-wrap items-center gap-2">
-                  {!isTwoFactorEnabled && !isTwoFactorPending && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setPasswordDialogOpen(true)}
-                      disabled={loading}
-                      className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                    >
-                      {loading ? (
-                        <Spinner />
-                      ) : (
-                        t("labels.two-factor.buttons.enable")
-                      )}
-                    </Button>
-                  )}
-                  {isTwoFactorPending && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setVerifyDialogOpen(true)}
-                        disabled={loading}
-                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                      >
-                        {t("labels.two-factor.buttons.verify")}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        onClick={resetTwoFactorSetup}
-                        disabled={loading}
-                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                      >
-                        {t("labels.two-factor.buttons.restart-setup")}
-                      </Button>
-                    </>
-                  )}
-                  {isTwoFactorEnabled && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setRegenerateDialogOpen(true)}
-                        disabled={loading}
-                        className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                      >
-                        {t(
-                          "labels.two-factor.buttons.regenerate-backup-codes",
-                        )}
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => setDisableDialogOpen(true)}
-                        disabled={loading}
-                        className="cursor-pointer"
-                      >
-                        {t("labels.two-factor.buttons.disable")}
-                      </Button>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-6">
-              <Label>{t("labels.password.title")}</Label>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                >
-                  {t("labels.password.buttons.change-password")}
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  onClick={handleResetEmailSend}
-                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                >
-                  {loading ? (
-                    <Spinner />
-                  ) : (
-                    t("labels.password.buttons.reset-password")
-                  )}
-                </Button>
-              </div>
-              <p className="text-sm opacity-80">
-                {t("labels.password.content")}
-              </p>
-            </div>
+            <PasswordSection
+              loading={loading}
+              onResetPasswordClick={handleResetEmailSend}
+            />
           </div>
         </CardContent>
       </Card>
 
-      {/* Password Confirmation Dialog for Enable */}
-      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
-        <DialogContent className="dark:!bg-dark-blue-background">
-          <DialogHeader>
-            <DialogTitle>
-              {t("labels.two-factor.dialogs.password.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("labels.two-factor.dialogs.password.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">
-                {t("labels.two-factor.dialogs.password.label")}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t(
-                  "labels.two-factor.dialogs.password.placeholder",
-                )}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    handleEnableTwoFactor();
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setPasswordDialogOpen(false);
-                setPassword("");
-              }}
-            >
-              {t("labels.two-factor.dialogs.cancel")}
-            </Button>
-            <Button
-              onClick={handleEnableTwoFactor}
-              disabled={loading || !password}
-            >
-              {loading ? <Spinner /> : t("labels.two-factor.dialogs.continue")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <PasswordConfirmationDialog
+        open={passwordDialogOpen}
+        onOpenChange={setPasswordDialogOpen}
+        password={password}
+        onPasswordChange={setPassword}
+        onSubmit={handleEnableTwoFactor}
+        loading={loading}
+      />
 
-      {/* QR Code Dialog */}
-      <Dialog open={qrDialogOpen} onOpenChange={setQrDialogOpen}>
-        <DialogContent className="dark:!bg-dark-blue-background max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("labels.two-factor.dialogs.qr.title")}</DialogTitle>
-            <DialogDescription>
-              {t("labels.two-factor.dialogs.qr.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {totpUri && (
-              <div className="flex flex-col items-center gap-4">
-                <div className="rounded-lg bg-white p-4">
-                  <QRCode value={totpUri} size={256} />
-                </div>
-              </div>
-            )}
-            {totpSecret && (
-              <div className="space-y-2">
-                <Label>{t("labels.two-factor.dialogs.qr.secret-key")}</Label>
-                <div className="flex flex-col gap-2">
-                  <div className="flex-1 bg-muted rounded-lg p-3 font-mono text-sm break-all">
-                    {totpSecret}
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(totpSecret)}
-                    className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                  >
-                    {t("labels.two-factor.dialogs.qr.copy-secret")}
-                  </Button>
-                </div>
-              </div>
-            )}
-            {/*totpSecret && (
-              <div className="flex items-center justify-center w-full">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => copyToClipboard(totpSecret)}
-                className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-              >
-                {t("labels.two-factor.dialogs.qr.copy-secret")}
-              </Button>
-              </div>
-            )*/}
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setQrDialogOpen(false);
-                setVerifyDialogOpen(true);
-              }}
-            >
-              {t("labels.two-factor.dialogs.qr.next")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <QrCodeDialog
+        open={qrDialogOpen}
+        onOpenChange={setQrDialogOpen}
+        totpUri={totpUri}
+        totpSecret={totpSecret}
+        onNext={() => {
+          setQrDialogOpen(false);
+          setVerifyDialogOpen(true);
+        }}
+      />
 
-      {/* Verify TOTP Dialog */}
-      <Dialog
+      <VerifyTotpDialog
         open={verifyDialogOpen}
-        onOpenChange={(open) => {
-          if (!open && !showBackupCodesAfterVerify) {
-            setVerifyDialogOpen(false);
-            setTotpCode("");
-          }
+        onOpenChange={setVerifyDialogOpen}
+        totpCode={totpCode}
+        onTotpCodeChange={setTotpCode}
+        onVerify={handleVerifyTotp}
+        loading={loading}
+        showBackupCodes={showBackupCodesAfterVerify}
+        backupCodes={backupCodes}
+        onClose={() => {
+          setVerifyDialogOpen(false);
+          setShowBackupCodesAfterVerify(false);
+          setTotpCode("");
+          setBackupCodes([]);
         }}
-      >
-        <DialogContent className="dark:!bg-dark-blue-background max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {showBackupCodesAfterVerify
-                ? t("labels.two-factor.dialogs.backup-codes.title")
-                : t("labels.two-factor.dialogs.verify.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {showBackupCodesAfterVerify
-                ? t("labels.two-factor.dialogs.backup-codes.description")
-                : t("labels.two-factor.dialogs.verify.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            {showBackupCodesAfterVerify ? (
-              // Show backup codes after verification
-              backupCodes.length > 0 && (
-                <div className="space-y-2">
-                  <div className="bg-muted grid grid-cols-2 gap-2 rounded-lg p-4">
-                    {backupCodes.map((code, index) => (
-                      <div
-                        key={index}
-                        className="bg-background hover:bg-accent cursor-pointer rounded border p-2 font-mono text-sm"
-                        onClick={() => copyToClipboard(code)}
-                      >
-                        {code}
-                      </div>
-                    ))}
-                  </div>
-                  <Button
-                    variant="outline"
-                    onClick={copyAllBackupCodes}
-                    className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer"
-                  >
-                    {t("labels.two-factor.dialogs.backup-codes.copy-all")}
-                  </Button>
-                  <p className="text-muted-foreground text-xs">
-                    {t("labels.two-factor.dialogs.backup-codes.warning")}
-                  </p>
-                </div>
-              )
-            ) : (
-              // Show verification input
-              <div className="space-y-2">
-                <Label htmlFor="totp-code">
-                  {t("labels.two-factor.dialogs.verify.label")}
-                </Label>
-                <Input
-                  id="totp-code"
-                  type="text"
-                  value={totpCode}
-                  onChange={(e) =>
-                    setTotpCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
-                  placeholder="000000"
-                  maxLength={6}
-                  className="text-center font-mono text-2xl tracking-widest"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && totpCode.length === 6) {
-                      handleVerifyTotp();
-                    }
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          <DialogFooter>
-            {showBackupCodesAfterVerify ? (
-              <Button
-                onClick={() => {
-                  setVerifyDialogOpen(false);
-                  setShowBackupCodesAfterVerify(false);
-                  setTotpCode("");
-                  setBackupCodes([]);
-                }}
-              >
-                {t("labels.two-factor.dialogs.close")}
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setVerifyDialogOpen(false);
-                    setTotpCode("");
-                  }}
-                >
-                  {t("labels.two-factor.dialogs.cancel")}
-                </Button>
-                <Button
-                  onClick={handleVerifyTotp}
-                  disabled={loading || totpCode.length !== 6}
-                >
-                  {loading ? (
-                    <Spinner />
-                  ) : (
-                    t("labels.two-factor.dialogs.verify.submit")
-                  )}
-                </Button>
-              </>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      />
 
-      {/* Regenerate Backup Codes Dialog */}
-      <Dialog
+      <RegenerateBackupCodesDialog
         open={regenerateDialogOpen}
-        onOpenChange={(open) => {
-          setRegenerateDialogOpen(open);
-          if (!open) {
-            setRegeneratePassword("");
-          }
-        }}
-      >
-        <DialogContent className="dark:!bg-dark-blue-background">
-          <DialogHeader>
-            <DialogTitle>
-              {t("labels.two-factor.dialogs.regenerate.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("labels.two-factor.dialogs.regenerate.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="regenerate-password">
-                {t("labels.two-factor.dialogs.password.label")}
-              </Label>
-              <Input
-                id="regenerate-password"
-                type="password"
-                value={regeneratePassword}
-                onChange={(e) => setRegeneratePassword(e.target.value)}
-                placeholder={t(
-                  "labels.two-factor.dialogs.password.placeholder",
-                )}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && regeneratePassword) {
-                    handleRegenerateBackupCodes();
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setRegenerateDialogOpen(false);
-                setRegeneratePassword("");
-              }}
-            >
-              {t("labels.two-factor.dialogs.cancel")}
-            </Button>
-            <Button
-              onClick={handleRegenerateBackupCodes}
-              disabled={loading || !regeneratePassword}
-            >
-              {loading ? (
-                <Spinner />
-              ) : (
-                t("labels.two-factor.dialogs.regenerate.confirm")
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        onOpenChange={setRegenerateDialogOpen}
+        password={regeneratePassword}
+        onPasswordChange={setRegeneratePassword}
+        onSubmit={handleRegenerateBackupCodes}
+        loading={loading}
+      />
 
-      {/* Disable 2FA Dialog */}
-      <Dialog open={disableDialogOpen} onOpenChange={setDisableDialogOpen}>
-        <DialogContent className="dark:!bg-dark-blue-background">
-          <DialogHeader>
-            <DialogTitle>
-              {t("labels.two-factor.dialogs.disable.title")}
-            </DialogTitle>
-            <DialogDescription>
-              {t("labels.two-factor.dialogs.disable.description")}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="disable-password">
-                {t("labels.two-factor.dialogs.password.label")}
-              </Label>
-              <Input
-                id="disable-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={t(
-                  "labels.two-factor.dialogs.password.placeholder",
-                )}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && password) {
-                    handleDisableTwoFactor();
-                  }
-                }}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDisableDialogOpen(false);
-                setPassword("");
-              }}
-            >
-              {t("labels.two-factor.dialogs.cancel")}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDisableTwoFactor}
-              disabled={loading || !password}
-            >
-              {loading ? (
-                <Spinner />
-              ) : (
-                t("labels.two-factor.dialogs.disable.confirm")
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DisableTwoFactorDialog
+        open={disableDialogOpen}
+        onOpenChange={setDisableDialogOpen}
+        password={password}
+        onPasswordChange={setPassword}
+        onSubmit={handleDisableTwoFactor}
+        loading={loading}
+      />
     </section>
   );
 }
