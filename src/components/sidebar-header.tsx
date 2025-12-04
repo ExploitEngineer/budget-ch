@@ -142,6 +142,8 @@ export default function SidebarHeader() {
         <div
           className={`flex flex-wrap items-center justify-end gap-4 transition-all duration-300`}
         >
+          {/* 
+          // Month Switcher
           <div
             className={`bg-blue-background hidden items-center gap-2 rounded-lg border px-2 transition-all duration-300 sm:flex`}
           >
@@ -154,7 +156,8 @@ export default function SidebarHeader() {
             <Button variant="ghost" size="icon" onClick={goToNextMonth}>
               <ChevronRight className="h-4 w-4" />
             </Button>
-          </div>
+          </div> 
+          */}
 
           {(route === "dashboard" || route === "transactions") && (
             <CreateTransactionDialog variant="gradient" />
