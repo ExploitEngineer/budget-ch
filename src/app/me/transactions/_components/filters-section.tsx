@@ -61,6 +61,15 @@ export function FiltersSection({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState<boolean>(false);
 
+  const defaultFilterValues: TransactionFiltersFormValues = {
+    dateFrom: undefined,
+    dateTo: undefined,
+    category: "",
+    amountMax: 0,
+    amountMin: 0,
+    text: "",
+  };
+
   const {
     data: categoriesData,
     isLoading: categoriesLoading,
@@ -89,14 +98,7 @@ export function FiltersSection({
 
   const form = useForm<TransactionFiltersFormValues>({
     resolver: zodResolver(transactionFiltersFormSchema) as any,
-    defaultValues: {
-      dateFrom: undefined,
-      dateTo: undefined,
-      category: "",
-      amountMax: 0,
-      amountMin: 0,
-      text: "",
-    },
+    defaultValues: defaultFilterValues,
   });
 
   const handleApply = () => {
@@ -104,8 +106,9 @@ export function FiltersSection({
   };
 
   const handleReset = () => {
-    form.reset();
+    form.reset(defaultFilterValues);
     onReset?.();
+    setSelectedCategory(null);
   };
 
   function handleCategoryAdded(newCategory: string) {
