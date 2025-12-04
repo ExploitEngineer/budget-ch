@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import SidebarHeader from "@/components/sidebar-header";
-import { CalculationSection } from "./calculations-section";
+import { FiltersSection } from "@/app/me/transactions/_components/filters-section";
 import { DataTable } from "./data-table";
 import type { Transaction } from "@/lib/types/dashboard-types";
-import type { CalculationFormValues } from "@/lib/validations/calculation-section-validations";
+import type { TransactionFiltersFormValues } from "@/lib/validations/transaction-filters-validations";
 import { useQuery } from "@tanstack/react-query";
 import { getTransactions } from "@/lib/services/transaction";
 import { transactionKeys } from "@/lib/query-keys";
@@ -36,7 +36,7 @@ export default function TransactionsClient() {
     setFiltered(transactions ?? []);
   }, [transactions]);
 
-  const handleFilter = (filters: CalculationFormValues) => {
+  const handleFilter = (filters: TransactionFiltersFormValues) => {
     const filteredData = (transactions ?? []).filter((tx) => {
       if (!tx.date) return false;
 
@@ -84,7 +84,7 @@ export default function TransactionsClient() {
     <section>
       <SidebarHeader />
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <CalculationSection
+        <FiltersSection
           onFilter={handleFilter}
           onReset={() => setFiltered(transactions ?? [])}
         />

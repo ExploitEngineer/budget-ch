@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const calculationFormSchema = z
+export const transactionFiltersFormSchema = z
   .object({
     dateFrom: z.date().optional(),
     dateTo: z.date().optional(),
@@ -34,4 +34,4 @@ export const calculationFormSchema = z
     { message: "Min amount must be less than Max amount", path: ["amountMax"] },
   );
 
-export type CalculationFormValues = z.infer<typeof calculationFormSchema>;
+export type TransactionFiltersFormValues = z.infer<typeof transactionFiltersFormSchema>;

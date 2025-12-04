@@ -32,23 +32,23 @@ import { useTranslations } from "next-intl";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CalculationFormValues,
-  calculationFormSchema,
-} from "@/lib/validations/calculation-section-validations";
+  TransactionFiltersFormValues,
+  transactionFiltersFormSchema,
+} from "@/lib/validations/transaction-filters-validations";
 import { useState } from "react";
 import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { useSearchParams } from "next/navigation";
 
-interface CalculationSectionProps {
-  onFilter: (filters: CalculationFormValues) => void;
+interface FiltersSectionProps {
+  onFilter: (filters: TransactionFiltersFormValues) => void;
   onReset?: () => void;
 }
 
-export function CalculationSection({
+export function FiltersSection({
   onFilter,
   onReset,
-}: CalculationSectionProps) {
+}: FiltersSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -58,8 +58,8 @@ export function CalculationSection({
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState<boolean>(false);
 
-  const form = useForm<CalculationFormValues>({
-    resolver: zodResolver(calculationFormSchema) as any,
+  const form = useForm<TransactionFiltersFormValues>({
+    resolver: zodResolver(transactionFiltersFormSchema) as any,
     defaultValues: {
       dateFrom: undefined,
       dateTo: undefined,
