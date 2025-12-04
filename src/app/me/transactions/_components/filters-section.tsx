@@ -35,10 +35,13 @@ import {
   TransactionFiltersFormValues,
   transactionFiltersFormSchema,
 } from "@/lib/validations/transaction-filters-validations";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { Spinner } from "@/components/ui/spinner";
 import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { categoryKeys } from "@/lib/query-keys";
+import { getCategories } from "@/lib/services/category";
 
 interface FiltersSectionProps {
   onFilter: (filters: TransactionFiltersFormValues) => void;
@@ -54,9 +57,35 @@ export function FiltersSection({
   const hubId = searchParams.get("hub");
 
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState<boolean>(false);
+
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    refetch: refetchCategories,
+  } = useQuery({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data;
+    },
+    enabled: !!hubId,
+  });
+
+  const availableCategories = useMemo(() => {
+    const fetchedNames = categoriesData?.map((category) => category.name) ?? [];
+    const uniqueCategories = new Set<string>(fetchedNames);
+    customCategories.forEach((category) => uniqueCategories.add(category));
+    return Array.from(uniqueCategories);
+  }, [categoriesData, customCategories]);
 
   const form = useForm<TransactionFiltersFormValues>({
     resolver: zodResolver(transactionFiltersFormSchema) as any,
@@ -80,7 +109,10 @@ export function FiltersSection({
   };
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
+    setCustomCategories((prev) =>
+      prev.includes(newCategory) ? prev : [...prev, newCategory],
+    );
+    refetchCategories();
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
   }
@@ -194,12 +226,14 @@ export function FiltersSection({
                               </Button>
                             </div>
 
-                            {categories.length === 0 ? (
+                            {availableCategories.length === 0 ? (
                               <SelectItem value="none" disabled>
-                                {t("labels.category.data.no-category")}
+                                {categoriesLoading
+                                  ? t("loading")
+                                  : t("labels.category.data.no-category")}
                               </SelectItem>
                             ) : (
-                              categories.map((category) => (
+                              availableCategories.map((category) => (
                                 <SelectItem key={category} value={category}>
                                   {category}
                                 </SelectItem>
