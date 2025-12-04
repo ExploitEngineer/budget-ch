@@ -109,6 +109,10 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
       header: t("data-table.headings.date"),
     },
     {
+      accessorKey: "type",
+      header: t("data-table.headings.type"),
+    },
+    {
       accessorKey: "source",
       header: t("data-table.headings.recipient"),
       cell: ({ row }) => row.original.recipient || "—",
@@ -300,7 +304,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="dark:border-border-blue"
+                    className="dark:border-border-blue capitalize"
                     data-state={row.getIsSelected() ? "selected" : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (

@@ -469,7 +469,8 @@
                     "category": "Kategorie",
                     "note": "Notiz",
                     "amount": "Betrag",
-                    "action": "Aktion"
+                    "action": "Aktion",
+                    "type": "Typ"
                 },
                 "action": "Bearbeiten",
                 "recipients": {

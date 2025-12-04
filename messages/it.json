@@ -469,7 +469,8 @@
                     "category": "Categoria",
                     "note": "Nota",
                     "amount": "Importo",
-                    "action": "Azione"
+                    "action": "Azione",
+                    "type": "Tipo"
                 },
                 "action": "Modifica",
                 "recipients": {

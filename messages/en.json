@@ -467,7 +467,8 @@
                     "category": "Category",
                     "note": "Note",
                     "amount": "Amount",
-                    "action": "Action"
+                    "action": "Action",
+                    "type": "Type"
                 },
                 "action": "Edit",
                 "recipients": {

@@ -469,7 +469,8 @@
                     "category": "Catégorie",
                     "note": "Note",
                     "amount": "Montant",
-                    "action": "Action"
+                    "action": "Action",
+                    "type": "Type"
                 },
                 "action": "Éditer",
                 "recipients": {

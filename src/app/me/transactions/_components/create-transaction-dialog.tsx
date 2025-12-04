@@ -375,6 +375,7 @@ export default function CreateTransactionDialog({
                                     value={account.id}
                                   >
                                     {account.name} ({account.type})
+                                    ({account.formattedBalance})
                                   </SelectItem>
                                 ))
                               ) : (
@@ -508,7 +509,7 @@ export default function CreateTransactionDialog({
                                       key={account.id}
                                       value={account.id}
                                     >
-                                      {account.name} ({account.type})
+                                      {account.name} ({account.type}) ({account.formattedBalance || 0} CHF)
                                     </SelectItem>
                                   ))
                               ) : (

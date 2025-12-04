@@ -18,39 +18,15 @@ import {
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AppearanceValues, appearanceSchema } from "@/lib/validations";
+import { UserPreferencesValues, userPreferencesSchema } from "@/lib/validations";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import { setLanguage } from "@/app/actions";
 import { usePathname, useSearchParams } from "next/navigation";
+import { getLocalUserPreferences, setLocalUserPreferences } from "@/lib/services/locat-store";
 
-const STORAGE_KEY = "budget-ch-user-preferences";
-
-function savePreferencesLocally(preferences: AppearanceValues) {
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
-}
-
-function loadPreferencesLocally() {
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    return null;
-  }
-  return JSON.parse(stored) as AppearanceValues;
-}
-
-function getInitialDefaultValues() {
-  const stored = loadPreferencesLocally();
-  if (!stored) {
-    return {
-      language: "en" as const,
-      currency: "chf" as const,
-      theme: "auto" as const,
-    };
-  }
-  return stored;
-}
 
 export function LocalizationAppearance() {
   const t = useTranslations("main-dashboard.settings-page.appearance-section");
@@ -59,14 +35,14 @@ export function LocalizationAppearance() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const form = useForm<AppearanceValues>({
-    resolver: zodResolver(appearanceSchema),
-    defaultValues: getInitialDefaultValues(),
+  const form = useForm<UserPreferencesValues>({
+    resolver: zodResolver(userPreferencesSchema),
+    defaultValues: getLocalUserPreferences(true) as UserPreferencesValues,
   });
 
-  const onSubmit = async (values: AppearanceValues) => {
+  const onSubmit = async (values: UserPreferencesValues) => {
     // Save preferences to localStorage
-    savePreferencesLocally(values);
+    setLocalUserPreferences(values);
 
     // Apply theme immediately
     // Map "auto" to "system" for next-themes

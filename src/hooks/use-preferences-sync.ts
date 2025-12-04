@@ -4,22 +4,8 @@ import { useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useLocale } from "next-intl";
 import { setLanguage } from "@/app/actions";
-import { AppearanceValues } from "@/lib/validations";
-
-const STORAGE_KEY = "budget-ch-user-preferences";
-
-function loadPreferencesLocally(): AppearanceValues | null {
-  if (typeof window === "undefined") return null;
-  const stored = window.localStorage.getItem(STORAGE_KEY);
-  if (!stored) {
-    return null;
-  }
-  try {
-    return JSON.parse(stored) as AppearanceValues;
-  } catch {
-    return null;
-  }
-}
+import { UserPreferencesValues } from "@/lib/validations";
+import { getLocalUserPreferences } from "@/lib/services/locat-store";
 
 /**
  * Hook to sync user preferences (theme and language) on page load
@@ -33,7 +19,7 @@ export function usePreferencesSync() {
     // Wait for theme to be mounted before applying preferences
     if (theme === undefined) return;
 
-    const preferences = loadPreferencesLocally();
+    const preferences = getLocalUserPreferences(false);
     if (!preferences) return;
 
     // Apply theme if different from current
@@ -54,6 +40,6 @@ export function usePreferencesSync() {
     }
   }, [theme, setTheme, currentLocale]); // Run when theme is mounted
 
-  return { preferences: loadPreferencesLocally() };
+  return { preferences: getLocalUserPreferences(false) as UserPreferencesValues | null };
 }
 

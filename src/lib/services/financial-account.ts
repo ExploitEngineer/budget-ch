@@ -60,7 +60,7 @@ export async function createFinancialAccount({
 }
 
 // READ Financial Accounts [Action]
-export async function getFinancialAccounts() {
+export async function getFinancialAccounts(currency: string = "CHF") {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
