@@ -120,7 +120,7 @@ export default function EditTransactionDialog({
       category: string;
       amount: number;
       note?: string;
-      source: string;
+      source?: string | null;
       transactionType: TransactionType;
       accountId: string;
       destinationAccountId?: string;
@@ -134,7 +134,7 @@ export default function EditTransactionDialog({
         categoryName: data.category.trim(),
         amount: data.amount,
         note: data.note,
-        source: data.source,
+        source: data.source || null,
         transactionType: data.transactionType,
         accountId: data.accountId,
         destinationAccountId: data.destinationAccountId,
@@ -323,7 +323,7 @@ export default function EditTransactionDialog({
       category: selectedCategory || values.category?.trim(),
       amount: values.amount,
       note: values.note,
-      source: values.recipient,
+      source: values.recipient || null,
       transactionType: values.transactionType,
       destinationAccountId: values.destinationAccountId,
     };
@@ -351,7 +351,7 @@ export default function EditTransactionDialog({
           category: payload.category || "",
           amount: payload.amount,
           note: payload.note,
-          source: payload.source,
+          source: payload.source || null,
           transactionType: payload.transactionType,
           accountId: values.accountId,
           destinationAccountId: payload.destinationAccountId,
@@ -595,6 +595,7 @@ export default function EditTransactionDialog({
                         <FormControl>
                           <Input
                             {...field}
+                            value={field.value ?? ""}
                             placeholder={t("dialog.placeholders.recipient")}
                           />
                         </FormControl>

@@ -16,7 +16,7 @@ export const TransactionDialogSchema = z.object({
   transactionType: z.enum(transactionType, {
     message: "Transaction Type is required",
   }),
-  recipient: z.string().min(1, { message: "Recipient is required" }),
+  recipient: z.string().optional().nullable(),
   category: z.string().optional(),
   destinationAccountId: z.string().optional(),
   amount: z.coerce.number({ message: "Amount must be 0 or more" }),

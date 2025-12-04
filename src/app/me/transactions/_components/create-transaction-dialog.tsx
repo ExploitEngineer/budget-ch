@@ -77,7 +77,7 @@ export default function CreateTransactionDialog({
       category?: string;
       amount: number;
       note?: string;
-      source: string;
+      source?: string | null;
       transactionType: TransactionType;
       accountId: string;
       destinationAccountId?: string;
@@ -91,7 +91,7 @@ export default function CreateTransactionDialog({
         categoryName: data.category?.trim() || "",
         amount: data.amount,
         note: data.note,
-        source: data.source,
+        source: data.source || null,
         transactionType: data.transactionType,
         accountId: data.accountId,
         destinationAccountId: data.destinationAccountId,
@@ -175,7 +175,7 @@ export default function CreateTransactionDialog({
     defaultValues: {
       date: new Date(),
       accountId: "",
-      recipient: "",
+      recipient: null,
       category: "",
       destinationAccountId: "",
       amount: 0,
@@ -207,7 +207,7 @@ export default function CreateTransactionDialog({
         category: values.category?.trim(),
         amount: values.amount,
         note: values.note,
-        source: values.recipient,
+        source: values.recipient || null,
         transactionType: values.transactionType,
         accountId: values.accountId,
         destinationAccountId: values.destinationAccountId,
@@ -447,6 +447,7 @@ export default function CreateTransactionDialog({
                         <FormControl>
                           <Input
                             {...field}
+                            value={field.value ?? ""}
                             placeholder={t("dialog.placeholders.recipient")}
                           />
                         </FormControl>

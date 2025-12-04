@@ -61,7 +61,7 @@ export type createTransactionArgs = {
   transactionCategoryId: string | null;
   amount: number;
   note?: string;
-  source: string;
+  source?: string | null;
   categoryName: string;
   transactionType: TransactionType;
   destinationAccountId?: string | null;
