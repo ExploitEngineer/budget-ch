@@ -304,7 +304,7 @@ export default function CreateTransactionDialog({
                     control={form.control}
                     name="date"
                     render={({ field }) => (
-                      <FormItem className="flex flex-1 flex-col">
+                      <FormItem className="flex flex-col w-full">
                         <FormLabel>{t("dialog.labels.date")}</FormLabel>
                         <FormControl>
                           <Popover>
@@ -337,7 +337,7 @@ export default function CreateTransactionDialog({
                     control={form.control}
                     name="accountId"
                     render={({ field }) => (
-                      <FormItem className="flex flex-1 flex-col">
+                      <FormItem className="flex flex-col w-full">
                         <FormLabel>{t("dialog.labels.account")}</FormLabel>
                         <FormControl>
                           <Select
@@ -392,12 +392,12 @@ export default function CreateTransactionDialog({
                   />
                 </div>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:gap-3">
                   <FormField
                     control={form.control}
                     name="transactionType"
                     render={({ field }) => (
-                      <FormItem className="flex !flex-1 flex-col">
+                      <FormItem className="w-full">
                         <FormLabel>
                           {t("dialog.labels.transactionType.title")}
                         </FormLabel>
@@ -442,7 +442,7 @@ export default function CreateTransactionDialog({
                     control={form.control}
                     name="recipient"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="w-full">
                         <FormLabel>{t("dialog.labels.recipient")}</FormLabel>
                         <FormControl>
                           <Input
