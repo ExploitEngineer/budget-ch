@@ -52,6 +52,7 @@ import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import type { TransactionFiltersFormValues } from "@/lib/validations/transaction-filters-validations";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 interface DataTableProps {
   transactions: Transaction[];
@@ -64,7 +65,7 @@ interface DataTableProps {
 const transactionFilterFn: FilterFn<Transaction> = (
   row: Row<Transaction>,
   _columnId: string,
-  filterValue: TransactionFiltersFormValues
+  filterValue: TransactionFiltersFormValues,
 ) => {
   const tx = row.original;
 
@@ -129,7 +130,12 @@ const transactionFilterFn: FilterFn<Transaction> = (
   return true;
 };
 
-export function DataTable({ transactions, filters, loading, error }: DataTableProps) {
+export function DataTable({
+  transactions,
+  filters,
+  loading,
+  error,
+}: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -144,7 +150,8 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-  const [globalFilter, setGlobalFilter] = React.useState<TransactionFiltersFormValues>(filters);
+  const [globalFilter, setGlobalFilter] =
+    React.useState<TransactionFiltersFormValues>(filters);
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
   // Update global filter when filters prop changes
@@ -162,14 +169,19 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
-      queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       setConfirmDialogOpen(false);
       toast.success("All transactions deleted!");
     },
     onError: (error: Error) => {
       setConfirmDialogOpen(false);
-      toast.error(error.message || "Something went wrong while deleting all transactions.");
+      toast.error(
+        error.message ||
+          "Something went wrong while deleting all transactions.",
+      );
     },
   });
 
@@ -281,17 +293,25 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection, globalFilter },
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
   });
 
   // Calculate total balance from filtered rows
   const totalBalance = React.useMemo(() => {
-    return table.getFilteredRowModel().rows.reduce((acc, row) => acc + row.original.amount, 0);
+    return table
+      .getFilteredRowModel()
+      .rows.reduce((acc, row) => acc + row.original.amount, 0);
   }, [table]);
 
   if (loading) {
     return (
-      <Card className="bg-blue-background dark:border-border-blue p-10 flex items-center justify-center">
+      <Card className="bg-blue-background dark:border-border-blue flex items-center justify-center p-10">
         <Spinner />
       </Card>
     );
@@ -337,17 +357,33 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
                 <span>{t("data-table.header.checkbox")}</span>
               </label>
             </Badge>
-            <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  className="cursor-pointer"
-                  disabled={deleteAllTransactionsMutation.isPending}
-                >
-                  {t("data-table.header.buttons.deleteAll")}
-                </Button>
-              </DialogTrigger>
-
+            <Button
+              size="sm"
+              variant="destructive"
+              className="cursor-pointer"
+              disabled={deleteAllTransactionsMutation.isPending}
+              onClick={() => setConfirmDialogOpen(true)}
+            >
+              {t("data-table.header.buttons.deleteAll")}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() =>
+                exportTransactions({
+                  transactions: table
+                    .getFilteredRowModel()
+                    .rows.map((row) => row.original),
+                })
+              }
+              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+            >
+              {t("data-table.header.buttons.export")} CSV
+            </Button>
+            <Dialog
+              open={confirmDialogOpen}
+              onOpenChange={setConfirmDialogOpen}
+            >
               <DialogContent className="max-w-md">
                 <DialogHeader>
                   <DialogTitle>
@@ -360,7 +396,10 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
                 </DialogDescription>
 
                 <DialogFooter className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setConfirmDialogOpen(false)}>
+                  <Button
+                    variant="outline"
+                    onClick={() => setConfirmDialogOpen(false)}
+                  >
                     {t("data-table.confirmation.cancel")}
                   </Button>
                   <Button
@@ -377,21 +416,6 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-            {/* <Button
-              variant="outline"
-              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-            >
-              {t("data-table.header.buttons.category")}
-            </Button> */}
-            <Button
-              variant="outline"
-              onClick={() => exportTransactions({ 
-                transactions: table.getFilteredRowModel().rows.map(row => row.original) 
-              })}
-              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-            >
-              {t("data-table.header.buttons.export")} CSV
-            </Button>
           </div>
           {/* <div className="flex flex-wrap items-center gap-2">
             <Badge
