@@ -745,6 +745,7 @@ export async function getTransactionsDB(
       userName: users.name,
       accountId: transactions.financialAccountId,
       destinationAccountId: transactions.destinationAccountId,
+      recurringTemplateId: transactions.recurringTemplateId,
     };
 
     const selectObj: Record<string, any> = {};

@@ -12,6 +12,8 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
+  FilterFn,
+  Row,
 } from "@tanstack/react-table";
 import {
   Card,
@@ -40,14 +42,85 @@ import { deleteAllTransactionsAndCategories } from "@/lib/services/transaction";
 import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import type { TransactionFiltersFormValues } from "@/lib/validations/transaction-filters-validations";
 
 interface DataTableProps {
   transactions: Transaction[];
+  filters: TransactionFiltersFormValues;
   loading?: boolean;
   error?: string | null;
 }
 
-export function DataTable({ transactions, loading, error }: DataTableProps) {
+// Custom filter function for transactions
+const transactionFilterFn: FilterFn<Transaction> = (
+  row: Row<Transaction>,
+  _columnId: string,
+  filterValue: TransactionFiltersFormValues
+) => {
+  const tx = row.original;
+
+  // Date filtering
+  if (tx.date && tx.date !== "—") {
+    const [day, month, year] = tx.date.split("/").map(Number);
+    const txDate = new Date(year, month - 1, day);
+    txDate.setHours(0, 0, 0, 0);
+
+    if (filterValue.dateFrom) {
+      const fromDate = new Date(filterValue.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      if (txDate < fromDate) return false;
+    }
+
+    if (filterValue.dateTo) {
+      const toDate = new Date(filterValue.dateTo);
+      toDate.setHours(0, 0, 0, 0);
+      if (txDate > toDate) return false;
+    }
+  }
+
+  // Category filtering
+  if (filterValue.category && filterValue.category !== "") {
+    if (tx.category !== filterValue.category) return false;
+  }
+
+  // Amount filtering
+  if (filterValue.amountMin && filterValue.amountMin > 0) {
+    if (Math.abs(tx.amount) < filterValue.amountMin) return false;
+  }
+
+  if (filterValue.amountMax && filterValue.amountMax > 0) {
+    if (Math.abs(tx.amount) > filterValue.amountMax) return false;
+  }
+
+  // Text search filtering
+  if (filterValue.text && filterValue.text.trim() !== "") {
+    const searchText = filterValue.text.toLowerCase();
+    const matchesRecipient = tx.recipient?.toLowerCase().includes(searchText);
+    const matchesNote = tx.note?.toLowerCase().includes(searchText);
+    const matchesCategory = tx.category?.toLowerCase().includes(searchText);
+    if (!matchesRecipient && !matchesNote && !matchesCategory) return false;
+  }
+
+  // Recurring filter (only show recurring transactions when checked)
+  if (filterValue.isRecurring) {
+    if (!tx.isRecurring) return false;
+  }
+
+  // Transfers only filter
+  if (filterValue.transfersOnly) {
+    if (tx.type !== "transfer") return false;
+  }
+
+  // With receipt filter - currently transactions don't have receipt field
+  // This filter is ready for when the feature is implemented
+  // if (filterValue.withReceipt) {
+  //   if (!tx.hasReceipt) return false;
+  // }
+
+  return true;
+};
+
+export function DataTable({ transactions, filters, loading, error }: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -62,6 +135,12 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [globalFilter, setGlobalFilter] = React.useState<TransactionFiltersFormValues>(filters);
+
+  // Update global filter when filters prop changes
+  React.useEffect(() => {
+    setGlobalFilter(filters);
+  }, [filters]);
 
   const deleteAllTransactionsMutation = useMutation({
     mutationFn: async () => {
@@ -166,28 +245,34 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
     },
   ];
 
-  const totalBalance = React.useMemo(() => {
-    return transactions.reduce((acc, tx) => acc + tx.amount, 0);
-  }, [transactions]);
-
   const table = useReactTable({
     data: transactions,
     columns,
+    filterFns: {
+      transactionFilter: transactionFilterFn,
+    },
+    globalFilterFn: transactionFilterFn,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection },
+    state: { sorting, columnFilters, columnVisibility, rowSelection, globalFilter },
   });
+
+  // Calculate total balance from filtered rows
+  const totalBalance = React.useMemo(() => {
+    return table.getFilteredRowModel().rows.reduce((acc, row) => acc + row.original.amount, 0);
+  }, [table]);
 
   if (loading) {
     return (
-      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
-        <p className="text-gray-500 dark:text-gray-400">{t("loading")}</p>
+      <Card className="bg-blue-background dark:border-border-blue p-10 flex items-center justify-center">
+        <Spinner />
       </Card>
     );
   }
@@ -252,13 +337,15 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
             </Button>
             <Button
               variant="outline"
-              onClick={() => exportTransactions({ transactions })}
+              onClick={() => exportTransactions({ 
+                transactions: table.getFilteredRowModel().rows.map(row => row.original) 
+              })}
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.header.buttons.export")} CSV
             </Button>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          {/* <div className="flex flex-wrap items-center gap-2">
             <Badge
               variant="outline"
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
@@ -271,7 +358,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
                 }).format(totalBalance)}
               </span>
             </Badge>
-          </div>
+          </div> */}
         </CardHeader>
 
         {/* Table */}

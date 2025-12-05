@@ -68,6 +68,9 @@ export function FiltersSection({
     amountMax: 0,
     amountMin: 0,
     text: "",
+    withReceipt: false,
+    isRecurring: false,
+    transfersOnly: false,
   };
 
   const {
@@ -315,39 +318,66 @@ export function FiltersSection({
           {/* Footer */}
           <CardFooter className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-              >
-                <label className="flex items-center gap-2">
-                  <Checkbox />
-                  <span className="cursor-pointer">
-                    {t("checkboxes.receipt")}
-                  </span>
-                </label>
-              </Badge>
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-              >
-                <label className="flex items-center gap-2">
-                  <Checkbox />
-                  <span className="cursor-pointer">
-                    {t("checkboxes.recurring")}
-                  </span>
-                </label>
-              </Badge>
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-              >
-                <label className="flex items-center gap-2">
-                  <Checkbox />
-                  <span className="cursor-pointer">
-                    {t("checkboxes.transfers")}
-                  </span>
-                </label>
-              </Badge>
+              <FormField
+                control={form.control}
+                name="withReceipt"
+                render={({ field }) => (
+                  <Badge
+                    variant="outline"
+                    className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                  >
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <span className="cursor-pointer">
+                        {t("checkboxes.receipt")}
+                      </span>
+                    </label>
+                  </Badge>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isRecurring"
+                render={({ field }) => (
+                  <Badge
+                    variant="outline"
+                    className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                  >
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <span className="cursor-pointer">
+                        {t("checkboxes.recurring")}
+                      </span>
+                    </label>
+                  </Badge>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="transfersOnly"
+                render={({ field }) => (
+                  <Badge
+                    variant="outline"
+                    className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                  >
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <span className="cursor-pointer">
+                        {t("checkboxes.transfers")}
+                      </span>
+                    </label>
+                  </Badge>
+                )}
+              />
             </div>
 
             <div className="flex items-center gap-2">

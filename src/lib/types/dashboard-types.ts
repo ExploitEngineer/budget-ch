@@ -33,4 +33,6 @@ export type Transaction = {
   amount: number;
   accountId?: string | null;
   destinationAccountId?: string | null;
+  recurringTemplateId?: string | null;
+  isRecurring?: boolean;
 };

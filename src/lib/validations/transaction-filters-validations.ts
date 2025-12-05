@@ -14,6 +14,9 @@ export const transactionFiltersFormSchema = z
       .min(0, { message: "Amount must be 0 or more" })
       .optional(),
     text: z.string().optional(),
+    withReceipt: z.boolean().optional().default(false),
+    isRecurring: z.boolean().optional().default(false),
+    transfersOnly: z.boolean().optional().default(false),
   })
   .refine(
     (data) => {

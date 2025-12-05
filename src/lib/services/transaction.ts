@@ -280,6 +280,7 @@ export async function getTransactions(): Promise<{
       amount: true,
       accountId: true,
       destinationAccountId: true,
+      recurringTemplateId: true,
     });
 
     if (!res.success || !res.data) {
@@ -300,6 +301,8 @@ export async function getTransactions(): Promise<{
       amount: tx.amount ?? 0,
       accountId: tx.accountId || null,
       destinationAccountId: tx.destinationAccountId || null,
+      recurringTemplateId: tx.recurringTemplateId || null,
+      isRecurring: !!tx.recurringTemplateId,
     }));
 
     return { success: true, data: transactions };

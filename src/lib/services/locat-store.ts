@@ -7,6 +7,7 @@ export const DEFAULT_PREFERENCES: UserPreferencesValues = {
   theme: "auto",
 };
 
+// FIXME: Window is not defined some times, when this is called
 export function getLocalUserPreferences(returnDefault: boolean = false) {
   try {
     const stored = window.localStorage.getItem(PREFERENCES_STORAGE_KEY);
