@@ -457,6 +457,7 @@
                 "buttons": {
                     "delete": "Supprimer",
                     "deleteAll": "Tout supprimer",
+                    "deleteSelected": "Supprimer la sélection",
                     "category": "Catégorie",
                     "export": "Exporter",
                     "update": "Mettre à jour"
@@ -468,6 +469,16 @@
                     "description": "Êtes-vous sûr de vouloir supprimer toutes les transactions ? Cette action est irréversible.",
                     "cancel": "Annuler",
                     "confirm": "Tout supprimer"
+                },
+                "delete-selected": {
+                    "success": "Transactions sélectionnées supprimées avec succès !",
+                    "error": "Une erreur s'est produite lors de la suppression des transactions sélectionnées.",
+                    "confirmation": {
+                        "title": "Confirmer la suppression des transactions sélectionnées",
+                        "description": "Êtes-vous sûr de vouloir supprimer {count} transaction(s) sélectionnée(s) ? Cette action est irréversible.",
+                        "cancel": "Annuler",
+                        "confirm": "Supprimer la sélection"
+                    }
                 },
                 "headings": {
                     "date": "Date",

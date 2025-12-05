@@ -455,6 +455,7 @@
                     "buttons": {
                         "delete": "Delete",
                     "deleteAll": "Delete All",
+                        "deleteSelected": "Delete Selected",
                         "category": "Category",
                         "export": "Export",
                         "update": "Update"
@@ -466,6 +467,16 @@
                     "description": "Are you sure you want to delete all transactions? This action cannot be undone.",
                     "cancel": "Cancel",
                     "confirm": "Delete All"
+                },
+                "delete-selected": {
+                    "success": "Selected transactions deleted successfully!",
+                    "error": "Something went wrong while deleting selected transactions.",
+                    "confirmation": {
+                        "title": "Confirm delete selected transactions",
+                        "description": "Are you sure you want to delete {count} selected transaction(s)? This action cannot be undone.",
+                        "cancel": "Cancel",
+                        "confirm": "Delete Selected"
+                    }
                 },
                 "headings": {
                     "date": "Date",

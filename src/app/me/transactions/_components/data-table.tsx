@@ -47,7 +47,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { deleteAllTransactions } from "@/lib/services/transaction";
+import { deleteAllTransactions, deleteTransactions } from "@/lib/services/transaction";
 import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -153,6 +153,8 @@ export function DataTable({
   const [globalFilter, setGlobalFilter] =
     React.useState<TransactionFiltersFormValues>(filters);
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+  const [confirmDeleteSelectedDialogOpen, setConfirmDeleteSelectedDialogOpen] =
+    React.useState(false);
 
   // Update global filter when filters prop changes
   React.useEffect(() => {
@@ -174,6 +176,7 @@ export function DataTable({
       });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       setConfirmDialogOpen(false);
+      setRowSelection({});
       toast.success("All transactions deleted!");
     },
     onError: (error: Error) => {
@@ -185,12 +188,54 @@ export function DataTable({
     },
   });
 
+  const deleteSelectedTransactionsMutation = useMutation({
+    mutationFn: async (transactionIds: string[]) => {
+      const result = await deleteTransactions(transactionIds);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete selected transactions");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      setConfirmDeleteSelectedDialogOpen(false);
+      setRowSelection({});
+      toast.success(t("data-table.delete-selected.success"));
+    },
+    onError: (error: Error) => {
+      setConfirmDeleteSelectedDialogOpen(false);
+      toast.error(
+        error.message ||
+          t("data-table.delete-selected.error"),
+      );
+    },
+  });
+
   const handleConfirmDeleteAll = () => {
     if (deleteAllTransactionsMutation.isPending) {
       return;
     }
 
     deleteAllTransactionsMutation.mutate();
+  };
+
+  const handleConfirmDeleteSelected = () => {
+    if (deleteSelectedTransactionsMutation.isPending) {
+      return;
+    }
+
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const transactionIds = selectedRows.map((row) => row.original.id);
+
+    if (transactionIds.length === 0) {
+      return;
+    }
+
+    deleteSelectedTransactionsMutation.mutate(transactionIds);
   };
 
   const title = t("transaction-edit-dialog.title-1");
@@ -302,6 +347,19 @@ export function DataTable({
     },
   });
 
+  // Calculate if some but not all rows are selected
+  const selectedRowCount = React.useMemo(() => {
+    return table.getFilteredSelectedRowModel().rows.length;
+  }, [table, rowSelection]);
+
+  const totalRowCount = React.useMemo(() => {
+    return table.getFilteredRowModel().rows.length;
+  }, [table]);
+
+  const showDeleteSelectedButton = React.useMemo(() => {
+    return selectedRowCount > 0 && selectedRowCount < totalRowCount;
+  }, [selectedRowCount, totalRowCount]);
+
   // Calculate total balance from filtered rows
   const totalBalance = React.useMemo(() => {
     return table
@@ -357,6 +415,17 @@ export function DataTable({
                 <span>{t("data-table.header.checkbox")}</span>
               </label>
             </Badge>
+            {showDeleteSelectedButton && (
+              <Button
+                size="sm"
+                variant="destructive"
+                className="cursor-pointer"
+                disabled={deleteSelectedTransactionsMutation.isPending}
+                onClick={() => setConfirmDeleteSelectedDialogOpen(true)}
+              >
+                {t("data-table.header.buttons.deleteSelected")}
+              </Button>
+            )}
             <Button
               size="sm"
               variant="destructive"
@@ -411,6 +480,44 @@ export function DataTable({
                       <Spinner />
                     ) : (
                       t("data-table.confirmation.confirm")
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog
+              open={confirmDeleteSelectedDialogOpen}
+              onOpenChange={setConfirmDeleteSelectedDialogOpen}
+            >
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("data-table.delete-selected.confirmation.title")}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <DialogDescription className="text-sm">
+                  {t("data-table.delete-selected.confirmation.description", {
+                    count: selectedRowCount,
+                  })}
+                </DialogDescription>
+
+                <DialogFooter className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setConfirmDeleteSelectedDialogOpen(false)}
+                  >
+                    {t("data-table.delete-selected.confirmation.cancel")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleConfirmDeleteSelected}
+                    disabled={deleteSelectedTransactionsMutation.isPending}
+                  >
+                    {deleteSelectedTransactionsMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("data-table.delete-selected.confirmation.confirm")
                     )}
                   </Button>
                 </DialogFooter>

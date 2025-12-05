@@ -876,6 +876,62 @@ export async function deleteTransactionDB({
   }
 }
 
+// DELETE Multiple Transactions
+export async function deleteTransactionsDB({
+  hubId,
+  transactionIds,
+}: {
+  hubId: string;
+  transactionIds: string[];
+}) {
+  try {
+    if (!transactionIds || transactionIds.length === 0) {
+      return { success: false, message: "No transaction IDs provided" };
+    }
+
+    // Verify all transactions belong to the hub
+    const txs = await db.query.transactions.findMany({
+      where: (tx) => inArray(tx.id, transactionIds),
+      columns: { id: true, hubId: true, transactionCategoryId: true },
+    });
+
+    if (txs.length === 0) {
+      return { success: false, message: "No transactions found" };
+    }
+
+    // Check if all transactions belong to the hub
+    const invalidTxs = txs.filter((tx) => tx.hubId !== hubId);
+    if (invalidTxs.length > 0) {
+      return { success: false, message: "Access denied to some transactions" };
+    }
+
+    // Get unique category IDs that will be orphaned
+    const categoryIds = txs
+      .map((tx) => tx.transactionCategoryId)
+      .filter((id): id is string => !!id);
+
+    // Delete transactions
+    const deleted = await db
+      .delete(transactions)
+      .where(
+        and(
+          inArray(transactions.id, transactionIds),
+          eq(transactions.hubId, hubId),
+        ),
+      )
+      .returning();
+
+
+    return { success: true, data: deleted, count: deleted.length };
+  } catch (err: any) {
+    console.error("Error deleting transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete transactions",
+    };
+  }
+}
+
 // CREATE Transaction Category
 export async function createTransactionCategoryDB(name: string, hubId: string) {
   try {

@@ -6,6 +6,7 @@ import {
   getTransactionsDB,
   updateTransactionDB,
   deleteTransactionDB,
+  deleteTransactionsDB,
   getFinancialAccountByType,
   getFinancialAccountById,
   updateFinancialAccountDB,
@@ -671,6 +672,43 @@ export async function deleteTransaction(transactionId: string) {
     return {
       success: false,
       message: err.message || "Unexpected error while deleting transaction.",
+    };
+  }
+}
+
+// DELETE Multiple Transactions
+export async function deleteTransactions(transactionIds: string[]) {
+  try {
+    const hdrs = await headers();
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
+
+    if (!transactionIds || transactionIds.length === 0) {
+      return {
+        success: false,
+        message: "No transactions selected for deletion.",
+      };
+    }
+
+    const res = await deleteTransactionsDB({ hubId, transactionIds });
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to delete transactions.",
+      };
+    }
+
+    return {
+      success: true,
+      message: `${res.count || transactionIds.length} transaction(s) deleted successfully!`,
+    };
+  } catch (err: any) {
+    console.error("Error in deleteTransactions:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while deleting transactions.",
     };
   }
 }

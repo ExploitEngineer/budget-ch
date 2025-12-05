@@ -457,6 +457,7 @@
                 "buttons": {
                     "delete": "Elimina",
                     "deleteAll": "Elimina tutto",
+                    "deleteSelected": "Elimina selezionate",
                     "category": "Categoria",
                     "export": "Esporta",
                     "update": "Aggiorna"
@@ -468,6 +469,16 @@
                     "description": "Sei sicuro di voler eliminare tutte le transazioni? Questa azione non può essere annullata.",
                     "cancel": "Annulla",
                     "confirm": "Elimina tutto"
+                },
+                "delete-selected": {
+                    "success": "Transazioni selezionate eliminate con successo!",
+                    "error": "Si è verificato un errore durante l'eliminazione delle transazioni selezionate.",
+                    "confirmation": {
+                        "title": "Conferma eliminazione delle transazioni selezionate",
+                        "description": "Sei sicuro di voler eliminare {count} transazione/i selezionata/e? Questa azione non può essere annullata.",
+                        "cancel": "Annulla",
+                        "confirm": "Elimina selezionate"
+                    }
                 },
                 "headings": {
                     "date": "Data",

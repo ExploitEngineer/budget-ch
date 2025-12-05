@@ -457,6 +457,7 @@
                     "buttons": {
                         "delete": "Löschen",
                     "deleteAll": "Alles löschen",
+                        "deleteSelected": "Ausgewählte löschen",
                         "category": "Kategorie",
                         "export": "Exportieren",
                         "update": "Aktualisieren"
@@ -468,6 +469,16 @@
                     "description": "Möchtest du wirklich alle Transaktionen löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
                     "cancel": "Abbrechen",
                     "confirm": "Alles löschen"
+                },
+                "delete-selected": {
+                    "success": "Ausgewählte Transaktionen erfolgreich gelöscht!",
+                    "error": "Beim Löschen der ausgewählten Transaktionen ist ein Fehler aufgetreten.",
+                    "confirmation": {
+                        "title": "Löschen ausgewählter Transaktionen bestätigen",
+                        "description": "Möchtest du wirklich {count} ausgewählte Transaktion(en) löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                        "cancel": "Abbrechen",
+                        "confirm": "Ausgewählte löschen"
+                    }
                 },
                 "headings": {
                     "date": "Datum",
