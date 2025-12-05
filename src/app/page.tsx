@@ -1,5 +1,6 @@
-import Greeting from "@/components/greeting";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  return <Greeting />;
+  redirect("/signin");
+  return null;
 }
