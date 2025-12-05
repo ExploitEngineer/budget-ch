@@ -454,13 +454,20 @@
             "data-table": {
                 "header": {
                     "checkbox": "Tous",
-                    "buttons": {
-                        "delete": "Supprimer",
-                        "category": "Catégorie",
-                        "export": "Exporter",
-                        "update": "Mettre à jour"
-                    },
+                "buttons": {
+                    "delete": "Supprimer",
+                    "deleteAll": "Tout supprimer",
+                    "category": "Catégorie",
+                    "export": "Exporter",
+                    "update": "Mettre à jour"
+                },
                     "badge": "Solde :"
+                },
+                "confirmation": {
+                    "title": "Confirmer la suppression de toutes les transactions",
+                    "description": "Êtes-vous sûr de vouloir supprimer toutes les transactions ? Cette action est irréversible.",
+                    "cancel": "Annuler",
+                    "confirm": "Tout supprimer"
                 },
                 "headings": {
                     "date": "Date",

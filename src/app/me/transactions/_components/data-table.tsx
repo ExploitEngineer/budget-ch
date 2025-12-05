@@ -38,7 +38,16 @@ import type { Transaction } from "@/lib/types/dashboard-types";
 import { Spinner } from "@/components/ui/spinner";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteAllTransactionsAndCategories } from "@/lib/services/transaction";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { deleteAllTransactions } from "@/lib/services/transaction";
 import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -136,6 +145,7 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
   const [globalFilter, setGlobalFilter] = React.useState<TransactionFiltersFormValues>(filters);
+  const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
 
   // Update global filter when filters prop changes
   React.useEffect(() => {
@@ -144,9 +154,9 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
 
   const deleteAllTransactionsMutation = useMutation({
     mutationFn: async () => {
-      const result = await deleteAllTransactionsAndCategories();
+      const result = await deleteAllTransactions();
       if (!result.success) {
-        throw new Error(result.message || "Failed to delete all transactions and categories");
+        throw new Error(result.message || "Failed to delete all transactions");
       }
       return result;
     },
@@ -154,12 +164,22 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
       queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
-      toast.success("All transactions and related categories deleted!");
+      setConfirmDialogOpen(false);
+      toast.success("All transactions deleted!");
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Something went wrong while deleting all transactions and categories.");
+      setConfirmDialogOpen(false);
+      toast.error(error.message || "Something went wrong while deleting all transactions.");
     },
   });
+
+  const handleConfirmDeleteAll = () => {
+    if (deleteAllTransactionsMutation.isPending) {
+      return;
+    }
+
+    deleteAllTransactionsMutation.mutate();
+  };
 
   const title = t("transaction-edit-dialog.title-1");
 
@@ -317,24 +337,52 @@ export function DataTable({ transactions, filters, loading, error }: DataTablePr
                 <span>{t("data-table.header.checkbox")}</span>
               </label>
             </Badge>
-            <Button
-              variant="outline"
-              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-              onClick={() => deleteAllTransactionsMutation.mutate()}
-              disabled={deleteAllTransactionsMutation.isPending}
-            >
-              {deleteAllTransactionsMutation.isPending ? (
-                <Spinner />
-              ) : (
-                t("data-table.header.buttons.delete")
-              )}
-            </Button>
-            <Button
+            <Dialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="cursor-pointer"
+                  disabled={deleteAllTransactionsMutation.isPending}
+                >
+                  {t("data-table.header.buttons.deleteAll")}
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("data-table.confirmation.title")}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <DialogDescription className="text-sm">
+                  {t("data-table.confirmation.description")}
+                </DialogDescription>
+
+                <DialogFooter className="flex justify-end gap-2">
+                  <Button variant="outline" onClick={() => setConfirmDialogOpen(false)}>
+                    {t("data-table.confirmation.cancel")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleConfirmDeleteAll}
+                    disabled={deleteAllTransactionsMutation.isPending}
+                  >
+                    {deleteAllTransactionsMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("data-table.confirmation.confirm")
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            {/* <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.header.buttons.category")}
-            </Button>
+            </Button> */}
             <Button
               variant="outline"
               onClick={() => exportTransactions({ 

@@ -454,11 +454,18 @@
                     "checkbox": "All",
                     "buttons": {
                         "delete": "Delete",
+                    "deleteAll": "Delete All",
                         "category": "Category",
                         "export": "Export",
                         "update": "Update"
                     },
                     "badge": "Balance:"
+                },
+                "confirmation": {
+                    "title": "Confirm delete all transactions",
+                    "description": "Are you sure you want to delete all transactions? This action cannot be undone.",
+                    "cancel": "Cancel",
+                    "confirm": "Delete All"
                 },
                 "headings": {
                     "date": "Date",

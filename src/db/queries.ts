@@ -1945,6 +1945,24 @@ export async function getMonthlyReportDB(hubId: string) {
   }
 }
 
+// DELETE ALL Transactions
+export async function deleteAllTransactionsDB(hubId: string) {
+  try {
+    await db.delete(transactions).where(eq(transactions.hubId, hubId));
+
+    return {
+      success: true,
+      message: "All transactions deleted.",
+    };
+  } catch (err: any) {
+    console.error("Error deleting all transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete all transactions.",
+    };
+  }
+}
+
 // DELETE ALL Transactions and related Categories
 export async function deleteAllTransactionsAndCategoriesDB(hubId: string) {
   try {

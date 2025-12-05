@@ -456,11 +456,18 @@
                     "checkbox": "Alle",
                     "buttons": {
                         "delete": "Löschen",
+                    "deleteAll": "Alles löschen",
                         "category": "Kategorie",
                         "export": "Exportieren",
                         "update": "Aktualisieren"
                     },
                     "badge": "Saldo:"
+                },
+                "confirmation": {
+                    "title": "Löschen aller Transaktionen bestätigen",
+                    "description": "Möchtest du wirklich alle Transaktionen löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                    "cancel": "Abbrechen",
+                    "confirm": "Alles löschen"
                 },
                 "headings": {
                     "date": "Datum",

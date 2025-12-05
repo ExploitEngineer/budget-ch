@@ -10,6 +10,7 @@ import {
   getFinancialAccountById,
   updateFinancialAccountDB,
   deleteAllTransactionsAndCategoriesDB,
+  deleteAllTransactionsDB,
   getSubscriptionByUserId,
   getMonthlyTransactionCount,
   getHubMemberRoleDB,
@@ -670,6 +671,41 @@ export async function deleteTransaction(transactionId: string) {
     return {
       success: false,
       message: err.message || "Unexpected error while deleting transaction.",
+    };
+  }
+}
+
+// DELETE ALL Transactions [Action]
+export async function deleteAllTransactions() {
+  try {
+    const hdrs = await headers();
+    const { hubId, userRole } = await getContext(hdrs, true);
+
+    requireAdminRole(userRole);
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const res = await deleteAllTransactionsDB(hubId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to delete all transactions.",
+      };
+    }
+
+    return {
+      success: true,
+      message: "All transactions deleted successfully!",
+    };
+  } catch (err: any) {
+    console.error("Error in deleteAllTransactions:", err);
+    return {
+      success: false,
+      message:
+        err.message || "Unexpected error while deleting all transactions.",
     };
   }
 }

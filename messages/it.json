@@ -454,13 +454,20 @@
             "data-table": {
                 "header": {
                     "checkbox": "Tutti",
-                    "buttons": {
-                        "delete": "Elimina",
-                        "category": "Categoria",
-                        "export": "Esporta",
-                        "update": "Aggiorna"
-                    },
+                "buttons": {
+                    "delete": "Elimina",
+                    "deleteAll": "Elimina tutto",
+                    "category": "Categoria",
+                    "export": "Esporta",
+                    "update": "Aggiorna"
+                },
                     "badge": "Saldo:"
+                },
+                "confirmation": {
+                    "title": "Conferma eliminazione di tutte le transazioni",
+                    "description": "Sei sicuro di voler eliminare tutte le transazioni? Questa azione non può essere annullata.",
+                    "cancel": "Annulla",
+                    "confirm": "Elimina tutto"
                 },
                 "headings": {
                     "date": "Data",
