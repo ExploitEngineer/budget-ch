@@ -141,7 +141,6 @@ async function main() {
           hubId,
           userId,
           transactionCategoryId: categoryMap[p.category],
-          addedAt: date,
           type: type as "income" | "expense",
           source: `${p.category}`,
           amount: p.amount,

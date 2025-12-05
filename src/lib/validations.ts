@@ -74,7 +74,7 @@ export const firstDays = ["monday", "sunday"] as const;
 export const densities = ["comfort", "compact"] as const;
 export const roundings = ["5-rappen", "1-rappen"] as const;
 
-export const appearanceSchema = z.object({
+export const userPreferencesSchema = z.object({
   language: z.enum(languages),
   currency: z.enum(currencies),
   theme: z.enum(themes),
@@ -83,7 +83,7 @@ export const appearanceSchema = z.object({
   rounding: z.enum(roundings).optional(),
 });
 
-export type AppearanceValues = z.infer<typeof appearanceSchema>;
+export type UserPreferencesValues = z.infer<typeof userPreferencesSchema>;
 
 // Filter Dialog Schema
 export const filterDialogSchema = z.object({

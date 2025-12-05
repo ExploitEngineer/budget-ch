@@ -174,17 +174,17 @@ export function BudgetProgressSection() {
         <Separator className="dark:bg-border-blue" />
         <div className="grid grid-cols-2 gap-4 pb-10">
           {categoriesError ? (
-            <p className="px-6 text-sm text-red-500">{categoriesError}</p>
+            <p className="px-6 text-sm text-red-500">{categoriesError.message}</p>
           ) : topCategories === null || categoriesLoading ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("line-progress-cards.loading")}
             </p>
-          ) : topCategories.length === 0 ? (
+          ) : topCategories?.length === 0 ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("line-progress-cards.no-categories-found")}
             </p>
           ) : (
-            topCategories.map((card) => (
+            topCategories?.map((card) => (
               <CardContent key={card.title} className="flex flex-col">
                 <div className="mb-3 flex flex-wrap items-center justify-between sm:mb-1">
                   <h3 className="text-sm sm:text-base">{card.title}</h3>
@@ -213,17 +213,17 @@ export function BudgetProgressSection() {
           {/* Task List */}
           <div className="flex flex-col gap-3 px-6 pb-4">
             {tasksError ? (
-              <p className="text-sm text-red-500">{tasksError}</p>
+              <p className="text-sm text-red-500">{tasksError.message}</p>
             ) : tasks === null || tasksLoading ? (
               <p className="text-muted-foreground text-sm">
                 {t("line-progress-cards.loading")}
               </p>
-            ) : tasks.length === 0 ? (
+            ) : tasks?.length === 0 ? (
               <p className="text-muted-foreground text-sm">
                 {t("todos.no-tasks")}
               </p>
             ) : (
-              tasks.map((task) => (
+              tasks?.map((task) => (
                 <div
                   key={task.id}
                   className="flex items-center justify-between rounded-md"
