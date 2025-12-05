@@ -41,16 +41,39 @@ import {
   SavingsGoalDialogValues,
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { Spinner } from "@/components/ui/spinner";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { createSavingGoal } from "@/lib/services/saving-goal";
+import { savingGoalKeys, accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import type { AccountRow } from "@/lib/types/row-types";
 
-export default function SavingGoalDialog() {
+export default function CreateSavingGoalDialog() {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",
   );
 
-  const { createGoalAndSync, createLoading } = useSavingGoalStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
   const [open, setOpen] = useState<boolean>(false);
+
+  const {
+    data: accounts,
+    isLoading: accountsLoading,
+  } = useQuery<AccountRow[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+    enabled: open, // Only fetch when dialog is open
+  });
 
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
@@ -59,25 +82,48 @@ export default function SavingGoalDialog() {
       goalAmount: 0,
       savedAmount: 0,
       dueDate: undefined,
-      account: "savings",
+      accountId: "",
       monthlyAllocation: 0,
+    },
+  });
+
+  const createGoalMutation = useMutation({
+    mutationFn: async (data: {
+      name: string;
+      goalAmount: number;
+      amountSaved: number;
+      monthlyAllocation: number;
+      financialAccountId: string;
+    }) => {
+      const result = await createSavingGoal(data);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create saving goal");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
+      queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
+      toast.success("Saving goal created successfully!");
+      form.reset();
+      setOpen(false);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create saving goal");
     },
   });
 
   async function onSubmit(values: SavingsGoalDialogValues) {
     try {
-      await createGoalAndSync({
+      await createGoalMutation.mutateAsync({
         name: values.name,
         goalAmount: values.goalAmount,
         amountSaved: values.savedAmount,
         monthlyAllocation: values.monthlyAllocation,
-        accountType: values.account,
+        financialAccountId: values.accountId,
       });
-
-      form.reset();
-      setOpen(false);
     } catch (err: any) {
-      console.error("Error submitting form:", err);
+      // Error already handled in onError
     }
   }
 
@@ -212,7 +258,7 @@ export default function SavingGoalDialog() {
 
               <FormField
                 control={form.control}
-                name="account"
+                name="accountId"
                 render={({ field }) => (
                   <FormItem className="flex flex-1 flex-col">
                     <FormLabel>{t("labels.account.title")}</FormLabel>
@@ -220,25 +266,33 @@ export default function SavingGoalDialog() {
                       <Select
                         onValueChange={field.onChange}
                         value={field.value}
+                        disabled={accountsLoading}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue
-                            placeholder={t("labels.account.title")}
+                            placeholder={
+                              accountsLoading
+                                ? "Loading accounts..."
+                                : t("labels.account.title")
+                            }
                           />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="checking">
-                            {t("labels.account.options.checking")}
-                          </SelectItem>
-                          <SelectItem value="savings">
-                            {t("labels.account.options.save")}
-                          </SelectItem>
-                          <SelectItem value="credit-card">
-                            {t("labels.account.options.credit-card")}
-                          </SelectItem>
-                          <SelectItem value="cash">
-                            {t("labels.account.options.cash")}
-                          </SelectItem>
+                          {accountsLoading ? (
+                            <SelectItem value="loading" disabled>
+                              Loading accounts...
+                            </SelectItem>
+                          ) : accounts && accounts.length > 0 ? (
+                            accounts.map((account) => (
+                              <SelectItem key={account.id} value={account.id}>
+                                {account.name} ({account.type})
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="no-accounts" disabled>
+                              No accounts available
+                            </SelectItem>
+                          )}
                         </SelectContent>
                       </Select>
                     </FormControl>
@@ -273,10 +327,10 @@ export default function SavingGoalDialog() {
             <div className="flex justify-end pt-4">
               <Button
                 type="submit"
-                disabled={createLoading}
+                disabled={createGoalMutation.isPending}
                 className="cursor-pointer"
               >
-                {createLoading ? <Spinner /> : t("save")}
+                {createGoalMutation.isPending ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

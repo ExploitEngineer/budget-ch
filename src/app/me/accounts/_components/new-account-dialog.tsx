@@ -36,7 +36,11 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
-import { useAccountStore } from "@/store/account-store";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createFinancialAccount } from "@/lib/services/financial-account";
+import { accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import { Spinner } from "@/components/ui/spinner";
 
 export default function NewAccountDialog({
@@ -48,8 +52,27 @@ export default function NewAccountDialog({
     "main-dashboard.content-page.sidebar-header.new-account-dialog",
   );
 
-  const { createAccountAndSync, createLoading } = useAccountStore();
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
   const [isOpen, setIsOpen] = useState<boolean>(false);
+
+  const createAccount = useMutation({
+    mutationFn: async (data: Parameters<typeof createFinancialAccount>[0]) => {
+      const result = await createFinancialAccount(data);
+      if (!result.status) {
+        throw new Error(result.message || "Failed to create account");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Account created successfully!");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to create account");
+    },
+  });
 
   const form = useForm<FinancialAccountDialogValues>({
     resolver: zodResolver(FinancialAccountDialogSchema) as any,
@@ -64,7 +87,7 @@ export default function NewAccountDialog({
 
   async function onSubmit(values: FinancialAccountDialogValues) {
     try {
-      await createAccountAndSync({
+      await createAccount.mutateAsync({
         name: values.name,
         type: values.type,
         initialBalance: values.balance,
@@ -75,6 +98,7 @@ export default function NewAccountDialog({
       form.reset();
       setIsOpen(false);
     } catch (err: any) {
+      // Error is already handled by the mutation (toast)
       console.error("Error submitting form:", err);
     }
   }
@@ -234,10 +258,10 @@ export default function NewAccountDialog({
             <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="submit"
-                disabled={createLoading}
+                disabled={createAccount.isPending}
                 className="cursor-pointer"
               >
-                {createLoading ? <Spinner /> : t("save")}
+                {createAccount.isPending ? <Spinner /> : t("save")}
               </Button>
             </div>
           </form>

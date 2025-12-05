@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { HighlightedBarChart } from "@/components/ui/highlighted-bar-chart";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { useDashboardStore } from "@/store/dashboard-store";
+import { useQuery } from "@tanstack/react-query";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { savingGoalKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { DashboardSavingsGoals } from "@/lib/types/dashboard-types";
 
 export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page.progress-cards");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
-  const { goalsLoading, goalsError, savingGoals, fetchSavingsGoals } =
-    useDashboardStore();
-
-  useEffect(() => {
-    fetchSavingsGoals();
-  }, []);
+  const {
+    data: savingGoals,
+    isLoading: goalsLoading,
+    error: goalsError,
+  } = useQuery<DashboardSavingsGoals[]>({
+    queryKey: savingGoalKeys.list(hubId, 3),
+    queryFn: async () => {
+      const res = await getSavingGoals(3);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch savings goals");
+      }
+      return res.data ?? [];
+    },
+  });
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">
@@ -30,8 +43,8 @@ export function BarChartSection() {
         <Separator className="dark:bg-border-blue" />
 
         {goalsError ? (
-          <p className="px-6 text-sm text-red-500">{goalsError}</p>
-        ) : savingGoals === null || goalsLoading ? (
+          <p className="px-6 text-sm text-red-500">{goalsError.message}</p>
+        ) : savingGoals === undefined || goalsLoading ? (
           <p className="text-muted-foreground px-6 text-sm">{t("loading")}</p>
         ) : savingGoals.length === 0 ? (
           <p className="text-muted-foreground px-6 text-sm">{t("no-goals")}</p>

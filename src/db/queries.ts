@@ -10,15 +10,18 @@ import {
   savingGoals,
   quickTasks,
   subscriptions,
-  accountTransfers,
   hubInvitations,
+  userSettings,
+  recurringTransactionTemplates,
 } from "./schema";
 import { eq, desc, gte, lte, sql, inArray, and, or } from "drizzle-orm";
-import type { QuickTask, UserType, SubscriptionType } from "./schema";
+import type { QuickTask, UserType, SubscriptionType, UserSettingsType } from "./schema";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
 } from "@/lib/services/budget";
+import type { SavingGoalsSummary } from "@/lib/services/saving-goal";
+import type { TransactionType } from "@/lib/types/common-types";
 
 export type AccessRole = "admin" | "member";
 
@@ -55,13 +58,13 @@ export type createTransactionArgs = {
   financialAccountId: string;
   hubId: string;
   userId: string;
-  transactionCategoryId: string;
+  transactionCategoryId: string | null;
   amount: number;
   note?: string;
-  source: string;
+  source?: string | null;
   categoryName: string;
-  transactionType: "income" | "expense";
-  accountType: AccountType;
+  transactionType: TransactionType;
+  destinationAccountId?: string | null;
 };
 
 export type updateTransactionArgs = {
@@ -74,8 +77,8 @@ export type updateTransactionArgs = {
     addedAt?: Date | string;
     transactionCategoryId?: string | null;
     financialAccountId?: string | null;
-    accountType?: AccountType;
-    transactionType?: "income" | "expense";
+    destinationAccountId?: string | null;
+    transactionType?: TransactionType;
   };
 };
 
@@ -97,7 +100,7 @@ export type savingGoalArgs = {
   goalAmount: number;
   amountSaved: number;
   monthlyAllocation: number;
-  accountType: AccountType;
+  financialAccountId?: string | null;
 };
 
 export interface SavingGoal {
@@ -107,16 +110,9 @@ export interface SavingGoal {
   amountSaved: number;
   monthlyAllocation?: number;
   value: number;
-  accountType: AccountType;
+  financialAccountId?: string | null;
   dueDate?: Date | null;
   remaining?: number;
-}
-
-export interface SavingGoalsSummary {
-  totalTarget: number;
-  totalSaved: number;
-  remainingToSave: number;
-  totalGoals: number;
 }
 
 export type quickTasksArgs = {
@@ -139,19 +135,10 @@ interface UpdateSavingGoalArgs {
     goalAmount?: number;
     amountSaved?: number;
     monthlyAllocation?: number;
-    accountType?: string;
+    financialAccountId?: string | null;
     dueDate?: Date | null;
   };
 }
-
-export type AccountTransferArgs = {
-  financialAccountId: string;
-  fromAccountType: AccountType;
-  toAccountType: AccountType;
-  hubId: string;
-  amount: number;
-  note?: string;
-};
 
 interface HubInvitationProps {
   hubId: string;
@@ -689,6 +676,21 @@ export async function getFinancialAccountByType(
   }
 }
 
+// GET financial account by ID
+export async function getFinancialAccountById(
+  accountId: string,
+  hubId: string,
+) {
+  try {
+    return await db.query.financialAccounts.findFirst({
+      where: (a) => and(eq(a.id, accountId), eq(a.hubId, hubId)),
+    });
+  } catch (err) {
+    console.error("Error fetching account by ID:", err);
+    return null;
+  }
+}
+
 // CREATE Transaction
 export async function createTransactionDB({
   financialAccountId,
@@ -699,7 +701,7 @@ export async function createTransactionDB({
   source,
   note,
   transactionType,
-  accountType,
+  destinationAccountId,
 }: Omit<createTransactionArgs, "categoryName">) {
   try {
     await db.insert(transactions).values({
@@ -711,7 +713,7 @@ export async function createTransactionDB({
       source,
       note,
       type: transactionType,
-      accountType,
+      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
     });
 
     return { success: true, message: "Transaction created successfully" };
@@ -733,15 +735,17 @@ export async function getTransactionsDB(
   try {
     const allFields = {
       id: transactions.id,
-      date: transactions.addedAt,
+      date: transactions.createdAt,
       recipient: transactions.source,
-      accountType: transactions.accountType,
       type: transactions.type,
       category: transactionCategories.name,
       note: transactions.note,
       amount: transactions.amount,
       accountName: financialAccounts.name,
       userName: users.name,
+      accountId: transactions.financialAccountId,
+      destinationAccountId: transactions.destinationAccountId,
+      recurringTemplateId: transactions.recurringTemplateId,
     };
 
     const selectObj: Record<string, any> = {};
@@ -767,7 +771,7 @@ export async function getTransactionsDB(
       )
       .leftJoin(users, eq(transactions.userId, users.id))
       .where(eq(transactions.hubId, hubId))
-      .orderBy(desc(transactions.addedAt));
+      .orderBy(desc(transactions.createdAt));
 
     if (limit) query.limit(limit);
 
@@ -808,7 +812,8 @@ export async function updateTransactionDB({
           : updatedData.addedAt,
       transactionCategoryId: updatedData.transactionCategoryId,
       financialAccountId: updatedData.financialAccountId,
-      accountType: updatedData.accountType,
+      destinationAccountId: updatedData.destinationAccountId,
+      type: updatedData.transactionType,
     };
 
     const cleanData = Object.fromEntries(
@@ -871,6 +876,62 @@ export async function deleteTransactionDB({
   }
 }
 
+// DELETE Multiple Transactions
+export async function deleteTransactionsDB({
+  hubId,
+  transactionIds,
+}: {
+  hubId: string;
+  transactionIds: string[];
+}) {
+  try {
+    if (!transactionIds || transactionIds.length === 0) {
+      return { success: false, message: "No transaction IDs provided" };
+    }
+
+    // Verify all transactions belong to the hub
+    const txs = await db.query.transactions.findMany({
+      where: (tx) => inArray(tx.id, transactionIds),
+      columns: { id: true, hubId: true, transactionCategoryId: true },
+    });
+
+    if (txs.length === 0) {
+      return { success: false, message: "No transactions found" };
+    }
+
+    // Check if all transactions belong to the hub
+    const invalidTxs = txs.filter((tx) => tx.hubId !== hubId);
+    if (invalidTxs.length > 0) {
+      return { success: false, message: "Access denied to some transactions" };
+    }
+
+    // Get unique category IDs that will be orphaned
+    const categoryIds = txs
+      .map((tx) => tx.transactionCategoryId)
+      .filter((id): id is string => !!id);
+
+    // Delete transactions
+    const deleted = await db
+      .delete(transactions)
+      .where(
+        and(
+          inArray(transactions.id, transactionIds),
+          eq(transactions.hubId, hubId),
+        ),
+      )
+      .returning();
+
+
+    return { success: true, data: deleted, count: deleted.length };
+  } catch (err: any) {
+    console.error("Error deleting transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete transactions",
+    };
+  }
+}
+
 // CREATE Transaction Category
 export async function createTransactionCategoryDB(name: string, hubId: string) {
   try {
@@ -903,6 +964,275 @@ export async function createTransactionCategoryDB(name: string, hubId: string) {
   }
 }
 
+// CREATE Recurring Transaction Template
+export type CreateRecurringTransactionTemplateArgs = {
+  hubId: string;
+  userId: string;
+  financialAccountId: string;
+  transactionCategoryId: string | null;
+  type: TransactionType;
+  source: string | null;
+  amount: number;
+  note: string | null;
+  frequencyDays: number;
+  startDate: Date;
+  endDate: Date | null;
+  status: "active" | "inactive";
+  destinationAccountId?: string | null;
+};
+
+export async function createRecurringTransactionTemplateDB({
+  hubId,
+  userId,
+  financialAccountId,
+  transactionCategoryId,
+  type,
+  source,
+  amount,
+  note,
+  frequencyDays,
+  startDate,
+  endDate,
+  status,
+  destinationAccountId,
+}: CreateRecurringTransactionTemplateArgs) {
+  try {
+    const [template] = await db
+      .insert(recurringTransactionTemplates)
+      .values({
+        hubId,
+        userId,
+        financialAccountId,
+        destinationAccountId: type === "transfer" ? destinationAccountId : null,
+        transactionCategoryId,
+        type,
+        source,
+        amount,
+        note,
+        frequencyDays,
+        startDate,
+        endDate,
+        status,
+      })
+      .returning();
+
+    return { success: true, data: template };
+  } catch (err: any) {
+    console.error("Error creating recurring transaction template:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to create recurring transaction template",
+    };
+  }
+}
+
+// UPDATE Recurring Transaction Template
+export type UpdateRecurringTransactionTemplateArgs = {
+  templateId: string;
+  hubId: string;
+  updatedData: {
+    financialAccountId?: string;
+    transactionCategoryId?: string | null;
+    type?: TransactionType;
+    source?: string | null;
+    amount?: number;
+    note?: string | null;
+    frequencyDays?: number;
+    startDate?: Date;
+    endDate?: Date | null;
+    status?: "active" | "inactive";
+    destinationAccountId?: string | null;
+  };
+};
+
+export async function updateRecurringTransactionTemplateDB({
+  templateId,
+  hubId,
+  updatedData,
+}: UpdateRecurringTransactionTemplateArgs) {
+  try {
+    // Verify template exists and belongs to hub
+    const template = await db.query.recurringTransactionTemplates.findFirst({
+      where: (templates, { and, eq }) =>
+        and(eq(templates.id, templateId), eq(templates.hubId, hubId)),
+    });
+
+    if (!template) {
+      return {
+        success: false,
+        message: "Recurring transaction template not found",
+      };
+    }
+
+    const [updated] = await db
+      .update(recurringTransactionTemplates)
+      .set({
+        ...updatedData,
+        updatedAt: new Date(),
+      })
+      .where(eq(recurringTransactionTemplates.id, templateId))
+      .returning();
+
+    return { success: true, data: updated };
+  } catch (err: any) {
+    console.error("Error updating recurring transaction template:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update recurring transaction template",
+    };
+  }
+}
+
+// GET Recurring Transaction Templates by Hub
+export async function getRecurringTransactionTemplatesDB(hubId: string) {
+  try {
+    const templates = await db
+      .select({
+        id: recurringTransactionTemplates.id,
+        hubId: recurringTransactionTemplates.hubId,
+        userId: recurringTransactionTemplates.userId,
+        financialAccountId: recurringTransactionTemplates.financialAccountId,
+        destinationAccountId: recurringTransactionTemplates.destinationAccountId,
+        transactionCategoryId: recurringTransactionTemplates.transactionCategoryId,
+        type: recurringTransactionTemplates.type,
+        source: recurringTransactionTemplates.source,
+        amount: recurringTransactionTemplates.amount,
+        note: recurringTransactionTemplates.note,
+        frequencyDays: recurringTransactionTemplates.frequencyDays,
+        startDate: recurringTransactionTemplates.startDate,
+        endDate: recurringTransactionTemplates.endDate,
+        status: recurringTransactionTemplates.status,
+        createdAt: recurringTransactionTemplates.createdAt,
+        updatedAt: recurringTransactionTemplates.updatedAt,
+        // Related data
+        accountName: financialAccounts.name,
+        accountType: financialAccounts.type,
+        categoryName: transactionCategories.name,
+      })
+      .from(recurringTransactionTemplates)
+      .leftJoin(
+        financialAccounts,
+        eq(
+          recurringTransactionTemplates.financialAccountId,
+          financialAccounts.id,
+        ),
+      )
+      .leftJoin(
+        transactionCategories,
+        eq(
+          recurringTransactionTemplates.transactionCategoryId,
+          transactionCategories.id,
+        ),
+      )
+      .where(
+        and(
+          eq(recurringTransactionTemplates.hubId, hubId),
+          eq(recurringTransactionTemplates.status, "active"),
+        ),
+      )
+      .orderBy(recurringTransactionTemplates.startDate);
+
+    // Fetch destination account names separately if needed
+    const templatesWithDestAccounts = await Promise.all(
+      templates.map(async (template) => {
+        if (template.destinationAccountId) {
+          const destAccount = await db.query.financialAccounts.findFirst({
+            where: (accounts, { eq }) => eq(accounts.id, template.destinationAccountId!),
+            columns: { name: true },
+          });
+          return {
+            ...template,
+            destinationAccountName: destAccount?.name ?? null,
+          };
+        }
+        return { ...template, destinationAccountName: null };
+      }),
+    );
+
+    return templatesWithDestAccounts;
+  } catch (err: any) {
+    console.error("Error fetching recurring transaction templates:", err);
+    throw err;
+  }
+}
+
+// GET Single Recurring Transaction Template by ID
+export async function getRecurringTransactionTemplateByIdDB(
+  templateId: string,
+  hubId: string,
+) {
+  try {
+    const template = await db
+      .select({
+        id: recurringTransactionTemplates.id,
+        hubId: recurringTransactionTemplates.hubId,
+        userId: recurringTransactionTemplates.userId,
+        financialAccountId: recurringTransactionTemplates.financialAccountId,
+        destinationAccountId: recurringTransactionTemplates.destinationAccountId,
+        transactionCategoryId: recurringTransactionTemplates.transactionCategoryId,
+        type: recurringTransactionTemplates.type,
+        source: recurringTransactionTemplates.source,
+        amount: recurringTransactionTemplates.amount,
+        note: recurringTransactionTemplates.note,
+        frequencyDays: recurringTransactionTemplates.frequencyDays,
+        startDate: recurringTransactionTemplates.startDate,
+        endDate: recurringTransactionTemplates.endDate,
+        status: recurringTransactionTemplates.status,
+        createdAt: recurringTransactionTemplates.createdAt,
+        updatedAt: recurringTransactionTemplates.updatedAt,
+        // Related data
+        accountName: financialAccounts.name,
+        accountType: financialAccounts.type,
+        categoryName: transactionCategories.name,
+      })
+      .from(recurringTransactionTemplates)
+      .leftJoin(
+        financialAccounts,
+        eq(
+          recurringTransactionTemplates.financialAccountId,
+          financialAccounts.id,
+        ),
+      )
+      .leftJoin(
+        transactionCategories,
+        eq(
+          recurringTransactionTemplates.transactionCategoryId,
+          transactionCategories.id,
+        ),
+      )
+      .where(
+        and(
+          eq(recurringTransactionTemplates.id, templateId),
+          eq(recurringTransactionTemplates.hubId, hubId),
+        ),
+      )
+      .limit(1);
+
+    if (!template || template.length === 0) {
+      return null;
+    }
+
+    const result = template[0];
+
+    // Fetch destination account name if needed
+    if (result.destinationAccountId) {
+      const destAccount = await db.query.financialAccounts.findFirst({
+        where: (accounts, { eq }) => eq(accounts.id, result.destinationAccountId!),
+        columns: { name: true },
+      });
+      return {
+        ...result,
+        destinationAccountName: destAccount?.name ?? null,
+      };
+    }
+
+    return { ...result, destinationAccountName: null };
+  } catch (err: any) {
+    console.error("Error fetching recurring transaction template:", err);
+    throw err;
+  }
+}
+
 // CREATE Budget
 export async function createBudgetDB({
   hubId,
@@ -916,7 +1246,8 @@ export async function createBudgetDB({
   try {
     const normalizedName = categoryName.trim().toLowerCase();
 
-    const existingCategory = await db.query.transactionCategories.findFirst({
+    // Find or create the category
+    let category = await db.query.transactionCategories.findFirst({
       where: (categories, { and, eq, sql }) =>
         and(
           sql`LOWER(${categories.name}) = ${normalizedName}`,
@@ -924,18 +1255,35 @@ export async function createBudgetDB({
         ),
     });
 
-    if (existingCategory) {
-      throw new Error(`Category "${normalizedName}" already exists`);
+    // If category doesn't exist, create it
+    if (!category) {
+      const [newCategory] = await db
+        .insert(transactionCategories)
+        .values({
+          name: normalizedName,
+          hubId,
+        })
+        .returning();
+      category = newCategory;
     }
 
-    const [category] = await db
-      .insert(transactionCategories)
-      .values({
-        name: normalizedName,
-        hubId,
-      })
-      .returning();
+    // Check if a budget already exists for this category in this hub
+    const existingBudget = await db.query.budgets.findFirst({
+      where: (b, { and, eq }) =>
+        and(
+          eq(b.hubId, hubId),
+          eq(b.transactionCategoryId, category!.id),
+        ),
+    });
 
+    if (existingBudget) {
+      return {
+        success: false,
+        message: `A budget already exists for category "${categoryName}"`,
+      };
+    }
+
+    // Create the budget
     await db.insert(budgets).values({
       hubId,
       userId,
@@ -964,7 +1312,7 @@ export async function createSavingGoalDB({
   goalAmount,
   amountSaved,
   monthlyAllocation,
-  accountType,
+  financialAccountId,
 }: savingGoalArgs) {
   try {
     await db.insert(savingGoals).values({
@@ -974,7 +1322,7 @@ export async function createSavingGoalDB({
       goalAmount,
       amountSaved,
       monthlyAllocation,
-      accountType,
+      financialAccountId: financialAccountId || null,
     });
 
     return { success: true, message: "Saving goal created successfully" };
@@ -1006,7 +1354,7 @@ export async function getSavingGoalsDB(
         goalAmount: savingGoals.goalAmount,
         amountSaved: savingGoals.amountSaved,
         monthlyAllocation: savingGoals.monthlyAllocation,
-        accountType: savingGoals.accountType,
+        financialAccountId: savingGoals.financialAccountId,
         dueDate: savingGoals.dueDate,
       })
       .from(savingGoals)
@@ -1052,7 +1400,6 @@ export async function getSavingGoalsDB(
         amountSaved: g.amountSaved,
         monthlyAllocation: g.monthlyAllocation,
         value: Math.round(progress),
-        accountType: g.accountType,
         dueDate: g.dueDate,
       };
     });
@@ -1093,7 +1440,7 @@ export async function updateSavingGoalDB({
         goalAmount: updatedData.goalAmount,
         amountSaved: updatedData.amountSaved,
         monthlyAllocation: updatedData.monthlyAllocation,
-        accountType: updatedData.accountType,
+        financialAccountId: updatedData.financialAccountId ?? null,
         dueDate: updatedData.dueDate ?? null,
       }).filter(([_, v]) => v !== undefined),
     );
@@ -1314,41 +1661,74 @@ export async function updateBudgetDB({
     let transactionCategoryId = budget.transactionCategoryId;
 
     if (updatedData.categoryName) {
-      const newName = updatedData.categoryName.trim();
+      const newName = updatedData.categoryName.trim().toLowerCase();
 
-      const currentCategory = await db.query.transactionCategories.findFirst({
-        where: (cat) => eq(cat.id, budget.transactionCategoryId),
-      });
-
-      if (!currentCategory) {
-        return {
-          success: false,
-          message: "Current category not found.",
-        };
-      }
-
-      if (currentCategory.name === newName) {
-        transactionCategoryId = currentCategory.id;
-      } else {
+      // If budget doesn't have a category associated, find or create one
+      if (!budget.transactionCategoryId) {
         const existingCategory = await db.query.transactionCategories.findFirst(
           {
-            where: (cat) => and(eq(cat.hubId, hubId), eq(cat.name, newName)),
+            where: (cat, { and, eq, sql }) =>
+              and(
+                eq(cat.hubId, hubId),
+                sql`LOWER(${cat.name}) = ${newName}`,
+              ),
           },
         );
 
         if (existingCategory) {
+          transactionCategoryId = existingCategory.id;
+        } else {
+          // Create new category
+          const [newCategory] = await db
+            .insert(transactionCategories)
+            .values({
+              hubId,
+              name: newName,
+            })
+            .returning({ id: transactionCategories.id });
+
+          transactionCategoryId = newCategory.id;
+        }
+      } else {
+        // Budget has an existing category, update it if needed
+        const currentCategory = await db.query.transactionCategories.findFirst({
+          where: (cat) => eq(cat.id, budget.transactionCategoryId!),
+        });
+
+        if (!currentCategory) {
           return {
             success: false,
-            message: "A category with this name already exists in your hub.",
+            message: "Current category not found.",
           };
         }
 
-        await db
-          .update(transactionCategories)
-          .set({ name: newName })
-          .where(eq(transactionCategories.id, currentCategory.id));
+        if (currentCategory.name.toLowerCase() === newName) {
+          transactionCategoryId = currentCategory.id;
+        } else {
+          const existingCategory = await db.query.transactionCategories.findFirst(
+            {
+              where: (cat, { and, eq, sql }) =>
+                and(
+                  eq(cat.hubId, hubId),
+                  sql`LOWER(${cat.name}) = ${newName}`,
+                ),
+            },
+          );
 
-        transactionCategoryId = currentCategory.id;
+          if (existingCategory) {
+            return {
+              success: false,
+              message: "A category with this name already exists in your hub.",
+            };
+          }
+
+          await db
+            .update(transactionCategories)
+            .set({ name: newName })
+            .where(eq(transactionCategories.id, currentCategory.id));
+
+          transactionCategoryId = currentCategory.id;
+        }
       }
     }
     const cleanData = Object.fromEntries(
@@ -1426,119 +1806,66 @@ export async function deleteBudgetDB({
   }
 }
 
-// CREATE Account Transfer
-export async function createAccountTransferDB({
-  financialAccountId,
-  fromAccountType,
-  toAccountType,
-  hubId,
-  amount,
-  note,
-}: AccountTransferArgs) {
-  try {
-    const from = await db.query.financialAccounts.findFirst({
-      where: (a) => and(eq(a.type, fromAccountType), eq(a.hubId, hubId)),
-      columns: {
-        id: true,
-        hubId: true,
-        initialBalance: true,
-        name: true,
-        type: true,
-      },
-    });
-
-    const to = await db.query.financialAccounts.findFirst({
-      where: (a) => and(eq(a.type, toAccountType), eq(a.hubId, hubId)),
-      columns: {
-        id: true,
-        hubId: true,
-        initialBalance: true,
-        name: true,
-        type: true,
-      },
-    });
-
-    if (!from) return { success: false, message: "Source account not found." };
-    if (!to)
-      return { success: false, message: "Destination account not found." };
-
-    if (from.hubId !== hubId || to.hubId !== hubId)
-      return { success: false, message: "Access denied." };
-
-    if (from.id === to.id)
-      return {
-        success: false,
-        message: "Cannot transfer to the same account.",
-      };
-
-    const fromBalance = Number(from.initialBalance ?? 0);
-    if (fromBalance < amount)
-      return {
-        success: false,
-        message: "Insufficient funds in source account.",
-      };
-
-    const newFromBalance = fromBalance - amount;
-    const newToBalance = Number(to.initialBalance ?? 0) + amount;
-
-    await db
-      .update(financialAccounts)
-      .set({ initialBalance: newFromBalance })
-      .where(eq(financialAccounts.id, from.id));
-
-    await db
-      .update(financialAccounts)
-      .set({ initialBalance: newToBalance })
-      .where(eq(financialAccounts.id, to.id));
-
-    const [transfer] = await db
-      .insert(accountTransfers)
-      .values({
-        financialAccountId,
-        sourceAccount: from.type,
-        destinationAccount: to.type,
-        note,
-        transferAmount: amount,
-      })
-      .returning();
-
-    return { success: true, data: transfer };
-  } catch (err: any) {
-    console.error("Error creating latest transfer:", err);
-    return {
-      success: false,
-      message: err.message || "Failed to create transfer",
-    };
-  }
-}
-
-// GET Account Transfers
+// GET Account Transfers (now queries transactions with type="transfer")
 export async function getAccountTransfersDB(financialAccountId: string) {
   try {
     const account = await db.query.financialAccounts.findFirst({
       where: eq(financialAccounts.id, financialAccountId),
-      columns: { type: true },
+      columns: { id: true, name: true },
     });
 
     if (!account) {
       return { status: false, message: "Account not found.", data: [] };
     }
+
     const results = await db
-      .select()
-      .from(accountTransfers)
+      .select({
+        id: transactions.id,
+        date: transactions.createdAt,
+        amount: transactions.amount,
+        note: transactions.note,
+        sourceAccountId: transactions.financialAccountId,
+        destinationAccountId: transactions.destinationAccountId,
+      })
+      .from(transactions)
       .where(
-        or(
-          eq(accountTransfers.sourceAccount, account.type),
-          eq(accountTransfers.destinationAccount, account.type),
+        and(
+          eq(transactions.type, "transfer"),
+          or(
+            eq(transactions.financialAccountId, account.id),
+            eq(transactions.destinationAccountId, account.id),
+          ),
         ),
       )
-      .orderBy(desc(accountTransfers.updatedAt));
+      .orderBy(desc(transactions.createdAt));
+
+    // Fetch account names separately
+    const accountIds = new Set<string>();
+    results.forEach((tx) => {
+      if (tx.sourceAccountId) accountIds.add(tx.sourceAccountId);
+      if (tx.destinationAccountId) accountIds.add(tx.destinationAccountId);
+    });
+
+    const accountsMap = new Map<string, string>();
+    if (accountIds.size > 0) {
+      const accounts = await db
+        .select({
+          id: financialAccounts.id,
+          name: financialAccounts.name,
+        })
+        .from(financialAccounts)
+        .where(inArray(financialAccounts.id, Array.from(accountIds)));
+
+      accounts.forEach((acc) => {
+        accountsMap.set(acc.id, acc.name);
+      });
+    }
 
     const formatted = results.map((tx) => ({
-      date: tx.updatedAt,
-      source: tx.sourceAccount,
-      destination: tx.destinationAccount,
-      amount: Number(tx.transferAmount),
+      date: tx.date,
+      source: accountsMap.get(tx.sourceAccountId) || "",
+      destination: accountsMap.get(tx.destinationAccountId || "") || "",
+      amount: Number(tx.amount),
       note: tx.note || "",
     }));
 
@@ -1549,6 +1876,32 @@ export async function getAccountTransfersDB(financialAccountId: string) {
       status: false,
       message: err.message || "Failed to fetch latest transfers",
       data: [],
+    };
+  }
+}
+
+// GET All Transaction Categories for a Hub
+export async function getTransactionCategoriesDB(hubId: string) {
+  try {
+    const result = await db
+      .select({
+        id: transactionCategories.id,
+        name: transactionCategories.name,
+      })
+      .from(transactionCategories)
+      .where(eq(transactionCategories.hubId, hubId))
+      .orderBy(transactionCategories.name);
+
+    return {
+      success: true,
+      message: "Fetched transaction categories",
+      data: result,
+    };
+  } catch (err: any) {
+    console.error("DB Error: getTransactionCategoriesDB Error:", err);
+    return {
+      success: false,
+      message: "Failed to fetch transaction categories",
     };
   }
 }
@@ -1631,20 +1984,38 @@ export async function getMonthlyReportDB(hubId: string) {
   try {
     const result = await db
       .select({
-        month: sql<string>`TO_CHAR(${transactions.addedAt}, 'Month')`,
+        month: sql<string>`TO_CHAR(${transactions.createdAt}, 'Month')`,
         income: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0)`,
         expenses: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`,
         balance: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE -${transactions.amount} END), 0)`,
       })
       .from(transactions)
       .where(eq(transactions.hubId, hubId))
-      .groupBy(sql`TO_CHAR(${transactions.addedAt}, 'Month')`)
-      .orderBy(sql`MIN(${transactions.addedAt})`);
+      .groupBy(sql`TO_CHAR(${transactions.createdAt}, 'Month')`)
+      .orderBy(sql`MIN(${transactions.createdAt})`);
 
     return { success: true, data: result };
   } catch (err: any) {
     console.error("DB Error: getMonthlyReportDB:", err);
     return { success: false, message: err.message };
+  }
+}
+
+// DELETE ALL Transactions
+export async function deleteAllTransactionsDB(hubId: string) {
+  try {
+    await db.delete(transactions).where(eq(transactions.hubId, hubId));
+
+    return {
+      success: true,
+      message: "All transactions deleted.",
+    };
+  } catch (err: any) {
+    console.error("Error deleting all transactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete all transactions.",
+    };
   }
 }
 
@@ -1688,7 +2059,6 @@ export async function getCategoriesByExpensesDB(hubId: string) {
     const expenseTxs = await db
       .select({
         categoryId: transactions.transactionCategoryId,
-        accountType: transactions.accountType,
         amount: transactions.amount,
         financialAccountId: transactions.financialAccountId,
       })
@@ -1699,15 +2069,14 @@ export async function getCategoriesByExpensesDB(hubId: string) {
 
     const grouped: Record<
       string,
-      { amount: number; accountType: string; financialAccountId: string }
+      { amount: number; financialAccountId: string }
     > = {};
 
     for (const tx of expenseTxs) {
-      const key = `${tx.categoryId}:${tx.accountType}`;
+      const key = `${tx.categoryId}:${tx.financialAccountId}`;
       if (!grouped[key]) {
         grouped[key] = {
           amount: 0,
-          accountType: tx.accountType,
           financialAccountId: tx.financialAccountId,
         };
       }
@@ -1717,26 +2086,24 @@ export async function getCategoriesByExpensesDB(hubId: string) {
     const results: {
       category: string;
       amount: number;
-      accountType: string;
       accountBalance: number;
     }[] = [];
 
     for (const [key, value] of Object.entries(grouped)) {
-      const [categoryId, accountType] = key.split(":");
+      const [categoryId, financialAccountId] = key.split(":");
       const categoryRow = await db.query.transactionCategories.findFirst({
         where: (cat) => eq(cat.id, categoryId),
         columns: { name: true },
       });
       const accountRow = await db.query.financialAccounts.findFirst({
         where: (acc) =>
-          and(eq(acc.hubId, hubId), eq(acc.type, accountType as any)),
+          and(eq(acc.hubId, hubId), eq(acc.id, financialAccountId)),
         columns: { initialBalance: true },
       });
 
       results.push({
         category: categoryRow?.name ?? "Unknown",
         amount: Math.abs(value.amount),
-        accountType: value.accountType,
         accountBalance: accountRow?.initialBalance ?? 0,
       });
     }
@@ -2005,8 +2372,85 @@ export async function getMonthlyTransactionCount(
     transactions,
     and(
       eq(transactions.userId, userId),
-      gte(transactions.addedAt, firstDayOfMonth),
-      lte(transactions.addedAt, now),
+      gte(transactions.createdAt, firstDayOfMonth),
+      lte(transactions.createdAt, now),
     ),
   );
+}
+
+// GET User Settings
+export async function getUserSettingsDB(
+  userId: string,
+): Promise<{ success: boolean; message: string; data?: UserSettingsType | null }> {
+  try {
+    const settings = await db.query.userSettings.findFirst({
+      where: eq(userSettings.userId, userId),
+    });
+
+    return {
+      success: true,
+      message: "User settings retrieved successfully",
+      data: settings ?? null,
+    };
+  } catch (err) {
+    console.error("Error fetching user settings: ", err);
+    return {
+      success: false,
+      message: `Failed to fetch user settings: ${(err as Error).message}`,
+    };
+  }
+}
+
+// CREATE or UPDATE User Settings
+export async function upsertUserSettingsDB(
+  userId: string,
+  updateData: {
+    householdSize?: string | null;
+    address?: string | null;
+  },
+): Promise<{ success: boolean; message: string; data?: UserSettingsType }> {
+  try {
+    const existingSettings = await db.query.userSettings.findFirst({
+      where: eq(userSettings.userId, userId),
+    });
+
+    if (existingSettings) {
+      // Update existing settings
+      const [updatedSettings] = await db
+        .update(userSettings)
+        .set({
+          ...updateData,
+          updatedAt: new Date(),
+        })
+        .where(eq(userSettings.userId, userId))
+        .returning();
+
+      return {
+        success: true,
+        message: "User settings updated successfully",
+        data: updatedSettings,
+      };
+    } else {
+      // Create new settings
+      const [newSettings] = await db
+        .insert(userSettings)
+        .values({
+          userId,
+          ...updateData,
+        })
+        .returning();
+
+      return {
+        success: true,
+        message: "User settings created successfully",
+        data: newSettings,
+      };
+    }
+  } catch (err) {
+    console.error("Error upserting user settings: ", err);
+    return {
+      success: false,
+      message: `Failed to upsert user settings: ${(err as Error).message}`,
+    };
+  }
 }

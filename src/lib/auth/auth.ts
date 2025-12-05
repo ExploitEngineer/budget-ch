@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { twoFactor } from "better-auth/plugins";
 import db from "@/db/db";
 import * as schema from "@/db/schema";
 import { createAuthMiddleware, APIError } from "better-auth/api";
@@ -15,8 +16,10 @@ export const auth = betterAuth({
       sessions: schema.sessions,
       accounts: schema.accounts,
       verifications: schema.verifications,
+      twoFactors: schema.twoFactor,
     },
   }),
+  appName: "Budget-ch",
   user: {
     additionalFields: {
       stripeCustomerId: {
@@ -196,4 +199,54 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     },
   },
+  plugins: [
+    twoFactor({
+      issuer: "Budget-ch",
+      /*
+      backupCodeOptions: {
+        length: 10,
+        amount: 10,
+      },
+      */
+      /*
+      otpOptions: {
+        async sendOTP({ user, otp }) {
+          const html = `
+            <html>
+              <head>
+                <meta charset="UTF-8" />
+                <title>Your Verification Code</title>
+              </head>
+              <body style="font-family: sans-serif; background: #f4f4f4; padding: 40px;">
+                <div style="max-width: 600px; margin: auto; background: #fff; padding: 32px; border-radius: 8px;">
+                  <h2 style="text-align: center; color: #111;">Your Verification Code</h2>
+                  <p>Hi ${user.name || user.email},</p>
+                  <p>Your verification code is:</p>
+                  <p style="text-align: center; margin: 32px 0;">
+                    <span style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; font-weight: bold; font-size: 24px; letter-spacing: 4px;">${otp}</span>
+                  </p>
+                  <p>This code will expire in 5 minutes.</p>
+                  <p>If you didn't request this code, you can safely ignore this email.</p>
+                  <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
+                  <p style="text-align: center; font-size: 12px; color: #666;">© 2025 Budget-ch. All rights reserved.</p>
+                </div>
+              </body>
+            </html>
+          `;
+          try {
+            await mailer.sendMail({
+              from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
+              to: user.email,
+              subject: "Your Verification Code",
+              html,
+            });
+          } catch (err) {
+            console.error("Failed to send OTP email:", err);
+          }
+        },
+        period: 3, // 3 minutes (in minutes for OTP)
+      },
+      */
+    }),
+  ],
 });

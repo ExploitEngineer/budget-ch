@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -13,26 +12,35 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import { useDashboardStore } from "@/store/dashboard-store";
+import { useQuery } from "@tanstack/react-query";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { Transaction } from "@/lib/types/dashboard-types";
 
 export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    transactions,
-    transactionError,
-    transactionLoading,
-    fetchTransactions,
-  } = useDashboardStore();
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
+    data: transactions,
+    isLoading: transactionLoading,
+    error: transactionError,
+  } = useQuery<Partial<Transaction>[]>({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const headings = [
     t("recent-transactions-table.table-headings.date"),
     t("recent-transactions-table.table-headings.recipient.title"),
-    t("recent-transactions-table.table-headings.account.title"),
     t("recent-transactions-table.table-headings.category.title"),
     t("recent-transactions-table.table-headings.note.title"),
     t("recent-transactions-table.table-headings.amount"),
@@ -53,8 +61,12 @@ export function RecentTransactionsTableSection() {
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
           {transactionError ? (
-            <p className="px-6 text-sm text-red-500">{transactionError}</p>
-          ) : transactions === null || transactionLoading ? (
+            <p className="px-6 text-sm text-red-500">
+              {transactionError instanceof Error
+                ? transactionError.message
+                : String(transactionError)}
+            </p>
+          ) : transactionLoading || !transactions ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("upcoming-cards.loading")}
             </p>
@@ -78,9 +90,6 @@ export function RecentTransactionsTableSection() {
                     <TableRow className="dark:border-border-blue" key={tx.id}>
                       <TableCell>{tx.date}</TableCell>
                       <TableCell>{tx.recipient}</TableCell>
-                      <TableCell className="whitespace-nowrap">
-                        {tx.accountType}
-                      </TableCell>
                       <TableCell>{tx.category}</TableCell>
                       <TableCell>{tx.note}</TableCell>
                       <TableCell>{`CHF ${tx.amount}`}</TableCell>
@@ -89,7 +98,7 @@ export function RecentTransactionsTableSection() {
                 ) : (
                   <TableRow>
                     <TableCell
-                      colSpan={6}
+                      colSpan={5}
                       className="text-center text-gray-500"
                     >
                       {t("upcoming-cards.no-transactions")}

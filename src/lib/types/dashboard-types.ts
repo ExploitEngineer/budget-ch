@@ -1,5 +1,3 @@
-import type { AccountType } from "@/db/queries";
-
 export type DashboardCards = {
   title: string;
   content: string;
@@ -19,20 +17,22 @@ export type DashboardSavingsGoals = {
   amountSaved: number;
   monthlyAllocation?: number;
   value: number;
-  accountType: AccountType;
   dueDate?: Date | null;
   remaining?: number;
 };
 
-type TransactionType = "income" | "expense";
+import type { TransactionType } from "./common-types";
 
 export type Transaction = {
   id: string;
   date: string;
   recipient: string;
-  accountType: AccountType;
   type: TransactionType;
   category: string;
   note: string;
   amount: number;
+  accountId?: string | null;
+  destinationAccountId?: string | null;
+  recurringTemplateId?: string | null;
+  isRecurring?: boolean;
 };

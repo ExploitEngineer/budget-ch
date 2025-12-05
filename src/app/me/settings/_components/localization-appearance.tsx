@@ -18,26 +18,56 @@ import {
 } from "@/components/ui/select";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AppearanceValues, appearanceSchema } from "@/lib/validations";
-import { useTranslations } from "next-intl";
+import { UserPreferencesValues, userPreferencesSchema } from "@/lib/validations";
+import { useTranslations, useLocale } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { useTheme } from "next-themes";
+import { setLanguage } from "@/app/actions";
+import { usePathname, useSearchParams } from "next/navigation";
+import { getLocalUserPreferences, setLocalUserPreferences } from "@/lib/services/locat-store";
+
 
 export function LocalizationAppearance() {
   const t = useTranslations("main-dashboard.settings-page.appearance-section");
+  const { setTheme } = useTheme();
+  const currentLocale = useLocale();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  const form = useForm<AppearanceValues>({
-    resolver: zodResolver(appearanceSchema),
-    defaultValues: {
-      language: "English",
-      currency: "CHF",
-      theme: "Auto",
-      firstDay: "Monday",
-      density: "Comfort",
-      rounding: "5-rappen",
-    },
+  const form = useForm<UserPreferencesValues>({
+    resolver: zodResolver(userPreferencesSchema),
+    defaultValues: getLocalUserPreferences(true) as UserPreferencesValues,
   });
 
-  const onSubmit = (values: AppearanceValues) => {
-    console.log("Appearance settings:", values);
+  const onSubmit = async (values: UserPreferencesValues) => {
+    // Save preferences to localStorage
+    setLocalUserPreferences(values);
+
+    // Apply theme immediately
+    // Map "auto" to "system" for next-themes
+    const themeToApply = values.theme === "auto" ? "system" : values.theme;
+    setTheme(themeToApply);
+
+    // Apply language if changed
+    if (values.language !== currentLocale) {
+      const formData = new FormData();
+      formData.append("locale", values.language);
+      // Include search params (e.g., hub parameter) in pathname
+      const fullPath = searchParams.toString() 
+        ? `${pathname}?${searchParams.toString()}`
+        : pathname;
+      formData.append("pathname", fullPath);
+      
+      // Show toast before redirect
+      toast.success(t("messages.preferences-saved"));
+      
+      // setLanguage will redirect, so we don't need to do anything else
+      await setLanguage(formData);
+    } else {
+      // Only show toast if language didn't change (theme change doesn't require redirect)
+      toast.success(t("messages.preferences-saved"));
+    }
   };
 
   return (
@@ -130,6 +160,15 @@ export function LocalizationAppearance() {
                   </FormItem>
                 )}
               />
+            </div>
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                className="btn-gradient cursor-pointer dark:text-white"
+                disabled={form.formState.isSubmitting}
+              >
+                {t("buttons.save-preferences")}
+              </Button>
             </div>
 
             {/* Content / Description */}

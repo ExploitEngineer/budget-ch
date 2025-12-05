@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
@@ -13,28 +15,37 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import DashboardTableAdjustDialog from "./dashboard-table-dialog";
-
-interface UpComingTables {
-  name: string;
-  account: string;
-  amount: string;
-}
-
-interface WarningCards {
-  title: string;
-  badge?: string;
-}
+import type { WarningCards } from "./data";
+import { useQuery } from "@tanstack/react-query";
+import { getUpcomingRecurringTransactions } from "@/lib/services/transaction";
+import { transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 
 interface WarningSectionProps {
-  upComingTables: UpComingTables[];
   warningCards: WarningCards[];
 }
 
 export function WarningSection({
   warningCards,
-  upComingTables,
 }: WarningSectionProps) {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+
+  const {
+    data: upcomingTransactions,
+    isLoading: upcomingLoading,
+    error: upcomingError,
+  } = useQuery({
+    queryKey: transactionKeys.upcomingRecurring(hubId),
+    queryFn: async () => {
+      const res = await getUpcomingRecurringTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch upcoming transactions");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const upComingTableHeadings: string[] = [
     t("upcoming-cards.table-data.table-heading.date"),
@@ -57,6 +68,17 @@ export function WarningSection({
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
+          {upcomingError ? (
+            <p className="px-6 text-sm text-red-500">
+              {upcomingError instanceof Error
+                ? upcomingError.message
+                : String(upcomingError)}
+            </p>
+          ) : upcomingLoading || !upcomingTransactions ? (
+            <p className="text-muted-foreground px-6 text-sm">
+              {t("upcoming-cards.loading")}
+            </p>
+          ) : (
           <div className="min-w-full">
             <Table className="min-w-[600px]">
               <TableHeader>
@@ -72,20 +94,32 @@ export function WarningSection({
                 </TableRow>
               </TableHeader>
               <TableBody className="overflow-x-scroll">
-                {upComingTables.map((data) => (
-                  <TableRow className="dark:border-border-blue" key={data.name}>
-                    <TableCell>25.9.2025</TableCell>
-                    <TableCell>{data.name}</TableCell>
-                    <TableCell>{data.account}</TableCell>
-                    <TableCell>{data.amount}</TableCell>
-                    <TableCell>
-                      <DashboardTableAdjustDialog />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                  {upcomingTransactions.length > 0 ? (
+                    upcomingTransactions.map((data) => (
+                      <TableRow className="dark:border-border-blue" key={data.id}>
+                        <TableCell>{data.date}</TableCell>
+                        <TableCell>{data.name}</TableCell>
+                        <TableCell>{data.account}</TableCell>
+                        <TableCell>{data.amount}</TableCell>
+                        <TableCell>
+                          <DashboardTableAdjustDialog templateId={data.templateId} />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={4}
+                        className="text-center text-gray-500"
+                      >
+                        {t("upcoming-cards.no-transactions")}
+                      </TableCell>
+                    </TableRow>
+                  )}
               </TableBody>
             </Table>
           </div>
+          )}
         </CardContent>
       </Card>
       <Card className="bg-blue-background dark:border-border-blue col-span-full lg:col-span-3">

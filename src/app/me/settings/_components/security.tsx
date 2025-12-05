@@ -1,43 +1,83 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormControl,
-  FormMessage,
-} from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { useForm } from "react-hook-form";
-import { MainFormValues, mainFormSchema } from "@/lib/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
 import { getUserEmail } from "@/lib/services/user";
 import { authClient } from "@/lib/auth/auth-client";
 import { toast } from "sonner";
-import { useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
+import { useState, useEffect } from "react";
+import {
+  enableTwoFactorAction,
+  getTotpUriAction,
+  getTwoFactorStatusAction,
+  regenerateBackupCodesAction,
+} from "../actions";
+import type { TwoFactorStatus } from "@/lib/types/common-types";
+import { PasswordConfirmationDialog } from "./security/password-confirmation-dialog";
+import { QrCodeDialog } from "./security/qr-code-dialog";
+import { VerifyTotpDialog } from "./security/verify-totp-dialog";
+import { RegenerateBackupCodesDialog } from "./security/regenerate-backup-codes-dialog";
+import { DisableTwoFactorDialog } from "./security/disable-two-factor-dialog";
+import { TwoFactorSection } from "./security/two-factor-section";
+import { PasswordSection } from "./security/password-section";
 
 export function Security() {
-  const form = useForm<MainFormValues>({
-    resolver: zodResolver(mainFormSchema) as any,
-    defaultValues: {
-      select: "",
-    },
-  });
   const t = useTranslations("main-dashboard.settings-page.security-section");
-
   const [loading, setLoading] = useState<boolean>(false);
+  const [twoFactorStatus, setTwoFactorStatus] =
+    useState<TwoFactorStatus>("disabled");
+  const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
+
+  // Dialog states
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [qrDialogOpen, setQrDialogOpen] = useState(false);
+  const [verifyDialogOpen, setVerifyDialogOpen] = useState(false);
+  const [disableDialogOpen, setDisableDialogOpen] = useState(false);
+  const [showBackupCodesAfterVerify, setShowBackupCodesAfterVerify] =
+    useState(false);
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
+
+  // Form states
+  const [password, setPassword] = useState("");
+  const [regeneratePassword, setRegeneratePassword] = useState("");
+  const [totpCode, setTotpCode] = useState("");
+  const [totpUri, setTotpUri] = useState<string | null>(null);
+  const [totpSecret, setTotpSecret] = useState<string | null>(null);
+  const [backupCodes, setBackupCodes] = useState<string[]>([]);
+
+  const resetTwoFactorSetup = () => {
+    setPassword("");
+    setTotpCode("");
+    setTotpUri(null);
+    setTotpSecret(null);
+    setBackupCodes([]);
+    setShowBackupCodesAfterVerify(false);
+    setPasswordDialogOpen(false);
+    setQrDialogOpen(false);
+    setVerifyDialogOpen(false);
+    setTwoFactorStatus("disabled");
+  };
+
+  useEffect(() => {
+    loadTwoFactorStatus();
+  }, []);
+
+  const loadTwoFactorStatus = async () => {
+    setLoadingStatus(true);
+    try {
+      const result = await getTwoFactorStatusAction();
+      if (result.success && result.data) {
+        setTwoFactorStatus(
+          result.data.twoFactorEnabled ? "enabled" : "disabled",
+        );
+      }
+    } catch (err) {
+      console.error("Error loading 2FA status:", err);
+    } finally {
+      setLoadingStatus(false);
+    }
+  };
 
   const handleResetEmailSend = async (): Promise<void> => {
     setLoading(true);
@@ -59,15 +99,188 @@ export function Security() {
 
         if (error) {
           toast.error(error.message);
+        } else {
+          toast.success(t("labels.password.messages.reset-email-sent"));
         }
-        toast.success("Password reset email sent");
       }
     } catch (err) {
       console.error(err);
+      toast.error(t("labels.password.messages.error"));
     } finally {
       setLoading(false);
     }
   };
+
+  const handleEnableTwoFactor = async () => {
+    if (!password) {
+      toast.error(t("labels.two-factor.messages.password-required"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await enableTwoFactorAction(password);
+      if (result.success && result.data) {
+        setTotpUri(result.data.totpURI || null);
+        // Extract secret from the totpURI
+        if (result.data.totpURI) {
+          const url = new URL(result.data.totpURI);
+          const secret = url.searchParams.get("secret");
+          setTotpSecret(secret);
+        }
+        setBackupCodes(result.data.backupCodes || []);
+        setTwoFactorStatus("pending");
+        setPasswordDialogOpen(false);
+        setPassword("");
+        setQrDialogOpen(true);
+        toast.success(t("labels.two-factor.messages.setup-started"));
+      } else {
+        toast.error(
+          result.message || t("labels.two-factor.messages.enable-error"),
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("labels.two-factor.messages.enable-error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyTotp = async () => {
+    if (!totpCode || totpCode.length !== 6) {
+      toast.error(t("labels.two-factor.messages.invalid-code"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      // Use client-side method instead of server action to ensure session cookies are properly handled, Prevents signing out user after signing out
+      const { data, error } = await authClient.twoFactor.verifyTotp({
+        code: totpCode,
+        // trustDevice: true,
+      });
+
+      if (error) {
+        toast.error(
+          error.message || t("labels.two-factor.messages.verify-error"),
+        );
+        return;
+      }
+
+      setTwoFactorStatus("enabled");
+      setTotpCode("");
+      setQrDialogOpen(false);
+      // Show backup codes immediately after verification
+      setShowBackupCodesAfterVerify(true);
+      toast.success(t("labels.two-factor.messages.enabled-success"));
+      await loadTwoFactorStatus();
+    } catch (err: any) {
+      console.error("Error verifying TOTP:", err);
+      toast.error(err.message || t("labels.two-factor.messages.verify-error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDisableTwoFactor = async () => {
+    if (!password) {
+      toast.error(t("labels.two-factor.messages.password-required"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await authClient.twoFactor.disable({ password });
+
+      if (error) {
+        toast.error(
+          error.message || t("labels.two-factor.messages.disable-error"),
+        );
+        return;
+      }
+
+      setTwoFactorStatus("disabled");
+      setDisableDialogOpen(false);
+      setPassword("");
+      setBackupCodes([]);
+      setTotpCode("");
+      setShowBackupCodesAfterVerify(false);
+      toast.success(t("labels.two-factor.messages.disabled-success"));
+      await loadTwoFactorStatus();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.message || t("labels.two-factor.messages.disable-error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegenerateBackupCodes = async () => {
+    if (!regeneratePassword) {
+      toast.error(t("labels.two-factor.messages.password-required"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await regenerateBackupCodesAction(regeneratePassword);
+      if (result.success && result.data) {
+        const newCodes = result.data?.backupCodes ?? [];
+        setBackupCodes(newCodes);
+        setShowBackupCodesAfterVerify(true);
+        setVerifyDialogOpen(true);
+        setRegenerateDialogOpen(false);
+        setRegeneratePassword("");
+        toast.success(t("labels.two-factor.messages.regenerate-success"));
+      } else {
+        toast.error(
+          result.message || t("labels.two-factor.messages.regenerate-error"),
+        );
+      }
+    } catch (err: any) {
+      console.error("Error regenerating backup codes:", err);
+      toast.error(
+        err.message || t("labels.two-factor.messages.regenerate-error"),
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGetTotpUri = async () => {
+    if (!password) {
+      toast.error(t("labels.two-factor.messages.password-required"));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const result = await getTotpUriAction(password);
+      if (result.success && result.data) {
+        setTotpUri(result.data.totpURI || null);
+        // Extract secret from the totpURI
+        if (result.data.totpURI) {
+          const url = new URL(result.data.totpURI);
+          const secret = url.searchParams.get("secret");
+          setTotpSecret(secret);
+        }
+        setPasswordDialogOpen(false);
+        setPassword("");
+        setQrDialogOpen(true);
+      } else {
+        toast.error(
+          result.message || t("labels.two-factor.messages.get-uri-error"),
+        );
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error(t("labels.two-factor.messages.get-uri-error"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <section>
@@ -78,96 +291,79 @@ export function Security() {
         <Separator className="dark:bg-border-blue" />
         <CardContent>
           <div className="mb-5 grid grid-cols-2 gap-5">
-            <div className="flex flex-col gap-6">
-              <Form {...form}>
-                <FormField
-                  control={form.control}
-                  name="account"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel className="text-sm">
-                        {t("labels.two-factor.title")}
-                      </FormLabel>
-                      <FormControl>
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-[40%] cursor-pointer">
-                            <SelectValue
-                              placeholder={t("labels.two-factor.options.off")}
-                            />
-                          </SelectTrigger>
-                          <SelectContent className="dark:!bg-dark-blue-background bg-white">
-                            <SelectItem value="off">
-                              {t("labels.two-factor.options.off")}
-                            </SelectItem>
-                            <SelectItem value="monthly">
-                              {t("labels.two-factor.options.totp-app")}
-                            </SelectItem>
-                            <SelectItem value="quarterly">
-                              {t("labels.two-factor.options.email-code")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </Form>
+            <TwoFactorSection
+              loadingStatus={loadingStatus}
+              twoFactorStatus={twoFactorStatus}
+              loading={loading}
+              onEnableClick={() => setPasswordDialogOpen(true)}
+              onVerifyClick={() => setVerifyDialogOpen(true)}
+              onRestartSetup={resetTwoFactorSetup}
+              onRegenerateBackupCodesClick={() => setRegenerateDialogOpen(true)}
+              onDisableClick={() => setDisableDialogOpen(true)}
+            />
 
-              <p className="text-sm opacity-80">
-                {t("labels.two-factor.content")}
-              </p>
-
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                >
-                  {t("labels.two-factor.buttons.show-backup-codes")}
-                </Button>
-                <Button
-                  variant="outline"
-                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                >
-                  {t("labels.two-factor.buttons.regenerate-backup-codes")}
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-6">
-              <Form {...form}>
-                <FormLabel>{t("labels.password.title")}</FormLabel>
-              </Form>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button
-                  variant="outline"
-                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                >
-                  {t("labels.password.buttons.change-password")}
-                </Button>
-                <Button
-                  variant="outline"
-                  disabled={loading}
-                  onClick={handleResetEmailSend}
-                  className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-                >
-                  {loading ? (
-                    <Spinner />
-                  ) : (
-                    t("labels.password.buttons.reset-password")
-                  )}
-                </Button>
-              </div>
-              <p className="text-sm opacity-80">
-                {t("labels.password.content")}
-              </p>
-            </div>
+            <PasswordSection
+              loading={loading}
+              onResetPasswordClick={handleResetEmailSend}
+            />
           </div>
         </CardContent>
       </Card>
+
+      <PasswordConfirmationDialog
+        open={passwordDialogOpen}
+        onOpenChange={setPasswordDialogOpen}
+        password={password}
+        onPasswordChange={setPassword}
+        onSubmit={handleEnableTwoFactor}
+        loading={loading}
+      />
+
+      <QrCodeDialog
+        open={qrDialogOpen}
+        onOpenChange={setQrDialogOpen}
+        totpUri={totpUri}
+        totpSecret={totpSecret}
+        onNext={() => {
+          setQrDialogOpen(false);
+          setVerifyDialogOpen(true);
+        }}
+      />
+
+      <VerifyTotpDialog
+        open={verifyDialogOpen}
+        onOpenChange={setVerifyDialogOpen}
+        totpCode={totpCode}
+        onTotpCodeChange={setTotpCode}
+        onVerify={handleVerifyTotp}
+        loading={loading}
+        showBackupCodes={showBackupCodesAfterVerify}
+        backupCodes={backupCodes}
+        onClose={() => {
+          setVerifyDialogOpen(false);
+          setShowBackupCodesAfterVerify(false);
+          setTotpCode("");
+          setBackupCodes([]);
+        }}
+      />
+
+      <RegenerateBackupCodesDialog
+        open={regenerateDialogOpen}
+        onOpenChange={setRegenerateDialogOpen}
+        password={regeneratePassword}
+        onPasswordChange={setRegeneratePassword}
+        onSubmit={handleRegenerateBackupCodes}
+        loading={loading}
+      />
+
+      <DisableTwoFactorDialog
+        open={disableDialogOpen}
+        onOpenChange={setDisableDialogOpen}
+        password={password}
+        onPasswordChange={setPassword}
+        onSubmit={handleDisableTwoFactor}
+        loading={loading}
+      />
     </section>
   );
 }

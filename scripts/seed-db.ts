@@ -10,8 +10,7 @@ import {
   savingGoals,
   quickTasks,
 } from "../src/db/schema";
-
-type AccountType = "checking" | "savings" | "credit-card" | "cash";
+import type { AccountType } from "../src/db/queries";
 
 async function main() {
   if (!process.env.DATABASE_URL) {
@@ -147,7 +146,6 @@ async function main() {
           source: `${p.category}`,
           amount: p.amount,
           note: `${p.category} ${type}`,
-          accountType: "checking" as AccountType,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
@@ -210,7 +208,6 @@ async function main() {
         goalAmount: g.goalAmount,
         amountSaved: g.amountSaved,
         monthlyAllocation: g.monthlyAllocation,
-        accountType: "savings" as AccountType,
         dueDate: new Date(Date.now() + 180 * 24 * 60 * 60 * 1000),
         createdAt: new Date(),
         updatedAt: new Date(),

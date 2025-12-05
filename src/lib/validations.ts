@@ -39,7 +39,7 @@ export const mainFormSchema = z.object({
 
 export type MainFormValues = z.infer<typeof mainFormSchema>;
 
-const householdSizes = ["single", "couple", "family"] as const;
+const householdSizes = ["single", "2", "3", "4", "5+"] as const;
 const subscriptionPlans = ["free", "individual", "family"] as const;
 
 export const profileHouseholdSchema = z.object({
@@ -75,36 +75,12 @@ export const densities = ["comfort", "compact"] as const;
 export const roundings = ["5-rappen", "1-rappen"] as const;
 
 export const appearanceSchema = z.object({
-  language: z
-    .string()
-    .refine((val) => languages.includes(val as (typeof languages)[number]), {
-      message: "Please select a valid language.",
-    }),
-  currency: z
-    .string()
-    .refine((val) => currencies.includes(val as (typeof currencies)[number]), {
-      message: "Please select a valid currency.",
-    }),
-  theme: z
-    .string()
-    .refine((val) => themes.includes(val as (typeof themes)[number]), {
-      message: "Please select a valid theme.",
-    }),
-  firstDay: z
-    .string()
-    .refine((val) => firstDays.includes(val as (typeof firstDays)[number]), {
-      message: "Please select a valid first day.",
-    }),
-  density: z
-    .string()
-    .refine((val) => densities.includes(val as (typeof densities)[number]), {
-      message: "Please select a valid density.",
-    }),
-  rounding: z
-    .string()
-    .refine((val) => roundings.includes(val as (typeof roundings)[number]), {
-      message: "Please select a valid rounding.",
-    }),
+  language: z.enum(languages),
+  currency: z.enum(currencies),
+  theme: z.enum(themes),
+  firstDay: z.enum(firstDays).optional(),
+  density: z.enum(densities).optional(),
+  rounding: z.enum(roundings).optional(),
 });
 
 export type AppearanceValues = z.infer<typeof appearanceSchema>;

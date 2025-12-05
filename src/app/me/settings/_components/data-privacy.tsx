@@ -11,11 +11,16 @@ import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { useDashboardStore } from "@/store/dashboard-store";
-import { useBudgetStore } from "@/store/budget-store";
-import { useAccountStore } from "@/store/account-store";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { getBudgets } from "@/lib/services/budget";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { SavingGoal } from "@/db/queries";
+import type { BudgetRow } from "@/lib/types/row-types";
 import {
   Dialog,
   DialogTrigger,
@@ -35,10 +40,53 @@ export function DataPrivacy() {
     "main-dashboard.settings-page.data-privacy-section",
   );
 
-  const { transactions } = useDashboardStore();
-  const { budgets } = useBudgetStore();
-  const { accounts } = useAccountStore();
-  const { goals } = useSavingGoalStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+  const { data: budgets } = useQuery<BudgetRow[]>({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
+  const { data: accounts } = useQuery({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+    enabled: !!hubId,
+  });
+  const { data: transactions } = useQuery({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
+
+  const { data: goals } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
 
   const { exportAllDataJSON } = useExportCSV();
 

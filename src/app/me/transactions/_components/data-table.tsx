@@ -12,6 +12,8 @@ import {
   SortingState,
   useReactTable,
   VisibilityState,
+  FilterFn,
+  Row,
 } from "@tanstack/react-table";
 import {
   Card,
@@ -31,20 +33,113 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import TransactionEditDialog from "./transactions-edit-dialog";
+import EditTransactionDialog from "@/app/me/transactions/_components/edit-transaction-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
-import { useTransactionStore } from "@/store/transaction-store";
 import { Spinner } from "@/components/ui/spinner";
 import { useExportCSV } from "@/hooks/use-export-csv";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { deleteAllTransactions, deleteTransactions } from "@/lib/services/transaction";
+import { transactionKeys, accountKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
+import type { TransactionFiltersFormValues } from "@/lib/validations/transaction-filters-validations";
+import { ButtonGroup } from "@/components/ui/button-group";
 
 interface DataTableProps {
-  transactions: Omit<Transaction, "type">[];
+  transactions: Transaction[];
+  filters: TransactionFiltersFormValues;
   loading?: boolean;
   error?: string | null;
 }
 
-export function DataTable({ transactions, loading, error }: DataTableProps) {
+// Custom filter function for transactions
+const transactionFilterFn: FilterFn<Transaction> = (
+  row: Row<Transaction>,
+  _columnId: string,
+  filterValue: TransactionFiltersFormValues,
+) => {
+  const tx = row.original;
+
+  // Date filtering
+  if (tx.date && tx.date !== "—") {
+    const [day, month, year] = tx.date.split("/").map(Number);
+    const txDate = new Date(year, month - 1, day);
+    txDate.setHours(0, 0, 0, 0);
+
+    if (filterValue.dateFrom) {
+      const fromDate = new Date(filterValue.dateFrom);
+      fromDate.setHours(0, 0, 0, 0);
+      if (txDate < fromDate) return false;
+    }
+
+    if (filterValue.dateTo) {
+      const toDate = new Date(filterValue.dateTo);
+      toDate.setHours(0, 0, 0, 0);
+      if (txDate > toDate) return false;
+    }
+  }
+
+  // Category filtering
+  if (filterValue.category && filterValue.category !== "") {
+    if (tx.category !== filterValue.category) return false;
+  }
+
+  // Amount filtering
+  if (filterValue.amountMin && filterValue.amountMin > 0) {
+    if (Math.abs(tx.amount) < filterValue.amountMin) return false;
+  }
+
+  if (filterValue.amountMax && filterValue.amountMax > 0) {
+    if (Math.abs(tx.amount) > filterValue.amountMax) return false;
+  }
+
+  // Text search filtering
+  if (filterValue.text && filterValue.text.trim() !== "") {
+    const searchText = filterValue.text.toLowerCase();
+    const matchesRecipient = tx.recipient?.toLowerCase().includes(searchText);
+    const matchesNote = tx.note?.toLowerCase().includes(searchText);
+    const matchesCategory = tx.category?.toLowerCase().includes(searchText);
+    if (!matchesRecipient && !matchesNote && !matchesCategory) return false;
+  }
+
+  // Recurring filter (only show recurring transactions when checked)
+  if (filterValue.isRecurring) {
+    if (tx.recurringTemplateId) return false;
+  }
+
+  // Transfers only filter
+  if (filterValue.transfersOnly) {
+    if (tx.type !== "transfer") return false;
+  }
+
+  // With receipt filter - currently transactions don't have receipt field
+  // This filter is ready for when the feature is implemented
+  if (filterValue.withReceipt) {
+    if (!tx.recipient) return false;
+  }
+
+  return true;
+};
+
+export function DataTable({
+  transactions,
+  filters,
+  loading,
+  error,
+}: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const queryClient = useQueryClient();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const { exportTransactions } = useExportCSV();
 
@@ -55,13 +150,97 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
+  const [globalFilter, setGlobalFilter] =
+    React.useState<TransactionFiltersFormValues>(filters);
+  const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+  const [confirmDeleteSelectedDialogOpen, setConfirmDeleteSelectedDialogOpen] =
+    React.useState(false);
 
-  const { deleteAllTransactionsAndCategoriesAndSync, deleteAllLoading } =
-    useTransactionStore();
+  // Update global filter when filters prop changes
+  React.useEffect(() => {
+    setGlobalFilter(filters);
+  }, [filters]);
+
+  const deleteAllTransactionsMutation = useMutation({
+    mutationFn: async () => {
+      const result = await deleteAllTransactions();
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete all transactions");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      setConfirmDialogOpen(false);
+      setRowSelection({});
+      toast.success("All transactions deleted!");
+    },
+    onError: (error: Error) => {
+      setConfirmDialogOpen(false);
+      toast.error(
+        error.message ||
+          "Something went wrong while deleting all transactions.",
+      );
+    },
+  });
+
+  const deleteSelectedTransactionsMutation = useMutation({
+    mutationFn: async (transactionIds: string[]) => {
+      const result = await deleteTransactions(transactionIds);
+      if (!result.success) {
+        throw new Error(result.message || "Failed to delete selected transactions");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      setConfirmDeleteSelectedDialogOpen(false);
+      setRowSelection({});
+      toast.success(t("data-table.delete-selected.success"));
+    },
+    onError: (error: Error) => {
+      setConfirmDeleteSelectedDialogOpen(false);
+      toast.error(
+        error.message ||
+          t("data-table.delete-selected.error"),
+      );
+    },
+  });
+
+  const handleConfirmDeleteAll = () => {
+    if (deleteAllTransactionsMutation.isPending) {
+      return;
+    }
+
+    deleteAllTransactionsMutation.mutate();
+  };
+
+  const handleConfirmDeleteSelected = () => {
+    if (deleteSelectedTransactionsMutation.isPending) {
+      return;
+    }
+
+    const selectedRows = table.getFilteredSelectedRowModel().rows;
+    const transactionIds = selectedRows.map((row) => row.original.id);
+
+    if (transactionIds.length === 0) {
+      return;
+    }
+
+    deleteSelectedTransactionsMutation.mutate(transactionIds);
+  };
 
   const title = t("transaction-edit-dialog.title-1");
 
-  const columns: ColumnDef<Omit<Transaction, "type">>[] = [
+  const columns: ColumnDef<Transaction>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -86,17 +265,13 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
       header: t("data-table.headings.date"),
     },
     {
+      accessorKey: "type",
+      header: t("data-table.headings.type"),
+    },
+    {
       accessorKey: "source",
       header: t("data-table.headings.recipient"),
       cell: ({ row }) => row.original.recipient || "—",
-    },
-    {
-      accessorKey: "accountType",
-      header: t("data-table.headings.account"),
-      cell: ({ row }) => {
-        const account = row.original.accountType || "—";
-        return <span className="capitalize">{account}</span>;
-      },
     },
     {
       accessorKey: "category",
@@ -137,46 +312,65 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
       cell: ({ row }) => {
         const transaction = row.original;
         return (
-          <TransactionEditDialog
+          <EditTransactionDialog
             variant="outline"
             text={title}
-            transaction={{
-              id: transaction.id || "",
-              date: transaction.date || "-",
-              recipient: transaction.recipient || "-",
-              accountType: transaction.accountType || "cash",
-              category: transaction.category || "-",
-              note: transaction.note || "-",
-              amount: transaction.amount || 0,
-            }}
+            transaction={transaction}
           />
         );
       },
     },
   ];
 
-  const totalBalance = React.useMemo(() => {
-    return transactions.reduce((acc, tx) => acc + tx.amount, 0);
-  }, [transactions]);
-
   const table = useReactTable({
     data: transactions,
     columns,
+    filterFns: {
+      transactionFilter: transactionFilterFn,
+    },
+    globalFilterFn: transactionFilterFn,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: { sorting, columnFilters, columnVisibility, rowSelection },
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+      rowSelection,
+      globalFilter,
+    },
   });
+
+  // Calculate if some but not all rows are selected
+  const selectedRowCount = React.useMemo(() => {
+    return table.getFilteredSelectedRowModel().rows.length;
+  }, [table, rowSelection]);
+
+  const totalRowCount = React.useMemo(() => {
+    return table.getFilteredRowModel().rows.length;
+  }, [table]);
+
+  const showDeleteSelectedButton = React.useMemo(() => {
+    return selectedRowCount > 0 && selectedRowCount < totalRowCount;
+  }, [selectedRowCount, totalRowCount]);
+
+  // Calculate total balance from filtered rows
+  const totalBalance = React.useMemo(() => {
+    return table
+      .getFilteredRowModel()
+      .rows.reduce((acc, row) => acc + row.original.amount, 0);
+  }, [table]);
 
   if (loading) {
     return (
-      <Card className="bg-blue-background dark:border-border-blue col-span-full p-10 text-center">
-        <p className="text-gray-500 dark:text-gray-400">{t("loading")}</p>
+      <Card className="bg-blue-background dark:border-border-blue flex items-center justify-center p-10">
+        <Spinner />
       </Card>
     );
   }
@@ -221,33 +415,116 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
                 <span>{t("data-table.header.checkbox")}</span>
               </label>
             </Badge>
+            {showDeleteSelectedButton && (
+              <Button
+                size="sm"
+                variant="destructive"
+                className="cursor-pointer"
+                disabled={deleteSelectedTransactionsMutation.isPending}
+                onClick={() => setConfirmDeleteSelectedDialogOpen(true)}
+              >
+                {t("data-table.header.buttons.deleteSelected")}
+              </Button>
+            )}
             <Button
-              variant="outline"
-              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-              onClick={deleteAllTransactionsAndCategoriesAndSync}
-              disabled={deleteAllLoading}
+              size="sm"
+              variant="destructive"
+              className="cursor-pointer"
+              disabled={deleteAllTransactionsMutation.isPending}
+              onClick={() => setConfirmDialogOpen(true)}
             >
-              {deleteAllLoading ? (
-                <Spinner />
-              ) : (
-                t("data-table.header.buttons.delete")
-              )}
+              {t("data-table.header.buttons.deleteAll")}
             </Button>
             <Button
+              size="sm"
               variant="outline"
-              className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-            >
-              {t("data-table.header.buttons.category")}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => exportTransactions({ transactions })}
+              onClick={() =>
+                exportTransactions({
+                  transactions: table
+                    .getFilteredRowModel()
+                    .rows.map((row) => row.original),
+                })
+              }
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
               {t("data-table.header.buttons.export")} CSV
             </Button>
+            <Dialog
+              open={confirmDialogOpen}
+              onOpenChange={setConfirmDialogOpen}
+            >
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("data-table.confirmation.title")}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <DialogDescription className="text-sm">
+                  {t("data-table.confirmation.description")}
+                </DialogDescription>
+
+                <DialogFooter className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setConfirmDialogOpen(false)}
+                  >
+                    {t("data-table.confirmation.cancel")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleConfirmDeleteAll}
+                    disabled={deleteAllTransactionsMutation.isPending}
+                  >
+                    {deleteAllTransactionsMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("data-table.confirmation.confirm")
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+            <Dialog
+              open={confirmDeleteSelectedDialogOpen}
+              onOpenChange={setConfirmDeleteSelectedDialogOpen}
+            >
+              <DialogContent className="max-w-md">
+                <DialogHeader>
+                  <DialogTitle>
+                    {t("data-table.delete-selected.confirmation.title")}
+                  </DialogTitle>
+                </DialogHeader>
+
+                <DialogDescription className="text-sm">
+                  {t("data-table.delete-selected.confirmation.description", {
+                    count: selectedRowCount,
+                  })}
+                </DialogDescription>
+
+                <DialogFooter className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setConfirmDeleteSelectedDialogOpen(false)}
+                  >
+                    {t("data-table.delete-selected.confirmation.cancel")}
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleConfirmDeleteSelected}
+                    disabled={deleteSelectedTransactionsMutation.isPending}
+                  >
+                    {deleteSelectedTransactionsMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("data-table.delete-selected.confirmation.confirm")
+                    )}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          {/* <div className="flex flex-wrap items-center gap-2">
             <Badge
               variant="outline"
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
@@ -260,7 +537,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
                 }).format(totalBalance)}
               </span>
             </Badge>
-          </div>
+          </div> */}
         </CardHeader>
 
         {/* Table */}
@@ -293,7 +570,7 @@ export function DataTable({ transactions, loading, error }: DataTableProps) {
                 table.getRowModel().rows.map((row) => (
                   <TableRow
                     key={row.id}
-                    className="dark:border-border-blue"
+                    className="dark:border-border-blue capitalize"
                     data-state={row.getIsSelected() ? "selected" : undefined}
                   >
                     {row.getVisibleCells().map((cell) => (

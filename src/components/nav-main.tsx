@@ -34,6 +34,7 @@ import {
   FeatureAccessResult,
 } from "@/lib/services/features-permission";
 import { toast } from "sonner";
+import { getUrlWithHubFromCookie } from "@/hooks/use-hub-sync";
 
 interface Items {
   title: string;
@@ -151,7 +152,7 @@ export function NavMain() {
             >
               <Link
                 key={item.title}
-                href={isRestricted ? "#" : item.url || ""}
+                href={isRestricted ? "#" : (item.url ? getUrlWithHubFromCookie(item.url) : "")}
                 onClick={(e): false | void =>
                   isRestricted && e.preventDefault()
                 }

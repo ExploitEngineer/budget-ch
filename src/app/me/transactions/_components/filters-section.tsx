@@ -32,40 +32,76 @@ import { useTranslations } from "next-intl";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  CalculationFormValues,
-  calculationFormSchema,
-} from "@/lib/validations/calculation-section-validations";
-import { useState } from "react";
-import AddCategory from "../../dashboard/_components/add-category-dialog";
+  TransactionFiltersFormValues,
+  transactionFiltersFormSchema,
+} from "@/lib/validations/transaction-filters-validations";
+import { useMemo, useState } from "react";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import { Spinner } from "@/components/ui/spinner";
+import { useSearchParams } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
+import { categoryKeys } from "@/lib/query-keys";
+import { getCategories } from "@/lib/services/category";
 
-interface CalculationSectionProps {
-  onFilter: (filters: CalculationFormValues) => void;
+interface FiltersSectionProps {
+  onFilter: (filters: TransactionFiltersFormValues) => void;
   onReset?: () => void;
 }
 
-export function CalculationSection({
+export function FiltersSection({
   onFilter,
   onReset,
-}: CalculationSectionProps) {
+}: FiltersSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isApplying, setIsApplying] = useState<boolean>(false);
 
-  const form = useForm<CalculationFormValues>({
-    resolver: zodResolver(calculationFormSchema) as any,
-    defaultValues: {
-      dateFrom: undefined,
-      dateTo: undefined,
-      category: "",
-      accountType: "all",
-      amountMax: 0,
-      amountMin: 0,
-      text: "",
+  const defaultFilterValues: TransactionFiltersFormValues = {
+    dateFrom: undefined,
+    dateTo: undefined,
+    category: "",
+    amountMax: 0,
+    amountMin: 0,
+    text: "",
+    withReceipt: false,
+    isRecurring: false,
+    transfersOnly: false,
+  };
+
+  const {
+    data: categoriesData,
+    isLoading: categoriesLoading,
+    refetch: refetchCategories,
+  } = useQuery({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data;
     },
+    enabled: !!hubId,
+  });
+
+  const availableCategories = useMemo(() => {
+    const fetchedNames = categoriesData?.map((category) => category.name) ?? [];
+    const uniqueCategories = new Set<string>(fetchedNames);
+    customCategories.forEach((category) => uniqueCategories.add(category));
+    return Array.from(uniqueCategories);
+  }, [categoriesData, customCategories]);
+
+  const form = useForm<TransactionFiltersFormValues>({
+    resolver: zodResolver(transactionFiltersFormSchema) as any,
+    defaultValues: defaultFilterValues,
   });
 
   const handleApply = () => {
@@ -73,22 +109,27 @@ export function CalculationSection({
   };
 
   const handleReset = () => {
-    form.reset();
+    form.reset(defaultFilterValues);
     onReset?.();
+    setSelectedCategory(null);
   };
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
+    setCustomCategories((prev) =>
+      prev.includes(newCategory) ? prev : [...prev, newCategory],
+    );
+    refetchCategories();
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
   }
 
   return (
     <section>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
 
       <FormProvider {...form}>
@@ -163,47 +204,6 @@ export function CalculationSection({
 
                 <FormField
                   control={form.control}
-                  name="accountType"
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>{t("labels.account.title")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger className="!bg-dark-blue-background dark:border-border-blue text-foreground w-full">
-                            <SelectValue
-                              placeholder={t(
-                                "labels.account.data.current-account",
-                              )}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="current-account">
-                              {t("labels.account.data.current-account")}
-                            </SelectItem>
-                            <SelectItem value="credit-card">
-                              {t("labels.account.data.credit-card")}
-                            </SelectItem>
-                            <SelectItem value="savings">
-                              {t("labels.account.data.savings")}
-                            </SelectItem>
-                            <SelectItem value="cash">
-                              {t("labels.account.data.cash")}
-                            </SelectItem>
-                            <SelectItem value="all">
-                              {t("labels.account.data.all")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
                   name="category"
                   render={({ field }) => (
                     <FormItem className="flex flex-1 flex-col">
@@ -232,12 +232,14 @@ export function CalculationSection({
                               </Button>
                             </div>
 
-                            {categories.length === 0 ? (
+                            {availableCategories.length === 0 ? (
                               <SelectItem value="none" disabled>
-                                {t("labels.category.data.no-category")}
+                                {categoriesLoading
+                                  ? t("loading")
+                                  : t("labels.category.data.no-category")}
                               </SelectItem>
                             ) : (
-                              categories.map((category) => (
+                              availableCategories.map((category) => (
                                 <SelectItem key={category} value={category}>
                                   {category}
                                 </SelectItem>
@@ -316,39 +318,66 @@ export function CalculationSection({
           {/* Footer */}
           <CardFooter className="flex items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-              >
-                <label className="flex items-center gap-2">
-                  <Checkbox />
-                  <span className="cursor-pointer">
-                    {t("checkboxes.receipt")}
-                  </span>
-                </label>
-              </Badge>
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-              >
-                <label className="flex items-center gap-2">
-                  <Checkbox />
-                  <span className="cursor-pointer">
-                    {t("checkboxes.recurring")}
-                  </span>
-                </label>
-              </Badge>
-              <Badge
-                variant="outline"
-                className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
-              >
-                <label className="flex items-center gap-2">
-                  <Checkbox />
-                  <span className="cursor-pointer">
-                    {t("checkboxes.transfers")}
-                  </span>
-                </label>
-              </Badge>
+              <FormField
+                control={form.control}
+                name="withReceipt"
+                render={({ field }) => (
+                  <Badge
+                    variant="outline"
+                    className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                  >
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <span className="cursor-pointer">
+                        {t("checkboxes.receipt")}
+                      </span>
+                    </label>
+                  </Badge>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="isRecurring"
+                render={({ field }) => (
+                  <Badge
+                    variant="outline"
+                    className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                  >
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <span className="cursor-pointer">
+                        {t("checkboxes.recurring")}
+                      </span>
+                    </label>
+                  </Badge>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="transfersOnly"
+                render={({ field }) => (
+                  <Badge
+                    variant="outline"
+                    className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                  >
+                    <label className="flex items-center gap-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                      <span className="cursor-pointer">
+                        {t("checkboxes.transfers")}
+                      </span>
+                    </label>
+                  </Badge>
+                )}
+              />
             </div>
 
             <div className="flex items-center gap-2">

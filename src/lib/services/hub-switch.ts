@@ -2,6 +2,10 @@
 
 import { cookies } from "next/headers";
 
+/**
+ * Switch hub by updating cookie (source of truth)
+ * Middleware will sync cookie to URL when navigating
+ */
 export async function switchHub(hubId: string) {
   const cookieStore = await cookies();
 

@@ -5,25 +5,74 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
-import { useDashboardStore } from "@/store/dashboard-store";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useEffect, useState } from "react";
-import { useBudgetStore } from "@/store/budget-store";
-import { useAccountStore } from "@/store/account-store";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { getBudgets } from "@/lib/services/budget";
+import {
+  accountKeys,
+  transactionKeys,
+  budgetKeys,
+  savingGoalKeys,
+} from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import type { BudgetRow } from "@/lib/types/row-types";
+import type { SavingGoal } from "@/db/queries";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
 
   const [transfers, setTransfers] = useState<TransferData[]>([]);
 
-  const { transactions, fetchTransactions } = useDashboardStore();
-  const { budgets, fetchBudgets } = useBudgetStore();
-  const { accounts, fetchAccounts } = useAccountStore();
-  const { goals, fetchGoals } = useSavingGoalStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+  const { data: budgets } = useQuery<BudgetRow[]>({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
+    },
+  });
+  const { data: accounts } = useQuery({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+  });
+  const { data: transactions } = useQuery({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
+    },
+  });
+
+  const { data: goals } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+  });
   const {
     exportTransactions,
     exportBudgets,
@@ -53,10 +102,6 @@ export function Export() {
   }
 
   useEffect(() => {
-    fetchTransactions();
-    fetchBudgets();
-    fetchAccounts();
-    fetchGoals();
     fetchTransfers();
   }, []);
 
@@ -75,15 +120,15 @@ export function Export() {
     },
     {
       title: t("export-card.buttons.budgets"),
-      onClick: () => exportBudgets({ budgets }),
+      onClick: () => exportBudgets({ budgets: budgets ?? null }),
     },
     {
       title: t("export-card.buttons.savings-goals"),
-      onClick: () => exportSavingGoals({ goals }),
+      onClick: () => exportSavingGoals({ goals: goals ?? null }),
     },
     {
       title: t("export-card.buttons.accounts"),
-      onClick: () => exportAccounts({ accounts }),
+      onClick: () => exportAccounts({ accounts: accounts ?? null }),
     },
     {
       title: t("export-card.buttons.transfers"),

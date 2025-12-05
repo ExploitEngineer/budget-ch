@@ -19,14 +19,14 @@ import {
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./ui/spinner";
-import { useHubStore } from "@/store/hub-store";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { switchHub } from "@/lib/services/hub-switch";
 
 export function HubDisplay() {
+  const searchParams = useSearchParams();
   const router = useRouter();
-
-  const { activeHubId, setActiveHubId } = useHubStore();
+  const pathname = usePathname();
+  const currentHubId = searchParams.get("hub");
 
   const [hubs, setHubs] = useState<Hub[]>([]);
   const [selectedHub, setSelectedHub] = useState<Hub | null>(null);
@@ -43,8 +43,9 @@ export function HubDisplay() {
         if (res.success && res.data?.length) {
           setHubs(res.data);
 
+          // Find current hub from URL param, or default to first hub
           const current =
-            res.data.find((h: Hub): boolean => h.id === activeHubId) ??
+            res.data.find((h: Hub): boolean => h.id === currentHubId) ??
             res.data[0];
 
           setSelectedHub(current);
@@ -58,7 +59,17 @@ export function HubDisplay() {
     };
 
     fetchHubs();
-  }, []);
+  }, [currentHubId]);
+
+  // Update selected hub when URL param changes
+  useEffect(() => {
+    if (currentHubId && hubs.length > 0) {
+      const hub = hubs.find((h) => h.id === currentHubId);
+      if (hub) {
+        setSelectedHub(hub);
+      }
+    }
+  }, [currentHubId, hubs]);
 
   if (loading) {
     return (
@@ -105,14 +116,16 @@ export function HubDisplay() {
                 onSelect={async (): Promise<void> => {
                   setSelectedHub(hub);
                   setOpen(false);
-
-                  setActiveHubId(hub.id);
-
+                  
+                  // Update cookie via server action
                   try {
                     await switchHub(hub.id);
-                    router.refresh();
+                    // Update URL with hub param
+                    const url = new URL(pathname, window.location.origin);
+                    url.searchParams.set("hub", hub.id);
+                    router.push(url.pathname + url.search);
                   } catch (err) {
-                    console.error("Failed to switch hub on server", err);
+                    console.error("Failed to switch hub", err);
                     toast.error("Failed to switch hub");
                   }
                 }}

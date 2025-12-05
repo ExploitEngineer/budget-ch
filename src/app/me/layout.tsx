@@ -3,16 +3,13 @@ import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { HubHydrator } from "@/components/hub-hydrator";
-import { cookies } from "next/headers";
+import { HubSync } from "@/components/hub-sync";
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = await cookies();
-  const activeHubId = cookieStore.get("activeHubId")?.value || null;
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -21,12 +18,15 @@ export default async function DashboardLayout({
     redirect("/signin");
   }
 
+  // Note: Hub ID is managed via cookie (source of truth)
+  // Middleware syncs cookie to URL when navigating
+  // HubSync component handles default hub when no cookie/URL param exists
+
   return (
     <SidebarProvider>
       <AppSidebar />
-      <HubHydrator hubId={activeHubId} />
+      <HubSync />
       <SidebarInset className="bg-gray-100/55 dark:![background:var(--fancy-gradient)]">
-        {" "}
         {children}
       </SidebarInset>
     </SidebarProvider>

@@ -7,7 +7,7 @@ import { LocalizationAppearance } from "./_components/localization-appearance";
 import { Notifications } from "./_components/notifications";
 import { Security } from "./_components/security";
 import { DataPrivacy } from "./_components/data-privacy";
-import { BillingDetails } from "./_components/billing-details";
+// import { BillingDetails } from "./_components/billing-details";
 import { AboutSection } from "./_components/about";
 import { loadStripePrices } from "@/lib/stripe";
 import { getContext } from "@/lib/auth/actions";
@@ -39,7 +39,7 @@ export default async function Settings() {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 p-4">
-        <ProfileHousehold />
+        <ProfileHousehold user={user} subscription={subscription} />
         {subscriptionInfo && (
           <CurrentSubscription subscription={subscriptionInfo} />
         )}
@@ -53,7 +53,7 @@ export default async function Settings() {
         <Notifications />
         <Security />
         <DataPrivacy />
-        <BillingDetails />
+        {/* <BillingDetails /> */}
         <AboutSection />
       </div>
     </section>

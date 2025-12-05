@@ -5,6 +5,9 @@ import {
   getUserByEmailDB,
   completeUserOnboardingDB,
   getUserEmailDB,
+  getUserSettingsDB,
+  upsertUserSettingsDB,
+  updateUser,
 } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
@@ -70,6 +73,77 @@ export async function getUserEmail() {
     return {
       success: false,
       message: `Failed to fetch user email: ${err.message}`,
+    };
+  }
+}
+
+// GET user settings
+export async function getUserSettings() {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    const res = await getUserSettingsDB(userId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Error fetching user settings",
+      };
+    }
+
+    return { success: true, data: res.data };
+  } catch (err: any) {
+    console.error("Error fetching user settings: ", err);
+    return {
+      success: false,
+      message: `Failed to fetch user settings: ${err.message}`,
+    };
+  }
+}
+
+// UPDATE profile and household settings
+export async function updateProfileHousehold(data: {
+  name: string;
+  householdSize?: string | null;
+  address?: string | null;
+}) {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    // Update user name
+    const userUpdateResult = await updateUser(userId, { name: data.name });
+
+    if (!userUpdateResult.success) {
+      return {
+        success: false,
+        message: userUpdateResult.message || "Error updating user name",
+      };
+    }
+
+    // Update or create user settings
+    const settingsUpdateResult = await upsertUserSettingsDB(userId, {
+      householdSize: data.householdSize ?? null,
+      address: data.address ?? null,
+    });
+
+    if (!settingsUpdateResult.success) {
+      return {
+        success: false,
+        message: settingsUpdateResult.message || "Error updating user settings",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Profile and household settings updated successfully",
+    };
+  } catch (err: any) {
+    console.error("Error updating profile and household: ", err);
+    return {
+      success: false,
+      message: `Failed to update profile and household: ${err.message}`,
     };
   }
 }

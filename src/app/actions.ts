@@ -11,7 +11,7 @@ import { redirect } from "next/navigation";
 export async function setLanguage(formData: FormData) {
   // 1. Get the desired locale from the form data
   const locale = formData.get("locale");
-  const pathname = formData.get("pathname");
+  const pathnameFromForm = formData.get("pathname");
   const headersList = await headers();
   const referer = headersList.get("referer");
 
@@ -24,7 +24,10 @@ export async function setLanguage(formData: FormData) {
 
   let redirectTo = "/"; // Default to home page
 
-  if (referer) {
+  // Prioritize pathname from formData if provided
+  if (typeof pathnameFromForm === "string" && pathnameFromForm) {
+    redirectTo = pathnameFromForm;
+  } else if (referer) {
     try {
       // Create a URL object from the referer string
       const url = new URL(referer);

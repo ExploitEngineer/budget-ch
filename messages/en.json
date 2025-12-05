@@ -1,4 +1,41 @@
 {
+    "two-factor": {
+        "title": "Two-Factor Authentication",
+        "description": "Please enter your verification code to continue",
+        "tabs": {
+            "totp": "TOTP Code",
+            "backup-code": "Backup Code"
+        },
+        "labels": {
+            "totp-code": "Enter 6-digit code",
+            "backup-code": "Enter backup code",
+            "trust-device": "Trust this device for 30 days"
+        },
+        "placeholders": {
+            "backup-code": "Enter your backup code"
+        },
+        "hints": {
+            "totp-code": "Enter the 6-digit code from your authenticator app",
+            "backup-code": "Enter one of your backup codes"
+        },
+        "buttons": {
+            "verify": "Verify",
+            "use-backup-code": "Use Backup Code"
+        },
+        "messages": {
+            "invalid-code": "Please enter a valid 6-digit code",
+            "backup-code-required": "Please enter a backup code",
+            "verify-error": "Invalid verification code. Please try again.",
+            "verify-success": "Verification successful. Redirecting...",
+            "backup-code-error": "Invalid backup code. Please try again.",
+            "backup-code-success": "Backup code accepted. Redirecting..."
+        }
+    },
+    "common": {
+        "updating": "Updating...",
+        "update": "Update",
+        "add": "Add"
+    },
     "greeting": {
         "cta": "Dashboard"
     },
@@ -135,25 +172,45 @@
                 "dialog": {
                     "title": "Adjust Recurring Payment",
                     "close": "Close",
+                    "loading": "Loading...",
+                    "read-only": {
+                        "title": "Transaction Details"
+                    },
                     "labels": {
                         "date": "Date",
                         "account": "Account",
                         "name": "Name",
-                        "amount": "Amount (CHF)"
+                        "amount": "Amount (CHF)",
+                        "frequency-days": "Frequency (Days)",
+                        "start-date": "Start Date",
+                        "end-date": "End Date",
+                        "has-end-date": "Set End Date",
+                        "status": "Status"
+                    },
+                    "descriptions": {
+                        "frequency-days": "How often this transaction repeats (in days)",
+                        "has-end-date": "Check to set an end date for this recurring transaction"
                     },
                     "placeholders": {
                         "date": "09/25/2025",
                         "account": "Choose an account",
-                        "name": "Enter name"
+                        "name": "Enter name",
+                        "start-date": "Select start date",
+                        "end-date": "Select end date"
                     },
                     "options": {
                         "giro": "Giro",
                         "credit-card": "Credit Card",
-                        "sparen": "Savings"
+                        "sparen": "Savings",
+                        "status": {
+                            "active": "Active",
+                            "inactive": "Inactive"
+                        }
                     },
                     "buttons": {
                         "delete": "Delete",
-                        "save": "Save"
+                        "save": "Save",
+                        "saving": "Saving..."
                     }
                 }
             },
@@ -306,9 +363,16 @@
                             "title": "Transaction Type",
                             "options": {
                                 "income": "income",
-                                "expense": "expense"
+                                "expense": "expense",
+                                "transfer": "transfer"
                             }
-                        }
+                        },
+                        "destinationAccount": "Destination Account",
+                        "recurring": "Recurring Transaction",
+                        "frequencyDays": "Frequency (days)",
+                        "startDate": "Start Date",
+                        "endDate": "End Date (optional)",
+                        "recurringStatus": "Status"
                     },
                     "placeholders": {
                         "date": "09/21/2025",
@@ -316,7 +380,10 @@
                         "recipient": "Enter recipient",
                         "category": "Choose a category",
                         "note": "Enter your note",
-                        "note-optional": "Note (optional)"
+                        "note-optional": "Note (optional)",
+                        "destinationAccount": "Choose destination account",
+                        "startDate": "Select start date",
+                        "endDate": "No end date"
                     },
                     "options": {
                         "checking": "Checking",
@@ -327,7 +394,9 @@
                         "restaurant": "Restaurant & Café",
                         "oev": "Public Transport & Mobility",
                         "haushalt": "Household",
-                        "einnahmen": "Income"
+                        "einnahmen": "Income",
+                        "active": "Active",
+                        "inactive": "Inactive"
                     },
                     "badges": {
                         "row": "Row",
@@ -385,11 +454,29 @@
                     "checkbox": "All",
                     "buttons": {
                         "delete": "Delete",
+                    "deleteAll": "Delete All",
+                        "deleteSelected": "Delete Selected",
                         "category": "Category",
                         "export": "Export",
                         "update": "Update"
                     },
                     "badge": "Balance:"
+                },
+                "confirmation": {
+                    "title": "Confirm delete all transactions",
+                    "description": "Are you sure you want to delete all transactions? This action cannot be undone.",
+                    "cancel": "Cancel",
+                    "confirm": "Delete All"
+                },
+                "delete-selected": {
+                    "success": "Selected transactions deleted successfully!",
+                    "error": "Something went wrong while deleting selected transactions.",
+                    "confirmation": {
+                        "title": "Confirm delete selected transactions",
+                        "description": "Are you sure you want to delete {count} selected transaction(s)? This action cannot be undone.",
+                        "cancel": "Cancel",
+                        "confirm": "Delete Selected"
+                    }
                 },
                 "headings": {
                     "date": "Date",
@@ -398,7 +485,8 @@
                     "category": "Category",
                     "note": "Note",
                     "amount": "Amount",
-                    "action": "Action"
+                    "action": "Action",
+                    "type": "Type"
                 },
                 "action": "Edit",
                 "recipients": {
@@ -630,7 +718,8 @@
                             "checking-account": "Checking Account",
                             "button": "Allocation",
                             "new-balance": "New Balance",
-                            "placeholder": "Amount"
+                            "placeholder": "Amount",
+                            "updating": "Updating..."
                         }
                     }
                 }
@@ -1012,36 +1101,40 @@
                         },
                         "button": "Upgrade Now"
                     },
-            "errors": {
-                "no-price": "That plan is temporarily unavailable.",
-                "portal-failed": "Unable to open the Stripe portal right now."
-            },
-            "current-plan-badge": "Current plan",
-            "manage-plan-button": "Manage plan",
+                    "errors": {
+                        "no-price": "That plan is temporarily unavailable.",
+                        "portal-failed": "Unable to open the Stripe portal right now."
+                    },
+                    "current-plan-badge": "Current plan",
+                    "manage-plan-button": "Manage plan",
                     "stripe-portal-button": "Manage Subscription (Stripe Portal)"
                 }
             },
-                "current-subscription-section": {
-                    "title": "Current subscription",
-                    "plan-label": "Plan",
-                    "plan-labels": {
-                        "individual": "Individual",
-                        "family": "Family"
-                    },
-                    "status-label": "Status",
-                    "started-label": "Started",
-                    "renewal-label": "Renews at",
-                    "renews-label": "Renews at",
-                    "cancels-at-label": "Cancels at",
-                    "days-remaining-label": "Days remaining",
-                    "manage-button": "Manage subscription",
-                    "errors": {
-                        "portal-failed": "Unable to open the Stripe portal right now."
-                    }
+            "current-subscription-section": {
+                "title": "Current subscription",
+                "plan-label": "Plan",
+                "plan-labels": {
+                    "individual": "Individual",
+                    "family": "Family"
                 },
+                "status-label": "Status",
+                "started-label": "Started",
+                "renewal-label": "Renews at",
+                "renews-label": "Renews at",
+                "cancels-at-label": "Cancels at",
+                "days-remaining-label": "Days remaining",
+                "manage-button": "Manage subscription",
+                "errors": {
+                    "portal-failed": "Unable to open the Stripe portal right now."
+                }
+            },
             "members-invitations-section": {
                 "title": "Members & Invitations",
-                "badge": "0 Members",
+                "badge": "{count} Members",
+                "plan-warning": {
+                    "free": "You are on the free plan. Upgrade to use this feature.",
+                    "individual": "You are on the individual plan. Upgrade to use this feature."
+                },
                 "labels": {
                     "invite-email": {
                         "title": "Invite via Email",
@@ -1056,6 +1149,38 @@
                     }
                 },
                 "button": "Send Invitation",
+                "buttons": {
+                    "cancel": "Cancel",
+                    "send": "Send Invitation",
+                    "sending": "Sending...",
+                    "upgrade": "Upgrade to Invite"
+                },
+                "members-table": {
+                    "title": "Hub Members",
+                    "badge": "{count} Members",
+                    "empty": "No members yet.",
+                    "table-headings": {
+                        "name": "Name",
+                        "email": "Email",
+                        "role": "Role",
+                        "joined": "Joined"
+                    }
+                },
+                "invitations-table": {
+                    "title": "Hub Invitations",
+                    "badge": "{count} Invitations",
+                    "empty": "No invitations yet.",
+                    "table-headings": {
+                        "email": "Email",
+                        "role": "Role",
+                        "status": "Status",
+                        "expires": "Expires"
+                    },
+                    "statuses": {
+                        "accepted": "Accepted",
+                        "pending": "Pending"
+                    }
+                },
                 "table": {
                     "table-headings": {
                         "email": "E-MAIL",
@@ -1116,6 +1241,12 @@
                             "1-rappen": "1 Rappen"
                         }
                     }
+                },
+                "messages": {
+                    "preferences-saved": "Preferences Saved"
+                },
+                "buttons": {
+                    "save-preferences": "Save Preferences"
                 }
             },
             "notifications-section": {
@@ -1150,16 +1281,82 @@
                 "title": "Security",
                 "labels": {
                     "two-factor": {
-                        "title": "Two-Factor",
-                        "content": "TOTP compatible with common authenticator apps. (Demo)",
+                        "title": "Two-Factor Authentication",
+                        "content": "TOTP compatible with common authenticator apps like Google Authenticator, Authy, or Microsoft Authenticator.",
+                        "status": {
+                            "enabled": "Enabled",
+                            "disabled": "Disabled",
+                            "pending": "Pending Verification"
+                        },
                         "options": {
                             "off": "Off",
                             "totp-app": "TOTP App",
                             "email-code": "Email Code"
                         },
                         "buttons": {
+                            "enable": "Enable 2FA",
+                            "disable": "Disable 2FA",
+                            "verify": "Verify Code",
+                            "restart-setup": "Restart Setup",
                             "show-backup-codes": "Show Backup Codes",
                             "regenerate-backup-codes": "Regenerate Backup Codes"
+                        },
+                        "messages": {
+                            "password-required": "Password is required",
+                            "invalid-code": "Please enter a valid 6-digit code",
+                            "enable-error": "Failed to enable two-factor authentication",
+                            "verify-error": "Invalid verification code",
+                            "disabled-success": "Two-factor authentication disabled successfully",
+                            "enabled-success": "Two-factor authentication enabled successfully",
+                            "setup-started": "Two-factor authentication setup started",
+                            "view-codes-error": "Failed to view backup codes",
+                            "regenerate-error": "Failed to regenerate backup codes",
+                            "regenerate-success": "Backup codes regenerated successfully",
+                            "disable-error": "Failed to disable two-factor authentication",
+                            "get-uri-error": "Failed to get TOTP URI",
+                            "copied": "Copied to clipboard"
+                        },
+                        "dialogs": {
+                            "cancel": "Cancel",
+                            "continue": "Continue",
+                            "close": "Close",
+                            "copy": "Copy",
+                            "password": {
+                                "title": "Confirm Password",
+                                "description": "Please enter your password to continue",
+                                "label": "Password",
+                                "placeholder": "Enter your password"
+                            },
+                            "qr": {
+                                "title": "Scan QR Code",
+                                "description": "Scan this QR code with your authenticator app",
+                                "secret-label": "Or enter this secret manually",
+                                "secret-key": "Secret Key",
+                                "copy-secret": "Copy Secret Key",
+                                "next": "Next: Verify Code"
+                            },
+                            "verify": {
+                                "title": "Verify Code",
+                                "description": "Enter the 6-digit code from your authenticator app",
+                                "label": "Verification Code",
+                                "submit": "Verify & Enable"
+                            },
+                            "backup-codes": {
+                                "title": "Backup Codes",
+                                "description": "Save these backup codes in a safe place. You can use them to access your account if you lose access to your authenticator app.",
+                                "warning": "Each code can only be used once. Keep them secure.",
+                                "copy-all": "Copy All Codes"
+                            },
+                            "disable": {
+                                "title": "Disable Two-Factor Authentication",
+                                "description": "Please enter your password to disable two-factor authentication",
+                                "confirm": "Disable 2FA"
+                            },
+                            "regenerate": {
+                                "title": "Regenerate Backup Codes",
+                                "description": "This will invalidate your existing backup codes and generate new ones. Please enter your password to continue.",
+                                "confirm": "Regenerate Codes"
+                            }
                         }
                     },
                     "password": {
@@ -1168,6 +1365,10 @@
                         "buttons": {
                             "change-password": "Change Password",
                             "reset-password": "Reset Password"
+                        },
+                        "messages": {
+                            "reset-email-sent": "Password reset email sent",
+                            "error": "An error occurred"
                         }
                     }
                 }

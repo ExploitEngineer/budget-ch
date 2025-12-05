@@ -1,4 +1,41 @@
 {
+    "two-factor": {
+        "title": "Autenticazione a due fattori",
+        "description": "Inserisci il tuo codice di verifica per continuare",
+        "tabs": {
+            "totp": "Codice TOTP",
+            "backup-code": "Codice di backup"
+        },
+        "labels": {
+            "totp-code": "Inserisci il codice a 6 cifre",
+            "backup-code": "Inserisci il codice di backup",
+            "trust-device": "Fidati di questo dispositivo per 30 giorni"
+        },
+        "placeholders": {
+            "backup-code": "Inserisci il tuo codice di backup"
+        },
+        "hints": {
+            "totp-code": "Inserisci il codice a 6 cifre dalla tua app di autenticazione",
+            "backup-code": "Inserisci uno dei tuoi codici di backup"
+        },
+        "buttons": {
+            "verify": "Verifica",
+            "use-backup-code": "Usa codice di backup"
+        },
+        "messages": {
+            "invalid-code": "Inserisci un codice a 6 cifre valido",
+            "backup-code-required": "Inserisci un codice di backup",
+            "verify-error": "Codice di verifica non valido. Riprova.",
+            "verify-success": "Verifica riuscita. Reindirizzamento...",
+            "backup-code-error": "Codice di backup non valido. Riprova.",
+            "backup-code-success": "Codice di backup accettato. Reindirizzamento..."
+        }
+    },
+    "common": {
+        "updating": "Aggiornamento...",
+        "update": "Aggiorna",
+        "add": "Aggiungi"
+    },
     "greeting": {
         "title": "Come stai?",
         "cta": "Cliccami"
@@ -136,25 +173,45 @@
                 "dialog": {
                     "title": "Modifica pagamento ricorrente",
                     "close": "Chiudi",
+                    "loading": "Caricamento...",
+                    "read-only": {
+                        "title": "Dettagli transazione"
+                    },
                     "labels": {
                         "date": "Data",
                         "account": "Conto",
                         "name": "Nome",
-                        "amount": "Importo (CHF)"
+                        "amount": "Importo (CHF)",
+                        "frequency-days": "Frequenza (Giorni)",
+                        "start-date": "Data di inizio",
+                        "end-date": "Data di fine",
+                        "has-end-date": "Imposta data di fine",
+                        "status": "Stato"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Frequenza di ripetizione di questa transazione (in giorni)",
+                        "has-end-date": "Seleziona per impostare una data di fine per questa transazione ricorrente"
                     },
                     "placeholders": {
                         "date": "25/09/2025",
                         "account": "Scegli un conto",
-                        "name": "Inserisci nome"
+                        "name": "Inserisci nome",
+                        "start-date": "Seleziona data di inizio",
+                        "end-date": "Seleziona data di fine"
                     },
                     "options": {
                         "giro": "Conto corrente",
                         "credit-card": "Carta di credito",
-                        "sparen": "Conto risparmio"
+                        "sparen": "Conto risparmio",
+                        "status": {
+                            "active": "Attivo",
+                            "inactive": "Inattivo"
+                        }
                     },
                     "buttons": {
                         "delete": "Elimina",
-                        "save": "Salva"
+                        "save": "Salva",
+                        "saving": "Salvataggio..."
                     }
                 }
             },
@@ -308,9 +365,16 @@
                             "title": "Tipo di transazione",
                             "options": {
                                 "income": "entrata",
-                                "expense": "uscita"
+                                "expense": "uscita",
+                                "transfer": "bonifico"
                             }
-                        }
+                        },
+                        "destinationAccount": "Conto di destinazione",
+                        "recurring": "Transazione ricorrente",
+                        "frequencyDays": "Frequenza (giorni)",
+                        "startDate": "Data di inizio",
+                        "endDate": "Data di fine (opzionale)",
+                        "recurringStatus": "Stato"
                     },
                     "placeholders": {
                         "date": "21/09/2025",
@@ -318,7 +382,10 @@
                         "recipient": "Inserisci destinatario",
                         "category": "Scegli una categoria",
                         "note": "Inserisci una nota",
-                        "note-optional": "Nota (facoltativa)"
+                        "note-optional": "Nota (facoltativa)",
+                        "destinationAccount": "Scegli il conto di destinazione",
+                        "startDate": "Seleziona data di inizio",
+                        "endDate": "Nessuna data di fine"
                     },
                     "options": {
                         "checking": "Conto corrente",
@@ -329,7 +396,9 @@
                         "restaurant": "Ristorante & Caffè",
                         "oev": "Trasporto pubblico & mobilità",
                         "haushalt": "Casa",
-                        "einnahmen": "Entrate"
+                        "einnahmen": "Entrate",
+                        "active": "Attivo",
+                        "inactive": "Inattivo"
                     },
                     "badges": {
                         "row": "Riga",
@@ -385,13 +454,31 @@
             "data-table": {
                 "header": {
                     "checkbox": "Tutti",
-                    "buttons": {
-                        "delete": "Elimina",
-                        "category": "Categoria",
-                        "export": "Esporta",
-                        "update": "Aggiorna"
-                    },
+                "buttons": {
+                    "delete": "Elimina",
+                    "deleteAll": "Elimina tutto",
+                    "deleteSelected": "Elimina selezionate",
+                    "category": "Categoria",
+                    "export": "Esporta",
+                    "update": "Aggiorna"
+                },
                     "badge": "Saldo:"
+                },
+                "confirmation": {
+                    "title": "Conferma eliminazione di tutte le transazioni",
+                    "description": "Sei sicuro di voler eliminare tutte le transazioni? Questa azione non può essere annullata.",
+                    "cancel": "Annulla",
+                    "confirm": "Elimina tutto"
+                },
+                "delete-selected": {
+                    "success": "Transazioni selezionate eliminate con successo!",
+                    "error": "Si è verificato un errore durante l'eliminazione delle transazioni selezionate.",
+                    "confirmation": {
+                        "title": "Conferma eliminazione delle transazioni selezionate",
+                        "description": "Sei sicuro di voler eliminare {count} transazione/i selezionata/e? Questa azione non può essere annullata.",
+                        "cancel": "Annulla",
+                        "confirm": "Elimina selezionate"
+                    }
                 },
                 "headings": {
                     "date": "Data",
@@ -400,7 +487,8 @@
                     "category": "Categoria",
                     "note": "Nota",
                     "amount": "Importo",
-                    "action": "Azione"
+                    "action": "Azione",
+                    "type": "Tipo"
                 },
                 "action": "Modifica",
                 "recipients": {
@@ -1029,20 +1117,24 @@
                     "individual": "Individuale",
                     "family": "Famiglia"
                 },
-                    "status-label": "Stato",
-                    "started-label": "Inizio",
-                    "renewal-label": "Si rinnova il",
-                    "renews-label": "Si rinnova il",
-                    "cancels-at-label": "Si annulla il",
-                    "days-remaining-label": "Giorni rimanenti",
-                    "manage-button": "Gestisci abbonamento",
-                    "errors": {
-                        "portal-failed": "Impossibile aprire il portale Stripe in questo momento."
-                    }
+                "status-label": "Stato",
+                "started-label": "Inizio",
+                "renewal-label": "Si rinnova il",
+                "renews-label": "Si rinnova il",
+                "cancels-at-label": "Si annulla il",
+                "days-remaining-label": "Giorni rimanenti",
+                "manage-button": "Gestisci abbonamento",
+                "errors": {
+                    "portal-failed": "Impossibile aprire il portale Stripe in questo momento."
+                }
             },
             "members-invitations-section": {
                 "title": "Membri & Inviti",
-                "badge": "0 Membri",
+                "badge": "{count} Membri",
+                "plan-warning": {
+                    "free": "Sei sul piano gratuito. Effettua l'upgrade per usare questa funzione.",
+                    "individual": "Sei sul piano individuale. Effettua l'upgrade per usare questa funzione."
+                },
                 "labels": {
                     "invite-email": {
                         "title": "Invita via email",
@@ -1057,6 +1149,38 @@
                     }
                 },
                 "button": "Invia invito",
+                "buttons": {
+                    "cancel": "Annulla",
+                    "send": "Invia invito",
+                    "sending": "Invio...",
+                    "upgrade": "Effettua l'upgrade per invitare"
+                },
+                "members-table": {
+                    "title": "Membri dell'hub",
+                    "badge": "{count} Membri",
+                    "empty": "Nessun membro per ora.",
+                    "table-headings": {
+                        "name": "Nome",
+                        "email": "Email",
+                        "role": "Ruolo",
+                        "joined": "Entrato il"
+                    }
+                },
+                "invitations-table": {
+                    "title": "Inviti all'hub",
+                    "badge": "{count} Inviti",
+                    "empty": "Nessun invito per ora.",
+                    "table-headings": {
+                        "email": "Email",
+                        "role": "Ruolo",
+                        "status": "Stato",
+                        "expires": "Scade il"
+                    },
+                    "statuses": {
+                        "accepted": "Accettato",
+                        "pending": "In attesa"
+                    }
+                },
                 "table": {
                     "table-headings": {
                         "email": "E-MAIL",
@@ -1117,6 +1241,12 @@
                             "1-rappen": "1 centesimo"
                         }
                     }
+                },
+                "messages": {
+                    "preferences-saved": "Preferenze salvate"
+                },
+                "buttons": {
+                    "save-preferences": "Salva preferenze"
                 }
             },
             "notifications-section": {
@@ -1152,15 +1282,81 @@
                 "labels": {
                     "two-factor": {
                         "title": "Autenticazione a due fattori",
-                        "content": "Compatibile TOTP con le comuni app di autenticazione. (Demo)",
+                        "content": "Compatibile TOTP con le comuni app di autenticazione come Google Authenticator, Authy o Microsoft Authenticator.",
+                        "status": {
+                            "enabled": "Attivato",
+                            "disabled": "Disattivato",
+                            "pending": "Verifica in attesa"
+                        },
                         "options": {
                             "off": "Disattivato",
                             "totp-app": "App TOTP",
                             "email-code": "Codice e-mail"
                         },
                         "buttons": {
+                            "enable": "Attiva 2FA",
+                            "disable": "Disattiva 2FA",
+                            "verify": "Verifica codice",
+                            "restart-setup": "Riavvia la configurazione",
                             "show-backup-codes": "Mostra codici di backup",
                             "regenerate-backup-codes": "Rigenera codici di backup"
+                        },
+                        "messages": {
+                            "password-required": "La password è richiesta",
+                            "invalid-code": "Inserisci un codice a 6 cifre valido",
+                            "enable-error": "Impossibile attivare l'autenticazione a due fattori",
+                            "verify-error": "Codice di verifica non valido",
+                            "disabled-success": "Autenticazione a due fattori disattivata con successo",
+                            "enabled-success": "Autenticazione a due fattori attivata con successo",
+                            "setup-started": "Configurazione dell'autenticazione a due fattori avviata",
+                            "view-codes-error": "Impossibile visualizzare i codici di backup",
+                            "regenerate-error": "Impossibile rigenerare i codici di backup",
+                            "regenerate-success": "I codici di backup sono stati rigenerati con successo",
+                            "disable-error": "Impossibile disattivare l'autenticazione a due fattori",
+                            "get-uri-error": "Impossibile ottenere l'URI TOTP",
+                            "copied": "Copiato negli appunti"
+                        },
+                        "dialogs": {
+                            "cancel": "Annulla",
+                            "continue": "Continua",
+                            "close": "Chiudi",
+                            "copy": "Copia",
+                            "password": {
+                                "title": "Conferma password",
+                                "description": "Inserisci la tua password per continuare",
+                                "label": "Password",
+                                "placeholder": "Inserisci la tua password"
+                            },
+                            "qr": {
+                                "title": "Scansiona codice QR",
+                                "description": "Scansiona questo codice QR con la tua app di autenticazione",
+                                "secret-label": "Oppure inserisci questa chiave manualmente",
+                                "secret-key": "Chiave segreta",
+                                "copy-secret": "Copia la chiave segreta",
+                                "next": "Avanti: Verifica codice"
+                            },
+                            "verify": {
+                                "title": "Verifica codice",
+                                "description": "Inserisci il codice a 6 cifre dalla tua app di autenticazione",
+                                "label": "Codice di verifica",
+                                "submit": "Verifica e attiva"
+                            },
+                            "backup-codes": {
+                                "title": "Codici di backup",
+                                "description": "Salva questi codici di backup in un posto sicuro. Puoi usarli per accedere al tuo account se perdi l'accesso alla tua app di autenticazione.",
+                                "warning": "Ogni codice può essere utilizzato una sola volta. Conservali in sicurezza.",
+                                "copy-all": "Copia tutti i codici"
+                            },
+                            "disable": {
+                                "title": "Disattiva autenticazione a due fattori",
+                                "description": "Inserisci la tua password per disattivare l'autenticazione a due fattori",
+                                "confirm": "Disattiva 2FA"
+                            },
+                            "regenerate": {
+                                "title": "Rigenera codici di backup",
+                                "description": "Questo invaliderà i tuoi codici di backup esistenti e ne genererà di nuovi. Inserisci la tua password per continuare.",
+                                "confirm": "Rigenera codici"
+                            }
                         }
                     },
                     "password": {
@@ -1169,6 +1365,10 @@
                         "buttons": {
                             "change-password": "Cambia password",
                             "reset-password": "Reimposta password"
+                        },
+                        "messages": {
+                            "reset-email-sent": "Email di reimpostazione password inviata",
+                            "error": "Si è verificato un errore"
                         }
                     }
                 }

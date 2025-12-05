@@ -34,19 +34,28 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Plus, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import AddCategory from "../../dashboard/_components/add-category-dialog";
-import { useState } from "react";
+import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
+import { useState, useEffect } from "react";
 import {
   TransactionDialogValues,
   TransactionDialogSchema,
 } from "@/lib/validations/transaction-dialog-validations";
 import { Spinner } from "@/components/ui/spinner";
-import { useTransactionStore } from "@/store/transaction-store";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { accountKeys, categoryKeys, transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { AccountRow } from "@/lib/types/row-types";
+import { getCategories } from "@/lib/services/category";
+import { createTransaction } from "@/lib/services/transaction";
+import { toast } from "sonner";
+import type { TransactionType } from "@/lib/types/common-types";
 
 export default function CreateTransactionDialog({
   variant,
@@ -57,10 +66,105 @@ export default function CreateTransactionDialog({
 }) {
   const [open, setOpen] = useState<boolean>(false);
   const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { createTransactionAndSync, createLoading } = useTransactionStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+  const queryClient = useQueryClient();
+
+  const createTransactionMutation = useMutation({
+    mutationFn: async (data: {
+      category?: string;
+      amount: number;
+      note?: string;
+      source?: string | null;
+      transactionType: TransactionType;
+      accountId: string;
+      destinationAccountId?: string;
+      isRecurring?: boolean;
+      frequencyDays?: number;
+      startDate?: Date;
+      endDate?: Date | null;
+      recurringStatus?: "active" | "inactive";
+    }) => {
+      const result = await createTransaction({
+        categoryName: data.category?.trim() || "",
+        amount: data.amount,
+        note: data.note,
+        source: data.source || null,
+        transactionType: data.transactionType,
+        accountId: data.accountId,
+        destinationAccountId: data.destinationAccountId,
+        isRecurring: data.isRecurring,
+        frequencyDays: data.frequencyDays,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        recurringStatus: data.recurringStatus,
+      });
+      if (!result.success) {
+        throw new Error(result.message || "Failed to create transaction");
+      }
+      return result;
+    },
+    onSuccess: () => {
+      // Invalidate transaction queries
+      queryClient.invalidateQueries({ queryKey: transactionKeys.list(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recent(hubId),
+      });
+      // Invalidate account queries since balance changes
+      queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      toast.success("Transaction created successfully!");
+    },
+    onError: (error: Error) => {
+      // Only show error if it's not already handled by the service
+      if (
+        !error.message?.includes("already exists") &&
+        !error.message?.includes("financial account") &&
+        !error.message?.includes("Failed to create transaction")
+      ) {
+        toast.error(
+          error.message ||
+            "Something went wrong while creating the transaction.",
+        );
+      } else {
+        toast.error(error.message);
+      }
+    },
+  });
+
+  const { data: accounts, isLoading: accountsLoading } = useQuery<AccountRow[]>(
+    {
+      queryKey: accountKeys.list(hubId),
+      queryFn: async () => {
+        const res = await getFinancialAccounts();
+        if (!res.status) {
+          throw new Error("Failed to fetch accounts");
+        }
+        return res.tableData ?? [];
+      },
+      enabled: open, // Only fetch when dialog is open
+    },
+  );
+
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery<
+    { id: string; name: string }[]
+  >({
+    queryKey: categoryKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getCategories(hubId);
+      if (!res.success || !res.data) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data;
+    },
+    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
+  });
+
+  const categories = categoriesData?.map((cat) => cat.name) ?? [];
 
   const t = useTranslations(
     "main-dashboard.transactions-page.transaction-edit-dialog",
@@ -70,39 +174,68 @@ export default function CreateTransactionDialog({
     resolver: zodResolver(TransactionDialogSchema) as any,
     defaultValues: {
       date: new Date(),
-      account: "savings",
-      recipient: "",
+      accountId: "",
+      recipient: null,
       category: "",
+      destinationAccountId: "",
       amount: 0,
       note: "",
       splits: [],
+      transactionType: undefined,
+      isRecurring: false,
+      frequencyDays: 30,
+      startDate: null,
+      endDate: null,
+      recurringStatus: "active",
     },
   });
 
+  const transactionType = form.watch("transactionType");
+  const isRecurring = form.watch("isRecurring");
+  const date = form.watch("date");
+
+  // Set startDate to transaction date when recurring is enabled and startDate is not set
+  useEffect(() => {
+    if (isRecurring && !form.getValues("startDate") && date) {
+      form.setValue("startDate", date);
+    }
+  }, [isRecurring, date, form]);
+
   async function onSubmit(values: TransactionDialogValues) {
     try {
-      await createTransactionAndSync({
-        category: values.category.trim(),
+      await createTransactionMutation.mutateAsync({
+        category: values.category?.trim(),
         amount: values.amount,
         note: values.note,
-        source: values.recipient,
+        source: values.recipient || null,
         transactionType: values.transactionType,
-        accountType: values.account,
+        accountId: values.accountId,
+        destinationAccountId: values.destinationAccountId,
+        isRecurring: values.isRecurring,
+        frequencyDays: values.isRecurring ? values.frequencyDays : undefined,
+        startDate: values.isRecurring
+          ? values.startDate || undefined
+          : undefined,
+        endDate: values.isRecurring ? values.endDate : undefined,
+        recurringStatus: values.isRecurring
+          ? values.recurringStatus
+          : undefined,
       });
 
       form.reset();
       setSelectedCategory(null);
-      setCategories([]);
       setOpen(false);
     } catch (err: any) {
+      // Error already handled in onError
       console.error("Error submitting form:", err);
     }
   }
 
   function handleCategoryAdded(newCategory: string) {
-    setCategories((prev) => [...prev, newCategory]);
     setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
+    // Refetch categories to get the updated list
+    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
   }
 
   const { fields, append, remove } = useFieldArray({
@@ -112,10 +245,11 @@ export default function CreateTransactionDialog({
 
   return (
     <>
-      <AddCategory
+      <CreateCategoryDialog
         open={isAddCategoryOpen}
         onOpenChangeAction={setIsAddCategoryOpen}
         onCategoryAddedAction={handleCategoryAdded}
+        hubId={hubId}
       />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer" asChild>
@@ -170,7 +304,7 @@ export default function CreateTransactionDialog({
                     control={form.control}
                     name="date"
                     render={({ field }) => (
-                      <FormItem className="flex flex-1 flex-col">
+                      <FormItem className="flex flex-col w-full">
                         <FormLabel>{t("dialog.labels.date")}</FormLabel>
                         <FormControl>
                           <Popover>
@@ -201,33 +335,54 @@ export default function CreateTransactionDialog({
 
                   <FormField
                     control={form.control}
-                    name="account"
+                    name="accountId"
                     render={({ field }) => (
-                      <FormItem className="flex flex-1 flex-col">
+                      <FormItem className="flex flex-col w-full">
                         <FormLabel>{t("dialog.labels.account")}</FormLabel>
                         <FormControl>
                           <Select
-                            onValueChange={field.onChange}
+                            onValueChange={(value) => {
+                              field.onChange(value);
+                              // Clear destination if it matches the new source account
+                              if (
+                                transactionType === "transfer" &&
+                                form.getValues("destinationAccountId") === value
+                              ) {
+                                form.setValue("destinationAccountId", "");
+                              }
+                            }}
                             value={field.value}
+                            disabled={accountsLoading}
                           >
                             <SelectTrigger className="w-full cursor-pointer">
                               <SelectValue
-                                placeholder={t("dialog.placeholders.account")}
+                                placeholder={
+                                  accountsLoading
+                                    ? "Loading accounts..."
+                                    : t("dialog.placeholders.account")
+                                }
                               />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="checking">
-                                {t("dialog.options.checking")}
-                              </SelectItem>
-                              <SelectItem value="savings">
-                                {t("dialog.options.savings")}
-                              </SelectItem>
-                              <SelectItem value="credit-card">
-                                {t("dialog.options.credit-card")}
-                              </SelectItem>
-                              <SelectItem value="cash">
-                                {t("dialog.options.cash")}
-                              </SelectItem>
+                              {accountsLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading accounts...
+                                </SelectItem>
+                              ) : accounts && accounts.length > 0 ? (
+                                accounts.map((account) => (
+                                  <SelectItem
+                                    key={account.id}
+                                    value={account.id}
+                                  >
+                                    {account.name} ({account.type})
+                                    ({account.formattedBalance})
+                                  </SelectItem>
+                                ))
+                              ) : (
+                                <SelectItem value="no-accounts" disabled>
+                                  No accounts available
+                                </SelectItem>
+                              )}
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -237,12 +392,12 @@ export default function CreateTransactionDialog({
                   />
                 </div>
 
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                <div className="flex flex-col items-start gap-4 sm:flex-row sm:gap-3">
                   <FormField
                     control={form.control}
                     name="transactionType"
                     render={({ field }) => (
-                      <FormItem className="flex !flex-1 flex-col">
+                      <FormItem className="w-full">
                         <FormLabel>
                           {t("dialog.labels.transactionType.title")}
                         </FormLabel>
@@ -269,6 +424,11 @@ export default function CreateTransactionDialog({
                                   "dialog.labels.transactionType.options.expense",
                                 )}
                               </SelectItem>
+                              <SelectItem value="transfer">
+                                {t(
+                                  "dialog.labels.transactionType.options.transfer",
+                                )}
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -282,11 +442,12 @@ export default function CreateTransactionDialog({
                     control={form.control}
                     name="recipient"
                     render={({ field }) => (
-                      <FormItem className="flex-1">
+                      <FormItem className="w-full">
                         <FormLabel>{t("dialog.labels.recipient")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
+                            value={field.value ?? ""}
                             placeholder={t("dialog.placeholders.recipient")}
                           />
                         </FormControl>
@@ -296,48 +457,66 @@ export default function CreateTransactionDialog({
                   />
                 </div>
 
-                {/* 3️⃣ Category + Amount */}
-                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                {/* Destination Account (for transfers) */}
+                {transactionType === "transfer" && (
                   <FormField
                     control={form.control}
-                    name="category"
+                    name="destinationAccountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
-                        <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                        <FormLabel>
+                          {t("dialog.labels.destinationAccount")}
+                        </FormLabel>
                         <FormControl>
                           <Select
-                            value={selectedCategory || ""}
                             onValueChange={(value) => {
-                              setSelectedCategory(value);
                               field.onChange(value);
+                              // Clear destination if it matches the source account
+                              if (
+                                transactionType === "transfer" &&
+                                form.getValues("accountId") === value
+                              ) {
+                                form.setValue("destinationAccountId", "");
+                              }
                             }}
+                            value={field.value}
+                            disabled={accountsLoading}
                           >
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select or add a category" />
+                            <SelectTrigger className="w-full cursor-pointer">
+                              <SelectValue
+                                placeholder={
+                                  accountsLoading
+                                    ? "Loading accounts..."
+                                    : t(
+                                        "dialog.placeholders.destinationAccount",
+                                      )
+                                }
+                              />
                             </SelectTrigger>
-
                             <SelectContent>
-                              <div className="flex items-center justify-between border-b px-2 py-1.5">
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  className="w-full cursor-pointer justify-center text-sm"
-                                  onClick={() => setIsAddCategoryOpen(true)}
-                                >
-                                  + {t("dialog.new-category")}
-                                </Button>
-                              </div>
-
-                              {categories.length === 0 ? (
-                                <SelectItem value="none" disabled>
-                                  {t("dialog.no-category")}
+                              {accountsLoading ? (
+                                <SelectItem value="loading" disabled>
+                                  Loading accounts...
                                 </SelectItem>
+                              ) : accounts && accounts.length > 0 ? (
+                                accounts
+                                  .filter(
+                                    (account) =>
+                                      account.id !==
+                                      form.getValues("accountId"),
+                                  )
+                                  .map((account) => (
+                                    <SelectItem
+                                      key={account.id}
+                                      value={account.id}
+                                    >
+                                      {account.name} ({account.type}) ({account.formattedBalance || 0} CHF)
+                                    </SelectItem>
+                                  ))
                               ) : (
-                                categories.map((category) => (
-                                  <SelectItem key={category} value={category}>
-                                    {category}
-                                  </SelectItem>
-                                ))
+                                <SelectItem value="no-accounts" disabled>
+                                  No accounts available
+                                </SelectItem>
                               )}
                             </SelectContent>
                           </Select>
@@ -346,6 +525,64 @@ export default function CreateTransactionDialog({
                       </FormItem>
                     )}
                   />
+                )}
+
+                {/* 3️⃣ Category + Amount */}
+                <div className="flex flex-col gap-4 sm:flex-row sm:gap-3">
+                  {transactionType !== "transfer" && (
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-1 flex-col">
+                          <FormLabel>{t("dialog.labels.category")}</FormLabel>
+                          <FormControl>
+                            <Select
+                              value={field.value}
+                              onValueChange={(value) => {
+                                setSelectedCategory(value);
+                                field.onChange(value);
+                              }}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select or add a category" />
+                              </SelectTrigger>
+
+                              <SelectContent>
+                                <div className="flex items-center justify-between border-b px-2 py-1.5">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full cursor-pointer justify-center text-sm"
+                                    onClick={() => setIsAddCategoryOpen(true)}
+                                  >
+                                    + {t("dialog.new-category")}
+                                  </Button>
+                                </div>
+
+                                {categoriesLoading ? (
+                                  <SelectItem value="loading" disabled>
+                                    Loading categories...
+                                  </SelectItem>
+                                ) : categories.length === 0 ? (
+                                  <SelectItem value="none" disabled>
+                                    {t("dialog.no-category")}
+                                  </SelectItem>
+                                ) : (
+                                  categories.map((category) => (
+                                    <SelectItem key={category} value={category}>
+                                      {category}
+                                    </SelectItem>
+                                  ))
+                                )}
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
 
                   <FormField
                     control={form.control}
@@ -385,7 +622,158 @@ export default function CreateTransactionDialog({
                   )}
                 />
 
+                {/* Recurring Transaction Section */}
+                <div className="flex flex-col gap-4 pt-2">
+                  <FormField
+                    control={form.control}
+                    name="isRecurring"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-y-0 space-x-3">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="cursor-pointer">
+                            {t("dialog.labels.recurring")}
+                          </FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+
+                  {isRecurring && (
+                    <div className="flex flex-col gap-4 pl-7 sm:flex-row sm:gap-3">
+                      <FormField
+                        control={form.control}
+                        name="frequencyDays"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>
+                              {t("dialog.labels.frequencyDays")}
+                            </FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                min={1}
+                                placeholder="30"
+                                {...field}
+                                onChange={(e) =>
+                                  field.onChange(parseInt(e.target.value) || 0)
+                                }
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="startDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>
+                              {t("dialog.labels.startDate")}
+                            </FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value
+                                      ? format(field.value, "dd/MM/yyyy")
+                                      : t("dialog.placeholders.startDate")}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value || undefined}
+                                    onSelect={field.onChange}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="endDate"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>{t("dialog.labels.endDate")}</FormLabel>
+                            <FormControl>
+                              <Popover>
+                                <PopoverTrigger asChild>
+                                  <Button
+                                    variant="outline"
+                                    className="w-full justify-start"
+                                  >
+                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                    {field.value
+                                      ? format(field.value, "dd/MM/yyyy")
+                                      : t("dialog.placeholders.endDate")}
+                                  </Button>
+                                </PopoverTrigger>
+                                <PopoverContent>
+                                  <Calendar
+                                    mode="single"
+                                    selected={field.value || undefined}
+                                    onSelect={field.onChange}
+                                  />
+                                </PopoverContent>
+                              </Popover>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="recurringStatus"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-1 flex-col">
+                            <FormLabel>
+                              {t("dialog.labels.recurringStatus")}
+                            </FormLabel>
+                            <FormControl>
+                              <Select
+                                onValueChange={field.onChange}
+                                value={field.value}
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="active">
+                                    {t("dialog.options.active")}
+                                  </SelectItem>
+                                  <SelectItem value="inactive">
+                                    {t("dialog.options.inactive")}
+                                  </SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+                </div>
+
                 {/* Split Rows Section */}
+                {/* 
                 <div className="flex flex-col gap-3 pt-2">
                   <FormLabel>{t("dialog.labels.splitSum")}</FormLabel>
 
@@ -394,7 +782,6 @@ export default function CreateTransactionDialog({
                       key={item.id}
                       className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3"
                     >
-                      {/* Category Select */}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.category`}
@@ -431,8 +818,6 @@ export default function CreateTransactionDialog({
                           </FormItem>
                         )}
                       />
-
-                      {/* Amount Input */}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.amount`}
@@ -449,8 +834,6 @@ export default function CreateTransactionDialog({
                           </FormItem>
                         )}
                       />
-
-                      {/* Description Input */}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.description`}
@@ -467,8 +850,6 @@ export default function CreateTransactionDialog({
                           </FormItem>
                         )}
                       />
-
-                      {/* Remove Button */}
                       <Button
                         type="button"
                         variant="outline"
@@ -478,8 +859,6 @@ export default function CreateTransactionDialog({
                       </Button>
                     </div>
                   ))}
-
-                  {/* Add Row Badge */}
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="secondary"
@@ -500,7 +879,8 @@ export default function CreateTransactionDialog({
                       {t("dialog.badges.splitTotal")}
                     </Badge>
                   </div>
-                </div>
+                </div> 
+                */}
 
                 {/* 7️⃣ Buttons */}
                 <div className="flex justify-end gap-3 pt-4">
@@ -514,10 +894,14 @@ export default function CreateTransactionDialog({
                   </Button>
                   <Button
                     type="submit"
-                    disabled={createLoading}
+                    disabled={createTransactionMutation.isPending}
                     className="cursor-pointer"
                   >
-                    {createLoading ? <Spinner /> : t("dialog.buttons.save")}
+                    {createTransactionMutation.isPending ? (
+                      <Spinner />
+                    ) : (
+                      t("dialog.buttons.save")
+                    )}
                   </Button>
                 </div>
               </form>

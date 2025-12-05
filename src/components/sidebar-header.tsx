@@ -12,23 +12,26 @@ import {
   MessageSquare,
   Check,
 } from "lucide-react";
-import TransactionDialog from "./dialogs/transaction-dialog";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import TransferDialog from "@/app/me/accounts/_components/transfer-dialog";
 import FilterDialog from "@/app/me/reports/_components/filter-dialog";
-import BudgetDialog from "@/app/me/budgets/_components/budget-dialog";
-import SavingGoalDialog from "@/app/me/saving-goals/_components/saving-goal-dialog";
+import CreateBudgetDialog from "@/app/me/budgets/_components/create-budget-dialog";
+import CreateSavingGoalDialog from "@/app/me/saving-goals/_components/create-saving-goal-dialog";
 import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
 import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { useDashboardStore } from "@/store/dashboard-store";
-import { useBudgetStore } from "@/store/budget-store";
-import { useAccountStore } from "@/store/account-store";
-import { useSavingGoalStore } from "@/store/saving-goal-store";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getRecentTransactions } from "@/lib/services/transaction";
+import { getBudgets } from "@/lib/services/budget";
+import { getSavingGoals } from "@/lib/services/saving-goal";
+import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { BudgetRow } from "@/lib/types/row-types";
+import type { SavingGoal } from "@/db/queries";
 
 const monthNames: string[] = [
   "January",
@@ -55,10 +58,48 @@ export default function SidebarHeader() {
   const pathname = usePathname();
   const route = pathname.split("/").pop();
 
-  const { transactions } = useDashboardStore();
-  const { budgets } = useBudgetStore();
-  const { accounts } = useAccountStore();
-  const { goals } = useSavingGoalStore();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+  const { data: budgets } = useQuery<BudgetRow[]>({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
+    },
+  });
+  const { data: accounts } = useQuery({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getFinancialAccounts();
+      if (!res.status) {
+        throw new Error("Failed to fetch accounts");
+      }
+      return res.tableData ?? [];
+    },
+  });
+  const { data: transactions } = useQuery({
+    queryKey: transactionKeys.recent(hubId),
+    queryFn: async () => {
+      const res = await getRecentTransactions();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch recent transactions");
+      }
+      return res.data ?? [];
+    },
+  });
+  const { data: goals } = useQuery<SavingGoal[]>({
+    queryKey: savingGoalKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getSavingGoals();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch saving goals");
+      }
+      return res.data ?? [];
+    },
+  });
 
   const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
 
@@ -101,6 +142,8 @@ export default function SidebarHeader() {
         <div
           className={`flex flex-wrap items-center justify-end gap-4 transition-all duration-300`}
         >
+          {/* 
+          // Month Switcher
           <div
             className={`bg-blue-background hidden items-center gap-2 rounded-lg border px-2 transition-all duration-300 sm:flex`}
           >
@@ -113,21 +156,19 @@ export default function SidebarHeader() {
             <Button variant="ghost" size="icon" onClick={goToNextMonth}>
               <ChevronRight className="h-4 w-4" />
             </Button>
-          </div>
+          </div> 
+          */}
 
-          {route === "dashboard" && <TransactionDialog />}
-
-          {route === "transactions" && (
+          {(route === "dashboard" || route === "transactions") && (
             <CreateTransactionDialog variant="gradient" />
           )}
 
-          {route === "budgets" && <BudgetDialog />}
+          {route === "budgets" && <CreateBudgetDialog />}
 
-          {route === "saving-goals" && <SavingGoalDialog />}
+          {route === "saving-goals" && <CreateSavingGoalDialog />}
 
           {route === "accounts" && (
             <div className="flex items-center gap-2">
-              <TransferDialog />
               <NewAccountDialog variant="gradient" />
             </div>
           )}

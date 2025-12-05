@@ -1,18 +1,9 @@
 import { z } from "zod";
 
-const accountType = [
-  "current-account",
-  "credit-card",
-  "savings",
-  "cash",
-  "all",
-] as const;
-
-export const calculationFormSchema = z
+export const transactionFiltersFormSchema = z
   .object({
     dateFrom: z.date().optional(),
     dateTo: z.date().optional(),
-    accountType: z.enum(accountType, { message: "Account is required" }),
     category: z.string({ message: "Category is required" }),
     amountMin: z.coerce
       .number()
@@ -23,6 +14,9 @@ export const calculationFormSchema = z
       .min(0, { message: "Amount must be 0 or more" })
       .optional(),
     text: z.string().optional(),
+    withReceipt: z.boolean().optional().default(false),
+    isRecurring: z.boolean().optional().default(false),
+    transfersOnly: z.boolean().optional().default(false),
   })
   .refine(
     (data) => {
@@ -43,4 +37,4 @@ export const calculationFormSchema = z
     { message: "Min amount must be less than Max amount", path: ["amountMax"] },
   );
 
-export type CalculationFormValues = z.infer<typeof calculationFormSchema>;
+export type TransactionFiltersFormValues = z.infer<typeof transactionFiltersFormSchema>;

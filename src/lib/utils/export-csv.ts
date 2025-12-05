@@ -1,7 +1,6 @@
 import Papa from "papaparse";
 import type { Transaction } from "@/lib/types/dashboard-types";
-import type { BudgetRow } from "../services/budget";
-import type { AccountRow } from "@/store/account-store";
+import type { BudgetRow, AccountRow } from "@/lib/types/row-types";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
 import type { CategoryDetail } from "@/store/report-store";
 import type { SavingGoal } from "@/db/queries";
@@ -55,7 +54,6 @@ export const exportTransactionsToCSV = ({
   const headers = [
     t("data-table.headings.date"),
     t("data-table.headings.category"),
-    t("data-table.headings.account"),
     t("data-table.headings.amount"),
     t("data-table.headings.recipient"),
     t("data-table.headings.note"),
@@ -64,10 +62,9 @@ export const exportTransactionsToCSV = ({
   const data = transactions.map((tx) => ({
     [headers[0]]: tx.date,
     [headers[1]]: tx.category,
-    [headers[2]]: tx.accountType,
-    [headers[3]]: tx.amount,
-    [headers[4]]: tx.recipient || "-",
-    [headers[5]]: tx.note || "-",
+    [headers[2]]: tx.amount,
+    [headers[3]]: tx.recipient || "-",
+    [headers[4]]: tx.note || "-",
   }));
 
   const csv = Papa.unparse(data);
@@ -181,8 +178,6 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
     t("cards.tax-reserves.content.saved"),
     t("cards.tax-reserves.content.remaining"),
     t("cards.tax-reserves.content.monthly-allocated"),
-    t("cards.tax-reserves.content.account.title"),
-    "Account Type",
   ];
 
   const data = goals.map((goal) => {
@@ -194,7 +189,7 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
       [headers[3]]: remaining.toFixed(2),
       [headers[4]]: goal.monthlyAllocation?.toFixed(2) ?? "0.00",
       [headers[5]]: `${goal.value.toFixed(1)}%`,
-      [headers[6]]: goal.accountType || "-",
+      [headers[6]]: goal.financialAccountId || "-",
     };
   });
 
@@ -207,7 +202,6 @@ export const exportTransactionsTemplateToCSV = (t: (key: string) => string) => {
   const headers = [
     t("data-table.headings.date"),
     t("data-table.headings.category"),
-    t("data-table.headings.account"),
     t("data-table.headings.amount"),
     t("data-table.headings.recipient"),
     t("data-table.headings.note"),
@@ -246,8 +240,6 @@ export const exportSavingGoalsTemplateToCSV = (t: (key: string) => string) => {
     t("cards.tax-reserves.content.saved"),
     t("cards.tax-reserves.content.remaining"),
     t("cards.tax-reserves.content.monthly-allocated"),
-    t("cards.tax-reserves.content.account.title"),
-    "Account Type",
   ];
 
   const csv = Papa.unparse([headers]);

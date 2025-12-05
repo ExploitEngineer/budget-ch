@@ -1,4 +1,41 @@
 {
+    "two-factor": {
+        "title": "Zwei-Faktor-Authentifizierung",
+        "description": "Bitte geben Sie Ihren Bestätigungscode ein, um fortzufahren",
+        "tabs": {
+            "totp": "TOTP-Code",
+            "backup-code": "Backup-Code"
+        },
+        "labels": {
+            "totp-code": "6-stelliger Code eingeben",
+            "backup-code": "Backup-Code eingeben",
+            "trust-device": "Dieses Gerät 30 Tage lang vertrauen"
+        },
+        "placeholders": {
+            "backup-code": "Geben Sie Ihren Backup-Code ein"
+        },
+        "hints": {
+            "totp-code": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein",
+            "backup-code": "Geben Sie einen Ihrer Backup-Codes ein"
+        },
+        "buttons": {
+            "verify": "Bestätigen",
+            "use-backup-code": "Backup-Code verwenden"
+        },
+        "messages": {
+            "invalid-code": "Bitte geben Sie einen gültigen 6-stelligen Code ein",
+            "backup-code-required": "Bitte geben Sie einen Backup-Code ein",
+            "verify-error": "Ungültiger Bestätigungscode. Bitte versuchen Sie es erneut.",
+            "verify-success": "Bestätigung erfolgreich. Weiterleitung...",
+            "backup-code-error": "Ungültiger Backup-Code. Bitte versuchen Sie es erneut.",
+            "backup-code-success": "Backup-Code akzeptiert. Weiterleitung..."
+        }
+    },
+    "common": {
+        "updating": "Aktualisieren...",
+        "update": "Aktualisieren",
+        "add": "Hinzufügen"
+    },
     "greeting": {
         "title": "Wie geht es dir?",
         "cta": "Klick mich"
@@ -136,25 +173,45 @@
                 "dialog": {
                     "title": "Wiederkehrende Zahlung anpassen",
                     "close": "Schließen",
+                    "loading": "Lädt...",
+                    "read-only": {
+                        "title": "Transaktionsdetails"
+                    },
                     "labels": {
                         "date": "Datum",
                         "account": "Konto",
                         "name": "Name",
-                        "amount": "Betrag (CHF)"
+                        "amount": "Betrag (CHF)",
+                        "frequency-days": "Häufigkeit (Tage)",
+                        "start-date": "Startdatum",
+                        "end-date": "Enddatum",
+                        "has-end-date": "Enddatum setzen",
+                        "status": "Status"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Wie oft sich diese Transaktion wiederholt (in Tagen)",
+                        "has-end-date": "Aktivieren, um ein Enddatum für diese wiederkehrende Transaktion festzulegen"
                     },
                     "placeholders": {
                         "date": "25.09.2025",
                         "account": "Konto auswählen",
-                        "name": "Name eingeben"
+                        "name": "Name eingeben",
+                        "start-date": "Startdatum auswählen",
+                        "end-date": "Enddatum auswählen"
                     },
                     "options": {
                         "giro": "Girokonto",
                         "credit-card": "Kreditkarte",
-                        "sparen": "Sparkonto"
+                        "sparen": "Sparkonto",
+                        "status": {
+                            "active": "Aktiv",
+                            "inactive": "Inaktiv"
+                        }
                     },
                     "buttons": {
                         "delete": "Löschen",
-                        "save": "Speichern"
+                        "save": "Speichern",
+                        "saving": "Speichert..."
                     }
                 }
             },
@@ -308,9 +365,16 @@
                             "title": "Transaktionstyp",
                             "options": {
                                 "income": "Einnahme",
-                                "expense": "Ausgabe"
+                                "expense": "Ausgabe",
+                                "transfer": "Überweisung"
                             }
-                        }
+                        },
+                        "destinationAccount": "Zielkonto",
+                        "recurring": "Wiederkehrende Transaktion",
+                        "frequencyDays": "Häufigkeit (Tage)",
+                        "startDate": "Startdatum",
+                        "endDate": "Enddatum (optional)",
+                        "recurringStatus": "Status"
                     },
                     "placeholders": {
                         "date": "21.09.2025",
@@ -318,7 +382,10 @@
                         "recipient": "Empfänger eingeben",
                         "category": "Kategorie auswählen",
                         "note": "Notiz eingeben",
-                        "note-optional": "Notiz (optional)"
+                        "note-optional": "Notiz (optional)",
+                        "destinationAccount": "Zielkonto auswählen",
+                        "startDate": "Startdatum auswählen",
+                        "endDate": "Kein Enddatum"
                     },
                     "options": {
                         "checking": "Checking",
@@ -329,7 +396,9 @@
                         "restaurant": "Restaurant & Café",
                         "oev": "Öffentlicher Verkehr & Mobilität",
                         "haushalt": "Haushalt",
-                        "einnahmen": "Einnahmen"
+                        "einnahmen": "Einnahmen",
+                        "active": "Aktiv",
+                        "inactive": "Inaktiv"
                     },
                     "badges": {
                         "row": "Zeile",
@@ -387,11 +456,29 @@
                     "checkbox": "Alle",
                     "buttons": {
                         "delete": "Löschen",
+                    "deleteAll": "Alles löschen",
+                        "deleteSelected": "Ausgewählte löschen",
                         "category": "Kategorie",
                         "export": "Exportieren",
                         "update": "Aktualisieren"
                     },
                     "badge": "Saldo:"
+                },
+                "confirmation": {
+                    "title": "Löschen aller Transaktionen bestätigen",
+                    "description": "Möchtest du wirklich alle Transaktionen löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                    "cancel": "Abbrechen",
+                    "confirm": "Alles löschen"
+                },
+                "delete-selected": {
+                    "success": "Ausgewählte Transaktionen erfolgreich gelöscht!",
+                    "error": "Beim Löschen der ausgewählten Transaktionen ist ein Fehler aufgetreten.",
+                    "confirmation": {
+                        "title": "Löschen ausgewählter Transaktionen bestätigen",
+                        "description": "Möchtest du wirklich {count} ausgewählte Transaktion(en) löschen? Dieser Vorgang kann nicht rückgängig gemacht werden.",
+                        "cancel": "Abbrechen",
+                        "confirm": "Ausgewählte löschen"
+                    }
                 },
                 "headings": {
                     "date": "Datum",
@@ -400,7 +487,8 @@
                     "category": "Kategorie",
                     "note": "Notiz",
                     "amount": "Betrag",
-                    "action": "Aktion"
+                    "action": "Aktion",
+                    "type": "Typ"
                 },
                 "action": "Bearbeiten",
                 "recipients": {
@@ -1000,27 +1088,31 @@
                     "stripe-portal-button": "Abonnement verwalten (Stripe Portal)"
                 }
             },
-                "current-subscription-section": {
-                    "title": "Aktuelles Abonnement",
-                    "plan-label": "Plan",
-                    "plan-labels": {
-                        "individual": "Einzeln",
-                        "family": "Familie"
-                    },
-                    "status-label": "Status",
-                    "started-label": "Beginn",
-                    "renewal-label": "Erneuert am",
-                    "renews-label": "Erneuert am",
-                    "cancels-at-label": "Wird beendet am",
-                    "days-remaining-label": "Verbleibende Tage",
-                    "manage-button": "Abonnement verwalten",
-                    "errors": {
-                        "portal-failed": "Das Stripe-Portal kann gerade nicht geöffnet werden."
-                    }
+            "current-subscription-section": {
+                "title": "Aktuelles Abonnement",
+                "plan-label": "Plan",
+                "plan-labels": {
+                    "individual": "Einzeln",
+                    "family": "Familie"
                 },
+                "status-label": "Status",
+                "started-label": "Beginn",
+                "renewal-label": "Erneuert am",
+                "renews-label": "Erneuert am",
+                "cancels-at-label": "Wird beendet am",
+                "days-remaining-label": "Verbleibende Tage",
+                "manage-button": "Abonnement verwalten",
+                "errors": {
+                    "portal-failed": "Das Stripe-Portal kann gerade nicht geöffnet werden."
+                }
+            },
             "members-invitations-section": {
                 "title": "Mitglieder & Einladungen",
-                "badge": "0 Mitglieder",
+                "badge": "{count} Mitglieder",
+                "plan-warning": {
+                    "free": "Du bist im kostenlosen Plan. Upgrade, um diese Funktion zu nutzen.",
+                    "individual": "Du bist im Individualplan. Upgrade, um diese Funktion zu nutzen."
+                },
                 "labels": {
                     "invite-email": {
                         "title": "Per E-Mail einladen",
@@ -1035,6 +1127,38 @@
                     }
                 },
                 "button": "Einladung senden",
+                "buttons": {
+                    "cancel": "Abbrechen",
+                    "send": "Einladung senden",
+                    "sending": "Senden...",
+                    "upgrade": "Upgrade für Einladung"
+                },
+                "members-table": {
+                    "title": "Hub-Mitglieder",
+                    "badge": "{count} Mitglieder",
+                    "empty": "Noch keine Mitglieder.",
+                    "table-headings": {
+                        "name": "Name",
+                        "email": "E-Mail",
+                        "role": "Rolle",
+                        "joined": "Beigetreten am"
+                    }
+                },
+                "invitations-table": {
+                    "title": "Hub-Einladungen",
+                    "badge": "{count} Einladungen",
+                    "empty": "Noch keine Einladungen.",
+                    "table-headings": {
+                        "email": "E-Mail",
+                        "role": "Rolle",
+                        "status": "Status",
+                        "expires": "Läuft ab"
+                    },
+                    "statuses": {
+                        "accepted": "Akzeptiert",
+                        "pending": "Ausstehend"
+                    }
+                },
                 "table": {
                     "table-headings": {
                         "email": "E-MAIL",
@@ -1095,6 +1219,12 @@
                             "1-rappen": "1 Rappen"
                         }
                     }
+                },
+                "messages": {
+                    "preferences-saved": "Präferenzen gespeichert"
+                },
+                "buttons": {
+                    "save-preferences": "Präferenzen speichern"
                 }
             },
             "notifications-section": {
@@ -1129,24 +1259,94 @@
                 "title": "Sicherheit",
                 "labels": {
                     "two-factor": {
-                        "title": "Zwei-Faktor",
-                        "content": "TOTP kompatibel mit gängigen Authenticator-Apps. (Demo)",
+                        "title": "Zwei-Faktor-Authentifizierung",
+                        "content": "TOTP kompatibel mit gängigen Authenticator-Apps wie Google Authenticator, Authy oder Microsoft Authenticator.",
+                        "status": {
+                            "enabled": "Aktiviert",
+                            "disabled": "Deaktiviert",
+                            "pending": "Bestätigung ausstehend"
+                        },
                         "options": {
                             "off": "Aus",
                             "totp-app": "TOTP App",
                             "email-code": "E-Mail Code"
                         },
                         "buttons": {
+                            "enable": "2FA aktivieren",
+                            "disable": "2FA deaktivieren",
+                            "verify": "Code bestätigen",
+                            "restart-setup": "Setup zurücksetzen",
                             "show-backup-codes": "Backup-Codes anzeigen",
                             "regenerate-backup-codes": "Backup-Codes neu erzeugen"
+                        },
+                        "messages": {
+                            "password-required": "Passwort ist erforderlich",
+                            "invalid-code": "Bitte geben Sie einen gültigen 6-stelligen Code ein",
+                            "enable-error": "Zwei-Faktor-Authentifizierung konnte nicht aktiviert werden",
+                            "verify-error": "Ungültiger Bestätigungscode",
+                            "disabled-success": "Zwei-Faktor-Authentifizierung erfolgreich deaktiviert",
+                            "enabled-success": "Zwei-Faktor-Authentifizierung erfolgreich aktiviert",
+                            "setup-started": "Einrichtung der Zwei-Faktor-Authentifizierung gestartet",
+                            "view-codes-error": "Backup-Codes konnten nicht angezeigt werden",
+                            "regenerate-error": "Backup-Codes konnten nicht neu erzeugt werden",
+                            "regenerate-success": "Backup-Codes wurden erfolgreich neu erzeugt",
+                            "disable-error": "Zwei-Faktor-Authentifizierung konnte nicht deaktiviert werden",
+                            "get-uri-error": "TOTP-URI konnte nicht abgerufen werden",
+                            "copied": "In Zwischenablage kopiert"
+                        },
+                        "dialogs": {
+                            "cancel": "Abbrechen",
+                            "continue": "Fortfahren",
+                            "close": "Schließen",
+                            "copy": "Kopieren",
+                            "password": {
+                                "title": "Passwort bestätigen",
+                                "description": "Bitte geben Sie Ihr Passwort ein, um fortzufahren",
+                                "label": "Passwort",
+                                "placeholder": "Geben Sie Ihr Passwort ein"
+                            },
+                            "qr": {
+                                "title": "QR-Code scannen",
+                                "description": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App",
+                                "secret-label": "Oder geben Sie diesen Schlüssel manuell ein",
+                                "secret-key": "Geheimschlüssel",
+                                "copy-secret": "Kopieer geheime sleutel",
+                                "next": "Weiter: Code bestätigen"
+                            },
+                            "verify": {
+                                "title": "Code bestätigen",
+                                "description": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein",
+                                "label": "Bestätigungscode",
+                                "submit": "Bestätigen & Aktivieren"
+                            },
+                            "backup-codes": {
+                                "title": "Backup-Codes",
+                                "description": "Speichern Sie diese Backup-Codes an einem sicheren Ort. Sie können sie verwenden, um auf Ihr Konto zuzugreifen, wenn Sie keinen Zugriff mehr auf Ihre Authenticator-App haben.",
+                                "warning": "Jeder Code kann nur einmal verwendet werden. Bewahren Sie sie sicher auf.",
+                                "copy-all": "Alle Codes kopieren"
+                            },
+                            "disable": {
+                                "title": "Zwei-Faktor-Authentifizierung deaktivieren",
+                                "description": "Bitte geben Sie Ihr Passwort ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren",
+                                "confirm": "2FA deaktivieren"
+                            },
+                            "regenerate": {
+                                "title": "Backup-Codes neu erzeugen",
+                                "description": "Dies wird Ihre bestehenden Backup-Codes ungültig machen und neue erzeugen. Bitte geben Sie Ihr Passwort ein, um fortzufahren.",
+                                "confirm": "Codes neu erzeugen"
+                            }
                         }
                     },
                     "password": {
                         "title": "Passwort",
-                        "content": "„Zurücksetzen“ sendet einen E-Mail-Link (Demo).",
+                        "content": "\"Zurücksetzen\" sendet einen E-Mail-Link (Demo).",
                         "buttons": {
                             "change-password": "Passwort ändern",
                             "reset-password": "Passwort zurücksetzen"
+                        },
+                        "messages": {
+                            "reset-email-sent": "E-Mail zum Zurücksetzen des Passworts gesendet",
+                            "error": "Ein Fehler ist aufgetreten"
                         }
                     }
                 }

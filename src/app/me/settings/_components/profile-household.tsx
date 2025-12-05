@@ -11,6 +11,7 @@ import {
   FormControl,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectTrigger,
@@ -25,11 +26,30 @@ import {
   profileHouseholdSchema,
   ProfileHouseholdValues,
 } from "@/lib/validations";
+import { useEffect, useState } from "react";
+import { getUserSettings } from "@/lib/services/user";
+import { updateProfileHouseholdAction } from "../actions";
+import { toast } from "sonner";
+import { Spinner } from "@/components/ui/spinner";
+import type { UserType, SubscriptionType } from "@/db/schema";
+import { cn } from "@/lib/utils";
 
-export function ProfileHousehold() {
+interface ProfileHouseholdProps {
+  user: UserType;
+  subscription: SubscriptionType | null;
+}
+
+export function ProfileHousehold({
+  user,
+  subscription,
+}: ProfileHouseholdProps) {
   const t = useTranslations(
     "main-dashboard.settings-page.profile-household-section",
   );
+  const tc = useTranslations("common");
+
+  const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
 
   const form = useForm<ProfileHouseholdValues>({
     resolver: zodResolver(profileHouseholdSchema),
@@ -42,8 +62,54 @@ export function ProfileHousehold() {
     },
   });
 
-  const onSubmit = (values: ProfileHouseholdValues) => {
-    console.log("Form submitted:", values);
+  // Load user settings and populate form
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const settingsResult = await getUserSettings();
+        const userSettings = settingsResult.data;
+
+        // Determine subscription display value
+        const subscriptionValue = subscription?.subscriptionPlan ?? "free";
+
+        form.reset({
+          name: user.name,
+          email: user.email,
+          householdSize: userSettings?.householdSize ?? "single",
+          subscriptionLocal: subscriptionValue,
+          address: userSettings?.address ?? "",
+        });
+      } catch (err) {
+        console.error("Error loading user settings:", err);
+      } finally {
+        setInitializing(false);
+      }
+    };
+
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user.id, user.name, user.email, subscription?.subscriptionPlan]);
+
+  const onSubmit = async (values: ProfileHouseholdValues) => {
+    setLoading(true);
+    try {
+      const result = await updateProfileHouseholdAction({
+        name: values.name,
+        householdSize: values.householdSize,
+        address: values.address || null,
+      });
+
+      if (result.success) {
+        toast.success("Profile and household settings updated successfully");
+      } else {
+        toast.error(result.message || "Failed to update settings");
+      }
+    } catch (err: any) {
+      console.error("Error updating profile:", err);
+      toast.error(err.message || "An unexpected error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,7 +121,9 @@ export function ProfileHousehold() {
             variant="outline"
             className="dark:border-border-blue bg-badge-background rounded-full px-3 py-2"
           >
-            {t("badge")}
+            {subscription
+              ? t(`subscription-local.plans.${subscription.subscriptionPlan}`)
+              : t("subscription-local.plans.free")}
           </Badge>
         </CardHeader>
         <Separator className="dark:bg-[#1A2441]" />
@@ -91,6 +159,7 @@ export function ProfileHousehold() {
                           type="email"
                           className="dark:border-border-blue !bg-dark-blue-background"
                           placeholder={t("email.placeholder")}
+                          disabled
                           {...field}
                         />
                       </FormControl>
@@ -141,8 +210,9 @@ export function ProfileHousehold() {
                         <Select
                           value={field.value}
                           onValueChange={field.onChange}
+                          disabled
                         >
-                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-pointer">
+                          <SelectTrigger className="dark:border-border-blue !bg-dark-blue-background w-full cursor-not-allowed opacity-60">
                             <SelectValue
                               placeholder={t("subscription-local.plans.free")}
                             />
@@ -182,6 +252,25 @@ export function ProfileHousehold() {
                   </FormItem>
                 )}
               />
+
+              {/* Update Button */}
+              <div className="flex justify-end pt-4">
+                <Button
+                  variant="outline"
+                  className={cn("cursor-pointer", "btn-gradient")}
+                  type="submit"
+                  disabled={loading || initializing}
+                >
+                  {loading ? (
+                    <>
+                      <Spinner className="mr-2" />
+                      tc("updating")
+                    </>
+                  ) : (
+                    tc("update")
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
         </CardContent>

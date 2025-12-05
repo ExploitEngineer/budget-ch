@@ -1,9 +1,20 @@
 import { nextCookies } from "better-auth/next-js";
 import { createAuthClient } from "better-auth/react";
+import { twoFactorClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    twoFactorClient({
+      // twoFactorPage: "/two-factor",
+      onTwoFactorRedirect() {
+        if (typeof window !== "undefined") {
+          window.location.href = "/two-factor";
+        }
+      },
+    }),
+  ],
 });
 
 export const signInWithGoogle = async () => {
