@@ -113,7 +113,7 @@ const transactionFilterFn: FilterFn<Transaction> = (
 
   // Recurring filter (only show recurring transactions when checked)
   if (filterValue.isRecurring) {
-    if (!tx.isRecurring) return false;
+    if (tx.recurringTemplateId) return false;
   }
 
   // Transfers only filter
@@ -123,9 +123,9 @@ const transactionFilterFn: FilterFn<Transaction> = (
 
   // With receipt filter - currently transactions don't have receipt field
   // This filter is ready for when the feature is implemented
-  // if (filterValue.withReceipt) {
-  //   if (!tx.hasReceipt) return false;
-  // }
+  if (filterValue.withReceipt) {
+    if (!tx.recipient) return false;
+  }
 
   return true;
 };

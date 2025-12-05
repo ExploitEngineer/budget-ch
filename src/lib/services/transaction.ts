@@ -294,10 +294,10 @@ export async function getTransactions(): Promise<{
 
     const transactions = res.data.map((tx: any) => ({
       id: tx.id,
-      date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
-      recipient: tx.recipient || "—",
+      date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : null,
+      recipient: tx.recipient || null,
       type: tx.type,
-      category: tx.category || "—",
+      category: tx.category || null,
       note: tx.note ?? null,
       amount: tx.amount ?? 0,
       accountId: tx.accountId || null,
@@ -306,7 +306,7 @@ export async function getTransactions(): Promise<{
       isRecurring: !!tx.recurringTemplateId,
     }));
 
-    return { success: true, data: transactions };
+    return { success: true, data: transactions as Transaction[] };
   } catch (err: any) {
     console.error("Error in getTransactionsTable:", err);
     return {
