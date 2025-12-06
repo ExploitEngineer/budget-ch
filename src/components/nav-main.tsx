@@ -124,6 +124,32 @@ export function NavMain() {
     },
   ];
 
+  const handleNavigation = async (
+    e: React.MouseEvent,
+    item: Items,
+    isRestricted: boolean,
+  ): Promise<void> => {
+    if (isRestricted) {
+      e.preventDefault();
+      toast.error("You are on free plan. Cannot access this feature.");
+      return;
+    }
+
+    if (item.onClick) {
+      e.preventDefault();
+      await item.onClick();
+      setOpenMobile(false);
+      return;
+    }
+
+    if (item.url) {
+      // Close sidebar after a brief delay to allow navigation to start
+      // This fixes mobile navigation issues where closing the Sheet immediately
+      // would prevent the Link click from completing
+      setTimeout(() => setOpenMobile(false), 100);
+    }
+  };
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="text-xs font-bold text-[#8C98B2]">
@@ -135,27 +161,16 @@ export function NavMain() {
             item.url === "/me/reports" && hasAccess === false;
 
           return (
-            <div
-              key={item.title}
-              onClick={async (): Promise<void> => {
-                setOpenMobile(false);
-                if (item.onClick) {
-                  await item.onClick();
-                }
-
-                if (isRestricted) {
-                  toast.error(
-                    "You are on free plan. Cannot access this feature.",
-                  );
-                }
-              }}
-            >
+            <div key={item.title}>
               <Link
-                key={item.title}
-                href={isRestricted ? "#" : (item.url ? getUrlWithHubFromCookie(item.url) : "")}
-                onClick={(e): false | void =>
-                  isRestricted && e.preventDefault()
+                href={
+                  isRestricted
+                    ? "#"
+                    : item.url
+                      ? getUrlWithHubFromCookie(item.url)
+                      : ""
                 }
+                onClick={(e) => handleNavigation(e, item, isRestricted)}
               >
                 <SidebarMenuItem>
                   <SidebarMenuButton
