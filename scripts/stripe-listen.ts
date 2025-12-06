@@ -3,15 +3,21 @@ import "dotenv/config";
 import { spawn } from "node:child_process";
 
 const key = process.env.STRIPE_SECRET_KEY;
+const url = process.env.NEXT_PUBLIC_APP_URL;
 
 if (!key) {
     console.error("Missing STRIPE_SECRET_KEY. Add it to .env before running this script.");
     process.exit(1);
 }
 
+if (!url) {
+    console.error("Missing NEXT_PUBLIC_APP_URL. Add it to .env before running this script.");
+    process.exit(1);
+}
+
 const child = spawn(
     "stripe",
-    ["listen", "--api-key", key, "--forward-to", "http://localhost:3000/api/webhooks/stripe"],
+    ["listen", "--api-key", key, "--forward-to", `${url}/api/webhooks/stripe`],
     { stdio: "inherit" }
 );
 
