@@ -32,6 +32,7 @@ import { signInWithGoogle } from "@/lib/auth/auth-client";
 export default function SignIn() {
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const form = useForm<UserSignInValues>({
     resolver: zodResolver(userSignInSchema),
     defaultValues: {
@@ -132,7 +133,7 @@ export default function SignIn() {
                 <FormLabel>{t("labels.password")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     className="dark:border-border-blue dark:!bg-dark-blue-background bg-[#F6F8FF]"
                     placeholder="********"
                     {...field}
@@ -146,7 +147,11 @@ export default function SignIn() {
           {/* show password */}
           <FormItem className="flex items-center justify-between border-0">
             <div className="flex items-center gap-2">
-              <Checkbox className="cursor-pointer" />
+              <Checkbox
+                checked={showPassword}
+                onCheckedChange={(checked) => setShowPassword(Boolean(checked))}
+                className="cursor-pointer"
+              />
               <span className="text-sm">{t("checkboxes.password")}</span>
             </div>
             <Link

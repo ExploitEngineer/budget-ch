@@ -33,6 +33,7 @@ export default function SignUp() {
   const router = useRouter();
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const form = useForm<UserSignUpValues>({
     resolver: zodResolver(userSignUpSchema),
     defaultValues: {
@@ -141,7 +142,7 @@ export default function SignUp() {
                 <FormLabel>{t("labels.password")}</FormLabel>
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="********"
                     className="dark:border-border-blue dark:!bg-dark-blue-background bg-[#F6F8FF]"
                     {...field}
@@ -155,7 +156,11 @@ export default function SignUp() {
           {/* Show password + tip */}
           <FormItem className="flex flex-col items-start justify-between border-0 sm:flex-row sm:items-center">
             <div className="flex items-center gap-2">
-              <Checkbox className="cursor-pointer" />
+              <Checkbox
+                checked={showPassword}
+                onCheckedChange={(checked) => setShowPassword(Boolean(checked))}
+                className="cursor-pointer"
+              />
               <span className="text-sm">{t("checkboxes.password")}</span>
             </div>
             <p className="text-sm">{t("tip")}</p>
