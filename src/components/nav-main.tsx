@@ -146,7 +146,7 @@ export function NavMain() {
       // Close sidebar after a brief delay to allow navigation to start
       // This fixes mobile navigation issues where closing the Sheet immediately
       // would prevent the Link click from completing
-      setTimeout(() => setOpenMobile(false), 100);
+      setTimeout(() => setOpenMobile(false), 200);
     }
   };
 

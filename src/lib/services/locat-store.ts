@@ -1,3 +1,5 @@
+"use client";
+
 import { UserPreferencesValues } from "../validations";
 
 export const PREFERENCES_STORAGE_KEY = "budget-ch-user-preferences";
@@ -7,11 +9,17 @@ export const DEFAULT_PREFERENCES: UserPreferencesValues = {
   theme: "auto",
 };
 
-// FIXME: Window is not defined some times, when this is called
+const hasLocalStorage = () =>
+  typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+
 export function getLocalUserPreferences(returnDefault: boolean = false) {
+  if (!hasLocalStorage()) {
+    return returnDefault ? DEFAULT_PREFERENCES : null;
+  }
+
   try {
     const stored = window.localStorage.getItem(PREFERENCES_STORAGE_KEY);
-    
+
     if (!stored && returnDefault) {
       return DEFAULT_PREFERENCES;
     }
@@ -28,9 +36,16 @@ export function getLocalUserPreferences(returnDefault: boolean = false) {
 export function setLocalUserPreferences(
   preferences: Partial<UserPreferencesValues>,
 ) {
+  const currentPreferences =
+    (getLocalUserPreferences(true) as UserPreferencesValues) ??
+    DEFAULT_PREFERENCES;
+  const newPreferences = { ...currentPreferences, ...preferences };
+
+  if (!hasLocalStorage()) {
+    return newPreferences;
+  }
+
   try {
-    const currentPreferences = getLocalUserPreferences();
-    const newPreferences = { ...currentPreferences, ...preferences };
     window.localStorage.setItem(
       PREFERENCES_STORAGE_KEY,
       JSON.stringify(newPreferences),
@@ -38,6 +53,6 @@ export function setLocalUserPreferences(
     return newPreferences;
   } catch (error) {
     console.error("Error setting local user preferences:", error);
-    return null;
+    return newPreferences;
   }
 }

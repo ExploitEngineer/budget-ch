@@ -263,15 +263,12 @@ export async function createTransactionCategory(
 }
 
 // GET Transactions
-export async function getTransactions(): Promise<{
+export async function getTransactions(hubId: string): Promise<{
   success: boolean;
   message?: string;
   data: Transaction[];
 }> {
   try {
-    const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
-
     const res = await getTransactionsDB(hubId, {
       id: true,
       date: true,
