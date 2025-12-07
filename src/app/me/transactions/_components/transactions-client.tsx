@@ -3,7 +3,7 @@
 import { useState } from "react";
 import SidebarHeader from "@/components/sidebar-header";
 import { FiltersSection } from "@/app/me/transactions/_components/filters-section";
-// import { DataTable } from "./data-table";
+import { DataTable } from "./data-table";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import type { TransactionFiltersFormValues } from "@/lib/validations/transaction-filters-validations";
 import { useQuery } from "@tanstack/react-query";
@@ -61,12 +61,12 @@ export default function TransactionsClient() {
           onFilter={handleFilter}
           onReset={handleReset}
         />
-        {/* <DataTable
+        <DataTable
           transactions={transactions ?? []}
           filters={filters}
           loading={transactionLoading}
           error={transactionError?.message ?? null}
-        /> */}
+        />
       </div>
     </section>
   );
