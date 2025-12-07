@@ -45,6 +45,7 @@ export function WarningSection({
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const upComingTableHeadings: string[] = [

@@ -34,6 +34,7 @@ export function BudgetCardsSection() {
       }
       return res.data;
     },
+    enabled: !!hubId,
   });
 
   const totalAllocated = budgetAmounts?.totalAllocated ?? 0;

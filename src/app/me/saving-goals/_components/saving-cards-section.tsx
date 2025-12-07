@@ -37,6 +37,7 @@ export function SavingCardsSection({ cards }: SavingCardsSectionProps) {
       }
       return res.data!;
     },
+    enabled: !!hubId,
   });
 
   return (

@@ -36,6 +36,7 @@ export function RecentTransactionsTableSection() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const headings = [

@@ -45,6 +45,7 @@ export function BudgetCardsSection() {
             : 0,
       };
     },
+    enabled: !!hubId,
   });
 
   const {
@@ -60,6 +61,7 @@ export function BudgetCardsSection() {
       }
       return Number(res.data?.count ?? 0);
     },
+    enabled: !!hubId,
   });
 
   const allocated = amounts?.allocated ?? null;

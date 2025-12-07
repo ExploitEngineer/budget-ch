@@ -50,6 +50,7 @@ export function BudgetDataTable() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const {
@@ -70,6 +71,7 @@ export function BudgetDataTable() {
         available: totalAllocated - totalSpent,
       };
     },
+    enabled: !!hubId,
   });
 
   const allocated = amounts?.allocated ?? null;

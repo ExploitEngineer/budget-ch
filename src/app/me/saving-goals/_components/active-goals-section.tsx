@@ -35,6 +35,7 @@ export function ActiveGoalsSection() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const activeGoalsData = goals ?? [];

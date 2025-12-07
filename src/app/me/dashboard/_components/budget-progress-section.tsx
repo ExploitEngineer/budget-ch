@@ -45,6 +45,7 @@ export function BudgetProgressSection() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   // Top categories query
@@ -61,6 +62,7 @@ export function BudgetProgressSection() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   // Create task mutation

@@ -50,6 +50,7 @@ export function ContentDataTable() {
       }
       return res.tableData ?? [];
     },
+    enabled: !!hubId,
   });
 
   const totalBalance = (accounts ?? []).reduce((sum, acc) => {

@@ -60,6 +60,10 @@ export default function SidebarHeader() {
 
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  
+  // Only fetch export-related data on the import-export page to avoid unnecessary requests
+  const isExportPage = route === "import-export";
+  
   const { data: budgets } = useQuery<BudgetRow[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
@@ -69,6 +73,7 @@ export default function SidebarHeader() {
       }
       return res.data ?? [];
     },
+    enabled: isExportPage && !!hubId,
   });
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
@@ -79,6 +84,7 @@ export default function SidebarHeader() {
       }
       return res.tableData ?? [];
     },
+    enabled: isExportPage && !!hubId,
   });
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
@@ -89,6 +95,7 @@ export default function SidebarHeader() {
       }
       return res.data ?? [];
     },
+    enabled: isExportPage && !!hubId,
   });
   const { data: goals } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId),
@@ -99,6 +106,7 @@ export default function SidebarHeader() {
       }
       return res.data ?? [];
     },
+    enabled: isExportPage && !!hubId,
   });
 
   const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
@@ -118,8 +126,11 @@ export default function SidebarHeader() {
   }
 
   useEffect(() => {
-    fetchTransfers();
-  }, []);
+    // Only fetch transfers on the import-export page
+    if (isExportPage) {
+      fetchTransfers();
+    }
+  }, [isExportPage]);
 
   const goToPrevMonth = () => {
     setDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));

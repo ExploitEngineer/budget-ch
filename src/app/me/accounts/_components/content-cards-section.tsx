@@ -34,6 +34,7 @@ export function ContentCardsSection() {
       }
       return res.tableData ?? [];
     },
+    enabled: !!hubId,
   });
 
   const parsedAccounts = (accounts ?? []).map((acc) => ({

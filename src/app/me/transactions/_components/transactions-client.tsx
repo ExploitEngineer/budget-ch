@@ -40,6 +40,7 @@ export default function TransactionsClient() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const [filters, setFilters] = useState<TransactionFiltersFormValues>(defaultFilters);

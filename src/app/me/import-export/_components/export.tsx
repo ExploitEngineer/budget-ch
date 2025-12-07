@@ -41,6 +41,7 @@ export function Export() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
@@ -51,6 +52,7 @@ export function Export() {
       }
       return res.tableData ?? [];
     },
+    enabled: !!hubId,
   });
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
@@ -61,6 +63,7 @@ export function Export() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
 
   const { data: goals } = useQuery<SavingGoal[]>({
@@ -72,6 +75,7 @@ export function Export() {
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
   const {
     exportTransactions,

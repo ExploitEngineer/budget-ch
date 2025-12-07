@@ -33,6 +33,7 @@ export function BudgetHealthSection() {
         available: totalAllocated - totalSpent,
       };
     },
+    enabled: !!hubId,
   });
 
   const {
@@ -47,6 +48,7 @@ export function BudgetHealthSection() {
       }
       return Number(res.data?.count ?? 0);
     },
+    enabled: !!hubId,
   });
 
   const allocated = amounts?.allocated ?? null;
