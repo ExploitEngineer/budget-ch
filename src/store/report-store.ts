@@ -28,6 +28,7 @@ interface ExpenseCategoryProgress {
 }
 
 interface ReportState {
+  hubId: string | null;
   transactions: Transaction[] | null;
   loading: boolean;
   error: string | null;
@@ -59,6 +60,7 @@ interface ReportState {
 }
 
 export const useReportStore = create<ReportState>((set, get) => ({
+  hubId: null,
   transactions: null,
   loading: false,
   error: null,
@@ -82,8 +84,8 @@ export const useReportStore = create<ReportState>((set, get) => ({
   fetchTransactions: async () => {
     try {
       set({ loading: true, error: null });
-
-      const res = await getTransactions();
+      // FIXME: Remove the usage of the report store and instead use the query client
+      const res = await getTransactions(get().hubId as string);
       if (!res.success || !res.data)
         throw new Error(res.message || "Failed to fetch transactions");
 
