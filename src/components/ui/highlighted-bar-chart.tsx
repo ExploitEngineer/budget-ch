@@ -1,7 +1,7 @@
 "use client";
 
 import { Bar, BarChart, XAxis, YAxis, Cell } from "recharts";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -12,7 +12,10 @@ import {
 } from "@/components/ui/chart";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { useReportStore } from "@/store/report-store";
+import { useQuery } from "@tanstack/react-query";
+import { getMonthlyReports, type MonthlyReport } from "@/lib/api";
+import { reportKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 
 const chartConfig = {
@@ -40,13 +43,27 @@ const ALL_MONTHS = [
 export function HighlightedBarChart() {
   const t = useTranslations("main-dashboard");
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
-  const { monthlyReports, fetchMonthlyReports, reportsLoading, reportsError } =
-    useReportStore();
-
-  useEffect(() => {
-    fetchMonthlyReports();
-  }, [fetchMonthlyReports]);
+  const {
+    data: monthlyReports,
+    isLoading: reportsLoading,
+    error: reportsError,
+  } = useQuery<MonthlyReport[]>({
+    queryKey: reportKeys.monthly(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getMonthlyReports(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch monthly reports");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
 
   const chartData = ALL_MONTHS.map((month) => {
     const found = monthlyReports?.find((report) => {
@@ -74,7 +91,11 @@ export function HighlightedBarChart() {
 
       <CardContent className="flex justify-center">
         {reportsError ? (
-          <p className="text-sm text-red-500">{reportsError}</p>
+          <p className="text-sm text-red-500">
+            {reportsError instanceof Error
+              ? reportsError.message
+              : "Failed to load monthly reports"}
+          </p>
         ) : reportsLoading ? (
           <Spinner />
         ) : (
