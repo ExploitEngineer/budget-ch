@@ -85,7 +85,7 @@ export function LatestTransfers() {
           <Button
             variant="outline"
             className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
-            onClick={() => exportTransfers({ transfers })}
+            onClick={() => exportTransfers({ transfers: transfers ?? null })}
           >
             {t("button")}
           </Button>
@@ -117,7 +117,7 @@ export function LatestTransfers() {
                   <TableCell>CHF {tx.amount.toFixed(2)}</TableCell>
                 </TableRow>
               ))}
-              {transfers.length === 0 && (
+              {(transfers ?? []).length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center opacity-60">
                     {t("no-transfers")}

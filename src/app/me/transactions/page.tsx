@@ -6,6 +6,7 @@ import {
 import { transactionKeys } from "@/lib/query-keys";
 import TransactionsClient from "./_components/transactions-client";
 import { getTransactions } from "@/lib/services/transaction";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
 
 interface TransactionsPageProps {
   searchParams: Promise<{ hub: string }>;

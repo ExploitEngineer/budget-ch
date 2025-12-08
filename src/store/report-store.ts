@@ -6,6 +6,8 @@ import {
 } from "@/lib/services/report";
 import { getCategoriesByExpenses } from "@/lib/services/report";
 import type { Transaction } from "@/lib/types/dashboard-types";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
+import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
 
 export interface CategoryDetail {
   id: string;
@@ -89,7 +91,10 @@ export const useReportStore = create<ReportState>((set, get) => ({
       if (!res.success || !res.data)
         throw new Error(res.message || "Failed to fetch transactions");
 
-      const transactions = res.data as Transaction[];
+      // Convert TransactionWithDetails[] to Transaction[] using adapter
+      const transactionRows = mapTransactionsToRows(res.data);
+      // TransactionRow is compatible with Transaction, so we can use it directly
+      const transactions: Transaction[] = transactionRows;
 
       let totalIncome = 0;
       let totalExpense = 0;

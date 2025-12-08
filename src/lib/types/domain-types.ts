@@ -7,6 +7,30 @@
  * UI-specific types should NOT be defined here. See ui-types.ts for presentation types.
  */
 
+// Import schema-derived base types for extending
+import type {
+  Budget,
+  FinancialAccount,
+  Transaction,
+  Hub,
+  HubMember,
+  HubInvitation,
+  TransactionCategory,
+  SavingGoal,
+  UserType,
+  SubscriptionType,
+  UserSettingsType,
+  QuickTask,
+  RecurringTransactionTemplateType,
+  TwoFactorType,
+  AccessRole,
+  TransactionType,
+  AccountType,
+  BudgetMarkerColor,
+  SubscriptionPlan,
+  SubscriptionStatus,
+} from "@/db/schema";
+
 // Re-export schema-derived base types
 export type {
   Budget,
@@ -23,7 +47,7 @@ export type {
   QuickTask,
   RecurringTransactionTemplateType,
   TwoFactorType,
-} from "@/db/schema";
+};
 
 // Re-export enum types
 export type {
@@ -33,7 +57,7 @@ export type {
   BudgetMarkerColor,
   SubscriptionPlan,
   SubscriptionStatus,
-} from "@/db/schema";
+};
 
 /**
  * BudgetWithCategory - Canonical domain view model for budgets with category information

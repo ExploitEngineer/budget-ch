@@ -59,8 +59,10 @@ import {
 } from "@/lib/services/transaction";
 import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
-import type { AccountRow } from "@/lib/types/row-types";
+import { getFinancialAccounts as getFinancialAccountsAPI } from "@/lib/api";
+import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
+import type { AccountRow } from "@/lib/types/ui-types";
+import type { FinancialAccount } from "@/lib/types/domain-types";
 import type { TransactionType } from "@/lib/types/common-types";
 
 interface EditTransactionDialogProps {
@@ -81,19 +83,25 @@ export default function EditTransactionDialog({
   const [open, setOpen] = useState<boolean>(false);
   const isEditMode = !!transaction;
 
-  const { data: accounts, isLoading: accountsLoading } = useQuery<AccountRow[]>(
+  const { data: domainAccounts, isLoading: accountsLoading } = useQuery<FinancialAccount[]>(
     {
       queryKey: accountKeys.list(hubId),
       queryFn: async () => {
-        const res = await getFinancialAccounts();
-        if (!res.status) {
-          throw new Error("Failed to fetch accounts");
+        if (!hubId) {
+          throw new Error("Hub ID is required");
         }
-        return res.tableData ?? [];
+        const res = await getFinancialAccountsAPI(hubId);
+        if (!res.success) {
+          throw new Error(res.message || "Failed to fetch accounts");
+        }
+        return res.data ?? [];
       },
-      enabled: open, // Only fetch when dialog is open
+      enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
     },
   );
+  
+  // Transform domain accounts to UI rows
+  const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
 
   const createTransactionMutation = useMutation({

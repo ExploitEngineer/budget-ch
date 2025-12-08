@@ -215,7 +215,7 @@ export function AnalysisTable() {
                       </p>
                     </TableCell>
                   </TableRow>
-                ) : monthlyReports === null || reportsLoading ? (
+                ) : monthlyReports === null || monthlyReports === undefined || reportsLoading ? (
                   <TableRow>
                     <TableCell colSpan={4}>
                       <p className="text-muted-foreground px-6 text-sm">

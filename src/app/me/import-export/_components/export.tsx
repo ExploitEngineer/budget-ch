@@ -18,10 +18,12 @@ import {
 import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
-import type { BudgetRow } from "@/lib/types/ui-types";
-import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import type { BudgetRow, AccountRow, TransactionRow } from "@/lib/types/ui-types";
+import type { BudgetWithCategory, FinancialAccount, TransactionWithDetails } from "@/lib/types/domain-types";
 import type { SavingGoal } from "@/lib/types/domain-types";
 import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
+import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
+import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
@@ -46,7 +48,8 @@ export function Export() {
 
   // Convert domain budgets to UI rows for export
   const budgets = domainBudgets ? mapBudgetsToRows(domainBudgets) : undefined;
-  const { data: accounts } = useQuery({
+  
+  const { data: domainAccounts } = useQuery<FinancialAccount[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -60,7 +63,11 @@ export function Export() {
     },
     enabled: !!hubId,
   });
-  const { data: transactions } = useQuery({
+  
+  // Convert domain accounts to UI rows for export
+  const accounts = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
+  
+  const { data: domainTransactions } = useQuery<TransactionWithDetails[]>({
     queryKey: transactionKeys.recent(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -74,6 +81,9 @@ export function Export() {
     },
     enabled: !!hubId,
   });
+  
+  // Convert domain transactions to UI rows for export
+  const transactions = domainTransactions ? mapTransactionsToRows(domainTransactions) : undefined;
 
   const { data: goals } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId),
@@ -119,8 +129,17 @@ export function Export() {
       title: t("export-card.buttons.transactions"),
       onClick: () => {
         if (transactions && transactions.length > 0) {
+          // Convert TransactionRow to the format expected by exportTransactions
+          const exportData = transactions.map(tx => ({
+            id: tx.id,
+            date: tx.date,
+            category: tx.category,
+            amount: tx.amount,
+            recipient: tx.recipient,
+            note: tx.note,
+          }));
           exportTransactions({
-            transactions: transactions as Omit<Transaction, "type">[],
+            transactions: exportData,
           });
         } else {
           console.warn("No transactions to export");
@@ -141,7 +160,7 @@ export function Export() {
     },
     {
       title: t("export-card.buttons.transfers"),
-      onClick: () => exportTransfers({ transfers }),
+      onClick: () => exportTransfers({ transfers: transfers ?? null }),
     },
   ];
 

@@ -17,7 +17,7 @@ import { getFinancialAccounts } from "@/lib/api";
 import type { FinancialAccount } from "@/lib/types/domain-types";
 import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
 import { useMemo } from "react";
-import { getRecentTransactions } from "@/lib/services/transaction";
+import { getRecentTransactions } from "@/lib/api";
 import { getBudgets } from "@/lib/services/budget";
 import { getSavingGoals } from "@/lib/services/saving-goal";
 import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
@@ -83,7 +83,10 @@ export function DataPrivacy() {
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
     queryFn: async () => {
-      const res = await getRecentTransactions();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getRecentTransactions(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch recent transactions");
       }

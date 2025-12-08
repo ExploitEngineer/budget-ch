@@ -182,13 +182,18 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
 
   const data = goals.map((goal) => {
     const remaining = goal.goalAmount - goal.amountSaved;
+    const goalAmount = Number(goal.goalAmount ?? 0);
+    const amountSaved = Number(goal.amountSaved ?? 0);
+    const progress = goalAmount > 0
+      ? Math.min(Math.round((amountSaved / goalAmount) * 100), 100)
+      : 0;
     return {
       [headers[0]]: goal.name,
       [headers[1]]: goal.goalAmount.toFixed(2),
       [headers[2]]: goal.amountSaved.toFixed(2),
       [headers[3]]: remaining.toFixed(2),
       [headers[4]]: goal.monthlyAllocation?.toFixed(2) ?? "0.00",
-      [headers[5]]: `${goal.value.toFixed(1)}%`,
+      [headers[5]]: `${progress.toFixed(1)}%`,
       [headers[6]]: goal.financialAccountId || "-",
     };
   });

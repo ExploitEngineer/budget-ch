@@ -50,8 +50,10 @@ import { Spinner } from "@/components/ui/spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getFinancialAccounts } from "@/lib/api";
 import { accountKeys, transactionKeys } from "@/lib/query-keys";
+import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
+import type { AccountRow } from "@/lib/types/ui-types";
+import type { FinancialAccount } from "@/lib/types/domain-types";
 import { useSearchParams } from "next/navigation";
-import type { AccountRow } from "@/lib/types/row-types";
 import { createTransaction } from "@/lib/services/transaction";
 import { toast } from "sonner";
 import type { TransactionType } from "@/lib/types/common-types";
@@ -130,22 +132,23 @@ export default function CreateTransactionDialog({
     },
   });
 
-  const { data: accounts, isLoading: accountsLoading } = useQuery<AccountRow[]>(
-    {
-      queryKey: accountKeys.list(hubId),
-      queryFn: async () => {
-        if (!hubId) {
-          throw new Error("Hub ID is required");
-        }
-        const res = await getFinancialAccounts(hubId);
-        if (!res.success) {
-          throw new Error(res.message || "Failed to fetch accounts");
-        }
-        return res.data ?? [];
-      },
-      enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
+  const { data: domainAccounts, isLoading: accountsLoading } = useQuery<FinancialAccount[]>({
+    queryKey: accountKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getFinancialAccounts(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
-  );
+    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
+  });
+  
+  // Transform domain accounts to UI rows
+  const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
 
   const t = useTranslations(

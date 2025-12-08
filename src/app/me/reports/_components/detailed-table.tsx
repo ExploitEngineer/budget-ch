@@ -53,7 +53,7 @@ export function DetailedTable() {
           <div className="flex items-center gap-2">
             <Button
               variant="outline"
-              onClick={() => exportCategories({ categories })}
+              onClick={() => exportCategories({ categories: categories ?? null })}
               className="!bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.categories-csv")}

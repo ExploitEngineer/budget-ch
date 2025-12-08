@@ -34,7 +34,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import type { BudgetWithCategory, BudgetMarkerColor } from "@/lib/types/domain-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBudget, updateBudget, deleteBudget } from "@/lib/services/budget";
 import { budgetKeys } from "@/lib/query-keys";
@@ -148,7 +148,7 @@ export default function EditBudgetDialog({
       budgetChf: budget?.allocatedAmount ?? 0,
       istChf: budget?.spentAmount ?? 0,
       warning: budget?.warningPercentage ?? 0,
-      colorMarker: budget?.markerColor ?? "standard",
+      colorMarker: (budget?.markerColor ?? "standard") as BudgetMarkerColor,
     },
   });
 
@@ -160,7 +160,7 @@ export default function EditBudgetDialog({
         budgetChf: budget.allocatedAmount ?? 0,
         istChf: budget.spentAmount ?? 0,
         warning: budget.warningPercentage ?? 0,
-        colorMarker: budget.markerColor ?? "standard",
+        colorMarker: (budget.markerColor ?? "standard") as BudgetMarkerColor,
       });
     } else if (open && !budget) {
       form.reset({

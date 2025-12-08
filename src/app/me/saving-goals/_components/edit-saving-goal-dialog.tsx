@@ -48,8 +48,10 @@ import { updateSavingGoal, deleteSavingGoal } from "@/lib/services/saving-goal";
 import { savingGoalKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
-import type { AccountRow } from "@/lib/types/row-types";
+import { getFinancialAccounts as getFinancialAccountsAPI } from "@/lib/api";
+import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
+import type { AccountRow } from "@/lib/types/ui-types";
+import type { FinancialAccount } from "@/lib/types/domain-types";
 
 export default function EditSavingGoalDialog({
   goalData,
@@ -66,19 +68,25 @@ export default function EditSavingGoalDialog({
   const [open, setOpen] = useState(false);
 
   const {
-    data: accounts,
+    data: domainAccounts,
     isLoading: accountsLoading,
-  } = useQuery<AccountRow[]>({
+  } = useQuery<FinancialAccount[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
+      if (!hubId) {
+        throw new Error("Hub ID is required");
       }
-      return res.tableData ?? [];
+      const res = await getFinancialAccountsAPI(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
-    enabled: open, // Only fetch when dialog is open
+    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
   });
+  
+  // Transform domain accounts to UI rows
+  const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
   const form = useForm<SavingsGoalDialogValues>({
     resolver: zodResolver(SavingsGoalDialogSchema) as any,
