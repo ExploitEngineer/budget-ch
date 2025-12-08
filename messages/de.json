@@ -32,6 +32,7 @@
         }
     },
     "common": {
+        "loading": "Wird geladen...",
         "updating": "Aktualisieren...",
         "update": "Aktualisieren",
         "add": "Hinzufügen"

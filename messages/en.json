@@ -32,6 +32,7 @@
         }
     },
     "common": {
+        "loading": "Loading...",
         "updating": "Updating...",
         "update": "Update",
         "add": "Add"

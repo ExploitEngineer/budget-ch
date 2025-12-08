@@ -34,13 +34,12 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBudget } from "@/lib/services/budget";
-import { getCategories } from "@/lib/services/category";
-import { budgetKeys, categoryKeys } from "@/lib/query-keys";
+import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import CategorySelector from "@/components/category-selector";
 
 export default function CreateBudgetDialog({
   variant = "gradient",
@@ -56,26 +55,7 @@ export default function CreateBudgetDialog({
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
-
-  // Fetch categories for the current hub
-  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
-    queryKey: categoryKeys.list(hubId),
-    queryFn: async () => {
-      if (!hubId) {
-        throw new Error("Hub ID is required");
-      }
-      const res = await getCategories(hubId);
-      if (!res.success) {
-        throw new Error(res.message || "Failed to fetch categories");
-      }
-      return res.data ?? [];
-    },
-    enabled: !!hubId && open, // Only fetch when dialog is open and hubId exists
-  });
-
-  const categories = categoriesData?.map((cat) => cat.name) ?? [];
 
   const createBudgetMutation = useMutation({
     mutationFn: async (data: {
@@ -130,20 +110,11 @@ export default function CreateBudgetDialog({
   }
 
   function handleCategoryAdded(newCategory: string) {
-    // Invalidate categories query to refetch and show new category
-    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
     form.setValue("category", newCategory);
   }
-  return (
-    <>
-      <CreateCategoryDialog
-        open={isAddCategoryOpen}
-        onOpenChangeAction={setIsAddCategoryOpen}
-        onCategoryAddedAction={handleCategoryAdded}
-        hubId={hubId}
-      />
 
-      <Dialog
+  return (
+    <Dialog
         open={open}
         onOpenChange={(isOpen) => {
           setOpen(isOpen);
@@ -191,56 +162,13 @@ export default function CreateBudgetDialog({
               className="space-y-6 pt-4"
             >
               {/* Row 1: Category */}
-              <FormField
+              <CategorySelector
                 control={form.control}
                 name="category"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t("labels.category.title")}</FormLabel>
-                    <FormControl>
-                      <Select
-                        value={field.value || ""}
-                        onValueChange={(value) => {
-                          field.onChange(value);
-                        }}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select or add a category" />
-                        </SelectTrigger>
-
-                        <SelectContent>
-                          <div className="flex items-center justify-between border-b px-2 py-1.5">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className="w-full cursor-pointer justify-center text-sm"
-                              onClick={() => setIsAddCategoryOpen(true)}
-                            >
-                              + {t("new-category")}
-                            </Button>
-                          </div>
-
-                          {categoriesLoading ? (
-                            <SelectItem value="loading" disabled>
-                              Loading categories...
-                            </SelectItem>
-                          ) : categories.length === 0 ? (
-                            <SelectItem value="none" disabled>
-                              {t("no-category")}
-                            </SelectItem>
-                          ) : (
-                            categories.map((category) => (
-                              <SelectItem key={category} value={category}>
-                                {category}
-                              </SelectItem>
-                            ))
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                hubId={hubId}
+                label={t("labels.category.title")}
+                enabled={open}
+                onCategoryAdded={handleCategoryAdded}
               />
               {/* Row 2: Budget & Ist */}
               <div className="flex items-center justify-between gap-3">
@@ -367,6 +295,5 @@ export default function CreateBudgetDialog({
           </Form>
         </DialogContent>
       </Dialog>
-    </>
   );
 }

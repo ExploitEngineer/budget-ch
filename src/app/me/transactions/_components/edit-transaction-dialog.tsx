@@ -47,8 +47,8 @@ import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
-import CreateCategoryDialog from "@/app/me/dashboard/_components/create-category-dialog";
 import type { Transaction } from "@/lib/types/dashboard-types";
+import CategorySelector from "@/components/category-selector";
 import { useEffect } from "react";
 import { parse } from "date-fns";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -57,10 +57,9 @@ import {
   updateTransaction,
   deleteTransaction,
 } from "@/lib/services/transaction";
-import { transactionKeys, accountKeys, categoryKeys } from "@/lib/query-keys";
+import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { getCategories } from "@/lib/services/category";
 import type { AccountRow } from "@/lib/types/row-types";
 import type { TransactionType } from "@/lib/types/common-types";
 
@@ -96,24 +95,6 @@ export default function EditTransactionDialog({
     },
   );
 
-  const { data: categoriesData, isLoading: categoriesLoading } = useQuery<
-    { id: string; name: string }[]
-  >({
-    queryKey: categoryKeys.list(hubId),
-    queryFn: async () => {
-      if (!hubId) {
-        throw new Error("Hub ID is required");
-      }
-      const res = await getCategories(hubId);
-      if (!res.success || !res.data) {
-        throw new Error(res.message || "Failed to fetch categories");
-      }
-      return res.data;
-    },
-    enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
-  });
-
-  const categories = categoriesData?.map((cat) => cat.name) ?? [];
 
   const createTransactionMutation = useMutation({
     mutationFn: async (data: {
@@ -229,8 +210,6 @@ export default function EditTransactionDialog({
     },
   });
 
-  const [isAddCategoryOpen, setIsAddCategoryOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const t = useTranslations(
     "main-dashboard.transactions-page.transaction-edit-dialog",
@@ -297,10 +276,6 @@ export default function EditTransactionDialog({
         endDate: null,
         recurringStatus: "active",
       });
-      
-      if (transaction.category) {
-        setSelectedCategory(transaction.category);
-      }
     } else if (!isEditMode && open) {
       // Reset to defaults when creating new transaction
       form.reset({
@@ -314,13 +289,12 @@ export default function EditTransactionDialog({
         splits: [],
         transactionType: "expense" as TransactionType,
       });
-      setSelectedCategory(null);
     }
   }, [transaction, isEditMode, open, form]);
 
   async function onSubmit(values: TransactionDialogValues) {
     const payload = {
-      category: selectedCategory || values.category?.trim(),
+      category: values.category?.trim(),
       amount: values.amount,
       note: values.note,
       source: values.recipient || null,
@@ -364,7 +338,6 @@ export default function EditTransactionDialog({
       }
 
       form.reset();
-      setSelectedCategory(null);
       setOpen(false);
     } catch (err: any) {
       // Error already handled in onError
@@ -377,7 +350,6 @@ export default function EditTransactionDialog({
     try {
       await deleteTransactionMutation.mutateAsync(transaction.id);
       form.reset();
-      setSelectedCategory(null);
       setOpen(false);
     } catch (err: any) {
       // Error already handled in onError
@@ -386,20 +358,10 @@ export default function EditTransactionDialog({
   }
 
   function handleCategoryAdded(newCategory: string) {
-    setSelectedCategory(newCategory);
     form.setValue("category", newCategory);
-    // Refetch categories to get the updated list
-    queryClient.invalidateQueries({ queryKey: categoryKeys.list(hubId) });
   }
   return (
     <>
-      <CreateCategoryDialog
-        open={isAddCategoryOpen}
-        onOpenChangeAction={setIsAddCategoryOpen}
-        onCategoryAddedAction={handleCategoryAdded}
-        hubId={hubId}
-      />
-
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer" asChild>
           <Button
@@ -678,57 +640,16 @@ export default function EditTransactionDialog({
                 {/* 3️⃣ Category + Amount */}
                 <div className="flex flex-col justify-center items-start gap-4 sm:flex-row sm:gap-3">
                   {transactionType !== "transfer" && (
-                    <FormField
+                    <CategorySelector
                       control={form.control}
                       name="category"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel>{t("dialog.labels.category")}</FormLabel>
-                          <FormControl>
-                            <Select
-                              value={selectedCategory || ""}
-                              onValueChange={(value) => {
-                                setSelectedCategory(value);
-                                field.onChange(value);
-                              }}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select or add a category" />
-                              </SelectTrigger>
-
-                              <SelectContent>
-                                <div className="flex items-center justify-between border-b px-2 py-1.5">
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    className="w-full cursor-pointer justify-center text-sm"
-                                    onClick={() => setIsAddCategoryOpen(true)}
-                                  >
-                                    + {t("dialog.new-category")}
-                                  </Button>
-                                </div>
-
-                                {categoriesLoading ? (
-                                  <SelectItem value="loading" disabled>
-                                    Loading categories...
-                                  </SelectItem>
-                                ) : categories.length === 0 ? (
-                                  <SelectItem value="none" disabled>
-                                    {t("dialog.no-category")}
-                                  </SelectItem>
-                                ) : (
-                                  categories.map((category) => (
-                                    <SelectItem key={category} value={category}>
-                                      {category}
-                                    </SelectItem>
-                                  ))
-                                )}
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                      hubId={hubId}
+                      allowCreate={true}
+                      label={t("dialog.labels.category")}
+                      placeholder="Select or add a category"
+                      enabled={open && !!hubId}
+                      className="w-full"
+                      onCategoryAdded={handleCategoryAdded}
                     />
                   )}
 

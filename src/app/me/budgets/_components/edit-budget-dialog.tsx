@@ -32,7 +32,7 @@ import {
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import type { BudgetRow } from "@/lib/types/row-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -40,6 +40,7 @@ import { createBudget, updateBudget, deleteBudget } from "@/lib/services/budget"
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import CategorySelector from "@/components/category-selector";
 
 interface EditBudgetDialogProps {
   variant?: "gradient" | "outline";
@@ -146,10 +147,35 @@ export default function EditBudgetDialog({
       category: budget?.category ?? "",
       budgetChf: budget?.allocated ?? 0,
       istChf: budget?.spent ?? 0,
-      warning: 0,
-      colorMarker: "standard",
+      warning: budget?.warningPercentage ?? 0,
+      colorMarker: budget?.markerColor ?? "standard",
     },
   });
+
+  // Reset form when dialog opens with a budget
+  useEffect(() => {
+    if (open && budget) {
+      form.reset({
+        category: budget.category ?? "",
+        budgetChf: budget.allocated ?? 0,
+        istChf: budget.spent ?? 0,
+        warning: budget.warningPercentage ?? 0,
+        colorMarker: budget.markerColor ?? "standard",
+      });
+    } else if (open && !budget) {
+      form.reset({
+        category: "",
+        budgetChf: 0,
+        istChf: 0,
+        warning: 0,
+        colorMarker: "standard",
+      });
+    }
+  }, [open, budget, form]);
+
+  function handleCategoryAdded(newCategory: string) {
+    form.setValue("category", newCategory);
+  }
 
   async function onSubmit(values: BudgetDialogValues) {
     try {
@@ -231,21 +257,13 @@ export default function EditBudgetDialog({
             className="space-y-6 pt-4"
           >
             {/* Row 1: Category */}
-            <FormField
+            <CategorySelector
               control={form.control}
               name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("labels.category.title")}</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder={t("labels.category.placeholder")}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              hubId={hubId}
+              label={t("labels.category.title")}
+              enabled={open}
+              onCategoryAdded={handleCategoryAdded}
             />
 
             {/* Row 2: Budget & Ist */}
