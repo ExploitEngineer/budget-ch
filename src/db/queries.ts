@@ -103,20 +103,6 @@ export type savingGoalArgs = {
   financialAccountId?: string | null;
 };
 
-// @deprecated: Use SavingGoal from @/db/schema or @/lib/types/domain-types instead
-// This type is kept for backward compatibility but should not be used in new code
-export interface SavingGoal {
-  id: string;
-  name: string;
-  goalAmount: number;
-  amountSaved: number;
-  monthlyAllocation?: number;
-  value: number;
-  financialAccountId?: string | null;
-  dueDate?: Date | null;
-  remaining?: number;
-}
-
 export type quickTasksArgs = {
   userId: string;
   hubId: string;

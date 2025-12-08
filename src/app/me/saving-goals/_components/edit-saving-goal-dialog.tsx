@@ -42,7 +42,7 @@ import {
 } from "@/lib/validations/saving-goal-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { Spinner } from "@/components/ui/spinner";
-import type { SavingGoal } from "@/db/queries";
+import type { SavingGoalRow } from "@/lib/types/ui-types";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { updateSavingGoal, deleteSavingGoal } from "@/lib/services/saving-goal";
 import { savingGoalKeys, accountKeys } from "@/lib/query-keys";
@@ -54,7 +54,7 @@ import type { AccountRow } from "@/lib/types/row-types";
 export default function EditSavingGoalDialog({
   goalData,
 }: {
-  goalData: SavingGoal;
+  goalData: SavingGoalRow;
 }) {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.sidebar-header.dialog",

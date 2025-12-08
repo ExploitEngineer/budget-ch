@@ -22,7 +22,7 @@ import { getBudgets } from "@/lib/services/budget";
 import { getSavingGoals } from "@/lib/services/saving-goal";
 import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import type { SavingGoal } from "@/db/queries";
+import type { SavingGoal } from "@/lib/types/domain-types";
 import type { BudgetRow } from "@/lib/types/ui-types";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";

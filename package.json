@@ -16,7 +16,8 @@
         "db:seed": "tsx scripts/seed-db.ts",
         "format:tailwindcss": "prettier --write .",
         "stripe:listen": "tsx scripts/stripe-listen.ts",
-        "dotenv:echo": "tsx scripts/echo-stripe-key.ts"
+        "dotenv:echo": "tsx scripts/echo-stripe-key.ts",
+        "type-check": "npx tsc --noEmit"
     },
     "dependencies": {
         "@hookform/resolvers": "^5.2.2",

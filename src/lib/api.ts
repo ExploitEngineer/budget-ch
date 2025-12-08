@@ -2,7 +2,7 @@ import ky from "ky";
 import { ApiResponse } from "./api-response";
 import { Transaction } from "./types/dashboard-types";
 import type { AccountRow } from "./types/row-types";
-import type { SavingGoal } from "@/db/queries";
+import type { SavingGoal } from "./types/domain-types";
 import type { QuickTask } from "@/db/schema";
 import type { DashboardSavingsGoalsCards } from "./types/dashboard-types";
 import type {

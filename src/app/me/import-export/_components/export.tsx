@@ -20,7 +20,7 @@ import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
 import type { BudgetRow } from "@/lib/types/ui-types";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
-import type { SavingGoal } from "@/db/queries";
+import type { SavingGoal } from "@/lib/types/domain-types";
 import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
 
 export function Export() {

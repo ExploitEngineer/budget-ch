@@ -38,18 +38,9 @@ export type {
 /**
  * BudgetWithCategory - Canonical domain view model for budgets with category information
  * Used by services and API routes when returning budget data that includes category names
+ * Extends Budget schema type with joined category name
  */
-export interface BudgetWithCategory {
-  id: string;
-  hubId: string;
-  userId: string | null;
-  transactionCategoryId: string | null;
-  allocatedAmount: number;
-  spentAmount: number;
-  warningPercentage: number;
-  markerColor: string;
-  createdAt: Date;
-  updatedAt: Date;
+export interface BudgetWithCategory extends Budget {
   categoryName: string | null; // From joined TransactionCategory
 }
 
@@ -65,21 +56,9 @@ export interface BudgetAmounts {
 /**
  * TransactionWithDetails - Canonical domain view model for transactions with joined data
  * Used by services and API routes when returning transaction data that includes category and account names
+ * Extends Transaction schema type with joined category, account, and user names
  */
-export interface TransactionWithDetails {
-  id: string;
-  hubId: string;
-  userId: string | null;
-  financialAccountId: string;
-  destinationAccountId: string | null;
-  transactionCategoryId: string | null;
-  recurringTemplateId: string | null;
-  type: TransactionType;
-  source: string | null;
-  amount: number;
-  note: string | null;
-  createdAt: Date;
-  updatedAt: Date;
+export interface TransactionWithDetails extends Transaction {
   // Joined fields
   categoryName: string | null; // From joined TransactionCategory
   accountName: string | null; // From joined FinancialAccount
