@@ -2286,10 +2286,21 @@ export async function getFirstHubMemberDB(userId: string) {
 }
 
 export async function getOwnedHubDB(userId: string) {
-  return await db.query.hubs.findFirst({
-    where: eq(hubs.userId, userId),
-    columns: { id: true },
+
+  const hubMember = await db.query.hubMembers.findFirst({
+    where: and(eq(hubMembers.userId, userId), eq(hubMembers.isOwner, true)),
+    columns: { hubId: true },
   });
+
+  if (hubMember) {
+    const hub = await db.query.hubs.findFirst({
+      where: eq(hubs.id, hubMember.hubId),
+      columns: { id: true },
+    });
+    return hub;
+  }
+
+  return null;
 }
 
 export async function getHubMemberRoleDB(userId: string, hubId: string) {

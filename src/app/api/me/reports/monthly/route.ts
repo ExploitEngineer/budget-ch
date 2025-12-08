@@ -10,7 +10,9 @@ export async function GET(request: Request) {
     return apiError({ message: "Hub ID is required", status: 400 });
   }
   
+  console.log("[me/reports/monthly] hubId", hubId);
   const access = await validateHubAccess(hubId);
+  console.log("[me/reports/monthly] access", access);
   if (!access.success) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }

@@ -21,12 +21,20 @@ export async function validateHubAccess(hubId: string): Promise<{
     }
 
     const userId = session.user.id;
+    console.log("userId", userId);
 
     // Verify user has access to this hub
     const hubMember = await getHubMemberRoleDB(userId, hubId);
+    // const humMembers = await getHubMembersDB(hubId)
+    console.log("hubMember", hubMember);
     const ownedHub = await getOwnedHubDB(userId);
-
-    if (!hubMember && ownedHub?.id !== hubId) {
+    console.log("ownedHub", ownedHub);
+    
+    // User has access if they are a member OR they own the hub
+    const hasAccess = !!hubMember || ownedHub?.id === hubId;
+    console.log("hasAccess:", hasAccess, "hubMember:", !!hubMember, "ownsHub:", ownedHub?.id === hubId);
+    
+    if (!hasAccess) {
       return {
         success: false,
         message: "You don't have access to this hub",

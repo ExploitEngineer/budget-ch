@@ -1,6 +1,6 @@
 "use server";
 
-import { getHubsByUserDB, getFirstHubMemberDB, getOwnedHubDB } from "@/db/queries";
+import { getHubsByUserDB, getFirstHubMemberDB, getOwnedHubDB, getHubMemberRoleDB } from "@/db/queries";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 
@@ -89,6 +89,45 @@ export async function getHubs(): Promise<GetHubsResponse> {
     return {
       success: false,
       message: (error as Error).message || "Failed to fetch hubs",
+    };
+  }
+}
+
+// Validate Hub Access for Current User [Action]
+export async function validateHubAccessAction(hubId: string): Promise<{
+  success: boolean;
+  message?: string;
+}> {
+  try {
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs });
+    
+    if (!session?.user) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const userId = session.user.id;
+
+    // Verify user has access to this hub
+    const hubMember = await getHubMemberRoleDB(userId, hubId);
+    const ownedHub = await getOwnedHubDB(userId);
+    
+    // User has access if they are a member OR they own the hub
+    const hasAccess = !!hubMember || ownedHub?.id === hubId;
+    
+    if (!hasAccess) {
+      return {
+        success: false,
+        message: "You don't have access to this hub",
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error validating hub access:", error);
+    return {
+      success: false,
+      message: (error as Error).message || "Failed to validate hub access",
     };
   }
 }
