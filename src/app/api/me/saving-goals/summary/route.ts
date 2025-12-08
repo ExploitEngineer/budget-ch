@@ -1,4 +1,4 @@
-import { getTransactions } from "@/lib/services/transaction";
+import { getSavingGoalsSummary } from "@/lib/services/saving-goal";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { validateHubAccess } from "@/lib/api-helpers";
 
@@ -15,11 +15,11 @@ export async function GET(request: Request) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
   
-  const transactions = await getTransactions(hubId);
+  const summary = await getSavingGoalsSummary();
   
-  if (!transactions.success) {
-    return apiError({ message: transactions.message ?? "Failed to fetch transactions", status: 500 });
+  if (!summary.success) {
+    return apiError({ message: summary.message ?? "Failed to fetch saving goals summary", status: 500 });
   }
   
-  return apiSuccess({ data: transactions.data, status: 200 });
+  return apiSuccess({ data: summary.data, status: 200 });
 }

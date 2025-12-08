@@ -1,4 +1,4 @@
-import { getTransactions } from "@/lib/services/transaction";
+import { getTasks } from "@/lib/services/tasks";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { validateHubAccess } from "@/lib/api-helpers";
 
@@ -15,11 +15,11 @@ export async function GET(request: Request) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
   
-  const transactions = await getTransactions(hubId);
+  const tasks = await getTasks();
   
-  if (!transactions.success) {
-    return apiError({ message: transactions.message ?? "Failed to fetch transactions", status: 500 });
+  if (!tasks.success) {
+    return apiError({ message: tasks.message ?? "Failed to fetch tasks", status: 500 });
   }
   
-  return apiSuccess({ data: transactions.data, status: 200 });
+  return apiSuccess({ data: tasks.data, status: 200 });
 }

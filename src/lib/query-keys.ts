@@ -63,3 +63,21 @@ export const savingGoalKeys = {
   summary: (hubId: string | null) => [...savingGoalKeys.all, "summary", hubId] as const,
 };
 
+/**
+ * Query key factory for reports
+ */
+export const reportKeys = {
+  all: ["reports"] as const,
+  detailedCategories: (hubId: string | null) => [...reportKeys.all, "detailed-categories", hubId] as const,
+  monthly: (hubId: string | null) => [...reportKeys.all, "monthly", hubId] as const,
+  expenseCategoriesProgress: (hubId: string | null) => [...reportKeys.all, "expense-categories-progress", hubId] as const,
+};
+
+/**
+ * Query key factory for transfers
+ */
+export const transferKeys = {
+  all: ["transfers"] as const,
+  list: () => [...transferKeys.all, "list"] as const,
+};
+

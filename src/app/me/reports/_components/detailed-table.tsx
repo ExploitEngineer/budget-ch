@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
-import { useReportStore } from "@/store/report-store";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Table,
@@ -15,18 +13,37 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import { useExportCSV } from "@/hooks/use-export-csv";
+import { useQuery } from "@tanstack/react-query";
+import { getDetailedCategories, type CategoryDetail } from "@/lib/api";
+import { reportKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
 
 export function DetailedTable() {
   const t = useTranslations("main-dashboard.report-page.detailed-table");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const { exportCategories } = useExportCSV();
 
-  const { categories, categoriesTotal, fetchCategories, loading } =
-    useReportStore();
+  const {
+    data: categories,
+    isLoading: loading,
+  } = useQuery<CategoryDetail[]>({
+    queryKey: reportKeys.detailedCategories(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getDetailedCategories(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch categories");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
 
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+  const categoriesTotal = categories?.reduce((sum, cat) => sum + cat.totalAmount, 0) ?? 0;
 
   return (
     <section>

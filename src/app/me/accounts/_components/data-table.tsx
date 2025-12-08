@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import EditAccountDialog from "./edit-account-dialog";
 import { useQuery } from "@tanstack/react-query";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getFinancialAccounts } from "@/lib/api";
 import { accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { useExportCSV } from "@/hooks/use-export-csv";
@@ -44,11 +44,14 @@ export function ContentDataTable() {
   } = useQuery<AccountRow[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
+      if (!hubId) {
+        throw new Error("Hub ID is required");
       }
-      return res.tableData ?? [];
+      const res = await getFinancialAccounts(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
     enabled: !!hubId,
   });

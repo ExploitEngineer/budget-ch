@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -13,7 +12,9 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { getAccountTransfers } from "@/lib/api";
+import { transferKeys } from "@/lib/query-keys";
+import { useQuery } from "@tanstack/react-query";
 import { useExportCSV } from "@/hooks/use-export-csv";
 
 export interface TransferData {
@@ -31,30 +32,22 @@ export function LatestTransfers() {
 
   const { exportTransfers } = useExportCSV();
 
-  const [transfers, setTransfers] = useState<TransferData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  async function fetchTransfers() {
-    try {
-      const result = await getAccountTransfers();
-
-      if (!result) {
-        throw new Error("No Financial Account Found");
+  const {
+    data: transfers,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery<TransferData[]>({
+    queryKey: transferKeys.list(),
+    queryFn: async () => {
+      const res = await getAccountTransfers();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transfers");
       }
+      return res.data ?? [];
+    },
+  });
 
-      setTransfers((result.data as TransferData[]) || []);
-    } catch (err: any) {
-      console.error("Error fetching transfers:", err);
-      setError("Failed to load transfers");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    fetchTransfers();
-  }, []);
+  const error = queryError ? (queryError instanceof Error ? queryError.message : "Failed to load transfers") : null;
 
   const tableHeadings: string[] = [
     t("data-table.headings.date"),
@@ -113,7 +106,7 @@ export function LatestTransfers() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {transfers.map((tx, index) => (
+              {(transfers ?? []).map((tx, index) => (
                 <TableRow key={index} className="dark:border-border-blue">
                   <TableCell>
                     {new Date(tx.date).toLocaleDateString("en-US")}

@@ -1,4 +1,4 @@
-import { getTransactions } from "@/lib/services/transaction";
+import { getMonthlyReportAction } from "@/lib/services/report";
 import { apiError, apiSuccess } from "@/lib/api-response";
 import { validateHubAccess } from "@/lib/api-helpers";
 
@@ -15,11 +15,11 @@ export async function GET(request: Request) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
   
-  const transactions = await getTransactions(hubId);
+  const reports = await getMonthlyReportAction();
   
-  if (!transactions.success) {
-    return apiError({ message: transactions.message ?? "Failed to fetch transactions", status: 500 });
+  if (!reports.success) {
+    return apiError({ message: reports.message ?? "Failed to fetch monthly reports", status: 500 });
   }
   
-  return apiSuccess({ data: transactions.data, status: 200 });
+  return apiSuccess({ data: reports.data, status: 200 });
 }

@@ -6,36 +6,34 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useExportCSV } from "@/hooks/use-export-csv";
-import { useEffect, useState } from "react";
-import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import { useQuery } from "@tanstack/react-query";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { getRecentTransactions } from "@/lib/services/transaction";
-import { getBudgets } from "@/lib/services/budget";
+import { getAccountTransfers, getFinancialAccounts, getRecentTransactions, getBudgets, getSavingGoals } from "@/lib/api";
 import {
   accountKeys,
   transactionKeys,
   budgetKeys,
   savingGoalKeys,
+  transferKeys,
 } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
-import { getSavingGoals } from "@/lib/services/saving-goal";
 import type { BudgetRow } from "@/lib/types/row-types";
 import type { SavingGoal } from "@/db/queries";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
 
-  const [transfers, setTransfers] = useState<TransferData[]>([]);
-
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  
   const { data: budgets } = useQuery<BudgetRow[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
-      const res = await getBudgets();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getBudgets(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budgets");
       }
@@ -46,18 +44,24 @@ export function Export() {
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
+      if (!hubId) {
+        throw new Error("Hub ID is required");
       }
-      return res.tableData ?? [];
+      const res = await getFinancialAccounts(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
     enabled: !!hubId,
   });
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
     queryFn: async () => {
-      const res = await getRecentTransactions();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getRecentTransactions(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch recent transactions");
       }
@@ -69,13 +73,27 @@ export function Export() {
   const { data: goals } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId),
     queryFn: async () => {
-      const res = await getSavingGoals();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getSavingGoals(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch saving goals");
       }
       return res.data ?? [];
     },
     enabled: !!hubId,
+  });
+  
+  const { data: transfers } = useQuery<TransferData[]>({
+    queryKey: transferKeys.list(),
+    queryFn: async () => {
+      const res = await getAccountTransfers();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transfers");
+      }
+      return res.data ?? [];
+    },
   });
   const {
     exportTransactions,
@@ -90,24 +108,6 @@ export function Export() {
     exportSavingGoalTemplate,
     exportAllDataJSON,
   } = useExportCSV();
-
-  async function fetchTransfers() {
-    try {
-      const result = await getAccountTransfers();
-
-      if (!result) {
-        throw new Error("Financial Account not found");
-      }
-
-      setTransfers((result.data as TransferData[]) || []);
-    } catch (err: any) {
-      console.error("Error fetching transfers:", err);
-    }
-  }
-
-  useEffect(() => {
-    fetchTransfers();
-  }, []);
 
   const buttons = [
     {
@@ -213,7 +213,7 @@ export function Export() {
                     budgets,
                     accounts,
                     goals,
-                    transfers,
+                    transfers: transfers ?? [],
                   })
                 }
                 className="btn-gradient dark:text-foreground w-[38%] cursor-pointer hover:text-white"

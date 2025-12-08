@@ -48,11 +48,10 @@ import {
 } from "@/lib/validations/transaction-dialog-validations";
 import { Spinner } from "@/components/ui/spinner";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getFinancialAccounts, getCategories } from "@/lib/api";
 import { accountKeys, categoryKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { AccountRow } from "@/lib/types/row-types";
-import { getCategories } from "@/lib/services/category";
 import { createTransaction } from "@/lib/services/transaction";
 import { toast } from "sonner";
 import type { TransactionType } from "@/lib/types/common-types";
@@ -137,13 +136,16 @@ export default function CreateTransactionDialog({
     {
       queryKey: accountKeys.list(hubId),
       queryFn: async () => {
-        const res = await getFinancialAccounts();
-        if (!res.status) {
-          throw new Error("Failed to fetch accounts");
+        if (!hubId) {
+          throw new Error("Hub ID is required");
         }
-        return res.tableData ?? [];
+        const res = await getFinancialAccounts(hubId);
+        if (!res.success) {
+          throw new Error(res.message || "Failed to fetch accounts");
+        }
+        return res.data ?? [];
       },
-      enabled: open, // Only fetch when dialog is open
+      enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
     },
   );
 
@@ -156,10 +158,10 @@ export default function CreateTransactionDialog({
         throw new Error("Hub ID is required");
       }
       const res = await getCategories(hubId);
-      if (!res.success || !res.data) {
+      if (!res.success) {
         throw new Error(res.message || "Failed to fetch categories");
       }
-      return res.data;
+      return res.data ?? [];
     },
     enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
   });

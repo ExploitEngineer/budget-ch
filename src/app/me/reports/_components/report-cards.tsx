@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import {
   Card,
   CardHeader,
@@ -10,25 +9,50 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useReportStore } from "@/store/report-store";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { getTransactions } from "@/lib/api";
+import { transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import type { Transaction } from "@/lib/types/dashboard-types";
 
 export function ReportCardsSection() {
   const t = useTranslations("main-dashboard.report-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    income,
-    expense,
-    balance,
-    savingRate,
-    loading,
-    error,
-    fetchTransactions,
-  } = useReportStore();
+    data: transactions,
+    isLoading: loading,
+    error: queryError,
+  } = useQuery<Transaction[]>({
+    queryKey: transactionKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getTransactions(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transactions");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [fetchTransactions]);
+  // Calculate income, expense, balance, and saving rate from transactions
+  const income = transactions?.reduce((sum, tx) => {
+    return tx.type === "income" ? sum + tx.amount : sum;
+  }, 0) ?? 0;
+
+  const expense = transactions?.reduce((sum, tx) => {
+    return tx.type === "expense" ? sum + tx.amount : sum;
+  }, 0) ?? 0;
+
+  const balance = income - expense;
+  const savingRate = income > 0 ? Number(((balance / income) * 100).toFixed(1)) : 0;
+
+  const error = queryError ? (queryError instanceof Error ? queryError.message : "Failed to load report data") : null;
 
   const cards = [
     {

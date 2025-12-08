@@ -12,8 +12,8 @@ import { Plus, X } from "lucide-react";
 import { useState, useRef } from "react";
 import Link from "next/link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getTasks, createTask, updateTask, deleteTask } from "@/lib/services/tasks";
-import { getTopCategories } from "@/lib/services/budget";
+import { getTasks, getTopCategories } from "@/lib/api";
+import { createTask, updateTask, deleteTask } from "@/lib/services/tasks";
 import { taskKeys, budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -39,7 +39,10 @@ export function BudgetProgressSection() {
   } = useQuery<QuickTask[]>({
     queryKey: taskKeys.list(hubId),
     queryFn: async () => {
-      const res = await getTasks();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getTasks(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch tasks");
       }
@@ -56,7 +59,10 @@ export function BudgetProgressSection() {
   } = useQuery<DashboardSavingsGoalsCards[]>({
     queryKey: budgetKeys.topCategories(hubId),
     queryFn: async () => {
-      const res = await getTopCategories();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getTopCategories(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch categories");
       }

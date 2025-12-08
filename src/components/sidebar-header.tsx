@@ -19,15 +19,12 @@ import CreateBudgetDialog from "@/app/me/budgets/_components/create-budget-dialo
 import CreateSavingGoalDialog from "@/app/me/saving-goals/_components/create-saving-goal-dialog";
 import NewAccountDialog from "@/app/me/accounts/_components/new-account-dialog";
 import CreateTransactionDialog from "@/app/me/transactions/_components/create-transaction-dialog";
-import { getAccountTransfers } from "@/lib/services/latest-transfers";
+import { getAccountTransfers } from "@/lib/api";
+import { transferKeys } from "@/lib/query-keys";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
 import { useExportCSV } from "@/hooks/use-export-csv";
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
-import { getRecentTransactions } from "@/lib/services/transaction";
-import { getBudgets } from "@/lib/services/budget";
-import { getSavingGoals } from "@/lib/services/saving-goal";
+import { getFinancialAccounts, getRecentTransactions, getBudgets, getSavingGoals } from "@/lib/api";
 import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { BudgetRow } from "@/lib/types/row-types";
@@ -51,7 +48,6 @@ const monthNames: string[] = [
 export default function SidebarHeader() {
   const today = new Date();
   const t = useTranslations("main-dashboard");
-  const [transfers, setTransfers] = useState<TransferData[]>([]);
   const [date, setDate] = useState(
     new Date(today.getFullYear(), today.getMonth()),
   );
@@ -64,10 +60,25 @@ export default function SidebarHeader() {
   // Only fetch export-related data on the import-export page to avoid unnecessary requests
   const isExportPage = route === "import-export";
   
+  const { data: transfers } = useQuery<TransferData[]>({
+    queryKey: transferKeys.list(),
+    queryFn: async () => {
+      const res = await getAccountTransfers();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transfers");
+      }
+      return res.data ?? [];
+    },
+    enabled: isExportPage,
+  });
+  
   const { data: budgets } = useQuery<BudgetRow[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
-      const res = await getBudgets();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getBudgets(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budgets");
       }
@@ -78,18 +89,24 @@ export default function SidebarHeader() {
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
+      if (!hubId) {
+        throw new Error("Hub ID is required");
       }
-      return res.tableData ?? [];
+      const res = await getFinancialAccounts(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
     enabled: isExportPage && !!hubId,
   });
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
     queryFn: async () => {
-      const res = await getRecentTransactions();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getRecentTransactions(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch recent transactions");
       }
@@ -100,7 +117,10 @@ export default function SidebarHeader() {
   const { data: goals } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId),
     queryFn: async () => {
-      const res = await getSavingGoals();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getSavingGoals(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch saving goals");
       }
@@ -110,27 +130,6 @@ export default function SidebarHeader() {
   });
 
   const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
-
-  async function fetchTransfers() {
-    try {
-      const result = await getAccountTransfers();
-
-      if (!result) {
-        throw new Error("Financial Account not found");
-      }
-
-      setTransfers((result.data as TransferData[]) || []);
-    } catch (err: any) {
-      console.error("Error fetching transfers:", err);
-    }
-  }
-
-  useEffect(() => {
-    // Only fetch transfers on the import-export page
-    if (isExportPage) {
-      fetchTransfers();
-    }
-  }, [isExportPage]);
 
   const goToPrevMonth = () => {
     setDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));

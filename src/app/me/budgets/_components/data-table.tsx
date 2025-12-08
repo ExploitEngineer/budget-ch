@@ -25,7 +25,7 @@ import EditBudgetDialog from "./edit-budget-dialog";
 import { useState, useMemo } from "react";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
-import { getBudgets, getBudgetsAmounts } from "@/lib/services/budget";
+import { getBudgets, getBudgetsAmounts } from "@/lib/api";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { BudgetRow } from "@/lib/types/row-types";
@@ -44,7 +44,10 @@ export function BudgetDataTable() {
   } = useQuery<BudgetRow[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
-      const res = await getBudgets();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getBudgets(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budgets");
       }
@@ -59,7 +62,10 @@ export function BudgetDataTable() {
   } = useQuery({
     queryKey: budgetKeys.amounts(hubId),
     queryFn: async () => {
-      const res = await getBudgetsAmounts();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getBudgetsAmounts(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budget amounts");
       }

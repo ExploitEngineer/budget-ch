@@ -14,29 +14,82 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
-import { useReportStore } from "@/store/report-store";
-import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getMonthlyReports, getExpenseCategoriesProgress, type MonthlyReport, type ExpenseCategoryProgress } from "@/lib/api";
+import { reportKeys, transactionKeys } from "@/lib/query-keys";
+import { useSearchParams } from "next/navigation";
+import { getTransactions, type Transaction } from "@/lib/api";
 
 export function AnalysisTable() {
   const t = useTranslations("main-dashboard.report-page");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
-    monthlyReports,
-    reportsError,
-    income,
-    expense,
-    fetchMonthlyReports,
-    reportsLoading,
-    expenseCategoriesProgress,
-    expenseCategoriesProgressLoading,
-    expenseCategoriesProgressError,
-    fetchExpenseCategoriesProgress,
-  } = useReportStore();
+    data: monthlyReports,
+    isLoading: reportsLoading,
+    error: reportsError,
+  } = useQuery<MonthlyReport[]>({
+    queryKey: reportKeys.monthly(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getMonthlyReports(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch monthly reports");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
 
-  useEffect(() => {
-    fetchMonthlyReports();
-    fetchExpenseCategoriesProgress();
-  }, []);
+  const {
+    data: expenseCategoriesProgressData,
+    isLoading: expenseCategoriesProgressLoading,
+    error: expenseCategoriesProgressError,
+  } = useQuery<{ data: ExpenseCategoryProgress[] }>({
+    queryKey: reportKeys.expenseCategoriesProgress(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getExpenseCategoriesProgress(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch expense categories progress");
+      }
+      return res.data ?? { data: [] };
+    },
+    enabled: !!hubId,
+  });
+
+  const expenseCategoriesProgress = expenseCategoriesProgressData?.data ?? null;
+
+  // Calculate income and expense from transactions for the badge
+  const {
+    data: transactions,
+  } = useQuery<Transaction[]>({
+    queryKey: transactionKeys.list(hubId),
+    queryFn: async () => {
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getTransactions(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transactions");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
+
+  const income = transactions?.reduce((sum, tx) => {
+    return tx.type === "income" ? sum + tx.amount : sum;
+  }, 0) ?? 0;
+
+  const expense = transactions?.reduce((sum, tx) => {
+    return tx.type === "expense" ? sum + tx.amount : sum;
+  }, 0) ?? 0;
 
   const tableHeadings: string[] = [
     t("income-exp.data-table.headings.month"),
@@ -96,7 +149,9 @@ export function AnalysisTable() {
             <div className="flex flex-col gap-3">
               {expenseCategoriesProgressError ? (
                 <p className="text-sm text-red-500">
-                  {expenseCategoriesProgressError}
+                  {expenseCategoriesProgressError instanceof Error 
+                    ? expenseCategoriesProgressError.message 
+                    : "Failed to load expense categories progress"}
                 </p>
               ) : expenseCategoriesProgressLoading ? (
                 <p className="text-muted-foreground text-sm">{t("loading")}</p>
@@ -145,7 +200,9 @@ export function AnalysisTable() {
                   <TableRow>
                     <TableCell colSpan={4}>
                       <p className="px-6 text-sm text-red-500">
-                        {reportsError}
+                        {reportsError instanceof Error 
+                          ? reportsError.message 
+                          : "Failed to load monthly reports"}
                       </p>
                     </TableCell>
                   </TableRow>
