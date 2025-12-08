@@ -6,10 +6,13 @@ import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-p
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getSavingGoals } from "@/lib/services/saving-goal";
+import { getSavingGoals } from "@/lib/api";
 import { savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { DashboardSavingsGoals } from "@/lib/types/dashboard-types";
+import type { SavingGoal } from "@/lib/types/domain-types";
+import { mapSavingGoalsToRows } from "@/app/me/saving-goals/saving-goal-adapters";
+import { useMemo } from "react";
 
 export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page.progress-cards");
@@ -17,19 +20,28 @@ export function BarChartSection() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: savingGoals,
+    data: domainSavingGoals,
     isLoading: goalsLoading,
     error: goalsError,
-  } = useQuery<DashboardSavingsGoals[]>({
+  } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId, 3),
     queryFn: async () => {
-      const res = await getSavingGoals(3);
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getSavingGoals(hubId, 3);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch savings goals");
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
+
+  const savingGoals = useMemo(() => {
+    if (!domainSavingGoals) return undefined;
+    return mapSavingGoalsToRows(domainSavingGoals) as DashboardSavingsGoals[];
+  }, [domainSavingGoals]);
 
   return (
     <div className="grid auto-rows-min gap-4 lg:grid-cols-5">

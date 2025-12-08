@@ -1,11 +1,16 @@
 import ky from "ky";
 import { ApiResponse } from "./api-response";
 import { Transaction } from "./types/dashboard-types";
-import type { BudgetRow } from "./types/row-types";
 import type { AccountRow } from "./types/row-types";
 import type { SavingGoal } from "@/db/queries";
 import type { QuickTask } from "@/db/schema";
 import type { DashboardSavingsGoalsCards } from "./types/dashboard-types";
+import type {
+  BudgetWithCategory,
+  BudgetAmounts,
+  FinancialAccount,
+  TransactionWithDetails,
+} from "./types/domain-types";
 
 export const apiInstance = ky.create({
   // prefixUrl: `${process.env.NEXT_PUBLIC_APP_URL}/api`,
@@ -19,7 +24,7 @@ export async function getTransactions(hubId: string) {
     }
   });
   const data = await response.json();
-  return data as ApiResponse<Transaction[]>;
+  return data as ApiResponse<TransactionWithDetails[]>;
 }
 
 export async function getRecentTransactions(hubId: string) {
@@ -29,7 +34,7 @@ export async function getRecentTransactions(hubId: string) {
     }
   });
   const data = await response.json();
-  return data as ApiResponse<Transaction[]>;
+  return data as ApiResponse<TransactionWithDetails[]>;
 }
 
 // Budgets
@@ -40,7 +45,7 @@ export async function getBudgets(hubId: string) {
     }
   });
   const data = await response.json();
-  return data as ApiResponse<BudgetRow[]>;
+  return data as ApiResponse<BudgetWithCategory[]>;
 }
 
 export async function getBudgetsAmounts(hubId: string) {
@@ -50,7 +55,7 @@ export async function getBudgetsAmounts(hubId: string) {
     }
   });
   const data = await response.json();
-  return data as ApiResponse<{ totalAllocated: number; totalSpent: number }>;
+  return data as ApiResponse<BudgetAmounts>;
 }
 
 export async function getTopCategories(hubId: string) {
@@ -71,7 +76,7 @@ export async function getFinancialAccounts(hubId: string) {
     }
   });
   const data = await response.json();
-  return data as ApiResponse<AccountRow[]>;
+  return data as ApiResponse<FinancialAccount[]>;
 }
 
 // Saving Goals

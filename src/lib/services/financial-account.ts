@@ -12,6 +12,7 @@ import type { financialAccountArgs } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 import { requireAdminRole } from "@/lib/auth/permissions";
+import type { FinancialAccount } from "@/lib/types/domain-types";
 
 // CREATE Financial Account [Action]
 export async function createFinancialAccount({
@@ -60,29 +61,21 @@ export async function createFinancialAccount({
 }
 
 // READ Financial Accounts [Action]
-export async function getFinancialAccounts(currency: string = "CHF") {
+export async function getFinancialAccounts(): Promise<{
+  status: boolean;
+  data?: FinancialAccount[];
+  message?: string;
+}> {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
 
     const accounts = await getFinancialAccountsDB(hubId);
 
-    const tableData = accounts.map((acc) => ({
-      id: acc.id,
-      name: acc.name,
-      type: acc.type,
-      iban: acc.iban,
-      balance: acc.balance,
-      formattedBalance: `CHF ${Number(acc.balance).toLocaleString("de-CH", {
-        minimumFractionDigits: 2,
-      })}`,
-      note: acc.note,
-    }));
-
-    return { status: true, tableData };
+    return { status: true, data: accounts };
   } catch (err) {
     console.error("Error fetching financial accounts:", err);
-    return { status: false, tableData: [] };
+    return { status: false, message: "Failed to fetch accounts" };
   }
 }
 

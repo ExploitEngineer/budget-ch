@@ -10,6 +10,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getTransactions } from "@/lib/api";
 import { transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
+import { mapTransactionsToRows } from "../transaction-adapters";
+import { useMemo } from "react";
 
 const defaultFilters: TransactionFiltersFormValues = {
   dateFrom: undefined,
@@ -28,20 +31,28 @@ export default function TransactionsClient() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: transactions,
+    data: domainTransactions,
     isLoading: transactionLoading,
     error: transactionError,
-  } = useQuery<Transaction[]>({
+  } = useQuery<TransactionWithDetails[]>({
     queryKey: transactionKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
       const res = await getTransactions(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch transactions");
+      }
       return res.data ?? [];
     },
     enabled: !!hubId,
   });
+
+  const transactions = useMemo(() => {
+    if (!domainTransactions) return undefined;
+    return mapTransactionsToRows(domainTransactions);
+  }, [domainTransactions]);
 
   const [filters, setFilters] = useState<TransactionFiltersFormValues>(defaultFilters);
 
@@ -62,7 +73,7 @@ export default function TransactionsClient() {
           onReset={handleReset}
         />
         <DataTable
-          transactions={transactions ?? []}
+          transactions={(transactions ?? []) as Transaction[]}
           filters={filters}
           loading={transactionLoading}
           error={transactionError?.message ?? null}

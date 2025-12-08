@@ -1,37 +1,13 @@
-import type { AccountType } from "@/db/queries";
-
 /**
  * Row types for data tables and components
- * Centralized location for all row type definitions
+ * 
+ * @deprecated This file is maintained for backward compatibility during migration.
+ * New code should import types directly from ui-types.ts
+ * 
+ * This file re-exports UI types from ui-types.ts to maintain compatibility
+ * with existing imports. Eventually, all imports should be updated to use ui-types.ts directly.
  */
 
-/**
- * Account row type for financial accounts table
- */
-export interface AccountRow {
-  id: string;
-  name: string;
-  type: AccountType;
-  iban: string | null;
-  balance: number;
-  formattedBalance: string;
-  note: string | null;
-}
-
-/**
- * Budget row type for budgets table
- */
-export interface BudgetRow {
-  id: string;
-  category: string;
-  allocated: number;
-  spent: number;
-  remaining: number;
-  progress: number;
-}
-
-// Future row types can be added here:
-// export interface TransactionRow { ... }
-// export interface SavingGoalRow { ... }
-// etc.
+// Re-export from ui-types.ts
+export type { BudgetRow, AccountRow } from "./ui-types";
 

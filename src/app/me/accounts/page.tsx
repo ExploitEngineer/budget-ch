@@ -8,7 +8,8 @@ import { ContentCardsSection } from "./_components/content-cards-section";
 import { ContentDataTable } from "./_components/data-table";
 import { LatestTransfers } from "./_components/latest-transfers";
 import { accountKeys } from "@/lib/query-keys";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getFinancialAccounts } from "@/lib/api";
+import type { FinancialAccount } from "@/lib/types/domain-types";
 
 interface AccountsPageProps {
   searchParams: Promise<{ hub?: string }>;
@@ -20,14 +21,14 @@ export default async function Content({ searchParams }: AccountsPageProps) {
   const queryClient = new QueryClient();
   
   if (hubId) {
-    await queryClient.prefetchQuery({
+    await queryClient.prefetchQuery<FinancialAccount[]>({
       queryKey: accountKeys.list(hubId),
       queryFn: async () => {
-        const res = await getFinancialAccounts();
-        if (!res.status) {
-          throw new Error("Failed to fetch accounts");
+        const res = await getFinancialAccounts(hubId);
+        if (!res.success) {
+          throw new Error(res.message || "Failed to fetch accounts");
         }
-        return res.tableData ?? [];
+        return res.data ?? [];
       },
     });
   }

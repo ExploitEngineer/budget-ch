@@ -17,7 +17,7 @@ export default async function TransactionsPage({
   const { hub: hubId } = await searchParams;
 
   const queryClient = new QueryClient();
-  await queryClient.prefetchQuery({
+  await queryClient.prefetchQuery<TransactionWithDetails[]>({
     queryKey: transactionKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {

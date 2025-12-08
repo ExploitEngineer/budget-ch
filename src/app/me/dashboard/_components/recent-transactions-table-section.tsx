@@ -13,10 +13,13 @@ import {
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getRecentTransactions } from "@/lib/services/transaction";
+import { getRecentTransactions } from "@/lib/api";
 import { transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { Transaction } from "@/lib/types/dashboard-types";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
+import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
+import { useMemo } from "react";
 
 export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
@@ -24,13 +27,16 @@ export function RecentTransactionsTableSection() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: transactions,
+    data: domainTransactions,
     isLoading: transactionLoading,
     error: transactionError,
-  } = useQuery<Partial<Transaction>[]>({
+  } = useQuery<TransactionWithDetails[]>({
     queryKey: transactionKeys.recent(hubId),
     queryFn: async () => {
-      const res = await getRecentTransactions();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getRecentTransactions(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch recent transactions");
       }
@@ -38,6 +44,11 @@ export function RecentTransactionsTableSection() {
     },
     enabled: !!hubId,
   });
+
+  const transactions = useMemo(() => {
+    if (!domainTransactions) return undefined;
+    return mapTransactionsToRows(domainTransactions);
+  }, [domainTransactions]);
 
   const headings = [
     t("recent-transactions-table.table-headings.date"),

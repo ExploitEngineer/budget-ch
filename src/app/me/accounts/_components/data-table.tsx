@@ -19,6 +19,9 @@ import { accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import type { AccountRow } from "@/lib/types/row-types";
+import type { FinancialAccount } from "@/lib/types/domain-types";
+import { mapAccountsToRows } from "../account-adapters";
+import { useMemo } from "react";
 
 export interface AccountData {
   id: string;
@@ -38,10 +41,10 @@ export function ContentDataTable() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: accounts,
+    data: domainAccounts,
     isLoading: accountsLoading,
     error: accountsError,
-  } = useQuery<AccountRow[]>({
+  } = useQuery<FinancialAccount[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -55,6 +58,11 @@ export function ContentDataTable() {
     },
     enabled: !!hubId,
   });
+
+  const accounts = useMemo(() => {
+    if (!domainAccounts) return undefined;
+    return mapAccountsToRows(domainAccounts);
+  }, [domainAccounts]);
 
   const totalBalance = (accounts ?? []).reduce((sum, acc) => {
     const amount =

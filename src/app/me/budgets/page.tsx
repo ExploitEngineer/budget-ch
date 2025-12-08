@@ -10,6 +10,7 @@ import { WarningSection } from "./_components/warning-section";
 import { Settings } from "./_components/settings";
 import { budgetKeys } from "@/lib/query-keys";
 import { getBudgets, getBudgetsAmounts } from "@/lib/services/budget";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
 
 interface BudgetsPageProps {
   searchParams: Promise<{ hub?: string }>;
@@ -21,7 +22,7 @@ export default async function Transactions({ searchParams }: BudgetsPageProps) {
   const queryClient = new QueryClient();
   
   if (hubId) {
-    await queryClient.prefetchQuery({
+    await queryClient.prefetchQuery<BudgetWithCategory[]>({
       queryKey: budgetKeys.list(hubId),
       queryFn: async () => {
         const res = await getBudgets();

@@ -8,7 +8,8 @@ import { ReportCardsSection } from "./_components/report-cards";
 import { AnalysisTable } from "./_components/analysis-table";
 import { DetailedTable } from "./_components/detailed-table";
 import { transactionKeys, reportKeys } from "@/lib/query-keys";
-import { getTransactions } from "@/lib/services/transaction";
+import { getTransactions } from "@/lib/api";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
 import { getDetailedCategories, getMonthlyReportAction, getCategoriesByExpenses } from "@/lib/services/report";
 
 interface ReportsPageProps {
@@ -21,7 +22,7 @@ export default async function Report({ searchParams }: ReportsPageProps) {
   const queryClient = new QueryClient();
   
   if (hubId) {
-    await queryClient.prefetchQuery({
+    await queryClient.prefetchQuery<TransactionWithDetails[]>({
       queryKey: transactionKeys.list(hubId),
       queryFn: async () => {
         const res = await getTransactions(hubId);

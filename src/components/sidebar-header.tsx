@@ -27,8 +27,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getFinancialAccounts, getRecentTransactions, getBudgets, getSavingGoals } from "@/lib/api";
 import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import type { BudgetRow } from "@/lib/types/row-types";
+import type { BudgetRow } from "@/lib/types/ui-types";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import type { SavingGoal } from "@/db/queries";
+import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
 
 const monthNames: string[] = [
   "January",
@@ -72,7 +74,7 @@ export default function SidebarHeader() {
     enabled: isExportPage,
   });
   
-  const { data: budgets } = useQuery<BudgetRow[]>({
+  const { data: domainBudgets } = useQuery<BudgetWithCategory[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -86,6 +88,9 @@ export default function SidebarHeader() {
     },
     enabled: isExportPage && !!hubId,
   });
+
+  // Convert domain budgets to UI rows for export
+  const budgets = domainBudgets ? mapBudgetsToRows(domainBudgets) : undefined;
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {

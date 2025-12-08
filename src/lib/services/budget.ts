@@ -5,7 +5,10 @@ import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 import { getBudgetsDB, updateBudgetDB, deleteBudgetDB } from "@/db/queries";
 import { requireAdminRole } from "@/lib/auth/permissions";
-import type { BudgetRow } from "@/lib/types/row-types";
+import type {
+  BudgetWithCategory,
+  BudgetAmounts,
+} from "@/lib/types/domain-types";
 
 export interface BaseBudgetFields {
   categoryName: string;
@@ -66,7 +69,7 @@ export async function createBudget(
 
 // GET Budgets Allocated & Spent Amount [Action]
 export async function getBudgetsAmounts(): Promise<
-  BudgetResponse<{ totalAllocated: number; totalSpent: number }>
+  BudgetResponse<BudgetAmounts>
 > {
   try {
     const hdrs = await headers();
@@ -76,7 +79,7 @@ export async function getBudgetsAmounts(): Promise<
       return { success: false, message: "Missing hubId parameter." };
     }
 
-    const res = await getBudgetsDB(hubId, { allocated: true, spent: true });
+    const res = await getBudgetsDB(hubId);
 
     if (!res.success || !res.data) {
       return {
@@ -88,11 +91,11 @@ export async function getBudgetsAmounts(): Promise<
     const budgetsArray = res.data;
 
     const totalAllocated = budgetsArray.reduce(
-      (acc, item) => acc + (item.allocated ?? 0),
+      (acc, item) => acc + Number(item.allocatedAmount ?? 0),
       0,
     );
     const totalSpent = budgetsArray.reduce(
-      (acc, item) => acc + (item.spent ?? 0),
+      (acc, item) => acc + Number(item.spentAmount ?? 0),
       0,
     );
 
@@ -110,8 +113,10 @@ export async function getBudgetsAmounts(): Promise<
   }
 }
 
-// GET Budgets [Action]
-export async function getBudgets(): Promise<BudgetResponse<BudgetRow[]>> {
+// GET Budgets [Action] - Returns canonical domain type BudgetWithCategory[]
+export async function getBudgets(): Promise<
+  BudgetResponse<BudgetWithCategory[]>
+> {
   try {
     const hdrs = await headers();
     const { hubId } = await getContext(hdrs, false);
@@ -120,12 +125,7 @@ export async function getBudgets(): Promise<BudgetResponse<BudgetRow[]>> {
       return { success: false, message: "Missing hubId parameter." };
     }
 
-    const res = await getBudgetsDB(hubId, {
-      id: true,
-      category: true,
-      allocated: true,
-      spent: true,
-    });
+    const res = await getBudgetsDB(hubId);
 
     if (!res.success || !res.data) {
       return {
@@ -134,24 +134,25 @@ export async function getBudgets(): Promise<BudgetResponse<BudgetRow[]>> {
       };
     }
 
-    const formattedBudgets: BudgetRow[] = res.data.map((b) => {
-      const allocated = Number(b.allocated ?? 0);
-      const spent = Number(b.spent ?? 0);
-
-      return {
-        id: b.id,
-        category: b.category ?? "Uncategorized",
-        allocated,
-        spent,
-        remaining: allocated - spent,
-        progress: allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0,
-      };
-    });
+    // Normalize DB output (ensure numbers are properly typed)
+    const budgets: BudgetWithCategory[] = res.data.map((b) => ({
+      id: b.id,
+      hubId: b.hubId,
+      userId: b.userId,
+      transactionCategoryId: b.transactionCategoryId,
+      allocatedAmount: Number(b.allocatedAmount ?? 0),
+      spentAmount: Number(b.spentAmount ?? 0),
+      warningPercentage: b.warningPercentage,
+      markerColor: b.markerColor,
+      createdAt: b.createdAt,
+      updatedAt: b.updatedAt,
+      categoryName: b.categoryName,
+    }));
 
     return {
       success: true,
       message: "Successfully fetched budgets",
-      data: formattedBudgets,
+      data: budgets,
     };
   } catch (err: any) {
     console.error("Server action error in getBudgets:", err);
@@ -172,26 +173,18 @@ export async function getTopCategories(): Promise<BudgetResponse<any[]>> {
       return { success: false, message: "Missing hubId parameter." };
     }
 
-    const res = await getBudgetsDB(
-      hubId,
-      {
-        category: true,
-        allocated: true,
-        spent: true,
-      },
-      4,
-    );
+    const res = await getBudgetsDB(hubId, 4);
 
     if (!res.success || !res.data) {
       return { success: false, message: res.message || "No budgets found" };
     }
 
     const topCategories = res.data.map((b) => {
-      const allocated = Number(b.allocated ?? 0);
-      const spent = Number(b.spent ?? 0);
+      const allocated = Number(b.allocatedAmount ?? 0);
+      const spent = Number(b.spentAmount ?? 0);
 
       return {
-        title: b.category ?? "Uncategorized",
+        title: b.categoryName ?? "Uncategorized",
         content: `CHF ${spent.toLocaleString()} / ${allocated.toLocaleString()}`,
         value: allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0,
       };

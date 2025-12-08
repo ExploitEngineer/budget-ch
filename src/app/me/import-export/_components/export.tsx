@@ -18,8 +18,10 @@ import {
 import { useSearchParams } from "next/navigation";
 import { type TransferData } from "../../accounts/_components/latest-transfers";
 import { type Transaction } from "@/lib/types/dashboard-types";
-import type { BudgetRow } from "@/lib/types/row-types";
+import type { BudgetRow } from "@/lib/types/ui-types";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import type { SavingGoal } from "@/db/queries";
+import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
 
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
@@ -27,7 +29,7 @@ export function Export() {
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   
-  const { data: budgets } = useQuery<BudgetRow[]>({
+  const { data: domainBudgets } = useQuery<BudgetWithCategory[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -41,6 +43,9 @@ export function Export() {
     },
     enabled: !!hubId,
   });
+
+  // Convert domain budgets to UI rows for export
+  const budgets = domainBudgets ? mapBudgetsToRows(domainBudgets) : undefined;
   const { data: accounts } = useQuery({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {

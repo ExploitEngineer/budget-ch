@@ -34,7 +34,7 @@ import {
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useState, useEffect } from "react";
 import { Spinner } from "@/components/ui/spinner";
-import type { BudgetRow } from "@/lib/types/row-types";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBudget, updateBudget, deleteBudget } from "@/lib/services/budget";
 import { budgetKeys } from "@/lib/query-keys";
@@ -45,7 +45,7 @@ import CategorySelector from "@/components/category-selector";
 interface EditBudgetDialogProps {
   variant?: "gradient" | "outline";
   text?: string;
-  budget?: BudgetRow;
+  budget?: BudgetWithCategory;
 }
 
 export default function EditBudgetDialog({
@@ -144,9 +144,9 @@ export default function EditBudgetDialog({
   const form = useForm<BudgetDialogValues>({
     resolver: zodResolver(BudgetDialogSchema) as any,
     defaultValues: {
-      category: budget?.category ?? "",
-      budgetChf: budget?.allocated ?? 0,
-      istChf: budget?.spent ?? 0,
+      category: budget?.categoryName ?? "",
+      budgetChf: budget?.allocatedAmount ?? 0,
+      istChf: budget?.spentAmount ?? 0,
       warning: budget?.warningPercentage ?? 0,
       colorMarker: budget?.markerColor ?? "standard",
     },
@@ -156,9 +156,9 @@ export default function EditBudgetDialog({
   useEffect(() => {
     if (open && budget) {
       form.reset({
-        category: budget.category ?? "",
-        budgetChf: budget.allocated ?? 0,
-        istChf: budget.spent ?? 0,
+        category: budget.categoryName ?? "",
+        budgetChf: budget.allocatedAmount ?? 0,
+        istChf: budget.spentAmount ?? 0,
         warning: budget.warningPercentage ?? 0,
         colorMarker: budget.markerColor ?? "standard",
       });

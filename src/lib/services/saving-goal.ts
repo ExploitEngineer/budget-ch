@@ -10,7 +10,7 @@ import {
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
-import type { SavingGoal } from "@/db/queries";
+import type { SavingGoal } from "@/lib/types/domain-types";
 import { requireAdminRole } from "@/lib/auth/permissions";
 
 export interface SavingGoalsSummary {

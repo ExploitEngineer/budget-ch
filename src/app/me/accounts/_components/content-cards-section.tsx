@@ -11,10 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getFinancialAccounts } from "@/lib/api";
 import { accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { AccountRow } from "@/lib/types/row-types";
+import type { FinancialAccount } from "@/lib/types/domain-types";
+import { mapAccountsToRows } from "../account-adapters";
+import { useMemo } from "react";
 
 export function ContentCardsSection() {
   const t = useTranslations("main-dashboard.content-page");
@@ -22,20 +25,28 @@ export function ContentCardsSection() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: accounts,
+    data: domainAccounts,
     isLoading: accountsLoading,
     error: accountsError,
-  } = useQuery<AccountRow[]>({
+  } = useQuery<FinancialAccount[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
+      if (!hubId) {
+        throw new Error("Hub ID is required");
       }
-      return res.tableData ?? [];
+      const res = await getFinancialAccounts(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
     enabled: !!hubId,
   });
+
+  const accounts = useMemo(() => {
+    if (!domainAccounts) return undefined;
+    return mapAccountsToRows(domainAccounts);
+  }, [domainAccounts]);
 
   const parsedAccounts = (accounts ?? []).map((acc) => ({
     ...acc,

@@ -13,14 +13,19 @@ import { useExportCSV } from "@/hooks/use-export-csv";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
 import { getAccountTransfers } from "@/lib/services/latest-transfers";
 import { useQuery } from "@tanstack/react-query";
-import { getFinancialAccounts } from "@/lib/services/financial-account";
+import { getFinancialAccounts } from "@/lib/api";
+import type { FinancialAccount } from "@/lib/types/domain-types";
+import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
+import { useMemo } from "react";
 import { getRecentTransactions } from "@/lib/services/transaction";
 import { getBudgets } from "@/lib/services/budget";
 import { getSavingGoals } from "@/lib/services/saving-goal";
 import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { SavingGoal } from "@/db/queries";
-import type { BudgetRow } from "@/lib/types/row-types";
+import type { BudgetRow } from "@/lib/types/ui-types";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
 import {
   Dialog,
   DialogTrigger,
@@ -42,7 +47,7 @@ export function DataPrivacy() {
 
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
-  const { data: budgets } = useQuery<BudgetRow[]>({
+  const { data: domainBudgets } = useQuery<BudgetWithCategory[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
       const res = await getBudgets();
@@ -53,17 +58,28 @@ export function DataPrivacy() {
     },
     enabled: !!hubId,
   });
-  const { data: accounts } = useQuery({
+
+  // Convert domain budgets to UI rows
+  const budgets = domainBudgets ? mapBudgetsToRows(domainBudgets) : undefined;
+  const { data: domainAccounts } = useQuery<FinancialAccount[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
-      const res = await getFinancialAccounts();
-      if (!res.status) {
-        throw new Error("Failed to fetch accounts");
+      if (!hubId) {
+        throw new Error("Hub ID is required");
       }
-      return res.tableData ?? [];
+      const res = await getFinancialAccounts(hubId);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch accounts");
+      }
+      return res.data ?? [];
     },
     enabled: !!hubId,
   });
+
+  const accounts = useMemo(() => {
+    if (!domainAccounts) return undefined;
+    return mapAccountsToRows(domainAccounts);
+  }, [domainAccounts]);
   const { data: transactions } = useQuery({
     queryKey: transactionKeys.recent(hubId),
     queryFn: async () => {

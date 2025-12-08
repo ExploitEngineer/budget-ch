@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
   
-  const transactions = await getRecentTransactions();
+  const transactions = await getRecentTransactions(hubId);
   
   if (!transactions.success) {
     return apiError({ message: transactions.message ?? "Failed to fetch recent transactions", status: 500 });

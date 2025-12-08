@@ -17,9 +17,9 @@ export async function GET(request: Request) {
   
   const accounts = await getFinancialAccounts();
   
-  if (!accounts.status) {
-    return apiError({ message: "Failed to fetch accounts", status: 500 });
+  if (!accounts.status || !accounts.data) {
+    return apiError({ message: accounts.message ?? "Failed to fetch accounts", status: 500 });
   }
   
-  return apiSuccess({ data: accounts.tableData, status: 200 });
+  return apiSuccess({ data: accounts.data, status: 200 });
 }

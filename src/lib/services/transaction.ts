@@ -28,6 +28,7 @@ import { transactionCategories } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import type { Transaction } from "../types/dashboard-types";
 import type { TransactionType } from "../types/common-types";
+import type { TransactionWithDetails } from "../types/domain-types";
 import db from "@/db/db";
 import { requireAdminRole } from "@/lib/auth/permissions";
 import { addDays, format, isBefore, isAfter, startOfDay, isSameDay } from "date-fns";
@@ -266,21 +267,10 @@ export async function createTransactionCategory(
 export async function getTransactions(hubId: string): Promise<{
   success: boolean;
   message?: string;
-  data: Transaction[];
+  data: TransactionWithDetails[];
 }> {
   try {
-    const res = await getTransactionsDB(hubId, {
-      id: true,
-      date: true,
-      recipient: true,
-      type: true,
-      category: true,
-      note: true,
-      amount: true,
-      accountId: true,
-      destinationAccountId: true,
-      recurringTemplateId: true,
-    });
+    const res = await getTransactionsDB(hubId);
 
     if (!res.success || !res.data) {
       return {
@@ -290,72 +280,41 @@ export async function getTransactions(hubId: string): Promise<{
       };
     }
 
-    const transactions = res.data.map((tx: any) => ({
-      id: tx.id,
-      date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : null,
-      recipient: tx.recipient || null,
-      type: tx.type,
-      category: tx.category || null,
-      note: tx.note ?? null,
-      amount: tx.amount ?? 0,
-      accountId: tx.accountId || null,
-      destinationAccountId: tx.destinationAccountId || null,
-      recurringTemplateId: tx.recurringTemplateId || null,
-      isRecurring: !!tx.recurringTemplateId,
-    }));
-
-    return { success: true, data: transactions as Transaction[] };
+    return { success: true, data: res.data };
   } catch (err: any) {
-    console.error("Error in getTransactionsTable:", err);
+    console.error("Error in getTransactions:", err);
     return {
       success: false,
-      message: err.message || "Failed to load transactions table data",
+      message: err.message || "Failed to load transactions data",
       data: [],
     };
   }
 }
 
 // GET Recent Transactions
-export async function getRecentTransactions() {
+export async function getRecentTransactions(hubId: string): Promise<{
+  success: boolean;
+  message?: string;
+  data: TransactionWithDetails[];
+}> {
   try {
-    const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
-
-    const res = await getTransactionsDB(
-      hubId,
-      {
-        id: true,
-        date: true,
-        recipient: true,
-        category: true,
-        note: true,
-        amount: true,
-      },
-      4,
-    );
+    const res = await getTransactionsDB(hubId, 4);
 
     if (!res.success || !res.data) {
       return {
         success: false,
         message: res.message || "Failed to fetch recent transactions",
+        data: [],
       };
     }
 
-    const transactions = res.data.map((tx: any) => ({
-      id: tx.id,
-      date: tx.date ? new Date(tx.date).toLocaleDateString("en-GB") : "—",
-      recipient: tx.recipient || "—",
-      category: tx.category || "—",
-      note: tx.note ?? null,
-      amount: tx.amount ?? 0,
-    }));
-
-    return { success: true, data: transactions };
+    return { success: true, data: res.data };
   } catch (err: any) {
     console.error("Server action error in getRecentTransactions:", err);
     return {
       success: false,
       message: err?.message || "Unexpected server error.",
+      data: [],
     };
   }
 }

@@ -413,3 +413,19 @@ export const userSettings = pgTable("user_settings", {
 });
 
 export type UserSettingsType = InferSelectModel<typeof userSettings>;
+
+// Schema-derived types for all key tables
+export type Budget = InferSelectModel<typeof budgets>;
+export type FinancialAccount = InferSelectModel<typeof financialAccounts>;
+export type Transaction = InferSelectModel<typeof transactions>;
+export type Hub = InferSelectModel<typeof hubs>;
+export type HubMember = InferSelectModel<typeof hubMembers>;
+export type HubInvitation = InferSelectModel<typeof hubInvitations>;
+export type TransactionCategory = InferSelectModel<typeof transactionCategories>;
+export type SavingGoal = InferSelectModel<typeof savingGoals>;
+
+// Enum types derived from pgEnum definitions
+export type AccessRole = "admin" | "member";
+export type TransactionType = "income" | "expense" | "transfer";
+export type AccountType = "checking" | "savings" | "credit-card" | "cash";
+export type BudgetMarkerColor = "standard" | "green" | "orange" | "red";

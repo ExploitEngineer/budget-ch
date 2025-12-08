@@ -9,10 +9,13 @@ import { Progress } from "@/components/ui/progress";
 import { AllocateForm } from "./allocate-form";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getSavingGoals } from "@/lib/services/saving-goal";
+import { getSavingGoals } from "@/lib/api";
 import { savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import type { SavingGoal } from "@/db/queries";
+import type { SavingGoal } from "@/lib/types/domain-types";
+import type { SavingGoalRow } from "@/lib/types/ui-types";
+import { mapSavingGoalsToRows } from "../saving-goal-adapters";
+import { useMemo } from "react";
 
 export function ActiveGoalsSection() {
   const t = useTranslations(
@@ -23,13 +26,16 @@ export function ActiveGoalsSection() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: goals,
+    data: domainGoals,
     isLoading: goalsLoading,
     error: goalsError,
   } = useQuery<SavingGoal[]>({
     queryKey: savingGoalKeys.list(hubId),
     queryFn: async () => {
-      const res = await getSavingGoals();
+      if (!hubId) {
+        throw new Error("Hub ID is required");
+      }
+      const res = await getSavingGoals(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch saving goals");
       }
@@ -38,7 +44,12 @@ export function ActiveGoalsSection() {
     enabled: !!hubId,
   });
 
-  const activeGoalsData = goals ?? [];
+  const goals = useMemo(() => {
+    if (!domainGoals) return undefined;
+    return mapSavingGoalsToRows(domainGoals);
+  }, [domainGoals]);
+
+  const activeGoalsData = (goals ?? []) as SavingGoalRow[];
 
   return (
     <section>

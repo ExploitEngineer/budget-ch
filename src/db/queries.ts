@@ -103,6 +103,8 @@ export type savingGoalArgs = {
   financialAccountId?: string | null;
 };
 
+// @deprecated: Use SavingGoal from @/db/schema or @/lib/types/domain-types instead
+// This type is kept for backward compatibility but should not be used in new code
 export interface SavingGoal {
   id: string;
   name: string;
@@ -645,14 +647,7 @@ export async function getFinancialAccountsDB(hubId: string) {
       .from(financialAccounts)
       .where(and(eq(financialAccounts.hubId, hubId)));
 
-    return results.map((acc) => ({
-      id: acc.id,
-      name: acc.name,
-      type: acc.type,
-      iban: acc.iban || "",
-      balance: acc.initialBalance,
-      note: acc.note || "",
-    }));
+    return results;
   } catch (err) {
     console.error("Error fetching financial accounts:", err);
     return [];
@@ -729,37 +724,28 @@ export async function createTransactionDB({
 // GET Transactions
 export async function getTransactionsDB(
   hubId: string,
-  fields: Record<string, boolean>,
   limit?: number,
 ) {
   try {
-    const allFields = {
-      id: transactions.id,
-      date: transactions.createdAt,
-      recipient: transactions.source,
-      type: transactions.type,
-      category: transactionCategories.name,
-      note: transactions.note,
-      amount: transactions.amount,
-      accountName: financialAccounts.name,
-      userName: users.name,
-      accountId: transactions.financialAccountId,
-      destinationAccountId: transactions.destinationAccountId,
-      recurringTemplateId: transactions.recurringTemplateId,
-    };
-
-    const selectObj: Record<string, any> = {};
-    for (const [key, enabled] of Object.entries(fields)) {
-      if (enabled && allFields[key as keyof typeof allFields]) {
-        selectObj[key] = allFields[key as keyof typeof allFields];
-      }
-    }
-
-    if (Object.keys(selectObj).length === 0)
-      throw new Error("No valid fields requested");
-
     let query = db
-      .select(selectObj)
+      .select({
+        id: transactions.id,
+        hubId: transactions.hubId,
+        userId: transactions.userId,
+        financialAccountId: transactions.financialAccountId,
+        destinationAccountId: transactions.destinationAccountId,
+        transactionCategoryId: transactions.transactionCategoryId,
+        recurringTemplateId: transactions.recurringTemplateId,
+        type: transactions.type,
+        source: transactions.source,
+        amount: transactions.amount,
+        note: transactions.note,
+        createdAt: transactions.createdAt,
+        updatedAt: transactions.updatedAt,
+        categoryName: transactionCategories.name,
+        accountName: financialAccounts.name,
+        userName: users.name,
+      })
       .from(transactions)
       .leftJoin(
         transactionCategories,
@@ -1341,22 +1327,14 @@ export async function getSavingGoalsDB(
   options: GetSavingGoalsOptions = {},
 ): Promise<{
   success: boolean;
-  data?: SavingGoal[] | SavingGoalsSummary;
+  data?: import("@/db/schema").SavingGoal[] | SavingGoalsSummary;
   message?: string;
 }> {
   try {
     const { summaryOnly = false, limit } = options;
 
     let query = db
-      .select({
-        id: savingGoals.id,
-        name: savingGoals.name,
-        goalAmount: savingGoals.goalAmount,
-        amountSaved: savingGoals.amountSaved,
-        monthlyAllocation: savingGoals.monthlyAllocation,
-        financialAccountId: savingGoals.financialAccountId,
-        dueDate: savingGoals.dueDate,
-      })
+      .select()
       .from(savingGoals)
       .where(eq(savingGoals.hubId, hubId))
       .orderBy(desc(savingGoals.dueDate));
@@ -1387,24 +1365,7 @@ export async function getSavingGoalsDB(
       };
     }
 
-    const formatted: SavingGoal[] = goals.map((g) => {
-      const progress =
-        g.goalAmount > 0
-          ? Math.min((g.amountSaved / g.goalAmount) * 100, 100)
-          : 0;
-
-      return {
-        id: g.id,
-        name: g.name,
-        goalAmount: g.goalAmount,
-        amountSaved: g.amountSaved,
-        monthlyAllocation: g.monthlyAllocation,
-        value: Math.round(progress),
-        dueDate: g.dueDate,
-      };
-    });
-
-    return { success: true, data: formatted };
+    return { success: true, data: goals };
   } catch (err: any) {
     console.error("Error fetching saving goals:", err);
     return {
@@ -1585,33 +1546,42 @@ export async function deleteTaskDB(taskId: string) {
   }
 }
 
-// GET Budgets
+// GET Budgets - Returns canonical BudgetWithCategory[] domain type
 export async function getBudgetsDB(
   hubId: string,
-  fields: Record<string, boolean>,
   limit?: number,
-) {
+): Promise<{
+  success: boolean;
+  data?: Array<{
+    id: string;
+    hubId: string;
+    userId: string | null;
+    transactionCategoryId: string | null;
+    allocatedAmount: number;
+    spentAmount: number;
+    warningPercentage: number;
+    markerColor: string;
+    createdAt: Date;
+    updatedAt: Date;
+    categoryName: string | null;
+  }>;
+  message?: string;
+}> {
   try {
-    const allFields = {
-      id: budgets.id,
-      category: transactionCategories.name,
-      allocated: budgets.allocatedAmount,
-      spent: budgets.spentAmount,
-      createdAt: budgets.createdAt,
-    };
-
-    const selectObj: Record<string, any> = {};
-    for (const [key, enabled] of Object.entries(fields)) {
-      if (enabled && allFields[key as keyof typeof allFields]) {
-        selectObj[key] = allFields[key as keyof typeof allFields];
-      }
-    }
-
-    if (Object.keys(selectObj).length === 0)
-      throw new Error("No valid fields requested");
-
-    let query = db
-      .select(selectObj)
+    const query = db
+      .select({
+        id: budgets.id,
+        hubId: budgets.hubId,
+        userId: budgets.userId,
+        transactionCategoryId: budgets.transactionCategoryId,
+        allocatedAmount: budgets.allocatedAmount,
+        spentAmount: budgets.spentAmount,
+        warningPercentage: budgets.warningPercentage,
+        markerColor: budgets.markerColor,
+        createdAt: budgets.createdAt,
+        updatedAt: budgets.updatedAt,
+        categoryName: transactionCategories.name,
+      })
       .from(budgets)
       .leftJoin(
         transactionCategories,
@@ -1620,10 +1590,12 @@ export async function getBudgetsDB(
       .where(eq(budgets.hubId, hubId))
       .orderBy(desc(budgets.createdAt));
 
-    if (limit) query.limit(limit);
+    if (limit) {
+      const results = await query.limit(limit);
+      return { success: true, data: results };
+    }
 
     const results = await query;
-
     return { success: true, data: results };
   } catch (err: any) {
     console.error("Error fetching budgets:", err);

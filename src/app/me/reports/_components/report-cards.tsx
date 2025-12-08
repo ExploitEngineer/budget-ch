@@ -15,6 +15,9 @@ import { getTransactions } from "@/lib/api";
 import { transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { Transaction } from "@/lib/types/dashboard-types";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
+import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
+import { useMemo } from "react";
 
 export function ReportCardsSection() {
   const t = useTranslations("main-dashboard.report-page");
@@ -22,10 +25,10 @@ export function ReportCardsSection() {
   const hubId = searchParams.get("hub");
 
   const {
-    data: transactions,
+    data: domainTransactions,
     isLoading: loading,
     error: queryError,
-  } = useQuery<Transaction[]>({
+  } = useQuery<TransactionWithDetails[]>({
     queryKey: transactionKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -39,6 +42,11 @@ export function ReportCardsSection() {
     },
     enabled: !!hubId,
   });
+
+  const transactions = useMemo(() => {
+    if (!domainTransactions) return undefined;
+    return mapTransactionsToRows(domainTransactions);
+  }, [domainTransactions]);
 
   // Calculate income, expense, balance, and saving rate from transactions
   const income = transactions?.reduce((sum, tx) => {

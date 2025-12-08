@@ -28,7 +28,9 @@ import { useQuery } from "@tanstack/react-query";
 import { getBudgets, getBudgetsAmounts } from "@/lib/api";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import type { BudgetRow } from "@/lib/types/row-types";
+import type { BudgetRow } from "@/lib/types/ui-types";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import { mapBudgetsToRows } from "../budget-adapters";
 
 export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
@@ -38,10 +40,10 @@ export function BudgetDataTable() {
   const { exportBudgets } = useExportCSV();
 
   const {
-    data: budgets,
+    data: domainBudgets,
     isLoading: budgetsLoading,
     error: budgetsError,
-  } = useQuery<BudgetRow[]>({
+  } = useQuery<BudgetWithCategory[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -55,6 +57,12 @@ export function BudgetDataTable() {
     },
     enabled: !!hubId,
   });
+
+  // Convert domain budgets to UI rows using adapter
+  const budgets = useMemo(() => {
+    if (!domainBudgets) return undefined;
+    return mapBudgetsToRows(domainBudgets);
+  }, [domainBudgets]);
 
   const {
     data: amounts,
@@ -179,24 +187,28 @@ export function BudgetDataTable() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredBudgets.map((data) => (
-                  <TableRow key={data.id} className="dark:border-border-blue">
-                    <TableCell>{data.category}</TableCell>
-                    <TableCell>{data.allocated}</TableCell>
-                    <TableCell>{data.spent}</TableCell>
-                    <TableCell>{data.remaining}</TableCell>
-                    <TableCell>
-                      <Progress value={data.progress} />
-                    </TableCell>
-                    <TableCell>
-                      <EditBudgetDialog
-                        variant="outline"
-                        text="Edit"
-                        budget={data}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))
+                filteredBudgets.map((row) => {
+                  // Find the corresponding domain budget for editing
+                  const domainBudget = domainBudgets?.find((b) => b.id === row.id);
+                  return (
+                    <TableRow key={row.id} className="dark:border-border-blue">
+                      <TableCell>{row.category}</TableCell>
+                      <TableCell>{row.allocated}</TableCell>
+                      <TableCell>{row.spent}</TableCell>
+                      <TableCell>{row.remaining}</TableCell>
+                      <TableCell>
+                        <Progress value={row.progress} />
+                      </TableCell>
+                      <TableCell>
+                        <EditBudgetDialog
+                          variant="outline"
+                          text="Edit"
+                          budget={domainBudget}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

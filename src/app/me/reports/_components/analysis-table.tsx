@@ -18,7 +18,11 @@ import { useQuery } from "@tanstack/react-query";
 import { getMonthlyReports, getExpenseCategoriesProgress, type MonthlyReport, type ExpenseCategoryProgress } from "@/lib/api";
 import { reportKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import { getTransactions, type Transaction } from "@/lib/api";
+import { getTransactions } from "@/lib/api";
+import type { Transaction } from "@/lib/types/dashboard-types";
+import type { TransactionWithDetails } from "@/lib/types/domain-types";
+import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
+import { useMemo } from "react";
 
 export function AnalysisTable() {
   const t = useTranslations("main-dashboard.report-page");
@@ -67,8 +71,8 @@ export function AnalysisTable() {
 
   // Calculate income and expense from transactions for the badge
   const {
-    data: transactions,
-  } = useQuery<Transaction[]>({
+    data: domainTransactions,
+  } = useQuery<TransactionWithDetails[]>({
     queryKey: transactionKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
@@ -82,6 +86,11 @@ export function AnalysisTable() {
     },
     enabled: !!hubId,
   });
+
+  const transactions = useMemo(() => {
+    if (!domainTransactions) return undefined;
+    return mapTransactionsToRows(domainTransactions);
+  }, [domainTransactions]);
 
   const income = transactions?.reduce((sum, tx) => {
     return tx.type === "income" ? sum + tx.amount : sum;
