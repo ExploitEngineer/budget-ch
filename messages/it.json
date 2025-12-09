@@ -1497,5 +1497,11 @@
                 "list-2": "Tema Chiaro/Scuro/Auto, cambio DE/FR/IT/EN."
             }
         }
+    },
+    "notifications": {
+        "title": "Notifiche",
+        "loading": "Caricamento notifiche...",
+        "noNotifications": "Nessuna notifica",
+        "markAllAsRead": "Segna tutte come lette"
     }
 }

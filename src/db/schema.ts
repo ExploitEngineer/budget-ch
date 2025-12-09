@@ -10,6 +10,7 @@ import {
   pgEnum,
   integer,
   index,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
 
@@ -55,6 +56,19 @@ export const subscriptionStatusEnum = pgEnum(
   "subscription_status",
   subscriptionStatusValues,
 );
+
+export const notificationTypeEnum = pgEnum("notification_type", [
+  "info",
+  "success",
+  "error",
+  "warning",
+]);
+
+export const notificationChannelEnum = pgEnum("notification_channel", [
+  "email",
+  "web",
+  "both",
+]);
 
 export type QuickTask = InferSelectModel<typeof quickTasks>;
 export type UserType = InferSelectModel<typeof users>;
@@ -414,6 +428,33 @@ export const userSettings = pgTable("user_settings", {
 
 export type UserSettingsType = InferSelectModel<typeof userSettings>;
 
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").notNull().primaryKey().defaultRandom(),
+    hubId: uuid("hub_id")
+      .notNull()
+      .references(() => hubs.id, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    type: notificationTypeEnum("type").notNull(),
+    title: text("title").notNull(),
+    message: text("message").notNull(),
+    html: text("html"),
+    isRead: boolean("is_read").default(false).notNull(),
+    readAt: timestamp("read_at"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    metadata: jsonb("metadata"),
+    channel: notificationChannelEnum("channel").notNull().default("both"),
+    emailSent: boolean("email_sent").default(false).notNull(),
+  },
+  (table) => [
+    index("notifications_hubId_idx").on(table.hubId),
+    index("notifications_userId_idx").on(table.userId),
+    index("notifications_isRead_idx").on(table.isRead),
+    index("notifications_createdAt_idx").on(table.createdAt),
+  ],
+);
+
 // Schema-derived types for all key tables
 export type Budget = InferSelectModel<typeof budgets>;
 export type FinancialAccount = InferSelectModel<typeof financialAccounts>;
@@ -423,9 +464,12 @@ export type HubMember = InferSelectModel<typeof hubMembers>;
 export type HubInvitation = InferSelectModel<typeof hubInvitations>;
 export type TransactionCategory = InferSelectModel<typeof transactionCategories>;
 export type SavingGoal = InferSelectModel<typeof savingGoals>;
+export type Notification = InferSelectModel<typeof notifications>;
 
 // Enum types derived from pgEnum definitions
 export type AccessRole = "admin" | "member";
 export type TransactionType = "income" | "expense" | "transfer";
 export type AccountType = "checking" | "savings" | "credit-card" | "cash";
 export type BudgetMarkerColor = "standard" | "green" | "orange" | "red";
+export type NotificationType = "info" | "success" | "error" | "warning";
+export type NotificationChannel = "email" | "web" | "both";

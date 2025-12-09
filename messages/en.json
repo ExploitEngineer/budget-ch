@@ -1497,5 +1497,11 @@
                 "list-2": "Light/Dark/Auto theme, DE/FR/IT/EN switching."
             }
         }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "loading": "Loading notifications...",
+        "noNotifications": "No notifications",
+        "markAllAsRead": "Mark all as read"
     }
 }

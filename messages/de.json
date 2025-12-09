@@ -1475,5 +1475,11 @@
                 "list-2": "Hell/Dunkel/Auto-Thema, DE/FR/IT/EN Umschaltung."
             }
         }
+    },
+    "notifications": {
+        "title": "Benachrichtigungen",
+        "loading": "Benachrichtigungen werden geladen...",
+        "noNotifications": "Keine Benachrichtigungen",
+        "markAllAsRead": "Alle als gelesen markieren"
     }
 }

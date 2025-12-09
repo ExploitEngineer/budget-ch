@@ -20,6 +20,7 @@ import {
   getRecurringTransactionTemplatesDB,
   getRecurringTransactionTemplateByIdDB,
   updateRecurringTransactionTemplateDB,
+  getBudgetsDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -31,7 +32,11 @@ import type { TransactionType } from "../types/common-types";
 import type { TransactionWithDetails } from "../types/domain-types";
 import db from "@/db/db";
 import { requireAdminRole } from "@/lib/auth/permissions";
-import { addDays, format, isBefore, isAfter, startOfDay, isSameDay } from "date-fns";
+import { addDays, format, isBefore, isAfter, startOfDay, isSameDay, subHours } from "date-fns";
+import { sendNotification } from "@/lib/notifications";
+import { BUDGET_THRESHOLD_80, BUDGET_THRESHOLD_100 } from "@/lib/notifications/types";
+import { transactions, notifications } from "@/db/schema";
+import { eq, and, sql, gte } from "drizzle-orm";
 
 // CREATE Transaction
 export async function createTransaction({
@@ -217,6 +222,106 @@ export async function createTransaction({
       if (!templateResult.success) {
         console.error("Failed to create recurring template:", templateResult.message);
         // Don't fail the transaction creation if template creation fails
+      }
+    }
+
+    // Check budget thresholds if this is an expense with a category
+    if (transactionType === "expense" && transactionCategoryId) {
+      try {
+        // Get all budgets for this category in the hub
+        const budgetsResult = await getBudgetsDB(hubId);
+        if (budgetsResult.success && budgetsResult.data) {
+          const categoryBudgets = budgetsResult.data.filter(
+            (b) => b.transactionCategoryId === transactionCategoryId,
+          );
+
+          for (const budget of categoryBudgets) {
+            // Calculate total spent amount for this category (sum of all expense transactions)
+            const spentResult = await db
+              .select({
+                totalSpent: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
+              })
+              .from(transactions)
+              .where(
+                and(
+                  eq(transactions.hubId, hubId),
+                  eq(transactions.transactionCategoryId, transactionCategoryId),
+                  eq(transactions.type, "expense"),
+                ),
+              );
+
+            const totalSpent = Number(spentResult[0]?.totalSpent ?? 0);
+            const allocatedAmount = Number(budget.allocatedAmount ?? 0);
+
+            if (allocatedAmount > 0) {
+              const percentage = totalSpent / allocatedAmount;
+
+              // Check if we've already sent a notification for this threshold recently (within last 24 hours)
+              const oneDayAgo = subHours(new Date(), 24);
+              const recentNotificationsResult = await db
+                .select()
+                .from(notifications)
+                .where(
+                  and(
+                    eq(notifications.hubId, hubId),
+                    eq(notifications.type, percentage >= 1 ? "error" : "warning"),
+                    gte(notifications.createdAt, oneDayAgo),
+                  ),
+                )
+                .limit(1);
+
+              // Check if any recent notification has matching budgetId in metadata
+              const hasRecentNotification = recentNotificationsResult.some((n) => {
+                if (!n.metadata) return false;
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.budgetId === budget.id;
+                } catch {
+                  return false;
+                }
+              });
+
+              // Only send notification if threshold crossed and no recent notification exists
+              if (!hasRecentNotification) {
+                if (percentage >= 1) {
+                  // Budget exceeded (100%) - hub-wide notification, but send email to transaction creator
+                  await sendNotification({
+                    typeKey: BUDGET_THRESHOLD_100,
+                    hubId,
+                    userId: null, // Hub-wide notification, visible to all members
+                    emailRecipientId: userId, // Send email to user who created the transaction
+                    metadata: {
+                      budgetId: budget.id,
+                      categoryName: budget.categoryName,
+                      spentAmount: totalSpent,
+                      allocatedAmount: allocatedAmount,
+                    },
+                  });
+                } else if (percentage >= 0.8) {
+                  // Budget reached 80% threshold - hub-wide notification, but send email to transaction creator
+                  await sendNotification({
+                    typeKey: BUDGET_THRESHOLD_80,
+                    hubId,
+                    userId: null, // Hub-wide notification, visible to all members
+                    emailRecipientId: userId, // Send email to user who created the transaction
+                    metadata: {
+                      budgetId: budget.id,
+                      categoryName: budget.categoryName,
+                      spentAmount: totalSpent,
+                      allocatedAmount: allocatedAmount,
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // Don't fail transaction creation if notification check fails
+        console.error("Error checking budget thresholds:", err);
       }
     }
 

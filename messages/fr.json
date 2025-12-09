@@ -1497,5 +1497,11 @@
                 "list-2": "Thème Clair/Sombre/Auto, changement DE/FR/IT/EN."
             }
         }
+    },
+    "notifications": {
+        "title": "Notifications",
+        "loading": "Chargement des notifications...",
+        "noNotifications": "Aucune notification",
+        "markAllAsRead": "Tout marquer comme lu"
     }
 }

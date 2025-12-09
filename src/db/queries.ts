@@ -13,9 +13,16 @@ import {
   hubInvitations,
   userSettings,
   recurringTransactionTemplates,
+  notifications,
 } from "./schema";
-import { eq, desc, gte, lte, sql, inArray, and, or } from "drizzle-orm";
-import type { QuickTask, UserType, SubscriptionType, UserSettingsType } from "./schema";
+import { eq, desc, gte, lte, sql, inArray, and, or, isNull } from "drizzle-orm";
+import type {
+  QuickTask,
+  UserType,
+  SubscriptionType,
+  UserSettingsType,
+  Notification,
+} from "./schema";
 import type {
   CreateBudgetInput,
   UpdateBudgetInput,
@@ -2420,6 +2427,283 @@ export async function upsertUserSettingsDB(
     return {
       success: false,
       message: `Failed to upsert user settings: ${(err as Error).message}`,
+    };
+  }
+}
+
+// NOTIFICATION QUERIES
+
+export interface CreateNotificationInput {
+  hubId: string;
+  userId?: string | null;
+  type: "info" | "success" | "error" | "warning";
+  title: string;
+  message: string;
+  html?: string | null;
+  channel?: "email" | "web" | "both";
+  metadata?: Record<string, unknown> | null;
+}
+
+export async function createNotificationDB(
+  input: CreateNotificationInput,
+): Promise<{ success: boolean; message?: string; data?: Notification }> {
+  try {
+    const [notification] = await db
+      .insert(notifications)
+      .values({
+        hubId: input.hubId,
+        userId: input.userId ?? null,
+        type: input.type,
+        title: input.title,
+        message: input.message,
+        html: input.html ?? null,
+        channel: input.channel ?? "both",
+        metadata: input.metadata ?? null,
+        emailSent: false,
+        isRead: false,
+      })
+      .returning();
+
+    return {
+      success: true,
+      message: "Notification created successfully",
+      data: notification,
+    };
+  } catch (err: any) {
+    console.error("Error creating notification:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to create notification",
+    };
+  }
+}
+
+export interface GetNotificationsOptions {
+  hubId: string;
+  userId?: string | null;
+  unreadOnly?: boolean;
+  limit?: number;
+}
+
+export async function getNotificationsDB(
+  options: GetNotificationsOptions,
+): Promise<{
+  success: boolean;
+  message?: string;
+  data?: Notification[];
+}> {
+  try {
+    const { hubId, userId, unreadOnly = false, limit } = options;
+
+    // Show notifications that are:
+    // 1. For this hub
+    // 2. Either user-specific (userId matches) OR hub-wide (userId is null)
+    // 3. Optionally unread only
+    let query = db
+      .select()
+      .from(notifications)
+      .where(
+        and(
+          eq(notifications.hubId, hubId),
+          userId
+            ? or(
+                eq(notifications.userId, userId),
+                isNull(notifications.userId),
+              )
+            : undefined,
+          unreadOnly ? eq(notifications.isRead, false) : undefined,
+        ),
+      )
+      .orderBy(desc(notifications.createdAt));
+
+    if (limit) {
+      query = query.limit(limit) as typeof query;
+    }
+
+    const results = await query;
+
+    return {
+      success: true,
+      message: "Notifications fetched successfully",
+      data: results,
+    };
+  } catch (err: any) {
+    console.error("Error fetching notifications:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch notifications",
+    };
+  }
+}
+
+export async function markNotificationAsReadDB(
+  notificationId: string,
+  hubId: string,
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    // Verify notification belongs to hub
+    const notification = await db.query.notifications.findFirst({
+      where: (n) => and(eq(n.id, notificationId), eq(n.hubId, hubId)),
+      columns: { id: true },
+    });
+
+    if (!notification) {
+      return {
+        success: false,
+        message: "Notification not found or access denied",
+      };
+    }
+
+    await db
+      .update(notifications)
+      .set({
+        isRead: true,
+        readAt: new Date(),
+      })
+      .where(eq(notifications.id, notificationId));
+
+    return {
+      success: true,
+      message: "Notification marked as read",
+    };
+  } catch (err: any) {
+    console.error("Error marking notification as read:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to mark notification as read",
+    };
+  }
+}
+
+export async function markAllNotificationsAsReadDB(
+  hubId: string,
+  userId?: string | null,
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    // Mark as read notifications that are:
+    // 1. For this hub
+    // 2. Either user-specific (userId matches) OR hub-wide (userId is null)
+    // 3. Currently unread
+    await db
+      .update(notifications)
+      .set({
+        isRead: true,
+        readAt: new Date(),
+      })
+      .where(
+        and(
+          eq(notifications.hubId, hubId),
+          userId
+            ? or(
+                eq(notifications.userId, userId),
+                isNull(notifications.userId),
+              )
+            : undefined,
+          eq(notifications.isRead, false),
+        ),
+      );
+
+    return {
+      success: true,
+      message: "All notifications marked as read",
+    };
+  } catch (err: any) {
+    console.error("Error marking all notifications as read:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to mark all notifications as read",
+    };
+  }
+}
+
+export async function getUnreadNotificationCountDB(
+  hubId: string,
+  userId?: string | null,
+): Promise<{ success: boolean; message?: string; data?: number }> {
+  try {
+    // Count notifications that are:
+    // 1. For this hub
+    // 2. Either user-specific (userId matches) OR hub-wide (userId is null)
+    // 3. Unread
+    const count = await db.$count(
+      notifications,
+      and(
+        eq(notifications.hubId, hubId),
+        userId
+          ? or(
+              eq(notifications.userId, userId),
+              isNull(notifications.userId),
+            )
+          : undefined,
+        eq(notifications.isRead, false),
+      ),
+    );
+
+    return {
+      success: true,
+      message: "Unread count fetched successfully",
+      data: count,
+    };
+  } catch (err: any) {
+    console.error("Error fetching unread notification count:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch unread notification count",
+    };
+  }
+}
+
+export async function updateNotificationEmailSentDB(
+  notificationId: string,
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    await db
+      .update(notifications)
+      .set({ emailSent: true })
+      .where(eq(notifications.id, notificationId));
+
+    return {
+      success: true,
+      message: "Notification email sent flag updated",
+    };
+  } catch (err: any) {
+    console.error("Error updating notification email sent flag:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update notification email sent flag",
+    };
+  }
+}
+
+export async function deleteNotificationDB(
+  notificationId: string,
+  hubId: string,
+): Promise<{ success: boolean; message?: string }> {
+  try {
+    // Verify notification belongs to hub
+    const notification = await db.query.notifications.findFirst({
+      where: (n) => and(eq(n.id, notificationId), eq(n.hubId, hubId)),
+      columns: { id: true },
+    });
+
+    if (!notification) {
+      return {
+        success: false,
+        message: "Notification not found or access denied",
+      };
+    }
+
+    await db.delete(notifications).where(eq(notifications.id, notificationId));
+
+    return {
+      success: true,
+      message: "Notification deleted successfully",
+    };
+  } catch (err: any) {
+    console.error("Error deleting notification:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to delete notification",
     };
   }
 }

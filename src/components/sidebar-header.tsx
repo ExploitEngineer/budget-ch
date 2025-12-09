@@ -31,6 +31,7 @@ import type { BudgetRow } from "@/lib/types/ui-types";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import type { SavingGoal } from "@/lib/types/domain-types";
 import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 const monthNames: string[] = [
   "January",
@@ -173,6 +174,8 @@ export default function SidebarHeader() {
             </Button>
           </div> 
           */}
+
+          <NotificationsBell />
 
           {(route === "dashboard" || route === "transactions") && (
             <CreateTransactionDialog variant="gradient" />

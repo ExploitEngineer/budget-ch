@@ -81,3 +81,15 @@ export const transferKeys = {
   list: () => [...transferKeys.all, "list"] as const,
 };
 
+/**
+ * Query key factory for notifications
+ */
+export const notificationKeys = {
+  all: ["notifications"] as const,
+  lists: () => [...notificationKeys.all, "list"] as const,
+  list: (hubId: string | null, unreadOnly?: boolean, limit?: number) =>
+    [...notificationKeys.lists(), hubId, unreadOnly, limit] as const,
+  count: (hubId: string | null) =>
+    [...notificationKeys.all, "count", hubId] as const,
+};
+
