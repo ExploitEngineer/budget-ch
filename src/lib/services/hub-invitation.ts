@@ -10,7 +10,6 @@ import {
 import { headers } from "next/headers";
 import { getContext } from "@/lib/auth/actions";
 import { mailer } from "@/lib/mailer";
-import { randomBytes } from "crypto";
 import type { AccessRole } from "@/db/queries";
 
 interface SendInvitationParams {
@@ -52,7 +51,12 @@ export async function sendHubInvitation({
       };
     }
 
-    const token = randomBytes(32).toString("hex");
+    // Generate a 32-byte random token using Web Crypto API (edge runtime compatible)
+    const randomBytes = new Uint8Array(32);
+    crypto.getRandomValues(randomBytes);
+    const token = Array.from(randomBytes, (byte) =>
+      byte.toString(16).padStart(2, "0"),
+    ).join("");
     const expiresAt = new Date(Date.now() + 7 * 86400000);
 
     const res = await createHubInvitationDB({

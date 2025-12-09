@@ -1,6 +1,11 @@
 "use server";
 
-import { getHubsByUserDB, getFirstHubMemberDB, getOwnedHubDB, getHubMemberRoleDB } from "@/db/queries";
+import {
+  getHubsByUserDB,
+  getFirstHubMemberDB,
+  getOwnedHubDB,
+  getHubMemberRoleDB,
+} from "@/db/queries";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 
@@ -20,7 +25,7 @@ export async function getDefaultHubId(userId: string): Promise<string | null> {
   try {
     const hubMemberRow = await getFirstHubMemberDB(userId);
     const ownedHub = await getOwnedHubDB(userId);
-    
+
     // Prefer member hub first, then owned hub
     return hubMemberRow?.hubId ?? ownedHub?.id ?? null;
   } catch (error) {
@@ -38,7 +43,7 @@ export async function getDefaultHubIdAction(): Promise<{
   try {
     const hdrs = await headers();
     const session = await auth.api.getSession({ headers: hdrs });
-    
+
     if (!session?.user) {
       return { success: false, message: "User not found" };
     }
@@ -64,7 +69,7 @@ export async function getHubs(): Promise<GetHubsResponse> {
   try {
     const hdrs = await headers();
     const session = await auth.api.getSession({ headers: hdrs });
-    
+
     if (!session?.user) {
       return { success: false, message: "User not found" };
     }
@@ -101,7 +106,7 @@ export async function validateHubAccessAction(hubId: string): Promise<{
   try {
     const hdrs = await headers();
     const session = await auth.api.getSession({ headers: hdrs });
-    
+
     if (!session?.user) {
       return { success: false, message: "Unauthorized" };
     }
@@ -111,10 +116,10 @@ export async function validateHubAccessAction(hubId: string): Promise<{
     // Verify user has access to this hub
     const hubMember = await getHubMemberRoleDB(userId, hubId);
     const ownedHub = await getOwnedHubDB(userId);
-    
+
     // User has access if they are a member OR they own the hub
     const hasAccess = !!hubMember || ownedHub?.id === hubId;
-    
+
     if (!hasAccess) {
       return {
         success: false,
@@ -130,4 +135,22 @@ export async function validateHubAccessAction(hubId: string): Promise<{
       message: (error as Error).message || "Failed to validate hub access",
     };
   }
+}
+
+export async function getActiveHubIdCookieOptions(
+  maxAge: number = 60 * 60 * 24 * 30,
+): Promise<{
+  httpOnly: boolean;
+  secure: boolean;
+  sameSite: "lax" | "strict" | "none";
+  maxAge: number;
+  path: string;
+}> {
+  return {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: maxAge,
+    path: "/me"
+  };
 }

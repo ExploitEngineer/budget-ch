@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
+import { getActiveHubIdCookieOptions } from "./lib/services/hub";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const sessionCookie = getSessionCookie(request);
 
   if (!sessionCookie) {
@@ -15,13 +16,11 @@ export async function middleware(request: NextRequest) {
 
   // Priority 1: If URL has hub param, sync it to cookie
   if (urlHubId && urlHubId.match(/^[a-zA-Z0-9-_]+$/)) {
-    response.cookies.set("activeHubId", urlHubId, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 30, // 30 days
-      path: "/",
-    });
+    response.cookies.set(
+      "activeHubId",
+      urlHubId,
+      await getActiveHubIdCookieOptions(60 * 60 * 24 * 1),
+    );
     return response;
   }
 

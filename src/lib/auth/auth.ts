@@ -6,6 +6,9 @@ import * as schema from "@/db/schema";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { ensureUserOnboarding } from "@/lib/services/user";
 import { mailer } from "@/lib/mailer";
+import { getActiveHubIdCookieOptions } from "../services/hub";
+
+// TODO: clear activeHubId cookie on signout
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -110,6 +113,9 @@ export const auth = betterAuth({
             console.error(`Error in sign-up hook: ${err.message}`);
           }
         }
+      }
+      if(ctx.path.startsWith("/sign-out")) {
+        console.log("signing out, clearing activeHubId cookie");
       }
     }),
   },

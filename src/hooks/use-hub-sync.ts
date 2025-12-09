@@ -21,7 +21,7 @@ export function useHubSync() {
     const syncHub = async () => {
       // If URL has hub param, validate user has access
       if (urlHubId) {
-        /*
+        
         const validation = await validateHubAccessAction(urlHubId);
         if (!validation.success) {
           // User doesn't have access, redirect to default hub
@@ -32,9 +32,6 @@ export function useHubSync() {
             router.replace(url.pathname + url.search);
           }
         }
-          // Reset activeHubId cookie
-        */
-        // If validation succeeds, do nothing - middleware will sync to cookie
         return;
       }
 
