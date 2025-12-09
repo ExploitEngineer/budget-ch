@@ -151,6 +151,6 @@ export async function getActiveHubIdCookieOptions(
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: maxAge,
-    path: "/me"
+    path: "/"
   };
 }

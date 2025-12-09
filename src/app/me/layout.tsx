@@ -24,7 +24,12 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar
+        user={{
+          name: session.user.name,
+          email: session.user.email,
+        }}
+      />
       <HubSync />
       <SidebarInset className="bg-gray-100/55 dark:![background:var(--fancy-gradient)]">
         {children}

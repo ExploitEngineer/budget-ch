@@ -6,7 +6,6 @@ import * as schema from "@/db/schema";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { ensureUserOnboarding } from "@/lib/services/user";
 import { mailer } from "@/lib/mailer";
-import { getActiveHubIdCookieOptions } from "../services/hub";
 
 // TODO: clear activeHubId cookie on signout
 
@@ -114,9 +113,7 @@ export const auth = betterAuth({
           }
         }
       }
-      if(ctx.path.startsWith("/sign-out")) {
-        console.log("signing out, clearing activeHubId cookie");
-      }
+      if(ctx.path.startsWith("/sign-out")) {}
     }),
   },
   emailAndPassword: {

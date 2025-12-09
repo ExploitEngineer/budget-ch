@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & { user: { email: string; name: string } }) {
   const [mounted, setMounted] = useState<boolean>(false);
   const { resolvedTheme } = useTheme();
   const { open } = useSidebar();
@@ -46,22 +46,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       >
         <div className="relative m-0 flex h-auto w-full items-center justify-start p-0 pt-1">
           {open ? (
-            <div className="relative me-9 h-[45px] w-full">
-              <Image
-                src={
-                  resolvedTheme === "dark"
-                    ? "/assets/images/dark-logo.png"
-                    : "/assets/images/logo.png"
-                }
-                alt="company logo"
-                fill
-                className={cn(
-                  "m-0 object-cover p-0",
-                  resolvedTheme === "dark" ? "pe-10" : "pe-0",
-                )}
-                priority
-              />
-            </div>
+            <>
+              <div className="relative me-9 h-[45px] w-full">
+                <Image
+                  src={
+                    resolvedTheme === "dark"
+                      ? "/assets/images/dark-logo.png"
+                      : "/assets/images/logo.png"
+                  }
+                  alt="company logo"
+                  fill
+                  className={cn(
+                    "m-0 object-cover p-0",
+                    resolvedTheme === "dark" ? "pe-10" : "pe-0",
+                  )}
+                  priority
+                />
+              </div>
+            </>
           ) : (
             <div className="relative h-[30px] w-[30px]">
               <Image
@@ -77,6 +79,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent className="dark:bg-blue-background">
+        {open && (
+          <div className="mx-auto flex gap-4 items-center">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+          </div>
+        )}
         <NavMain />
       </SidebarContent>
 
