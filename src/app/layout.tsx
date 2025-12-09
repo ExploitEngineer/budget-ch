@@ -6,6 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { PreferencesSync } from "@/components/preferences-sync";
+import { BrowserNotificationPrompt } from "@/components/browser-notification-prompt";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <PreferencesSync />
+            <BrowserNotificationPrompt />
             <>{children}</>
             <Toaster position="top-center" richColors />
           </ThemeProvider>

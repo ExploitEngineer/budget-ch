@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -18,10 +19,19 @@ import {
 } from "@/components/ui/form";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { MainFormValues, mainFormSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslations } from "next-intl";
+import {
+  useBrowserNotifications,
+  isBrowserNotificationEnabled,
+  setBrowserNotificationEnabled,
+  requestNotificationPermission,
+  getNotificationPermission,
+} from "@/hooks/use-browser-notifications";
 
 export function Notifications() {
   const form = useForm<MainFormValues>({
@@ -33,6 +43,53 @@ export function Notifications() {
   const t = useTranslations(
     "main-dashboard.settings-page.notifications-section",
   );
+  const browserT = useTranslations("notifications.browser");
+
+  const [browserNotificationsEnabled, setBrowserNotificationsEnabled] =
+    useState(false);
+  const [permissionStatus, setPermissionStatus] =
+    useState<NotificationPermission>("default");
+
+  const {
+    isSupported,
+    requestPermission: requestBrowserPermission,
+  } = useBrowserNotifications({ notifications: [] });
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setBrowserNotificationsEnabled(isBrowserNotificationEnabled());
+      setPermissionStatus(getNotificationPermission());
+    }
+  }, []);
+
+  const handleBrowserNotificationToggle = async (checked: boolean) => {
+    if (checked) {
+      // If enabling, check permission first
+      const currentPermission = getNotificationPermission();
+      if (currentPermission === "default") {
+        // Request permission
+        const permission = await requestBrowserPermission();
+        if (permission === "granted") {
+          setBrowserNotificationEnabled(true);
+          setBrowserNotificationsEnabled(true);
+          setPermissionStatus("granted");
+        } else {
+          setPermissionStatus(permission);
+          return; // Don't enable if permission denied
+        }
+      } else if (currentPermission === "granted") {
+        setBrowserNotificationEnabled(true);
+        setBrowserNotificationsEnabled(true);
+      } else {
+        // Permission denied - show message
+        setPermissionStatus("denied");
+        return;
+      }
+    } else {
+      setBrowserNotificationEnabled(false);
+      setBrowserNotificationsEnabled(false);
+    }
+  };
 
   const emailAlertBadges: string[] = [
     t("labels.email-alerts.badges.budget"),
@@ -70,9 +127,39 @@ export function Notifications() {
               </div>
             </div>
             <div>
-              <h3 className="mb-3 text-sm opacity-80">
-                {t("labels.push-browser.title")}
-              </h3>
+              <div className="mb-3 flex items-center justify-between">
+                <h3 className="text-sm opacity-80">
+                  {t("labels.push-browser.title")}
+                </h3>
+                {isSupported && (
+                  <div className="flex items-center gap-2">
+                    <Checkbox
+                      id="browser-notifications"
+                      checked={browserNotificationsEnabled}
+                      onCheckedChange={handleBrowserNotificationToggle}
+                      disabled={permissionStatus === "denied"}
+                    />
+                    <label
+                      htmlFor="browser-notifications"
+                      className="text-sm cursor-pointer"
+                    >
+                      {browserNotificationsEnabled
+                        ? browserT("settings.enabled")
+                        : browserT("settings.disabled")}
+                    </label>
+                  </div>
+                )}
+              </div>
+              {isSupported && permissionStatus === "denied" && (
+                <p className="text-xs text-muted-foreground mb-2">
+                  {browserT("settings.permissionDenied")}
+                </p>
+              )}
+              {!isSupported && (
+                <p className="text-xs text-muted-foreground mb-2">
+                  {browserT("settings.notSupported")}
+                </p>
+              )}
               <div className="flex flex-wrap gap-2">
                 {pushBrowserBadges.map((badge) => (
                   <Badge

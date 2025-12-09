@@ -1502,6 +1502,20 @@
         "title": "Notifications",
         "loading": "Loading notifications...",
         "noNotifications": "No notifications",
-        "markAllAsRead": "Mark all as read"
+        "markAllAsRead": "Mark all as read",
+        "browser": {
+            "prompt": {
+                "title": "Enable Browser Notifications",
+                "description": "Get notified about new updates even when you're on a different tab. We'll only show notifications when you're not actively viewing the app.",
+                "allow": "Allow",
+                "dismiss": "Not now"
+            },
+            "settings": {
+                "enabled": "Enabled",
+                "disabled": "Disabled",
+                "permissionDenied": "Browser notifications are blocked. Please enable them in your browser settings.",
+                "notSupported": "Browser notifications are not supported in this browser."
+            }
+        }
     }
 }

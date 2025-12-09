@@ -17,6 +17,7 @@ import {
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
 } from "@/hooks/use-notifications";
+import { useBrowserNotifications } from "@/hooks/use-browser-notifications";
 import { formatDistanceToNow } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
@@ -31,7 +32,20 @@ export function NotificationsBell() {
     limit: 10,
   });
 
+  // Fetch all unread notifications for browser notification detection
+  const { data: allUnreadNotifications = [] } = useNotifications({
+    hubId,
+    unreadOnly: true,
+    limit: 50, // Get more notifications for browser notification detection
+  });
+
   const { data: unreadCount = 0 } = useNotificationCount(hubId);
+
+  // Enable browser notifications - use all unread notifications for detection
+  useBrowserNotifications({
+    notifications: allUnreadNotifications,
+    enabled: !!hubId,
+  });
 
   const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();

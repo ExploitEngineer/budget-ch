@@ -1502,6 +1502,20 @@
         "title": "Notifiche",
         "loading": "Caricamento notifiche...",
         "noNotifications": "Nessuna notifica",
-        "markAllAsRead": "Segna tutte come lette"
+        "markAllAsRead": "Segna tutte come lette",
+        "browser": {
+            "prompt": {
+                "title": "Abilita notifiche del browser",
+                "description": "Ricevi notifiche sui nuovi aggiornamenti anche quando sei su un'altra scheda. Mostreremo le notifiche solo quando non stai visualizzando attivamente l'app.",
+                "allow": "Consenti",
+                "dismiss": "Non ora"
+            },
+            "settings": {
+                "enabled": "Abilitato",
+                "disabled": "Disabilitato",
+                "permissionDenied": "Le notifiche del browser sono bloccate. Abilitalle nelle impostazioni del browser.",
+                "notSupported": "Le notifiche del browser non sono supportate in questo browser."
+            }
+        }
     }
 }

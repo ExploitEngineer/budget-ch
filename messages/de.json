@@ -1480,6 +1480,20 @@
         "title": "Benachrichtigungen",
         "loading": "Benachrichtigungen werden geladen...",
         "noNotifications": "Keine Benachrichtigungen",
-        "markAllAsRead": "Alle als gelesen markieren"
+        "markAllAsRead": "Alle als gelesen markieren",
+        "browser": {
+            "prompt": {
+                "title": "Browser-Benachrichtigungen aktivieren",
+                "description": "Erhalten Sie Benachrichtigungen über neue Updates, auch wenn Sie sich auf einem anderen Tab befinden. Wir zeigen Benachrichtigungen nur an, wenn Sie die App nicht aktiv ansehen.",
+                "allow": "Erlauben",
+                "dismiss": "Nicht jetzt"
+            },
+            "settings": {
+                "enabled": "Aktiviert",
+                "disabled": "Deaktiviert",
+                "permissionDenied": "Browser-Benachrichtigungen sind blockiert. Bitte aktivieren Sie sie in Ihren Browser-Einstellungen.",
+                "notSupported": "Browser-Benachrichtigungen werden in diesem Browser nicht unterstützt."
+            }
+        }
     }
 }

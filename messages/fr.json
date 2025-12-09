@@ -1502,6 +1502,20 @@
         "title": "Notifications",
         "loading": "Chargement des notifications...",
         "noNotifications": "Aucune notification",
-        "markAllAsRead": "Tout marquer comme lu"
+        "markAllAsRead": "Tout marquer comme lu",
+        "browser": {
+            "prompt": {
+                "title": "Activer les notifications du navigateur",
+                "description": "Recevez des notifications sur les nouvelles mises à jour même lorsque vous êtes sur un autre onglet. Nous n'afficherons les notifications que lorsque vous ne consultez pas activement l'application.",
+                "allow": "Autoriser",
+                "dismiss": "Pas maintenant"
+            },
+            "settings": {
+                "enabled": "Activé",
+                "disabled": "Désactivé",
+                "permissionDenied": "Les notifications du navigateur sont bloquées. Veuillez les activer dans les paramètres de votre navigateur.",
+                "notSupported": "Les notifications du navigateur ne sont pas prises en charge dans ce navigateur."
+            }
+        }
     }
 }
