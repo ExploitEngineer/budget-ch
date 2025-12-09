@@ -20,7 +20,6 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Spinner } from "./ui/spinner";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
-import { switchHub } from "@/lib/services/hub-switch";
 
 export function HubDisplay() {
   const searchParams = useSearchParams();
@@ -119,7 +118,6 @@ export function HubDisplay() {
                   
                   // Update cookie via server action
                   try {
-                    await switchHub(hub.id);
                     // Update URL with hub param
                     const url = new URL(pathname, window.location.origin);
                     url.searchParams.set("hub", hub.id);
