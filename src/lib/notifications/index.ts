@@ -6,6 +6,7 @@ import {
   markNotificationAsReadDB,
   markAllNotificationsAsReadDB,
   getUnreadNotificationCountDB,
+  getHubMembersDB,
 } from "@/db/queries";
 import { sendNotificationEmail } from "./email";
 import { getUserEmailDB } from "@/db/queries";
@@ -25,13 +26,12 @@ export interface SendNotificationResult {
  */
 export async function sendNotification(
   input:
-    | (SendNotificationInput & { typeKey?: never; emailRecipientId?: string | null })
+    | (SendNotificationInput & { typeKey?: never })
     | {
         typeKey: NotificationTypeKey;
         hubId: string;
         userId?: string | null;
         metadata?: Record<string, unknown>;
-        emailRecipientId?: string | null; // Optional: user to send email to (for hub-wide notifications)
       },
 ): Promise<SendNotificationResult> {
   try {
@@ -73,21 +73,41 @@ export async function sendNotification(
     // Send email if channel includes email
     const channel = (notificationData.channel ?? "both") as NotificationChannel;
     if (channel === "email" || channel === "both") {
-      // Determine email recipient: use emailRecipientId if provided, otherwise use userId
-      const emailRecipientId = "emailRecipientId" in input 
-        ? input.emailRecipientId 
-        : notificationData.userId;
-      
-      if (emailRecipientId) {
-        const emailResult = await getUserEmailDB(emailRecipientId);
-        if (emailResult.success && emailResult.data?.email) {
-          // Fire-and-forget email sending
-          sendNotificationEmail(notification, emailResult.data.email).catch(
-            (err) => {
-              console.error("Error sending notification email:", err);
-              // Don't fail the notification creation if email fails
-            },
-          );
+      // Check if this is a hub-wide notification (userId is null)
+      const isHubWide = notificationData.userId === null;
+
+      if (isHubWide) {
+        // Hub-wide notification: send emails to all hub members
+        const hubMembersResult = await getHubMembersDB(notificationData.hubId);
+        if (hubMembersResult.success && hubMembersResult.data) {
+          // Send email to each hub member (fire-and-forget)
+          for (const member of hubMembersResult.data) {
+            if (member.email) {
+              sendNotificationEmail(notification, member.email).catch(
+                (err) => {
+                  console.error(
+                    `Error sending notification email to ${member.email}:`,
+                    err,
+                  );
+                  // Don't fail the notification creation if email fails
+                },
+              );
+            }
+          }
+        }
+      } else {
+        // User-specific notification: send email to the specified user
+        if (notificationData.userId) {
+          const emailResult = await getUserEmailDB(notificationData.userId);
+          if (emailResult.success && emailResult.data?.email) {
+            // Fire-and-forget email sending
+            sendNotificationEmail(notification, emailResult.data.email).catch(
+              (err) => {
+                console.error("Error sending notification email:", err);
+                // Don't fail the notification creation if email fails
+              },
+            );
+          }
         }
       }
     }

@@ -287,12 +287,11 @@ export async function createTransaction({
               // Only send notification if threshold crossed and no recent notification exists
               if (!hasRecentNotification) {
                 if (percentage >= 1) {
-                  // Budget exceeded (100%) - hub-wide notification, but send email to transaction creator
+                  // Budget exceeded (100%) - hub-wide notification, emails sent to all hub members
                   await sendNotification({
                     typeKey: BUDGET_THRESHOLD_100,
                     hubId,
                     userId: null, // Hub-wide notification, visible to all members
-                    emailRecipientId: userId, // Send email to user who created the transaction
                     metadata: {
                       budgetId: budget.id,
                       categoryName: budget.categoryName,
@@ -301,12 +300,11 @@ export async function createTransaction({
                     },
                   });
                 } else if (percentage >= 0.8) {
-                  // Budget reached 80% threshold - hub-wide notification, but send email to transaction creator
+                  // Budget reached 80% threshold - hub-wide notification, emails sent to all hub members
                   await sendNotification({
                     typeKey: BUDGET_THRESHOLD_80,
                     hubId,
                     userId: null, // Hub-wide notification, visible to all members
-                    emailRecipientId: userId, // Send email to user who created the transaction
                     metadata: {
                       budgetId: budget.id,
                       categoryName: budget.categoryName,
