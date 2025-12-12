@@ -19,15 +19,17 @@ import type { BudgetRow } from "@/lib/types/ui-types";
  */
 export function mapBudgetToBudgetRow(budget: BudgetWithCategory): BudgetRow {
   const allocated = Number(budget.allocatedAmount ?? 0);
-  const spent = Number(budget.spentAmount ?? 0);
-  const remaining = allocated - spent;
+  const ist = Number(budget.spentAmount ?? 0); // Initial stored spent amount
+  const spent = Number(budget.calculatedSpentAmount ?? 0); // Calculated from transactions
+  const remaining = allocated - spent; // Use calculated spent for remaining
   const progress =
-    allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0;
+    allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0; // Use calculated spent for progress
 
   return {
     id: budget.id,
     category: budget.categoryName ?? "Uncategorized",
     allocated,
+    ist,
     spent,
     remaining,
     progress,

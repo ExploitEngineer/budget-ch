@@ -81,14 +81,15 @@ export const exportBudgetsToCSV = ({
     return;
   }
 
-  const headers = budgetHeadings.slice(0, -1);
+  const headers = budgetHeadings.slice(0, -1); // Remove "action" column
 
   const data = budgets.map((budget) => ({
     [headers[0]]: budget.category,
     [headers[1]]: budget.allocated.toFixed(2),
-    [headers[2]]: budget.spent.toFixed(2),
-    [headers[3]]: budget.remaining.toFixed(2),
-    [headers[4]]: `${budget.progress.toFixed(1)}%`,
+    [headers[2]]: budget.ist.toFixed(2), // IST column
+    [headers[3]]: budget.spent.toFixed(2), // Spent column
+    [headers[4]]: budget.remaining.toFixed(2),
+    [headers[5]]: `${budget.progress.toFixed(1)}%`,
   }));
 
   const csv = Papa.unparse(data);
@@ -221,6 +222,7 @@ export const exportBudgetsTemplateToCSV = (t: (key: string) => string) => {
     t("data-table.headings.category"),
     t("data-table.headings.budget"),
     t("data-table.headings.ist"),
+    t("data-table.headings.spent"),
     t("data-table.headings.rest"),
     t("data-table.headings.progress"),
   ];

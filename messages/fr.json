@@ -592,6 +592,7 @@
                     "category": "CATÉGORIE",
                     "budget": "BUDGET",
                     "ist": "RÉEL",
+                    "spent": "DÉPENSÉ",
                     "rest": "RESTE",
                     "progress": "PROGRÈS",
                     "action": "ACTION"

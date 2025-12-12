@@ -62,10 +62,11 @@ export type {
 /**
  * BudgetWithCategory - Canonical domain view model for budgets with category information
  * Used by services and API routes when returning budget data that includes category names
- * Extends Budget schema type with joined category name
+ * Extends Budget schema type with joined category name and calculated spent amount
  */
 export interface BudgetWithCategory extends Budget {
   categoryName: string | null; // From joined TransactionCategory
+  calculatedSpentAmount?: number; // Calculated from actual transactions (expenses - income)
 }
 
 /**

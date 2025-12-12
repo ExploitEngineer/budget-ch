@@ -1552,6 +1552,7 @@ export async function getBudgetsDB(
     transactionCategoryId: string | null;
     allocatedAmount: number;
     spentAmount: number;
+    calculatedSpentAmount: number;
     warningPercentage: number;
     markerColor: string;
     createdAt: Date;
@@ -1561,6 +1562,33 @@ export async function getBudgetsDB(
   message?: string;
 }> {
   try {
+    // Create a subquery to calculate net spent amounts from transactions for each category
+    // Net spent = expenses - income (but not less than 0)
+    const spentAmountsSubquery = db
+      .select({
+        transactionCategoryId: transactions.transactionCategoryId,
+        totalSpent: sql<number>`
+          GREATEST(
+            COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0) -
+            COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0),
+            0
+          )
+        `.as("totalSpent"),
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.hubId, hubId),
+          or(
+            eq(transactions.type, "expense"),
+            eq(transactions.type, "income"),
+          ),
+          sql`${transactions.transactionCategoryId} IS NOT NULL`,
+        ),
+      )
+      .groupBy(transactions.transactionCategoryId)
+      .as("spentAmounts");
+
     const query = db
       .select({
         id: budgets.id,
@@ -1568,7 +1596,10 @@ export async function getBudgetsDB(
         userId: budgets.userId,
         transactionCategoryId: budgets.transactionCategoryId,
         allocatedAmount: budgets.allocatedAmount,
-        spentAmount: budgets.spentAmount,
+        spentAmount: budgets.spentAmount, // IST - stored initial spent amount
+        calculatedSpentAmount: sql<number>`COALESCE(${spentAmountsSubquery.totalSpent}, 0)`.as(
+          "calculatedSpentAmount",
+        ),
         warningPercentage: budgets.warningPercentage,
         markerColor: budgets.markerColor,
         createdAt: budgets.createdAt,
@@ -1579,6 +1610,13 @@ export async function getBudgetsDB(
       .leftJoin(
         transactionCategories,
         eq(transactionCategories.id, budgets.transactionCategoryId),
+      )
+      .leftJoin(
+        spentAmountsSubquery,
+        eq(
+          spentAmountsSubquery.transactionCategoryId,
+          budgets.transactionCategoryId,
+        ),
       )
       .where(eq(budgets.hubId, hubId))
       .orderBy(desc(budgets.createdAt));

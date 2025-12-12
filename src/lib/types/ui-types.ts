@@ -26,9 +26,10 @@ export interface BudgetRow {
   id: BudgetWithCategory["id"];
   category: string; // Maps from categoryName, with fallback to "Uncategorized"
   allocated: BudgetWithCategory["allocatedAmount"];
-  spent: BudgetWithCategory["spentAmount"];
-  remaining: number; // Computed: allocated - spent
-  progress: number; // Computed: (spent / allocated) * 100
+  ist: BudgetWithCategory["spentAmount"]; // Initial stored spent amount
+  spent: number; // Calculated spent amount from transactions
+  remaining: number; // Computed: allocated - spent (using calculated spent)
+  progress: number; // Computed: (spent / allocated) * 100 (using calculated spent)
 }
 
 /**

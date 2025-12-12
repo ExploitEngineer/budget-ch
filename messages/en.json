@@ -590,6 +590,7 @@
                     "category": "CATEGORY",
                     "budget": "BUDGET",
                     "ist": "IST",
+                    "spent": "SPENT",
                     "rest": "REST",
                     "progress": "PROGRESS",
                     "action": "ACTION"

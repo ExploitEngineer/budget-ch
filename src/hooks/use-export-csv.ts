@@ -45,6 +45,7 @@ export const useExportCSV = () => {
     budgetT("data-table.headings.category"),
     budgetT("data-table.headings.budget"),
     budgetT("data-table.headings.ist"),
+    budgetT("data-table.headings.spent"),
     budgetT("data-table.headings.rest"),
     budgetT("data-table.headings.progress"),
     budgetT("data-table.headings.action"),

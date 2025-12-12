@@ -94,8 +94,9 @@ export async function getBudgetsAmounts(): Promise<
       (acc, item) => acc + Number(item.allocatedAmount ?? 0),
       0,
     );
+    // Use calculated spent amount (from transactions) for totals, not IST
     const totalSpent = budgetsArray.reduce(
-      (acc, item) => acc + Number(item.spentAmount ?? 0),
+      (acc, item) => acc + Number(item.calculatedSpentAmount ?? 0),
       0,
     );
 
@@ -141,7 +142,8 @@ export async function getBudgets(): Promise<
       userId: b.userId,
       transactionCategoryId: b.transactionCategoryId,
       allocatedAmount: Number(b.allocatedAmount ?? 0),
-      spentAmount: Number(b.spentAmount ?? 0),
+      spentAmount: Number(b.spentAmount ?? 0), // IST - stored initial spent amount
+      calculatedSpentAmount: Number(b.calculatedSpentAmount ?? 0), // Calculated from transactions
       warningPercentage: b.warningPercentage,
       markerColor: b.markerColor,
       createdAt: b.createdAt,

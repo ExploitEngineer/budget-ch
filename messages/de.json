@@ -592,6 +592,7 @@
                     "category": "KATEGORIE",
                     "budget": "BUDGET",
                     "ist": "IST",
+                    "spent": "AUSGEGEBEN",
                     "rest": "REST",
                     "progress": "FORTSCHRITT",
                     "action": "AKTION"

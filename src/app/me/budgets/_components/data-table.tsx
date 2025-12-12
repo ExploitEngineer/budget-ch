@@ -97,6 +97,7 @@ export function BudgetDataTable() {
     t("data-table.headings.category"),
     t("data-table.headings.budget"),
     t("data-table.headings.ist"),
+    t("data-table.headings.spent"),
     t("data-table.headings.rest"),
     t("data-table.headings.progress"),
     t("data-table.headings.action"),
@@ -170,19 +171,19 @@ export function BudgetDataTable() {
             <TableBody>
               {budgetsError ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-red-500">
+                  <TableCell colSpan={7} className="text-center text-red-500">
                     {budgetsError.message || "Failed to load budgets"}
                   </TableCell>
                 </TableRow>
               ) : budgetsLoading || budgets === undefined ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center">
+                  <TableCell colSpan={7} className="text-center">
                     Loading...
                   </TableCell>
                 </TableRow>
               ) : filteredBudgets.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-gray-400">
+                  <TableCell colSpan={7} className="text-center text-gray-400">
                     No Budgets Found
                   </TableCell>
                 </TableRow>
@@ -194,6 +195,7 @@ export function BudgetDataTable() {
                     <TableRow key={row.id} className="dark:border-border-blue">
                       <TableCell>{row.category}</TableCell>
                       <TableCell>{row.allocated}</TableCell>
+                      <TableCell>{row.ist}</TableCell>
                       <TableCell>{row.spent}</TableCell>
                       <TableCell>{row.remaining}</TableCell>
                       <TableCell>
