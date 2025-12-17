@@ -12,6 +12,7 @@
     "db:seed": "tsx scripts/seed-db.ts",
     "db:studio": "drizzle-kit studio",
     "dev": "next dev --turbopack",
+    "sst:dev": "sst dev",
     "dotenv:echo": "tsx scripts/echo-stripe-key.ts",
     "format:tailwindcss": "prettier --write .",
     "preinstall": "npx only-allow pnpm",
