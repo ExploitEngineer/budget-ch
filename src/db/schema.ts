@@ -374,6 +374,33 @@ export const budgets = pgTable("budgets", {
     .notNull(),
 });
 
+export const budgetInstances = pgTable(
+  "budget_instances",
+  {
+    id: uuid("id").notNull().primaryKey().defaultRandom(),
+    budgetId: uuid("budget_id")
+      .notNull()
+      .references(() => budgets.id, { onDelete: "cascade" }),
+    month: integer("month").notNull(),
+    year: integer("year").notNull(),
+    allocatedAmount: doublePrecision("allocated_amount").notNull().default(0),
+    carriedOverAmount: doublePrecision("carried_over_amount")
+      .notNull()
+      .default(0),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("budgetInstances_budgetId_month_year_unique").on(
+      table.budgetId,
+      table.month,
+      table.year,
+    ),
+  ],
+);
+
 export const savingGoals = pgTable("saving_goals", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   hubId: uuid("hub_id")
@@ -460,6 +487,7 @@ export const notifications = pgTable(
 
 // Schema-derived types for all key tables
 export type Budget = InferSelectModel<typeof budgets>;
+export type BudgetInstance = InferSelectModel<typeof budgetInstances>;
 export type FinancialAccount = InferSelectModel<typeof financialAccounts>;
 export type Transaction = InferSelectModel<typeof transactions>;
 export type Hub = InferSelectModel<typeof hubs>;

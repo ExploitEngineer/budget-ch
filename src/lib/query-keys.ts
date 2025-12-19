@@ -38,8 +38,8 @@ export const transactionKeys = {
 export const budgetKeys = {
   all: ["budgets"] as const,
   lists: () => [...budgetKeys.all, "list"] as const,
-  list: (hubId: string | null) => [...budgetKeys.lists(), hubId] as const,
-  amounts: (hubId: string | null) => [...budgetKeys.all, "amounts", hubId] as const,
+  list: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.lists(), hubId, month, year] as const,
+  amounts: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.all, "amounts", hubId, month, year] as const,
   topCategories: (hubId: string | null) => [...budgetKeys.all, "top-categories", hubId] as const,
   categoriesCount: (hubId: string | null) => [...budgetKeys.all, "categories-count", hubId] as const,
 };

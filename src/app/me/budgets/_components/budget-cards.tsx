@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getBudgetsAmounts, getBudgets } from "@/lib/services/budget";
+import { getBudgetsAmounts, getBudgets } from "@/lib/api";
 import { getCategoriesCount } from "@/lib/services/category";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
@@ -21,15 +21,18 @@ export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.budgets-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
+  const year = searchParams.get("year") ? parseInt(searchParams.get("year")!) : undefined;
 
   const {
     data: amounts,
     isLoading: amountsLoading,
     error: amountsError,
   } = useQuery({
-    queryKey: budgetKeys.amounts(hubId),
+    queryKey: budgetKeys.amounts(hubId, month, year),
     queryFn: async () => {
-      const res = await getBudgetsAmounts();
+      if (!hubId) return null;
+      const res = await getBudgetsAmounts(hubId, month, year);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budget amounts");
       }
@@ -53,9 +56,10 @@ export function BudgetCardsSection() {
     data: budgets,
     isLoading: budgetsLoading,
   } = useQuery({
-    queryKey: budgetKeys.list(hubId),
+    queryKey: budgetKeys.list(hubId, month, year),
     queryFn: async () => {
-      const res = await getBudgets();
+      if (!hubId) return [];
+      const res = await getBudgets(hubId, month, year);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budgets");
       }

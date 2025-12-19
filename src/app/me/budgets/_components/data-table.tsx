@@ -38,6 +38,8 @@ export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
+  const year = searchParams.get("year") ? parseInt(searchParams.get("year")!) : undefined;
 
   const { exportBudgets } = useExportCSV();
 
@@ -46,12 +48,12 @@ export function BudgetDataTable() {
     isLoading: budgetsLoading,
     error: budgetsError,
   } = useQuery<BudgetWithCategory[]>({
-    queryKey: budgetKeys.list(hubId),
+    queryKey: budgetKeys.list(hubId, month, year),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getBudgets(hubId);
+      const res = await getBudgets(hubId, month, year);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budgets");
       }
@@ -70,12 +72,12 @@ export function BudgetDataTable() {
     data: amounts,
     isLoading: amountsLoading,
   } = useQuery({
-    queryKey: budgetKeys.amounts(hubId),
+    queryKey: budgetKeys.amounts(hubId, month, year),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getBudgetsAmounts(hubId);
+      const res = await getBudgetsAmounts(hubId, month, year);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budget amounts");
       }

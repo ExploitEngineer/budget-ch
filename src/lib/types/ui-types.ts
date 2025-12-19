@@ -28,6 +28,7 @@ export interface BudgetRow {
   allocated: number | null;
   ist: number | null; // Initial stored spent amount
   spent: number; // Calculated spent amount from transactions
+  carriedOver: number | null; // Carried over from previous month
   remaining: number; // Computed: allocated - (spent + ist)
   progress: number; // Computed: ((spent + ist) / allocated) * 100
   warningThreshold: number | null;

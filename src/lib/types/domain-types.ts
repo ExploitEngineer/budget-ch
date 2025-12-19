@@ -72,6 +72,8 @@ export interface BudgetWithCategory {
   createdAt?: Date | null;
   updatedAt?: Date | null;
   categoryName: string | null;
+  carriedOverAmount?: number;
+  isInstance?: boolean;
 }
 
 /**

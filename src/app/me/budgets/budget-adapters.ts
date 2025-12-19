@@ -18,7 +18,13 @@ import type { BudgetRow } from "@/lib/types/ui-types";
  * Computes remaining and progress fields for display
  */
 export function mapBudgetToBudgetRow(budget: BudgetWithCategory): BudgetRow {
-  const allocated = budget.allocatedAmount !== null ? Number(budget.allocatedAmount) : null;
+  const baseAllocated = budget.allocatedAmount !== null ? Number(budget.allocatedAmount) : null;
+  const carriedOver = budget.carriedOverAmount ? Number(budget.carriedOverAmount) : 0;
+
+  // Effective allocated = base + carry over
+  // Only apply carry over if base allocated is set (budgeted)
+  const allocated = baseAllocated !== null ? baseAllocated + carriedOver : null;
+
   const ist = budget.spentAmount !== null ? Number(budget.spentAmount) : 0; // Initial stored spent amount
   const spent = Number(budget.calculatedSpentAmount ?? 0); // Calculated from transactions
 
@@ -33,6 +39,7 @@ export function mapBudgetToBudgetRow(budget: BudgetWithCategory): BudgetRow {
     allocated,
     ist,
     spent,
+    carriedOver: carriedOver !== 0 ? carriedOver : null,
     remaining,
     progress,
     warningThreshold: budget.warningPercentage ?? null,
