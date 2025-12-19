@@ -57,6 +57,23 @@ export default $config({
       } as any,
     });
 
+    // Budget Monthly Rollover (1st of each month at 00:05 UTC)
+    new sst.aws.Cron("BudgetMonthlyRollover", {
+      schedule: "cron(5 0 1 * ? *)",
+      function: {
+        handler: "src/functions/budget-rollover.handler",
+        nodejs: {
+          install: ["pg"],
+          esbuild: {
+            external: ["pg"],
+          },
+        },
+        environment: {
+          DATABASE_URL: process.env.DATABASE_URL!,
+        },
+      } as any,
+    });
+
     return {
       web,
     };

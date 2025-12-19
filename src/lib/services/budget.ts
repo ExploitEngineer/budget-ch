@@ -329,7 +329,8 @@ export async function upsertBudgetInstance(input: {
 }
 
 // Internal Helper: Ensure Budget Instances Exist (Lazy Rollover)
-async function ensureBudgetInstances(
+// Exported for use by budget-rollover service
+export async function ensureBudgetInstances(
   hubId: string,
   month: number,
   year: number,
