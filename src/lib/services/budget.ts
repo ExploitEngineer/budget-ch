@@ -41,15 +41,12 @@ export async function createBudget(
 ): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
-    const { userId, userRole, hubId, financialAccountId } = await getContext(
+    const { userId, userRole, hubId } = await getContext(
       hdrs,
-      true,
+      false,
     );
     requireAdminRole(userRole);
 
-    if (!financialAccountId) {
-      return { success: false, message: "No financial account found" };
-    }
 
     const result = await createBudgetDB({
       ...input,
@@ -91,12 +88,12 @@ export async function getBudgetsAmounts(): Promise<
     const budgetsArray = res.data;
 
     const totalAllocated = budgetsArray.reduce(
-      (acc, item) => acc + Number(item.allocatedAmount ?? 0),
+      (acc, item) => acc + (item.allocatedAmount !== null ? Number(item.allocatedAmount) : 0),
       0,
     );
-    // Use calculated spent amount (from transactions) for totals, not IST
+    // Use calculated spent amount (from transactions) for totals, including IST
     const totalSpent = budgetsArray.reduce(
-      (acc, item) => acc + Number(item.calculatedSpentAmount ?? 0),
+      (acc, item) => acc + Number(item.calculatedSpentAmount ?? 0) + (item.spentAmount !== null ? Number(item.spentAmount) : 0),
       0,
     );
 
@@ -141,8 +138,8 @@ export async function getBudgets(): Promise<
       hubId: b.hubId,
       userId: b.userId,
       transactionCategoryId: b.transactionCategoryId,
-      allocatedAmount: Number(b.allocatedAmount ?? 0),
-      spentAmount: Number(b.spentAmount ?? 0), // IST - stored initial spent amount
+      allocatedAmount: b.allocatedAmount !== null ? Number(b.allocatedAmount) : null,
+      spentAmount: b.spentAmount !== null ? Number(b.spentAmount) : null, // IST - stored initial spent amount
       calculatedSpentAmount: Number(b.calculatedSpentAmount ?? 0), // Calculated from transactions
       warningPercentage: b.warningPercentage,
       markerColor: b.markerColor,
@@ -183,12 +180,14 @@ export async function getTopCategories(): Promise<BudgetResponse<any[]>> {
 
     const topCategories = res.data.map((b) => {
       const allocated = Number(b.allocatedAmount ?? 0);
-      const spent = Number(b.spentAmount ?? 0);
+      const spent = Number(b.calculatedSpentAmount ?? 0) + Number(b.spentAmount ?? 0);
 
       return {
         title: b.categoryName ?? "Uncategorized",
         content: `CHF ${spent.toLocaleString()} / ${allocated.toLocaleString()}`,
         value: allocated > 0 ? Math.min((spent / allocated) * 100, 100) : 0,
+        warningThreshold: b.warningPercentage ?? 80,
+        markerColor: b.markerColor ?? "standard",
       };
     });
 
@@ -213,7 +212,7 @@ export async function updateBudget({
 }: Omit<UpdateBudgetInput, "hubId">): Promise<BudgetResponse> {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -237,7 +236,7 @@ export async function updateBudget({
 export async function deleteBudget(budgetId: string) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 

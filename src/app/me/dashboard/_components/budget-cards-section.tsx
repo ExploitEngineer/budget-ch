@@ -43,7 +43,7 @@ export function BudgetCardsSection() {
   const spent = totalSpent;
   const available = totalAllocated - totalSpent;
   const percent =
-    totalAllocated > 0 ? Math.min((totalSpent / totalAllocated) * 100, 100) : 0;
+    totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
 
   const isLoading = budgetLoading || budgetAmounts === undefined;
 
@@ -56,12 +56,14 @@ export function BudgetCardsSection() {
     {
       title: t("cards.card-2.title"),
       content: `CHF ${(spent ?? 0).toLocaleString()}`,
-      badge: percent + t("cards.card-2.badge"),
+      badge: percent.toFixed(0) + "% " + t("cards.card-2.badge"),
     },
     {
-      title: t("cards.card-3.title"),
+      title: (available ?? 0) < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
       content: `CHF ${(available ?? 0).toLocaleString()}`,
-      badge: t("cards.card-3.badge"),
+      badge: (available ?? 0) < 0
+        ? `${Math.ceil(Math.abs(percent - 100))}% ` + t("cards.card-3.badge-over")
+        : t("cards.card-3.badge"),
     },
     {
       title: t("cards.card-4.title"),

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getBudgetsAmounts } from "@/lib/services/budget";
+import { getBudgetsAmounts, getBudgets } from "@/lib/services/budget";
 import { getCategoriesCount } from "@/lib/services/category";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
@@ -41,9 +41,25 @@ export function BudgetCardsSection() {
         available: totalAllocated - totalSpent,
         percent:
           totalAllocated > 0
-            ? Math.min((totalSpent / totalAllocated) * 100, 100)
+            ? (totalSpent / totalAllocated) * 100
             : 0,
       };
+    },
+    enabled: !!hubId,
+  });
+
+
+  const {
+    data: budgets,
+    isLoading: budgetsLoading,
+  } = useQuery({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
     },
     enabled: !!hubId,
   });
@@ -55,7 +71,8 @@ export function BudgetCardsSection() {
   } = useQuery({
     queryKey: budgetKeys.categoriesCount(hubId),
     queryFn: async () => {
-      const res = await getCategoriesCount();
+      if (!hubId) return 0;
+      const res = await getCategoriesCount(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch categories count");
       }
@@ -63,6 +80,15 @@ export function BudgetCardsSection() {
     },
     enabled: !!hubId,
   });
+
+  const warningCount = budgets?.filter((b) => {
+    const ist = Number(b.spentAmount ?? 0);
+    const spent = Number(b.calculatedSpentAmount ?? 0);
+    const totalSpent = ist + spent;
+    const allocated = Number(b.allocatedAmount ?? 0);
+    const threshold = (allocated * (b.warningPercentage ?? 100)) / 100;
+    return allocated > 0 && totalSpent > threshold;
+  }).length;
 
   const allocated = amounts?.allocated ?? null;
   const spent = amounts?.spent ?? null;
@@ -78,12 +104,14 @@ export function BudgetCardsSection() {
     {
       title: t("cards.card-2.title"),
       content: `CHF ${spent?.toLocaleString() ?? "—"}`,
-      badge: percent + t("cards.card-2.badge"),
+      badge: percent.toFixed(0) + "% " + t("cards.card-2.badge"),
     },
     {
-      title: t("cards.card-3.title"),
+      title: (available ?? 0) < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
       content: `CHF ${available?.toLocaleString() ?? "—"}`,
-      badge: t("cards.card-3.badge"),
+      badge: (available ?? 0) < 0
+        ? `${Math.ceil(Math.abs(percent - 100))}% ` + t("cards.card-3.badge-over")
+        : `+${(100 - percent).toFixed(0)}% ` + t("cards.card-3.badge"),
     },
     {
       title: t("cards.card-4.title"),
@@ -92,7 +120,10 @@ export function BudgetCardsSection() {
         : categoriesError
           ? "—"
           : String(categoriesCount ?? "—"),
-      badge: t("cards.card-4.badge"),
+      badge:
+        budgetsLoading || categoriesLoading
+          ? "..."
+          : `${t("cards.card-4.badge")}: ${warningCount ?? 0}`,
     },
   ];
 

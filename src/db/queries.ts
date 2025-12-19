@@ -1546,17 +1546,17 @@ export async function getBudgetsDB(
 ): Promise<{
   success: boolean;
   data?: Array<{
-    id: string;
+    id: string | null;
     hubId: string;
     userId: string | null;
-    transactionCategoryId: string | null;
-    allocatedAmount: number;
-    spentAmount: number;
+    transactionCategoryId: string;
+    allocatedAmount: number | null;
+    spentAmount: number | null;
     calculatedSpentAmount: number;
-    warningPercentage: number;
-    markerColor: string;
-    createdAt: Date;
-    updatedAt: Date;
+    warningPercentage: number | null;
+    markerColor: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
     categoryName: string | null;
   }>;
   message?: string;
@@ -1592,9 +1592,9 @@ export async function getBudgetsDB(
     const query = db
       .select({
         id: budgets.id,
-        hubId: budgets.hubId,
+        hubId: transactionCategories.hubId,
         userId: budgets.userId,
-        transactionCategoryId: budgets.transactionCategoryId,
+        transactionCategoryId: transactionCategories.id,
         allocatedAmount: budgets.allocatedAmount,
         spentAmount: budgets.spentAmount, // IST - stored initial spent amount
         calculatedSpentAmount: sql<number>`COALESCE(${spentAmountsSubquery.totalSpent}, 0)`.as(
@@ -1606,20 +1606,20 @@ export async function getBudgetsDB(
         updatedAt: budgets.updatedAt,
         categoryName: transactionCategories.name,
       })
-      .from(budgets)
+      .from(transactionCategories)
       .leftJoin(
-        transactionCategories,
-        eq(transactionCategories.id, budgets.transactionCategoryId),
+        budgets,
+        eq(budgets.transactionCategoryId, transactionCategories.id),
       )
       .leftJoin(
         spentAmountsSubquery,
         eq(
           spentAmountsSubquery.transactionCategoryId,
-          budgets.transactionCategoryId,
+          transactionCategories.id,
         ),
       )
-      .where(eq(budgets.hubId, hubId))
-      .orderBy(desc(budgets.createdAt));
+      .where(eq(transactionCategories.hubId, hubId))
+      .orderBy(desc(transactionCategories.createdAt));
 
     if (limit) {
       const results = await query.limit(limit);
@@ -1666,71 +1666,47 @@ export async function updateBudgetDB({
     if (updatedData.categoryName) {
       const newName = updatedData.categoryName.trim().toLowerCase();
 
-      // If budget doesn't have a category associated, find or create one
-      if (!budget.transactionCategoryId) {
-        const existingCategory = await db.query.transactionCategories.findFirst(
-          {
-            where: (cat, { and, eq, sql }) =>
+      // Find if a category with this name already exists in the hub
+      let targetCategory = await db.query.transactionCategories.findFirst({
+        where: (cat, { and, eq, sql }) =>
+          and(eq(cat.hubId, hubId), sql`LOWER(${cat.name}) = ${newName}`),
+      });
+
+      if (targetCategory) {
+        // If it's a different category than current, check for budget collision
+        if (targetCategory.id !== budget.transactionCategoryId) {
+          const otherBudget = await db.query.budgets.findFirst({
+            where: (b, { and, eq, ne }) =>
               and(
-                eq(cat.hubId, hubId),
-                sql`LOWER(${cat.name}) = ${newName}`,
+                eq(b.hubId, hubId),
+                eq(b.transactionCategoryId, targetCategory!.id),
+                ne(b.id, budgetId),
               ),
-          },
-        );
+          });
 
-        if (existingCategory) {
-          transactionCategoryId = existingCategory.id;
-        } else {
-          // Create new category
-          const [newCategory] = await db
-            .insert(transactionCategories)
-            .values({
-              hubId,
-              name: newName,
-            })
-            .returning({ id: transactionCategories.id });
-
-          transactionCategoryId = newCategory.id;
-        }
-      } else {
-        // Budget has an existing category, update it if needed
-        const currentCategory = await db.query.transactionCategories.findFirst({
-          where: (cat) => eq(cat.id, budget.transactionCategoryId!),
-        });
-
-        if (!currentCategory) {
-          return {
-            success: false,
-            message: "Current category not found.",
-          };
-        }
-
-        if (currentCategory.name.toLowerCase() === newName) {
-          transactionCategoryId = currentCategory.id;
-        } else {
-          const existingCategory = await db.query.transactionCategories.findFirst(
-            {
-              where: (cat, { and, eq, sql }) =>
-                and(
-                  eq(cat.hubId, hubId),
-                  sql`LOWER(${cat.name}) = ${newName}`,
-                ),
-            },
-          );
-
-          if (existingCategory) {
+          if (otherBudget) {
             return {
               success: false,
-              message: "A category with this name already exists in your hub.",
+              message: `A budget already exists for category "${updatedData.categoryName}"`,
             };
           }
-
+        }
+        transactionCategoryId = targetCategory.id;
+      } else {
+        // No existing category with this name. 
+        // If current budget has a category, rename it. Otherwise create new.
+        if (budget.transactionCategoryId) {
           await db
             .update(transactionCategories)
             .set({ name: newName })
-            .where(eq(transactionCategories.id, currentCategory.id));
-
-          transactionCategoryId = currentCategory.id;
+            .where(eq(transactionCategories.id, budget.transactionCategoryId));
+          transactionCategoryId = budget.transactionCategoryId;
+        } else {
+          const [newCategory] = await db
+            .insert(transactionCategories)
+            .values({ hubId, name: newName })
+            .returning({ id: transactionCategories.id });
+          transactionCategoryId = newCategory.id;
         }
       }
     }
@@ -2315,6 +2291,55 @@ export async function getHubMembersDB(hubId: string) {
   }
 }
 
+// GET Hub Settings
+export async function getHubSettingsDB(hubId: string) {
+  try {
+    const hub = await db.query.hubs.findFirst({
+      where: eq(hubs.id, hubId),
+      columns: {
+        budgetCarryOver: true,
+        budgetEmailWarnings: true,
+      },
+    });
+
+    if (!hub) return { success: false, message: "Hub not found" };
+
+    return {
+      success: true,
+      data: hub,
+    };
+  } catch (err: any) {
+    console.error("Error in getHubSettingsDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+// UPDATE Hub Settings
+export async function updateHubSettingsDB(
+  hubId: string,
+  data: Partial<{ budgetCarryOver: boolean; budgetEmailWarnings: boolean }>,
+) {
+  try {
+    const [updatedHub] = await db
+      .update(hubs)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(hubs.id, hubId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Hub settings updated successfully",
+      data: updatedHub,
+    };
+  } catch (err: any) {
+    console.error("Error in updateHubSettingsDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
 // Functions for getContext
 export async function getHubByIdDB(hubId: string) {
   return await db.query.hubs.findFirst({
@@ -2355,9 +2380,12 @@ export async function getHubMemberRoleDB(userId: string, hubId: string) {
   });
 }
 
-export async function getFinancialAccountDB(userId: string) {
+export async function getFinancialAccountDB(userId: string, hubId: string) {
   return await db.query.financialAccounts.findFirst({
-    where: eq(financialAccounts.userId, userId),
+    where: and(
+      eq(financialAccounts.userId, userId),
+      eq(financialAccounts.hubId, hubId),
+    ),
   });
 }
 
@@ -2545,9 +2573,9 @@ export async function getNotificationsDB(
           eq(notifications.hubId, hubId),
           userId
             ? or(
-                eq(notifications.userId, userId),
-                isNull(notifications.userId),
-              )
+              eq(notifications.userId, userId),
+              isNull(notifications.userId),
+            )
             : undefined,
           unreadOnly ? eq(notifications.isRead, false) : undefined,
         ),
@@ -2633,9 +2661,9 @@ export async function markAllNotificationsAsReadDB(
           eq(notifications.hubId, hubId),
           userId
             ? or(
-                eq(notifications.userId, userId),
-                isNull(notifications.userId),
-              )
+              eq(notifications.userId, userId),
+              isNull(notifications.userId),
+            )
             : undefined,
           eq(notifications.isRead, false),
         ),
@@ -2669,9 +2697,9 @@ export async function getUnreadNotificationCountDB(
         eq(notifications.hubId, hubId),
         userId
           ? or(
-              eq(notifications.userId, userId),
-              isNull(notifications.userId),
-            )
+            eq(notifications.userId, userId),
+            isNull(notifications.userId),
+          )
           : undefined,
         eq(notifications.isRead, false),
       ),

@@ -1,11 +1,42 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { useTranslations } from "next-intl";
+import { useQuery } from "@tanstack/react-query";
+import { budgetKeys } from "@/lib/query-keys";
+import { getBudgets } from "@/lib/services/budget";
+import { useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function WarningSection() {
   const t = useTranslations("main-dashboard.budgets-page.warning-section");
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
+
+  const { data: budgets, isLoading } = useQuery({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets();
+      if (!res.success) throw new Error(res.message);
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
+
+  const warnings = budgets?.filter((b) => {
+    const totalSpent = Number(b.calculatedSpentAmount ?? 0) + Number(b.spentAmount ?? 0);
+    const allocated = Number(b.allocatedAmount ?? 0);
+    // Warning triggers if total spent reaches the threshold percentage or is over budget
+    const thresholdPercentage = b.warningPercentage ?? 80;
+    const isOverBudget = allocated > 0 && totalSpent >= allocated;
+    const isNearThreshold = allocated > 0 && totalSpent >= (allocated * thresholdPercentage) / 100;
+
+    return isOverBudget || isNearThreshold;
+  });
+
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue">
@@ -20,18 +51,42 @@ export function WarningSection() {
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="flex flex-wrap items-center gap-2">
-          <Badge
-            className="bg-badge-background rounded-full border-[#996E41] px-3 py-2"
-            variant="outline"
-          >
-            {t("badges.restaurant")}
-          </Badge>
-          <Badge
-            className="bg-badge-background rounded-full border-[#996E41] px-3 py-2"
-            variant="outline"
-          >
-            {t("badges.health")}
-          </Badge>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground italic">
+              {t("loading") || "Checking for warnings..."}
+            </p>
+          ) : warnings && warnings.length > 0 ? (
+            warnings.map((w) => {
+              const totalSpent = Number(w.calculatedSpentAmount ?? 0) + Number(w.spentAmount ?? 0);
+              const allocated = Number(w.allocatedAmount ?? 0);
+              const percent = allocated > 0 ? (totalSpent / allocated) * 100 : 0;
+              const isOver = totalSpent >= allocated;
+              return (
+                <Badge
+                  key={w.id}
+                  className={cn(
+                    "rounded-full px-3 py-2 text-white border-none shadow-sm",
+                    isOver
+                      ? "bg-red-600"
+                      : w.markerColor === "green"
+                        ? "bg-green-500"
+                        : w.markerColor === "orange"
+                          ? "bg-orange-500"
+                          : w.markerColor === "red"
+                            ? "bg-red-500"
+                            : "bg-[#F59E0B]"
+                  )}
+                  variant="outline"
+                >
+                  {w.categoryName}: {percent.toFixed(0)}% (CHF {totalSpent})
+                </Badge>
+              );
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground italic">
+              {t("no-warnings") || "Your budget is looking healthy! No warnings."}
+            </p>
+          )}
         </CardContent>
       </Card>
     </section>

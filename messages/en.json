@@ -226,7 +226,9 @@
                 },
                 "card-3": {
                     "title": "Available",
-                    "badge": "+40% Buffer"
+                    "title-over": "Over Budget",
+                    "badge": "+40% Buffer",
+                    "badge-over": "Overspent"
                 },
                 "card-4": {
                     "title": "Forecast until 30/09/2025",
@@ -455,7 +457,7 @@
                     "checkbox": "All",
                     "buttons": {
                         "delete": "Delete",
-                    "deleteAll": "Delete All",
+                        "deleteAll": "Delete All",
                         "deleteSelected": "Delete Selected",
                         "category": "Category",
                         "export": "Export",
@@ -539,7 +541,7 @@
                             "placeholder": "e.g. groceries"
                         },
                         "budget-chf": "Budget (CHF)",
-                        "1-chf": "1st (CHF)",
+                        "1-chf": "IST (CHF)",
                         "warning": "Warning at (%)",
                         "color-marker": {
                             "title": "Color Marker",
@@ -560,22 +562,24 @@
                 "card-1": {
                     "title": "Total Budget (Month)",
                     "content": "CHF 2’900.00",
-                    "badge": "Carryover: Inactive"
+                    "badge": "Active"
                 },
                 "card-2": {
                     "title": "Spent so far",
                     "content": "CHF 1’915.00",
-                    "badge": "% of the budget"
+                    "badge": "of the budget"
                 },
                 "card-3": {
                     "title": "Available",
+                    "title-over": "Over Budget",
                     "content": "CHF 985.00",
-                    "badge": "+34% available"
+                    "badge": "Available",
+                    "badge-over": "Overspent"
                 },
                 "card-4": {
                     "title": "Number of categories",
                     "content": "8",
-                    "badge": "Warnings: 2"
+                    "badge": "Warnings"
                 }
             },
             "data-table": {
@@ -584,7 +588,7 @@
                 "rest-budget": "Rest: ",
                 "buttons": {
                     "export": "Export CSV",
-                    "reset": "Reset (Demo)"
+                    "reset": "Reset"
                 },
                 "headings": {
                     "category": "CATEGORY",
@@ -617,10 +621,9 @@
             "warning-section": {
                 "title": "Notes & Warnings",
                 "button": "Hide all",
-                "badges": {
-                    "restaurant": "Budget Restaurant & Café at 82%",
-                    "health": "Budget Health at 96%"
-                },
+                "badges": {},
+                "loading": "Checking for warnings...",
+                "no-warnings": "Your budget is looking healthy! No warnings.",
                 "settings": {
                     "title": "Settings (Month)",
                     "button": "+ Budget",
@@ -733,7 +736,7 @@
             },
             "settings-section": {
                 "title": "Settings",
-                "button": "Reset Demo",
+                "button": "Reset",
                 "checkboxes": {
                     "monthly": "Monthly Auto-Allocation Active",
                     "goals": "Show Overfunded Goals"
@@ -840,7 +843,7 @@
                 "badge": "5 Konten • Liquid CHF 2’620.00",
                 "buttons": {
                     "export": "Export CSV",
-                    "reset": "Reset Demo"
+                    "reset": "Reset"
                 },
                 "headings": {
                     "name": "NAME",

@@ -455,14 +455,14 @@
             "data-table": {
                 "header": {
                     "checkbox": "Tous",
-                "buttons": {
-                    "delete": "Supprimer",
-                    "deleteAll": "Tout supprimer",
-                    "deleteSelected": "Supprimer la sélection",
-                    "category": "Catégorie",
-                    "export": "Exporter",
-                    "update": "Mettre à jour"
-                },
+                    "buttons": {
+                        "delete": "Supprimer",
+                        "deleteAll": "Tout supprimer",
+                        "deleteSelected": "Supprimer la sélection",
+                        "category": "Catégorie",
+                        "export": "Exporter",
+                        "update": "Mettre à jour"
+                    },
                     "badge": "Solde :"
                 },
                 "confirmation": {
@@ -586,7 +586,7 @@
                 "rest-budget": "Restant : ",
                 "buttons": {
                     "export": "Exporter CSV",
-                    "reset": "Réinitialiser (Demo)"
+                    "reset": "Réinitialiser"
                 },
                 "headings": {
                     "category": "CATÉGORIE",
@@ -734,7 +734,7 @@
             },
             "settings-section": {
                 "title": "Paramètres",
-                "button": "Réinitialiser la démo",
+                "button": "Réinitialiser",
                 "checkboxes": {
                     "monthly": "Allocation automatique mensuelle active",
                     "goals": "Afficher les objectifs surfinancés"
@@ -841,7 +841,7 @@
                 "badge": "5 comptes • Liquidité CHF 2’620.00",
                 "buttons": {
                     "export": "Exporter CSV",
-                    "reset": "Réinitialiser la démo"
+                    "reset": "Réinitialiser"
                 },
                 "headings": {
                     "name": "NOM",

@@ -457,7 +457,7 @@
                     "checkbox": "Alle",
                     "buttons": {
                         "delete": "Löschen",
-                    "deleteAll": "Alles löschen",
+                        "deleteAll": "Alles löschen",
                         "deleteSelected": "Ausgewählte löschen",
                         "category": "Kategorie",
                         "export": "Exportieren",
@@ -541,7 +541,7 @@
                             "placeholder": "z. B. Lebensmittel"
                         },
                         "budget-chf": "Budget (CHF)",
-                        "1-chf": "Ist (CHF)",
+                        "1-chf": "IST (CHF)",
                         "warning": "Warnung bei (%)",
                         "color-marker": {
                             "title": "Farbmarker",
@@ -571,8 +571,10 @@
                 },
                 "card-3": {
                     "title": "Verfügbar",
+                    "title-over": "Über Budget",
                     "content": "CHF 985.00",
-                    "badge": "+34% verfügbar"
+                    "badge": "+34% verfügbar",
+                    "badge-over": "Überzogen"
                 },
                 "card-4": {
                     "title": "Anzahl Kategorien",
@@ -586,7 +588,7 @@
                 "rest-budget": "Verbleibend: ",
                 "buttons": {
                     "export": "CSV exportieren",
-                    "reset": "Zurücksetzen (Demo)"
+                    "reset": "Zurücksetzen"
                 },
                 "headings": {
                     "category": "KATEGORIE",
@@ -734,7 +736,7 @@
             },
             "settings-section": {
                 "title": "Einstellungen",
-                "button": "Demo zurücksetzen",
+                "button": "Zurücksetzen",
                 "checkboxes": {
                     "monthly": "Monatliche Auto-Zuweisung aktiv",
                     "goals": "Überfinanzierte Ziele anzeigen"
@@ -841,7 +843,7 @@
                 "badge": "5 Konten • Liquidität CHF 2’620.00",
                 "buttons": {
                     "export": "CSV exportieren",
-                    "reset": "Demo zurücksetzen"
+                    "reset": "Zurücksetzen"
                 },
                 "headings": {
                     "name": "NAME",

@@ -8,8 +8,13 @@ import { cn } from "@/lib/utils";
 function Progress({
   className,
   value,
+  warningThreshold = 80,
+  markerColor = "standard",
   ...props
-}: React.ComponentProps<typeof ProgressPrimitive.Root>) {
+}: React.ComponentProps<typeof ProgressPrimitive.Root> & {
+  warningThreshold?: number;
+  markerColor?: string;
+}) {
   return (
     <ProgressPrimitive.Root
       data-slot="progress"
@@ -23,10 +28,16 @@ function Progress({
         data-slot="progress-indicator"
         className={cn(
           "h-full w-full flex-1 transition-all",
-          value === 100
+          value && value >= 100
             ? "bg-red-600"
-            : value && value >= 80
-              ? "bg-[#F59E0B]"
+            : value && value >= warningThreshold
+              ? markerColor === "green"
+                ? "bg-green-500"
+                : markerColor === "orange"
+                  ? "bg-orange-500"
+                  : markerColor === "red"
+                    ? "bg-red-500"
+                    : "bg-[#F59E0B]"
               : "progress-gradient",
         )}
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}

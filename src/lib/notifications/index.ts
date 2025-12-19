@@ -28,11 +28,11 @@ export async function sendNotification(
   input:
     | (SendNotificationInput & { typeKey?: never })
     | {
-        typeKey: NotificationTypeKey;
-        hubId: string;
-        userId?: string | null;
-        metadata?: Record<string, unknown>;
-      },
+      typeKey: NotificationTypeKey;
+      hubId: string;
+      userId?: string | null;
+      metadata?: Record<string, unknown>;
+    },
 ): Promise<SendNotificationResult> {
   try {
     let notificationData: SendNotificationInput;
@@ -80,18 +80,18 @@ export async function sendNotification(
         // Hub-wide notification: send emails to all hub members
         const hubMembersResult = await getHubMembersDB(notificationData.hubId);
         if (hubMembersResult.success && hubMembersResult.data) {
-          // Send email to each hub member (fire-and-forget)
+          // Send emails to all hub members sequentially and await them
           for (const member of hubMembersResult.data) {
             if (member.email) {
-              sendNotificationEmail(notification, member.email).catch(
-                (err) => {
-                  console.error(
-                    `Error sending notification email to ${member.email}:`,
-                    err,
-                  );
-                  // Don't fail the notification creation if email fails
-                },
-              );
+              try {
+                await sendNotificationEmail(notification, member.email);
+              } catch (err) {
+                console.error(
+                  `Error sending notification email to ${member.email}:`,
+                  err,
+                );
+                // Don't fail the notification creation if email fails
+              }
             }
           }
         }
@@ -100,13 +100,12 @@ export async function sendNotification(
         if (notificationData.userId) {
           const emailResult = await getUserEmailDB(notificationData.userId);
           if (emailResult.success && emailResult.data?.email) {
-            // Fire-and-forget email sending
-            sendNotificationEmail(notification, emailResult.data.email).catch(
-              (err) => {
-                console.error("Error sending notification email:", err);
-                // Don't fail the notification creation if email fails
-              },
-            );
+            try {
+              await sendNotificationEmail(notification, emailResult.data.email);
+            } catch (err) {
+              console.error("Error sending notification email:", err);
+              // Don't fail the notification creation if email fails
+            }
           }
         }
       }

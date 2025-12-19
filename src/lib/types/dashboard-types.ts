@@ -8,6 +8,8 @@ export type DashboardSavingsGoalsCards = {
   title: string;
   content: string;
   value: number;
+  warningThreshold?: number;
+  markerColor?: string;
 };
 
 export type DashboardSavingsGoals = {

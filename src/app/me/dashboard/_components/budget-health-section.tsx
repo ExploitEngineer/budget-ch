@@ -42,7 +42,8 @@ export function BudgetHealthSection() {
   } = useQuery({
     queryKey: budgetKeys.categoriesCount(hubId),
     queryFn: async () => {
-      const res = await getCategoriesCount();
+      if (!hubId) return 0;
+      const res = await getCategoriesCount(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch categories count");
       }

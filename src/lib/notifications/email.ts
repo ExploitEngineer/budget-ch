@@ -10,10 +10,8 @@ export async function sendNotificationEmail(
   notification: Notification,
   recipientEmail: string,
 ): Promise<void> {
-  // Fire-and-forget: don't await, just trigger
-  // This ensures email sending doesn't block the main flow
-  mailer
-    .sendMail({
+  try {
+    await mailer.sendMail({
       from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
       to: recipientEmail,
       subject: notification.title,
@@ -29,13 +27,12 @@ export async function sendNotificationEmail(
           </p>
         </div>
       `,
-    })
-    .then(async () => {
-      // Update emailSent flag after successful send
-      await updateNotificationEmailSentDB(notification.id);
-    })
-    .catch((err) => {
-      // Log error but don't throw - email sending failures shouldn't break the flow
-      console.error("Failed to send notification email:", err);
     });
+
+    // Update emailSent flag after successful send
+    await updateNotificationEmailSentDB(notification.id);
+  } catch (err) {
+    // Log error but don't throw - email sending failures shouldn't break the flow
+    console.error("Failed to send notification email:", err);
+  }
 }

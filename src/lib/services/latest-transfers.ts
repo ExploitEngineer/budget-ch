@@ -8,12 +8,12 @@ import { headers } from "next/headers";
 export async function getAccountTransfers() {
   try {
     const hdrs = await headers();
-    const { financialAccountId } = await getContext(hdrs, true);
+    const { financialAccountId } = await getContext(hdrs, false);
 
     if (!financialAccountId) {
       return {
-        status: false,
-        message: "No financial account found in context.",
+        status: true,
+        message: "No financial account found. Please create a financial account in the settings to continue.",
         data: [],
       };
     }

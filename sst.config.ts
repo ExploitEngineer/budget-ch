@@ -7,23 +7,54 @@ export default $config({
       removal: input?.stage === "production" ? "retain" : "remove",
       protect: ["production"].includes(input?.stage),
       home: "aws",
+      providers: {
+        aws: {
+          region: "eu-central-1",
+        },
+      },
     };
   },
   async run() {
     const web = new sst.aws.Nextjs("MyWeb");
 
-    // Scheduled notifications Lambda function (runs daily at 9 AM UTC)
-    new sst.aws.Cron("ScheduledNotifications", {
-      schedule: "cron(0 9 * * ? *)", // Daily at 9 AM UTC
+    // Subscription Expiry Check (Daily at 9 AM UTC)
+    new sst.aws.Cron("SubscriptionNotifications", {
+      schedule: "cron(0 9 * * ? *)",
       function: {
         handler: "src/functions/scheduled-notifications.handler",
+        nodejs: {
+          install: ["pg", "nodemailer"],
+          esbuild: {
+            external: ["pg", "nodemailer"],
+          },
+        },
         environment: {
           DATABASE_URL: process.env.DATABASE_URL!,
           SMTP_HOST: process.env.SMTP_HOST!,
           MAIL_USER: process.env.MAIL_USER!,
           MAIL_PASS: process.env.MAIL_PASS!,
         },
-      } as any, // Type assertion needed due to SST v3 type definitions
+      } as any,
+    });
+
+    // Budget Alerts (Every 1 hour)
+    new sst.aws.Cron("BudgetAlerts", {
+      schedule: "rate(1 hour)",
+      function: {
+        handler: "src/functions/budget-alerts.handler",
+        nodejs: {
+          install: ["pg", "nodemailer"],
+          esbuild: {
+            external: ["pg", "nodemailer"],
+          },
+        },
+        environment: {
+          DATABASE_URL: process.env.DATABASE_URL!,
+          SMTP_HOST: process.env.SMTP_HOST!,
+          MAIL_USER: process.env.MAIL_USER!,
+          MAIL_PASS: process.env.MAIL_PASS!,
+        },
+      } as any,
     });
 
     return {

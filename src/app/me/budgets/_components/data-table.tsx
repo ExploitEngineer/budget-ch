@@ -21,7 +21,9 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslations } from "next-intl";
 import { Separator } from "@/components/ui/separator";
+import { cn } from "@/lib/utils";
 import EditBudgetDialog from "./edit-budget-dialog";
+import CreateBudgetDialog from "./create-budget-dialog";
 import { useState, useMemo } from "react";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
@@ -192,21 +194,47 @@ export function BudgetDataTable() {
                   // Find the corresponding domain budget for editing
                   const domainBudget = domainBudgets?.find((b) => b.id === row.id);
                   return (
-                    <TableRow key={row.id} className="dark:border-border-blue">
-                      <TableCell>{row.category}</TableCell>
-                      <TableCell>{row.allocated}</TableCell>
-                      <TableCell>{row.ist}</TableCell>
+                    <TableRow key={row.category} className="dark:border-border-blue">
+                      <TableCell className="font-medium">
+                        <div className="flex items-center gap-2">
+                          {row.colorMarker && row.colorMarker !== "standard" && (
+                            <div
+                              className={cn(
+                                "h-2 w-2 rounded-full",
+                                row.colorMarker === "green" ? "bg-green-500" :
+                                  row.colorMarker === "orange" ? "bg-orange-500" :
+                                    row.colorMarker === "red" ? "bg-red-500" : ""
+                              )}
+                            />
+                          )}
+                          {row.category}
+                        </div>
+                      </TableCell>
+                      <TableCell>{row.allocated !== null ? row.allocated : "—"}</TableCell>
+                      <TableCell>{row.ist !== null ? row.ist : "—"}</TableCell>
                       <TableCell>{row.spent}</TableCell>
-                      <TableCell>{row.remaining}</TableCell>
+                      <TableCell>{row.allocated !== null ? row.remaining : "—"}</TableCell>
                       <TableCell>
-                        <Progress value={row.progress} />
+                        <Progress
+                          value={row.progress}
+                          warningThreshold={row.warningThreshold ?? 80}
+                          markerColor={row.colorMarker ?? "standard"}
+                        />
                       </TableCell>
                       <TableCell>
-                        <EditBudgetDialog
-                          variant="outline"
-                          text="Edit"
-                          budget={domainBudget}
-                        />
+                        {row.id ? (
+                          <EditBudgetDialog
+                            variant="outline"
+                            text="Edit"
+                            budget={domainBudget}
+                          />
+                        ) : (
+                          <CreateBudgetDialog
+                            variant="outline"
+                            text="Set Budget"
+                            defaultCategory={row.category}
+                          />
+                        )}
                       </TableCell>
                     </TableRow>
                   );

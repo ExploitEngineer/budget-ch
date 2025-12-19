@@ -59,14 +59,19 @@ export type {
   SubscriptionStatus,
 };
 
-/**
- * BudgetWithCategory - Canonical domain view model for budgets with category information
- * Used by services and API routes when returning budget data that includes category names
- * Extends Budget schema type with joined category name and calculated spent amount
- */
-export interface BudgetWithCategory extends Budget {
-  categoryName: string | null; // From joined TransactionCategory
-  calculatedSpentAmount?: number; // Calculated from actual transactions (expenses - income)
+export interface BudgetWithCategory {
+  id: string | null; // Null if category is not budgeted
+  hubId: string;
+  userId?: string | null;
+  transactionCategoryId: string;
+  allocatedAmount: number | null;
+  spentAmount: number | null; // IST
+  calculatedSpentAmount?: number; // From transactions
+  warningPercentage?: number | null;
+  markerColor?: string | null;
+  createdAt?: Date | null;
+  updatedAt?: Date | null;
+  categoryName: string | null;
 }
 
 /**

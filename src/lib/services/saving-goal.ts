@@ -49,7 +49,7 @@ export async function createSavingGoal({
 }) {
   try {
     const hdrs = await headers();
-    const { userId, hubId, userRole } = await getContext(hdrs, true);
+    const { userId, hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -155,7 +155,7 @@ export async function updateSavingGoal({
 }: UpdateSavingGoalArgs): Promise<ActionResponse> {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -207,7 +207,7 @@ export async function updateSavingGoal({
 export async function deleteSavingGoal(goalId: string) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 

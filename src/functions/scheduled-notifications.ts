@@ -1,14 +1,14 @@
-import { scheduledNotifications } from "@/lib/notifications/scheduled";
+import { checkSubscriptionExpiry } from "@/lib/notifications/scheduled";
 
 /**
- * Lambda handler for scheduled notifications
+ * Lambda handler for scheduled subscription notifications
  * This function is called by AWS EventBridge (cron) daily at 9 AM UTC
  */
 export async function handler() {
   try {
-    console.log("Starting scheduled notifications job...");
-    const result = await scheduledNotifications();
-    
+    console.log("Starting scheduled subscription notifications job...");
+    const result = await checkSubscriptionExpiry();
+
     if (result.success) {
       console.log(
         `Scheduled notifications completed successfully. Processed: ${result.processed}`,

@@ -171,12 +171,12 @@ export function BudgetProgressSection() {
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("line-progress-cards.title")}</CardTitle>
           <Link href="/me/budgets">
-          <Button
-            variant="outline"
-            className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-          >
-            {t("line-progress-cards.button")}
-          </Button>
+            <Button
+              variant="outline"
+              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+            >
+              {t("line-progress-cards.button")}
+            </Button>
           </Link>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
@@ -198,7 +198,11 @@ export function BudgetProgressSection() {
                   <h3 className="text-sm sm:text-base">{card.title}</h3>
                   <h3 className="text-sm sm:text-base">{card.content}</h3>
                 </div>
-                <Progress value={card.value} />
+                <Progress
+                  value={card.value}
+                  warningThreshold={card.warningThreshold ?? 80}
+                  markerColor={card.markerColor ?? "standard"}
+                />
               </CardContent>
             ))
           )}
@@ -260,9 +264,8 @@ export function BudgetProgressSection() {
                       />
                     ) : (
                       <h3
-                        className={`text-sm ${
-                          task.checked ? "line-through opacity-70" : ""
-                        }`}
+                        className={`text-sm ${task.checked ? "line-through opacity-70" : ""
+                          }`}
                         onDoubleClick={() => startEditing(task.id, task.name)}
                         title="Double click to edit"
                       >

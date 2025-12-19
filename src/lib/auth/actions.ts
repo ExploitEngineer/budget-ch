@@ -36,7 +36,7 @@ export async function getContext(headersObj: Headers, requireAccount = false) {
       // Verify user has access to this hub
       const hubMember = await getHubMemberRoleDB(userId, activeHubId);
       const ownedHub = await getOwnedHubDB(userId);
-      
+
       if (!hubMember && ownedHub?.id !== activeHubId) {
         // User doesn't have access, reset to default
         activeHubId = null;
@@ -59,8 +59,8 @@ export async function getContext(headersObj: Headers, requireAccount = false) {
   // Financial account check
   let financialAccountId: string | null = null;
   if (requireAccount) {
-    const account = await getFinancialAccountDB(userId);
-    if (!account) throw new Error("Financial account not found");
+    const account = await getFinancialAccountDB(userId, activeHubId);
+    if (!account) throw new Error("No financial account found. Please create a financial account in the settings to continue.");
     financialAccountId = account.id;
   }
 

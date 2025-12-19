@@ -160,7 +160,7 @@ export async function createTransaction({
 
     // For transfers, category is optional (can be null)
     let transactionCategoryId: string | null = null;
-    
+
     if (transactionType !== "transfer" && categoryName) {
       const normalizedName = categoryName.trim().toLowerCase();
 
@@ -470,7 +470,7 @@ export async function getUpcomingRecurringTransactions(
       // Generate occurrences up to specified days ahead
       let iterations = 0;
       const maxIterations = 100; // Safety limit
-      
+
       while (
         (isBefore(currentDate, nextDays) || isSameDay(currentDate, nextDays)) &&
         iterations < maxIterations
@@ -618,7 +618,7 @@ export async function updateTransaction(
     const hdrs = await headers();
     const { hubId, userRole, financialAccountId } = await getContext(
       hdrs,
-      true,
+      false,
     );
 
     requireAdminRole(userRole);
@@ -626,7 +626,7 @@ export async function updateTransaction(
     if (!financialAccountId) {
       return {
         success: false,
-        message: "No financial account found in context",
+        message: "No financial account found. Please create a financial account in settings to update transactions.",
       };
     }
 
@@ -709,7 +709,7 @@ export async function updateTransaction(
 export async function deleteTransaction(transactionId: string) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -739,7 +739,7 @@ export async function deleteTransaction(transactionId: string) {
 export async function deleteTransactions(transactionIds: string[]) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -776,7 +776,7 @@ export async function deleteTransactions(transactionIds: string[]) {
 export async function deleteAllTransactions() {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -811,7 +811,7 @@ export async function deleteAllTransactions() {
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 

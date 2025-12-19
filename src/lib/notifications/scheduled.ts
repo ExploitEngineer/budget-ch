@@ -1,21 +1,24 @@
 "use server";
 
 import db from "@/db/db";
-import { subscriptions, hubs } from "@/db/schema";
-import { eq, and, lte, gte, sql } from "drizzle-orm";
+import { eq, and, lte, sql, desc } from "drizzle-orm";
 import { sendNotification } from "./index";
 import {
   SUBSCRIPTION_EXPIRING_3_DAYS,
   SUBSCRIPTION_EXPIRING_1_DAY,
   SUBSCRIPTION_EXPIRED,
+  BUDGET_THRESHOLD_80,
+  BUDGET_THRESHOLD_100,
 } from "./types";
-import { addDays, startOfDay, differenceInDays } from "date-fns";
+import { addDays, startOfDay, differenceInDays, format } from "date-fns";
+import { subscriptions, hubs, notifications } from "@/db/schema";
+import { getBudgetsDB } from "@/db/queries";
 
 /**
- * Scheduled notification function for subscription expiry checks
- * This function will be called by Lambda cron job daily at 9 AM UTC
+ * Checks for subscriptions that are about to expire and sends notifications.
+ * Typically runs daily.
  */
-export async function scheduledNotifications(): Promise<{
+export async function checkSubscriptionExpiry(): Promise<{
   success: boolean;
   message?: string;
   processed?: number;
@@ -25,7 +28,6 @@ export async function scheduledNotifications(): Promise<{
     const threeDaysFromNow = addDays(today, 3);
     const oneDayFromNow = addDays(today, 1);
 
-    // Get all active subscriptions
     const allSubscriptions = await db
       .select()
       .from(subscriptions)
@@ -42,7 +44,6 @@ export async function scheduledNotifications(): Promise<{
       const periodEnd = startOfDay(new Date(subscription.currentPeriodEnd));
       const daysUntilExpiry = differenceInDays(periodEnd, today);
 
-      // Get user's hub (subscription is per user, and user owns a hub)
       const hub = await db.query.hubs.findFirst({
         where: eq(hubs.userId, subscription.userId),
         columns: { id: true },
@@ -61,9 +62,7 @@ export async function scheduledNotifications(): Promise<{
         daysRemaining: daysUntilExpiry,
       };
 
-      // Check if we should send notification based on days remaining
       if (daysUntilExpiry === 3) {
-        // Expiring in 3 days
         await sendNotification({
           typeKey: SUBSCRIPTION_EXPIRING_3_DAYS,
           hubId: hub.id,
@@ -72,7 +71,6 @@ export async function scheduledNotifications(): Promise<{
         });
         processed++;
       } else if (daysUntilExpiry === 1) {
-        // Expiring in 1 day
         await sendNotification({
           typeKey: SUBSCRIPTION_EXPIRING_1_DAY,
           hubId: hub.id,
@@ -81,7 +79,6 @@ export async function scheduledNotifications(): Promise<{
         });
         processed++;
       } else if (daysUntilExpiry <= 0) {
-        // Already expired
         await sendNotification({
           typeKey: SUBSCRIPTION_EXPIRED,
           hubId: hub.id,
@@ -98,10 +95,97 @@ export async function scheduledNotifications(): Promise<{
       processed,
     };
   } catch (err: any) {
-    console.error("Error in scheduledNotifications:", err);
+    console.error("Error in checkSubscriptionExpiry:", err);
     return {
       success: false,
-      message: err.message || "Failed to process scheduled notifications",
+      message: err.message || "Failed to process subscription notifications",
+    };
+  }
+}
+
+/**
+ * Checks budget thresholds (80% and 100%) and sends notifications if needed.
+ * Typically runs more frequently (e.g., every 30 minutes).
+ */
+export async function checkBudgetThresholds(): Promise<{
+  success: boolean;
+  message?: string;
+  processed?: number;
+}> {
+  try {
+    const allHubs = await db.select().from(hubs);
+    const currentMonth = format(new Date(), "yyyy-MM");
+    let processed = 0;
+
+    for (const hub of allHubs) {
+      if (!hub.budgetEmailWarnings) continue;
+
+      const budgetsResult = await getBudgetsDB(hub.id);
+      if (!budgetsResult.success || !budgetsResult.data) continue;
+
+      for (const budget of budgetsResult.data) {
+        const allocated =
+          budget.allocatedAmount !== null ? Number(budget.allocatedAmount) : 0;
+        if (allocated <= 0) continue;
+
+        const ist = budget.spentAmount !== null ? Number(budget.spentAmount) : 0;
+        const spent = Number(budget.calculatedSpentAmount ?? 0);
+        const totalSpent = ist + spent;
+        const percentage = (totalSpent / allocated) * 100;
+
+        let thresholdType:
+          | typeof BUDGET_THRESHOLD_80
+          | typeof BUDGET_THRESHOLD_100
+          | null = null;
+        if (percentage >= 100) {
+          thresholdType = BUDGET_THRESHOLD_100;
+        } else if (percentage >= 80) {
+          thresholdType = BUDGET_THRESHOLD_80;
+        }
+
+        if (thresholdType) {
+          const existingNotification = await db.query.notifications.findFirst({
+            where: (n, { and, eq, sql }) =>
+              and(
+                eq(n.hubId, hub.id),
+                eq(
+                  n.type,
+                  thresholdType === BUDGET_THRESHOLD_100 ? "error" : "warning",
+                ),
+                sql`${n.metadata}->>'budgetId' = ${budget.id}`,
+                sql`${n.metadata}->>'period' = ${currentMonth}`,
+              ),
+          });
+
+          if (!existingNotification) {
+            await sendNotification({
+              typeKey: thresholdType,
+              hubId: hub.id,
+              userId: null,
+              metadata: {
+                budgetId: budget.id,
+                categoryName: budget.categoryName,
+                spentAmount: totalSpent,
+                allocatedAmount: allocated,
+                period: currentMonth,
+              },
+            });
+            processed++;
+          }
+        }
+      }
+    }
+
+    return {
+      success: true,
+      message: `Processed ${processed} budget threshold notifications`,
+      processed,
+    };
+  } catch (err: any) {
+    console.error("Error in checkBudgetThresholds:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to process budget notifications",
     };
   }
 }

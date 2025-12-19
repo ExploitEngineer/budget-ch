@@ -93,3 +93,11 @@ export const notificationKeys = {
     [...notificationKeys.all, "count", hubId] as const,
 };
 
+/**
+ * Query key factory for hubs
+ */
+export const hubKeys = {
+  all: ["hubs"] as const,
+  settings: (hubId: string | null) => [...hubKeys.all, "settings", hubId] as const,
+};
+

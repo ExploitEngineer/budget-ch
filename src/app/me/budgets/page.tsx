@@ -20,7 +20,7 @@ export default async function Transactions({ searchParams }: BudgetsPageProps) {
   const { hub: hubId } = await searchParams;
 
   const queryClient = new QueryClient();
-  
+
   if (hubId) {
     await queryClient.prefetchQuery<BudgetWithCategory[]>({
       queryKey: budgetKeys.list(hubId),
@@ -46,6 +46,7 @@ export default async function Transactions({ searchParams }: BudgetsPageProps) {
           allocated: totalAllocated,
           spent: totalSpent,
           available: totalAllocated - totalSpent,
+          percent: totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0,
         };
       },
     });

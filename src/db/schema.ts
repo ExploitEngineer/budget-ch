@@ -205,6 +205,8 @@ export const hubs = pgTable("hubs", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  budgetCarryOver: boolean("budget_carry_over").default(false).notNull(),
+  budgetEmailWarnings: boolean("budget_email_warnings").default(true).notNull(),
 });
 
 export const hubMembers = pgTable(
@@ -394,6 +396,7 @@ export const savingGoals = pgTable("saving_goals", {
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
+  autoAllocationEnabled: boolean("auto_allocation_enabled").default(false).notNull(),
 });
 
 export const quickTasks = pgTable("quick_tasks", {

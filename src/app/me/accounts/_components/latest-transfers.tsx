@@ -33,19 +33,22 @@ export function LatestTransfers() {
   const { exportTransfers } = useExportCSV();
 
   const {
-    data: transfers,
+    data,
     isLoading: loading,
     error: queryError,
-  } = useQuery<TransferData[]>({
+  } = useQuery<{ data: TransferData[]; message?: string }>({
     queryKey: transferKeys.list(),
     queryFn: async () => {
       const res = await getAccountTransfers();
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch transfers");
       }
-      return res.data ?? [];
+      return { data: res.data ?? [], message: res.message };
     },
   });
+
+  const transfers = data?.data;
+  const apiMessage = data?.message;
 
   const error = queryError ? (queryError instanceof Error ? queryError.message : "Failed to load transfers") : null;
 
@@ -119,8 +122,8 @@ export function LatestTransfers() {
               ))}
               {(transfers ?? []).length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center opacity-60">
-                    {t("no-transfers")}
+                  <TableCell colSpan={5} className="text-center opacity-60 italic">
+                    {apiMessage || t("no-transfers")}
                   </TableCell>
                 </TableRow>
               )}

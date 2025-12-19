@@ -5,13 +5,19 @@ import {
   getFirstHubMemberDB,
   getOwnedHubDB,
   getHubMemberRoleDB,
+  getHubSettingsDB,
+  updateHubSettingsDB,
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
+import { getContext } from "../auth/actions";
+import { requireAdminRole } from "../auth/permissions";
 
 export interface Hub {
   id: string;
   name: string;
+  budgetCarryOver: boolean;
+  budgetEmailWarnings: boolean;
 }
 
 export interface GetHubsResponse {
@@ -151,6 +157,51 @@ export async function getActiveHubIdCookieOptions(
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     maxAge: maxAge,
-    path: "/"
+    path: "/",
   };
+}
+
+export async function getHubSettings() {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    // The type returned by getHubSettingsDB is now explicitly handled in db/queries.ts
+    // This function will simply return the result from the DB query.
+    return await getHubSettingsDB(hubId);
+  } catch (err: any) {
+    console.error("Error in getHubSettings service:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error",
+    };
+  }
+}
+
+export async function updateHubSettings(data: Partial<{
+  budgetCarryOver: boolean;
+  budgetEmailWarnings: boolean;
+}>) {
+  try {
+    const hdrs = await headers();
+    const { hubId, userRole } = await getContext(hdrs, false);
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    requireAdminRole(userRole);
+
+    return await updateHubSettingsDB(hubId, data);
+  } catch (err: any) {
+    console.error("Error in updateHubSettings service:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected server error",
+    };
+  }
 }
