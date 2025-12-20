@@ -44,14 +44,7 @@ export default async function Transactions({ searchParams }: BudgetsPageProps) {
         if (!res.success) {
           throw new Error(res.message || "Failed to fetch budget amounts");
         }
-        const totalAllocated = res.data?.totalAllocated ?? 0;
-        const totalSpent = res.data?.totalSpent ?? 0;
-        return {
-          allocated: totalAllocated,
-          spent: totalSpent,
-          available: totalAllocated - totalSpent,
-          percent: totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0,
-        };
+        return res.data;
       },
     });
   }

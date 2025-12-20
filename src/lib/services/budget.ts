@@ -13,8 +13,19 @@ import {
   createBudgetInstancesDB,
   getHubSettingsDB,
   getExistingBudgetInstancesDB,
+  getRecurringTransactionTemplatesDB,
+  getHubTotalExpensesDB,
 } from "@/db/queries";
 import { requireAdminRole } from "@/lib/auth/permissions";
+import {
+  startOfDay,
+  endOfMonth,
+  addDays,
+  isBefore,
+  isAfter,
+  isSameDay,
+  format
+} from "date-fns";
 import type {
   BudgetWithCategory,
   BudgetAmounts,
@@ -79,10 +90,12 @@ export async function createBudget(
 export async function getBudgetsAmounts(
   month?: number,
   year?: number,
+  hubIdArg?: string,
 ): Promise<BudgetResponse<BudgetAmounts>> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };
@@ -108,14 +121,12 @@ export async function getBudgetsAmounts(
         acc + (item.allocatedAmount !== null ? Number(item.allocatedAmount) : 0),
       0,
     );
-    // Use calculated spent amount (from transactions) for totals, including IST
-    const totalSpent = budgetsArray.reduce(
-      (acc, item) =>
-        acc +
-        Number(item.calculatedSpentAmount ?? 0) +
-        (item.spentAmount !== null ? Number(item.spentAmount) : 0),
-      0,
+    const totalSpentRes = await getHubTotalExpensesDB(
+      hubId,
+      targetMonth,
+      targetYear,
     );
+    const totalSpent = totalSpentRes.success ? Number(totalSpentRes.data || 0) : 0;
 
     return {
       success: true,
@@ -131,15 +142,154 @@ export async function getBudgetsAmounts(
   }
 } // End getBudgetsAmounts
 
+/**
+ * GET Count of budgets over their warning threshold
+ */
+export async function getBudgetWarningsCount(
+  month?: number,
+  year?: number,
+  hubIdArg?: string,
+): Promise<BudgetResponse<{ count: number }>> {
+  try {
+    const hdrs = await headers();
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const now = new Date();
+    const targetMonth = month || now.getMonth() + 1;
+    const targetYear = year || now.getFullYear();
+
+    const res = await getBudgetsByMonthDB(hubId, targetMonth, targetYear);
+    if (!res.success || !res.data) {
+      return { success: true, data: { count: 0 }, message: "No budgets found or error fetching budgets" };
+    }
+
+    const warnings = res.data.filter((b) => {
+      const allocated = Number(b.allocatedAmount ?? 0);
+      const carried = Number(b.carriedOverAmount ?? 0);
+      const totalAllocated = allocated + (allocated > 0 ? carried : 0);
+
+      const ist = Number(b.spentAmount ?? 0);
+      const spent = Number(b.calculatedSpentAmount ?? 0);
+      const totalSpent = ist + spent;
+
+      const threshold = b.warningPercentage ?? 80;
+      const percent = totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
+
+      return percent >= threshold;
+    });
+
+    return {
+      success: true,
+      message: "Budget warnings count fetched",
+      data: { count: warnings.length },
+    };
+  } catch (err: any) {
+    console.error("Error in getBudgetWarningsCount:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch budget warnings count",
+    };
+  }
+}
+
+/**
+ * GET Budget Forecast for the end of the month
+ * Forecast = (Total Allocated - Total Spent) - (Upcoming Recurring Expenses this month)
+ */
+export async function getBudgetForecast(
+  hubIdArg?: string,
+): Promise<BudgetResponse<{
+  forecastValue: number;
+  forecastDate: string;
+}>> {
+  try {
+    const hdrs = await headers();
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const today = startOfDay(new Date());
+    const monthEnd = endOfMonth(today);
+
+    // 1. Get Budget Amounts
+    const amountsRes = await getBudgetsAmounts(undefined, undefined, hubId);
+    if (!amountsRes.success || !amountsRes.data) {
+      return { success: false, message: "Failed to fetch budget amounts for forecast" };
+    }
+
+    const { totalAllocated, totalSpent } = amountsRes.data;
+    const available = totalAllocated - totalSpent;
+
+    // 2. Get Upcoming Recurring Transactions for the rest of this month
+    const templates = await getRecurringTransactionTemplatesDB(hubId);
+    let upcomingRecurringTotal = 0;
+
+    for (const template of templates) {
+      const startDate = startOfDay(new Date(template.startDate));
+      let nextOccur = startDate;
+
+      if (template.frequencyDays > 0) {
+        while (isBefore(nextOccur, today)) {
+          nextOccur = startOfDay(addDays(nextOccur, template.frequencyDays));
+        }
+      }
+
+      // Sum all occurrences between today and monthEnd
+      while (isBefore(nextOccur, monthEnd) || isSameDay(nextOccur, monthEnd)) {
+        // Check end date
+        if (template.endDate && isAfter(nextOccur, startOfDay(new Date(template.endDate)))) {
+          break;
+        }
+
+        // Add to total (subtract expenses, add income)
+        if (template.type === "expense" || template.type === "transfer") {
+          upcomingRecurringTotal += Number(template.amount);
+        } else if (template.type === "income") {
+          upcomingRecurringTotal -= Number(template.amount);
+        }
+
+        nextOccur = startOfDay(addDays(nextOccur, template.frequencyDays));
+      }
+    }
+
+    const forecast = available - upcomingRecurringTotal;
+
+    return {
+      success: true,
+      message: "Forecast calculated",
+      data: {
+        forecastValue: forecast,
+        forecastDate: format(monthEnd, "dd.MM.yyyy"),
+      },
+    };
+  } catch (err: any) {
+    console.error("Error calculating budget forecast:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to calculate forecast",
+    };
+  }
+}
+
 // GET Budgets [Action] - Returns canonical domain type BudgetWithCategory[]
 // GET Budgets [Action] - Returns canonical domain type BudgetWithCategory[]
 export async function getBudgets(
   month?: number,
   year?: number,
+  hubIdArg?: string,
 ): Promise<BudgetResponse<BudgetWithCategory[]>> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };

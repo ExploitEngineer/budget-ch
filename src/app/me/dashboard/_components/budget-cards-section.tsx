@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getBudgetsAmounts } from "@/lib/services/budget";
+import { getBudgetsAmounts, getBudgetForecast } from "@/lib/services/budget";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { DashboardCards } from "@/lib/types/dashboard-types";
@@ -28,7 +28,7 @@ export function BudgetCardsSection() {
   } = useQuery({
     queryKey: budgetKeys.amounts(hubId),
     queryFn: async () => {
-      const res = await getBudgetsAmounts();
+      const res = await getBudgetsAmounts(undefined, undefined, hubId || undefined);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budgets");
       }
@@ -37,37 +37,50 @@ export function BudgetCardsSection() {
     enabled: !!hubId,
   });
 
+  const {
+    data: forecastData,
+    isLoading: forecastLoading,
+  } = useQuery({
+    queryKey: budgetKeys.forecast(hubId),
+    queryFn: async () => {
+      const res = await getBudgetForecast(hubId || undefined);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch forecast");
+      }
+      return res.data;
+    },
+    enabled: !!hubId,
+  });
+
   const totalAllocated = budgetAmounts?.totalAllocated ?? 0;
   const totalSpent = budgetAmounts?.totalSpent ?? 0;
-  const allocated = totalAllocated;
-  const spent = totalSpent;
   const available = totalAllocated - totalSpent;
   const percent =
     totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
 
-  const isLoading = budgetLoading || budgetAmounts === undefined;
+  const isLoading = budgetLoading || budgetAmounts === undefined || forecastLoading;
 
   const cards: DashboardCards[] = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${(allocated ?? 0).toLocaleString()}`,
+      content: `CHF ${(totalAllocated).toLocaleString()}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${(spent ?? 0).toLocaleString()}`,
+      content: `CHF ${(totalSpent).toLocaleString()}`,
       badge: percent.toFixed(0) + "% " + t("cards.card-2.badge"),
     },
     {
-      title: (available ?? 0) < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
-      content: `CHF ${(available ?? 0).toLocaleString()}`,
-      badge: (available ?? 0) < 0
+      title: available < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
+      content: `CHF ${available.toLocaleString()}`,
+      badge: available < 0
         ? `${Math.ceil(Math.abs(percent - 100))}% ` + t("cards.card-3.badge-over")
-        : t("cards.card-3.badge"),
+        : `+${Math.floor(100 - percent)}% ` + t("cards.card-3.badge"),
     },
     {
-      title: t("cards.card-4.title"),
-      content: t("cards.card-4.content"),
+      title: t("cards.card-4.title") + " " + (forecastData?.forecastDate ?? ""),
+      content: `CHF ${forecastData?.forecastValue.toLocaleString() ?? "-"}`,
       badge: t("cards.card-4.badge"),
     },
   ];

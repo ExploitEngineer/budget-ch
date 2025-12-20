@@ -52,6 +52,7 @@ export async function createTransaction({
   startDate,
   endDate,
   recurringStatus,
+  hubIdArg,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -67,10 +68,16 @@ export async function createTransaction({
   startDate?: Date;
   endDate?: Date | null;
   recurringStatus?: "active" | "inactive";
+  hubIdArg?: string;
 }) {
   try {
     const hdrs = await headers();
-    const { userId, userRole, hubId } = await getContext(hdrs, false);
+    const { userId, userRole, hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Hub ID is required." };
+    }
 
     requireAdminRole(userRole);
 
@@ -434,6 +441,7 @@ export interface UpcomingRecurringTransaction {
 
 export async function getUpcomingRecurringTransactions(
   days: number = 14,
+  hubIdArg?: string,
 ): Promise<{
   success: boolean;
   data?: UpcomingRecurringTransaction[];
@@ -441,7 +449,12 @@ export async function getUpcomingRecurringTransactions(
 }> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId" };
+    }
 
     const templates = await getRecurringTransactionTemplatesDB(hubId);
 
@@ -454,17 +467,10 @@ export async function getUpcomingRecurringTransactions(
       let currentDate = startDate;
 
       // If start date is in the past, calculate next occurrence
-      if (isBefore(startDate, today)) {
-        // Calculate next occurrence after today
-        const daysSinceStart = Math.floor(
-          (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
-        );
-        const occurrencesSinceStart = Math.floor(
-          daysSinceStart / template.frequencyDays,
-        );
-        currentDate = startOfDay(
-          addDays(startDate, (occurrencesSinceStart + 1) * template.frequencyDays),
-        );
+      if (template.frequencyDays > 0) {
+        while (isBefore(currentDate, today)) {
+          currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+        }
       }
 
       // Generate occurrences up to specified days ahead
@@ -498,6 +504,10 @@ export async function getUpcomingRecurringTransactions(
             date: format(currentDate, "d.M.yyyy"),
             templateId: template.id,
           });
+
+          // Optimization: Only show the next occurrence for each recurring template 
+          // to prevent high-frequency transactions (e.g., daily) from crowding out others.
+          break;
         }
 
         // Move to next occurrence
@@ -613,13 +623,19 @@ export async function updateRecurringTransactionTemplate(
 export async function updateTransaction(
   transactionId: string,
   formData: FormData,
+  hubIdArg?: string,
 ) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole, financialAccountId } = await getContext(
+    const { userId, userRole, hubId: sessionHubId, financialAccountId } = await getContext(
       hdrs,
       false,
     );
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Hub ID is required." };
+    }
 
     requireAdminRole(userRole);
 
@@ -706,10 +722,18 @@ export async function updateTransaction(
 }
 
 // DELETE Transaction
-export async function deleteTransaction(transactionId: string) {
+export async function deleteTransaction(
+  transactionId: string,
+  hubIdArg?: string,
+) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, false);
+    const { userId, userRole, hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Hub ID is required." };
+    }
 
     requireAdminRole(userRole);
 

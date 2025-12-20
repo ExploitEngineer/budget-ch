@@ -17,6 +17,7 @@ import { createTask, updateTask, deleteTask } from "@/lib/services/tasks";
 import { taskKeys, budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { ErrorState } from "@/components/ui/error-state";
 import type { QuickTask } from "@/db/schema";
 import type { DashboardSavingsGoalsCards } from "@/lib/types/dashboard-types";
 
@@ -182,7 +183,7 @@ export function BudgetProgressSection() {
         <Separator className="dark:bg-border-blue" />
         <div className="grid grid-cols-2 gap-4 pb-10">
           {categoriesError ? (
-            <p className="px-6 text-sm text-red-500">{categoriesError.message}</p>
+            <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: budgetKeys.topCategories(hubId) })} />
           ) : topCategories === null || categoriesLoading ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("line-progress-cards.loading")}
@@ -225,7 +226,7 @@ export function BudgetProgressSection() {
           {/* Task List */}
           <div className="flex flex-col gap-3 px-6 pb-4">
             {tasksError ? (
-              <p className="text-sm text-red-500">{tasksError.message}</p>
+              <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) })} />
             ) : tasks === null || tasksLoading ? (
               <p className="text-muted-foreground text-sm">
                 {t("line-progress-cards.loading")}

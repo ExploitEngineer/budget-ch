@@ -1669,18 +1669,14 @@ export async function getBudgetsByMonthDB(
     const startDate = new Date(Date.UTC(year, month - 1, 1));
     const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
 
-    // Create a subquery to calculate net spent amounts from transactions for each category
-    // Net spent = expenses - income (but not less than 0)
+    // Create a subquery to calculate gross spent amounts from transactions for each category
+    // Gross spent = sum of expenses
     // FILTERED by Month/Year
     const spentAmountsSubquery = db
       .select({
         transactionCategoryId: transactions.transactionCategoryId,
         totalSpent: sql<number>`
-          GREATEST(
-            COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0) -
-            COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0),
-            0
-          )
+          COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)
         `.as("totalSpent"),
       })
       .from(transactions)
@@ -2227,6 +2223,37 @@ export async function getMonthlyReportDB(hubId: string) {
     return { success: true, data: result };
   } catch (err: any) {
     console.error("DB Error: getMonthlyReportDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+// GET HUB Total Expenses (Gross) for a specific month
+export async function getHubTotalExpensesDB(
+  hubId: string,
+  month: number,
+  year: number,
+) {
+  try {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+
+    const result = await db
+      .select({
+        total: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.hubId, hubId),
+          eq(transactions.type, "expense"),
+          gte(transactions.createdAt, startDate),
+          lte(transactions.createdAt, endDate),
+        ),
+      );
+
+    return { success: true, data: result[0]?.total || 0 };
+  } catch (err: any) {
+    console.error("DB Error: getHubTotalExpensesDB:", err);
     return { success: false, message: err.message };
   }
 }

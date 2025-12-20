@@ -5,10 +5,7 @@ import { BudgetProgressSection } from "./_components/budget-progress-section";
 import { WarningSection } from "./_components/warning-section";
 import { RecentTransactionsTableSection } from "./_components/recent-transactions-table-section";
 import { BudgetHealthSection } from "./_components/budget-health-section";
-import { useDashboardData } from "./_components/data";
-
 export default function Dashboard() {
-  const { warningCards } = useDashboardData();
   return (
     <section>
       <div>
@@ -19,7 +16,7 @@ export default function Dashboard() {
         <BudgetCardsSection />
         <BarChartSection />
         <BudgetProgressSection />
-        <WarningSection warningCards={warningCards} />
+        <WarningSection />
         <RecentTransactionsTableSection />
         <BudgetHealthSection />
       </div>

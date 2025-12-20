@@ -99,7 +99,7 @@ export default function EditTransactionDialog({
       enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
     },
   );
-  
+
   // Transform domain accounts to UI rows
   const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
@@ -118,6 +118,7 @@ export default function EditTransactionDialog({
       startDate?: Date | null;
       endDate?: Date | null;
       recurringStatus?: "active" | "inactive";
+      hubIdArg?: string;
     }) => {
       const result = await createTransaction({
         categoryName: data.category.trim(),
@@ -132,6 +133,7 @@ export default function EditTransactionDialog({
         startDate: data.startDate || undefined,
         endDate: data.endDate,
         recurringStatus: data.recurringStatus,
+        hubIdArg: hubId || undefined,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -154,7 +156,7 @@ export default function EditTransactionDialog({
       ) {
         toast.error(
           error.message ||
-            "Something went wrong while creating the transaction.",
+          "Something went wrong while creating the transaction.",
         );
       } else {
         toast.error(error.message);
@@ -170,7 +172,7 @@ export default function EditTransactionDialog({
       id: string;
       formData: FormData;
     }) => {
-      const result = await updateTransaction(id, formData);
+      const result = await updateTransaction(id, formData, hubId || undefined);
       if (!result.success) {
         throw new Error(result.message || "Failed to update transaction");
       }
@@ -195,7 +197,7 @@ export default function EditTransactionDialog({
 
   const deleteTransactionMutation = useMutation({
     mutationFn: async (id: string) => {
-      const result = await deleteTransaction(id);
+      const result = await deleteTransaction(id, hubId || undefined);
       if (!result.success) {
         throw new Error(result.message || "Failed to delete transaction");
       }
@@ -267,7 +269,7 @@ export default function EditTransactionDialog({
       const parsedDate = parse(transaction.date, "dd/MM/yyyy", new Date());
       // Check if date parsing was successful
       const dateValue = isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
-      
+
       form.reset({
         date: dateValue,
         accountId: transaction.accountId || "",
@@ -342,6 +344,7 @@ export default function EditTransactionDialog({
           startDate: values.isRecurring ? values.startDate : undefined,
           endDate: values.isRecurring ? values.endDate : undefined,
           recurringStatus: values.isRecurring ? values.recurringStatus : undefined,
+          hubIdArg: hubId || undefined,
         });
       }
 
@@ -606,8 +609,8 @@ export default function EditTransactionDialog({
                                   accountsLoading
                                     ? "Loading accounts..."
                                     : t(
-                                        "dialog.placeholders.destinationAccount",
-                                      )
+                                      "dialog.placeholders.destinationAccount",
+                                    )
                                 }
                               />
                             </SelectTrigger>

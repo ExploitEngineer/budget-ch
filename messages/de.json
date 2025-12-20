@@ -35,7 +35,9 @@
         "loading": "Wird geladen...",
         "updating": "Aktualisieren...",
         "update": "Aktualisieren",
-        "add": "Hinzufügen"
+        "add": "Hinzufügen",
+        "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+        "retry": "Wiederholen"
     },
     "greeting": {
         "title": "Wie geht es dir?",
@@ -223,11 +225,11 @@
                 },
                 "card-2": {
                     "title": "Ausgaben (Aktuell)",
-                    "badge": "% des Budgets"
+                    "badge": "des Budgets"
                 },
                 "card-3": {
                     "title": "Verfügbar",
-                    "badge": "+40% Puffer"
+                    "badge": "Puffer"
                 },
                 "card-4": {
                     "title": "Prognose bis 30.09.2025",
@@ -567,7 +569,7 @@
                 "card-2": {
                     "title": "Bisher ausgegeben",
                     "content": "CHF 1’915.00",
-                    "badge": "% des Budgets"
+                    "badge": "des Budgets"
                 },
                 "card-3": {
                     "title": "Verfügbar",

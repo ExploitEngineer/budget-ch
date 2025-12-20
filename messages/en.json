@@ -35,7 +35,9 @@
         "loading": "Loading...",
         "updating": "Updating...",
         "update": "Update",
-        "add": "Add"
+        "add": "Add",
+        "error": "Something went wrong. Please try again.",
+        "retry": "Retry"
     },
     "greeting": {
         "cta": "Dashboard"
@@ -222,16 +224,16 @@
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
-                    "badge": "% of the budget"
+                    "badge": "of the budget"
                 },
                 "card-3": {
                     "title": "Available",
                     "title-over": "Over Budget",
-                    "badge": "+40% Buffer",
+                    "badge": "Buffer",
                     "badge-over": "Overspent"
                 },
                 "card-4": {
-                    "title": "Forecast until 30/09/2025",
+                    "title": "Forecast until",
                     "content": "CHF 4’980",
                     "badge": "incl. Recurring"
                 }

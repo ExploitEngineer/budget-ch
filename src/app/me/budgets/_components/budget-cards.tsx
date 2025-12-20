@@ -36,17 +36,7 @@ export function BudgetCardsSection() {
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budget amounts");
       }
-      const totalAllocated = res.data?.totalAllocated ?? 0;
-      const totalSpent = res.data?.totalSpent ?? 0;
-      return {
-        allocated: totalAllocated,
-        spent: totalSpent,
-        available: totalAllocated - totalSpent,
-        percent:
-          totalAllocated > 0
-            ? (totalSpent / totalAllocated) * 100
-            : 0,
-      };
+      return res.data;
     },
     enabled: !!hubId,
   });
@@ -94,10 +84,10 @@ export function BudgetCardsSection() {
     return allocated > 0 && totalSpent > threshold;
   }).length;
 
-  const allocated = amounts?.allocated ?? null;
-  const spent = amounts?.spent ?? null;
-  const available = amounts?.available ?? null;
-  const percent = amounts?.percent ?? 0;
+  const allocated = amounts?.totalAllocated ?? null;
+  const spent = amounts?.totalSpent ?? null;
+  const available = (allocated !== null && spent !== null) ? allocated - spent : null;
+  const percent = (allocated !== null && spent !== null && allocated > 0) ? (spent / allocated) * 100 : 0;
 
   const cards: CardsContent[] = [
     {

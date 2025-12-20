@@ -42,6 +42,8 @@ export const budgetKeys = {
   amounts: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.all, "amounts", hubId, month, year] as const,
   topCategories: (hubId: string | null) => [...budgetKeys.all, "top-categories", hubId] as const,
   categoriesCount: (hubId: string | null) => [...budgetKeys.all, "categories-count", hubId] as const,
+  warningsCount: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.all, "warnings-count", hubId, month, year] as const,
+  forecast: (hubId: string | null) => [...budgetKeys.all, "forecast", hubId] as const,
 };
 
 /**

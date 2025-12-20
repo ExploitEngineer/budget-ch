@@ -5,7 +5,7 @@ import { HighlightedBarChart } from "@/components/ui/highlighted-bar-chart";
 import { AnimatedCircularProgressBar } from "@/components/ui/animated-circular-progress-bar";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getSavingGoals } from "@/lib/api";
 import { savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
@@ -13,11 +13,13 @@ import type { DashboardSavingsGoals } from "@/lib/types/dashboard-types";
 import type { SavingGoal } from "@/lib/types/domain-types";
 import { mapSavingGoalsToRows } from "@/app/me/saving-goals/saving-goal-adapters";
 import { useMemo } from "react";
+import { ErrorState } from "@/components/ui/error-state";
 
 export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page.progress-cards");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const queryClient = useQueryClient();
 
   const {
     data: domainSavingGoals,
@@ -55,7 +57,7 @@ export function BarChartSection() {
         <Separator className="dark:bg-border-blue" />
 
         {goalsError ? (
-          <p className="px-6 text-sm text-red-500">{goalsError.message}</p>
+          <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId, 3) })} />
         ) : savingGoals === undefined || goalsLoading ? (
           <p className="text-muted-foreground px-6 text-sm">{t("loading")}</p>
         ) : savingGoals.length === 0 ? (
