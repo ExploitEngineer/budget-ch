@@ -16,7 +16,12 @@ export const SavingsGoalDialogSchema = z.object({
 export type SavingsGoalDialogValues = z.infer<typeof SavingsGoalDialogSchema>;
 
 export const AllocateAmountSchema = z.object({
-  amount: z.coerce.number().min(1, { message: "Must be 1 or more" }),
+  amount: z.string()
+    .transform((v) => {
+      if (v === "" || v === undefined) return undefined;
+      return Number(v);
+    })
+    .pipe(z.number().min(1, { message: "Must be 1 or more" }).optional()),
 });
 
 export type AllocateAmountValues = z.infer<typeof AllocateAmountSchema>;

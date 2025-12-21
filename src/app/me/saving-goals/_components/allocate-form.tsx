@@ -37,9 +37,9 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
-  const form = useForm<AllocateAmountValues>({
-    resolver: zodResolver(AllocateAmountSchema) as any,
-    defaultValues: { amount: undefined },
+  const form = useForm<any>({
+    resolver: zodResolver(AllocateAmountSchema),
+    defaultValues: { amount: "" },
   });
 
   const updateGoalMutation = useMutation({
@@ -57,7 +57,7 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
       toast.success("Saving goal updated successfully!");
-      form.reset({ amount: undefined });
+      form.reset({ amount: "" });
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to update saving goal");
@@ -78,13 +78,17 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
     }
   });
 
+  // Watch amount to disable button if empty (avoiding validation error)
+  const amountValue = form.watch("amount");
+  const isButtonDisabled = !amountValue || updateGoalMutation.isPending;
+
   return (
     <Form {...form}>
       <form onSubmit={handleSubmit} className="flex items-center gap-2">
         <Button
           variant="outline"
           type="submit"
-          disabled={updateGoalMutation.isPending}
+          disabled={isButtonDisabled}
           className="dark:border-border-blue !bg-dark-blue-background flex cursor-pointer items-center gap-3"
         >
           {updateGoalMutation.isPending ? (
