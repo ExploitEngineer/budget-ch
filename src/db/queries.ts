@@ -692,7 +692,10 @@ export async function createTransactionDB({
   note,
   transactionType,
   destinationAccountId,
-}: Omit<createTransactionArgs, "categoryName">) {
+  recurringTemplateId,
+}: Omit<createTransactionArgs, "categoryName"> & {
+  recurringTemplateId?: string | null;
+}) {
   try {
     await db.insert(transactions).values({
       financialAccountId,
@@ -704,6 +707,7 @@ export async function createTransactionDB({
       note,
       type: transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+      recurringTemplateId: recurringTemplateId || null,
     });
 
     return { success: true, message: "Transaction created successfully" };
@@ -3066,6 +3070,127 @@ export async function deleteNotificationDB(
     return {
       success: false,
       message: err.message || "Failed to delete notification",
+    };
+  }
+}
+
+// GET Active Recurring Templates for Generation
+export async function getActiveRecurringTemplatesDB() {
+  try {
+    const today = new Date();
+
+    const templates = await db
+      .select({
+        id: recurringTransactionTemplates.id,
+        hubId: recurringTransactionTemplates.hubId,
+        userId: recurringTransactionTemplates.userId,
+        financialAccountId: recurringTransactionTemplates.financialAccountId,
+        destinationAccountId: recurringTransactionTemplates.destinationAccountId,
+        transactionCategoryId: recurringTransactionTemplates.transactionCategoryId,
+        type: recurringTransactionTemplates.type,
+        source: recurringTransactionTemplates.source,
+        amount: recurringTransactionTemplates.amount,
+        note: recurringTransactionTemplates.note,
+        frequencyDays: recurringTransactionTemplates.frequencyDays,
+        startDate: recurringTransactionTemplates.startDate,
+        endDate: recurringTransactionTemplates.endDate,
+        status: recurringTransactionTemplates.status,
+        lastGeneratedDate: recurringTransactionTemplates.lastGeneratedDate,
+        consecutiveFailures: recurringTransactionTemplates.consecutiveFailures,
+        categoryName: transactionCategories.name,
+      })
+      .from(recurringTransactionTemplates)
+      .leftJoin(
+        transactionCategories,
+        eq(recurringTransactionTemplates.transactionCategoryId, transactionCategories.id)
+      )
+      .where(
+        and(
+          eq(recurringTransactionTemplates.status, "active"),
+          lte(recurringTransactionTemplates.startDate, today),
+          or(
+            isNull(recurringTransactionTemplates.endDate),
+            gte(recurringTransactionTemplates.endDate, today)
+          )
+        )
+      );
+
+    return { success: true, data: templates };
+  } catch (err: any) {
+    console.error("Error fetching active recurring templates:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch active recurring templates",
+    };
+  }
+}
+
+// UPDATE Template Last Generated Date
+export async function updateTemplateLastGeneratedDB(templateId: string) {
+  try {
+    await db
+      .update(recurringTransactionTemplates)
+      .set({
+        lastGeneratedDate: new Date(),
+        consecutiveFailures: 0, // Reset on success
+      })
+      .where(eq(recurringTransactionTemplates.id, templateId));
+
+    return { success: true, message: "Template updated successfully" };
+  } catch (err: any) {
+    console.error("Error updating template last generated date:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update template",
+    };
+  }
+}
+
+// MARK Template Failure
+export async function markTemplateFailureDB(
+  templateId: string,
+  reason: string
+) {
+  try {
+    // Get current template to increment failures
+    const template = await db.query.recurringTransactionTemplates.findFirst({
+      where: (t, { eq }) => eq(t.id, templateId),
+      columns: {
+        id: true,
+        consecutiveFailures: true,
+      },
+    });
+
+    if (!template) {
+      return {
+        success: false,
+        message: "Template not found",
+      };
+    }
+
+    const currentFailures = template.consecutiveFailures || 0;
+    const newFailures = currentFailures + 1;
+
+    await db
+      .update(recurringTransactionTemplates)
+      .set({
+        lastFailedDate: new Date(),
+        failureReason: reason,
+        consecutiveFailures: newFailures,
+        // Note: Auto-pause logic will be handled in service layer for now
+      })
+      .where(eq(recurringTransactionTemplates.id, templateId));
+
+    return {
+      success: true,
+      message: "Template failure marked",
+      consecutiveFailures: newFailures,
+    };
+  } catch (err: any) {
+    console.error("Error marking template failure:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to mark template failure",
     };
   }
 }

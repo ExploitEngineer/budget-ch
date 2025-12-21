@@ -329,7 +329,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                             onCheckedChange={field.onChange}
                           />
                           <span className="cursor-pointer">
-                            {t("checkboxes.receipt")}
+                            {t("checkboxes.recipient")}
                           </span>
                         </label>
                       </Badge>

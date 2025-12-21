@@ -844,8 +844,8 @@ export default function EditTransactionDialog({
                   )}
                 </div>
 
-                {/* Split Rows Section */}
-                <div className="flex flex-col gap-3 pt-2">
+                {/* Split Rows Section - COMMENTED OUT */}
+                {/* <div className="flex flex-col gap-3 pt-2">
                   <FormLabel>{t("dialog.labels.splitSum")}</FormLabel>
 
                   {fields.map((item, index) => (
@@ -853,7 +853,7 @@ export default function EditTransactionDialog({
                       key={item.id}
                       className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-3"
                     >
-                      {/* Category Select */}
+                      {/* Category Select *\/}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.category`}
@@ -891,7 +891,7 @@ export default function EditTransactionDialog({
                         )}
                       />
 
-                      {/* Amount Input */}
+                      {/* Amount Input *\/}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.amount`}
@@ -909,7 +909,7 @@ export default function EditTransactionDialog({
                         )}
                       />
 
-                      {/* Description Input */}
+                      {/* Description Input *\/}
                       <FormField
                         control={form.control}
                         name={`splits.${index}.description`}
@@ -927,7 +927,7 @@ export default function EditTransactionDialog({
                         )}
                       />
 
-                      {/* Remove Button */}
+                      {/* Remove Button *\/}
                       <Button
                         type="button"
                         variant="outline"
@@ -938,7 +938,7 @@ export default function EditTransactionDialog({
                     </div>
                   ))}
 
-                  {/* Add Row Badge */}
+                  {/* Add Row Badge *\/}
                   <div className="flex items-center gap-2">
                     <Badge
                       variant="secondary"
@@ -959,7 +959,7 @@ export default function EditTransactionDialog({
                       {t("dialog.badges.splitTotal")}
                     </Badge>
                   </div>
-                </div>
+                </div> */}
 
                 {/* 7️⃣ Buttons */}
                 <div className="flex justify-end gap-3 pt-4">

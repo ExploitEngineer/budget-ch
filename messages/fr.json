@@ -446,7 +446,7 @@
                 }
             },
             "checkboxes": {
-                "receipt": "Avec reçu",
+                "recipient": "Avec Destinataire",
                 "recurring": "Récurrent",
                 "transfers": "Transferts uniquement"
             },

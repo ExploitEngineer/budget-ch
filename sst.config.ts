@@ -92,6 +92,24 @@ export default $config({
       } as any,
     });
 
+    // Recurring Transaction Generation (Daily at 02:00 UTC)
+    // Runs daily to generate transactions from active recurring templates
+    new sst.aws.Cron("RecurringTransactionGeneration", {
+      schedule: "cron(0 2 * * ? *)",
+      function: {
+        handler: "src/functions/recurring-transactions-generator.handler",
+        nodejs: {
+          install: ["pg"],
+          esbuild: {
+            external: ["pg"],
+          },
+        },
+        environment: {
+          DATABASE_URL: process.env.DATABASE_URL!,
+        },
+      } as any,
+    });
+
     return {
       web,
     };

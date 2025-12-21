@@ -314,6 +314,11 @@ export const recurringTransactionTemplates = pgTable(
     // Null for infinite recurrence
     endDate: timestamp("end_date", { withTimezone: true }),
     status: text("status", { enum: ['active', 'inactive'] }).notNull().default('active'),
+    // Generation tracking fields
+    lastGeneratedDate: timestamp("last_generated_date", { withTimezone: true }),
+    lastFailedDate: timestamp("last_failed_date", { withTimezone: true }),
+    failureReason: text("failure_reason"),
+    consecutiveFailures: integer("consecutive_failures").notNull().default(0),
   },
 );
 
