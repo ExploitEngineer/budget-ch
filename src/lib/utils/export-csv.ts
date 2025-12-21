@@ -179,23 +179,40 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
     t("cards.tax-reserves.content.saved"),
     t("cards.tax-reserves.content.remaining"),
     t("cards.tax-reserves.content.monthly-allocated"),
+    "Progress",
+    "Account",
+    "Due Date",
+    "Status",
   ];
 
   const data = goals.map((goal) => {
-    const remaining = goal.goalAmount - goal.amountSaved;
+    const remaining = Math.max(0, (goal.goalAmount ?? 0) - (goal.amountSaved ?? 0));
     const goalAmount = Number(goal.goalAmount ?? 0);
     const amountSaved = Number(goal.amountSaved ?? 0);
+    // Allow progress > 100%
     const progress = goalAmount > 0
-      ? Math.min(Math.round((amountSaved / goalAmount) * 100), 100)
+      ? (amountSaved / goalAmount) * 100
       : 0;
+
+    let status = "Not Started";
+    if (amountSaved >= goalAmount) status = "Achieved";
+    else if (amountSaved > 0) status = "In Progress";
+
+    // Add overdue check if needed, but simple status requested for now
+    if (goal.dueDate && new Date(goal.dueDate) < new Date() && amountSaved < goalAmount) {
+      status = "Overdue";
+    }
+
     return {
       [headers[0]]: goal.name,
-      [headers[1]]: goal.goalAmount.toFixed(2),
-      [headers[2]]: goal.amountSaved.toFixed(2),
+      [headers[1]]: goalAmount.toFixed(2),
+      [headers[2]]: amountSaved.toFixed(2),
       [headers[3]]: remaining.toFixed(2),
-      [headers[4]]: goal.monthlyAllocation?.toFixed(2) ?? "0.00",
+      [headers[4]]: (goal.monthlyAllocation ?? 0).toFixed(2),
       [headers[5]]: `${progress.toFixed(1)}%`,
       [headers[6]]: goal.financialAccountId || "-",
+      [headers[7]]: goal.dueDate ? new Date(goal.dueDate).toLocaleDateString() : "N/A",
+      [headers[8]]: status,
     };
   });
 

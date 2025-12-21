@@ -19,7 +19,7 @@ export function mapSavingGoalToSavingGoalRow(
   const amountSaved = Number(goal.amountSaved ?? 0);
   const progress =
     goalAmount > 0
-      ? Math.min(Math.round((amountSaved / goalAmount) * 100), 100)
+      ? Math.round((amountSaved / goalAmount) * 100)
       : 0;
   const remaining = goalAmount - amountSaved;
 

@@ -74,6 +74,24 @@ export default $config({
       } as any,
     });
 
+    // Savings Goal Auto-Allocation (1st of each month at 01:00 UTC)
+    // Runs after rollover to ensure budget is settled first
+    new sst.aws.Cron("SavingsGoalAutoAllocation", {
+      schedule: "cron(0 1 1 * ? *)",
+      function: {
+        handler: "src/functions/savings-goal-allocation.handler",
+        nodejs: {
+          install: ["pg"],
+          esbuild: {
+            external: ["pg"],
+          },
+        },
+        environment: {
+          DATABASE_URL: process.env.DATABASE_URL!,
+        },
+      } as any,
+    });
+
     return {
       web,
     };

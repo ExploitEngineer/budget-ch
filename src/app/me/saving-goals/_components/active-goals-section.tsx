@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 import type { SavingGoal } from "@/lib/types/domain-types";
 import type { SavingGoalRow } from "@/lib/types/ui-types";
 import { mapSavingGoalsToRows } from "../saving-goal-adapters";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 export function ActiveGoalsSection() {
   const t = useTranslations(
@@ -24,6 +24,10 @@ export function ActiveGoalsSection() {
 
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  // Default to true if not specified
+  const showOverfunded = searchParams.get("showOverfunded") !== "false";
+
+  const [sortBy, setSortBy] = useState<"due" | "progress" | "remaining-amount">("due");
 
   const {
     data: domainGoals,
@@ -46,8 +50,32 @@ export function ActiveGoalsSection() {
 
   const goals = useMemo(() => {
     if (!domainGoals) return undefined;
-    return mapSavingGoalsToRows(domainGoals);
-  }, [domainGoals]);
+    const mapped = mapSavingGoalsToRows(domainGoals);
+
+    // Filter based on "Show Overfunded" setting
+    const filtered = showOverfunded
+      ? mapped
+      : mapped.filter(g => g.value < 100);
+
+    // Sort based on selected option
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === "due") {
+        // Sort by due date (soonest first, null dates last)
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      } else if (sortBy === "progress") {
+        // Sort by progress percentage (highest first)
+        return b.value - a.value;
+      } else if (sortBy === "remaining-amount") {
+        // Sort by remaining amount (highest first)
+        return (b.remaining ?? 0) - (a.remaining ?? 0);
+      }
+      return 0;
+    });
+
+    return sorted;
+  }, [domainGoals, sortBy, showOverfunded]);
 
   const activeGoalsData = (goals ?? []) as SavingGoalRow[];
 
@@ -61,13 +89,19 @@ export function ActiveGoalsSection() {
               variant="outline"
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
             >
-              {t("badge")}
+              {activeGoalsData.length} Goals • Auto Allocation: CHF{" "}
+              {(domainGoals ?? [])
+                .filter(g => g.autoAllocationEnabled)
+                .reduce((sum, g) => sum + (g.monthlyAllocation ?? 0), 0)
+                .toLocaleString()}
             </Badge>
           </div>
 
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background inline-flex flex-none items-center gap-1 rounded border"
             type="single"
+            value={sortBy}
+            onValueChange={(value) => value && setSortBy(value as typeof sortBy)}
             aria-label="view"
           >
             <ToggleGroupItem
@@ -127,7 +161,7 @@ export function ActiveGoalsSection() {
               return (
                 <Card
                   className="bg-blue-background dark:border-border-blue"
-                  key={idx}
+                  key={goal.id}
                 >
                   <CardHeader className="flex items-center justify-between">
                     <CardTitle>{goal.name}</CardTitle>
@@ -166,7 +200,17 @@ export function ActiveGoalsSection() {
                       </div>
                     </div>
 
-                    <Progress value={goal.value} className="mt-2 mb-3" />
+                    <Progress
+                      value={goal.value}
+                      className="mt-2 mb-3"
+                      markerColor={
+                        goal.dueDate && new Date(goal.dueDate) < new Date() && goal.value < 100
+                          ? "red"
+                          : goal.value >= 100
+                            ? "green"
+                            : "standard"
+                      }
+                    />
 
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge
@@ -174,7 +218,7 @@ export function ActiveGoalsSection() {
                         className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                       >
                         {t("cards.tax-reserves.content.auto")}: CHF{" "}
-                        {goal.goalAmount?.toLocaleString("de-CH", {
+                        {goal.monthlyAllocation?.toLocaleString("de-CH", {
                           minimumFractionDigits: 2,
                         }) ?? "0.00"}
                       </Badge>
@@ -184,7 +228,7 @@ export function ActiveGoalsSection() {
                         className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                       >
                         {t("cards.tax-reserves.content.remaining")}: CHF{" "}
-                        {goal.monthlyAllocation?.toLocaleString("de-CH", {
+                        {goal.remaining?.toLocaleString("de-CH", {
                           minimumFractionDigits: 2,
                         }) ?? "0.00"}
                       </Badge>

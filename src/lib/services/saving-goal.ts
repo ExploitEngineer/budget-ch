@@ -9,15 +9,21 @@ import {
   getFinancialAccountById,
 } from "@/db/queries";
 import { headers } from "next/headers";
+import db from "@/db/db";
+import { savingGoals } from "@/db/schema";
 import { getContext } from "../auth/actions";
 import type { SavingGoal } from "@/lib/types/domain-types";
 import { requireAdminRole } from "@/lib/auth/permissions";
+import { revalidatePath } from "next/cache";
+import { eq } from "drizzle-orm";
 
 export interface SavingGoalsSummary {
   totalTarget: number;
   totalSaved: number;
   remainingToSave: number;
   totalGoals: number;
+  overdueGoalsCount: number;
+  totalMonthlyAllocation: number;
 }
 
 export interface ActionResponse<T = unknown> {
@@ -229,6 +235,35 @@ export async function deleteSavingGoal(goalId: string) {
     return {
       success: false,
       message: err.message || "Unexpected error while deleting saving goal.",
+    };
+  }
+}
+
+// Toggle Hub Auto-Allocation [Action]
+export async function toggleHubAutoAllocation(
+  enabled: boolean,
+): Promise<ActionResponse<void>> {
+  try {
+    const hdrs = await headers();
+    const { hubId } = await getContext(hdrs, false);
+
+    if (!hubId) {
+      return { success: false, message: "Hub not found" };
+    }
+
+    // Bulk update all goals in this hub
+    await db
+      .update(savingGoals)
+      .set({ autoAllocationEnabled: enabled })
+      .where(eq(savingGoals.hubId, hubId));
+
+    revalidatePath("/me/saving-goals");
+    return { success: true };
+  } catch (err: any) {
+    console.error("Server action error (toggleHubAutoAllocation):", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update settings",
     };
   }
 }

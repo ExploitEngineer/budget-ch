@@ -1349,6 +1349,22 @@ export async function getSavingGoalsDB(
       );
       const remainingToSave = totalTarget - totalSaved;
 
+      // Sum total monthly allocation across all goals
+      const totalMonthlyAllocation = goals.reduce(
+        (sum, g) => sum + (g.monthlyAllocation ?? 0),
+        0,
+      );
+
+      // Count overdue goals (past due date and not achieved)
+      const today = new Date();
+      const overdueGoalsCount = goals.filter(g => {
+        if (!g.dueDate) return false; // No due date = not overdue
+        const dueDate = new Date(g.dueDate);
+        const amountSaved = g.amountSaved ?? 0;
+        const goalAmount = g.goalAmount ?? 0;
+        return dueDate < today && amountSaved < goalAmount;
+      }).length;
+
       return {
         success: true,
         data: {
@@ -1356,6 +1372,8 @@ export async function getSavingGoalsDB(
           totalSaved,
           remainingToSave,
           totalGoals: goals.length,
+          overdueGoalsCount,
+          totalMonthlyAllocation,
         },
       };
     }
