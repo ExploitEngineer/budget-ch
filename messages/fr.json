@@ -882,6 +882,18 @@
             "loading": "Chargement...",
             "no-reports": "Aucun rapport mensuel pour le moment",
             "no-categories-yet": "Aucune catégorie pour le moment",
+            "export": {
+                "summary-title": "Résumé financier",
+                "income": "Revenu total",
+                "expenses": "Dépenses totales",
+                "balance": "Solde",
+                "savings-rate": "Taux d'épargne",
+                "categories-title": "Dépenses par catégories",
+                "category": "Catégorie",
+                "amount": "Montant",
+                "trend-title": "Analyse des tendances",
+                "no-data": "Pas de données disponibles"
+            },
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filtrer",
@@ -929,6 +941,9 @@
             "analysis-table-data": {
                 "title": "Analyse",
                 "badge-last-month": "Le mois dernier : ",
+                "badge-this-quarter": "Ce trimestre: ",
+                "badge-this-year": "Cette année: ",
+                "badge-period": "Période sélectionnée: ",
                 "badge-income": "Revenus • ",
                 "badge-expense": "Dépenses ",
                 "toggle-groups": {
@@ -948,18 +963,18 @@
                     }
                 }
             },
-            "income-exp": {
-                "title": "Revenus vs Dépenses (9 derniers mois)",
-                "data-table": {
-                    "headings": {
-                        "month": "MOIS",
-                        "income": "REVENU",
-                        "expenses": "Dépenses",
-                        "balance": "Solde"
-                    }
-                }
-            },
             "detailed-table": {
+                "income-exp": {
+                    "title": "Revenus vs Dépenses (9 derniers mois)",
+                    "data-table": {
+                        "headings": {
+                            "month": "MOIS",
+                            "income": "REVENU",
+                            "expenses": "Dépenses",
+                            "balance": "Solde"
+                        }
+                    }
+                },
                 "title": "Tableau détaillé",
                 "loading": "Chargement...",
                 "buttons": {

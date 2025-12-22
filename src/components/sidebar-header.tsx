@@ -24,7 +24,15 @@ import { transferKeys } from "@/lib/query-keys";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
-import { getFinancialAccounts, getRecentTransactions, getBudgets, getSavingGoals } from "@/lib/api";
+import {
+  getFinancialAccounts,
+  getRecentTransactions,
+  getBudgets,
+  getSavingGoals,
+  getReportSummary,
+  getDetailedCategories,
+  getMonthlyReports,
+} from "@/lib/api";
 import { accountKeys, transactionKeys, budgetKeys, savingGoalKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { BudgetRow } from "@/lib/types/ui-types";
@@ -48,7 +56,13 @@ const monthNames: string[] = [
   "December",
 ];
 
-export default function SidebarHeader() {
+export default function SidebarHeader({
+  initialFrom,
+  initialTo,
+}: {
+  initialFrom?: string;
+  initialTo?: string;
+}) {
   const today = new Date();
   const t = useTranslations("main-dashboard");
   const [date, setDate] = useState(
@@ -59,14 +73,14 @@ export default function SidebarHeader() {
 
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
-  
+
   // Only fetch export-related data on the import-export page to avoid unnecessary requests
   const isExportPage = route === "import-export";
-  
+
   const { data: transfers } = useQuery<TransferData[]>({
-    queryKey: transferKeys.list(),
+    queryKey: transferKeys.list(hubId),
     queryFn: async () => {
-      const res = await getAccountTransfers();
+      const res = await getAccountTransfers(hubId!);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch transfers");
       }
@@ -74,7 +88,7 @@ export default function SidebarHeader() {
     },
     enabled: isExportPage,
   });
-  
+
   const { data: domainBudgets } = useQuery<BudgetWithCategory[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
@@ -135,7 +149,46 @@ export default function SidebarHeader() {
     enabled: isExportPage && !!hubId,
   });
 
-  const { exportAllDataJSON, exportALLCSVTemplates } = useExportCSV();
+  const from = searchParams.get("from");
+  const to = searchParams.get("to");
+  const groupBy = searchParams.get("group_by") || "month";
+
+  const isReportsPage = route === "reports";
+
+  const { data: reportSummary } = useQuery({
+    queryKey: ["reports", "summary", hubId, from, to],
+    queryFn: async () => {
+      if (!hubId) return null;
+      const res = await getReportSummary(hubId, from || undefined, to || undefined);
+      if (!res.success) throw new Error(res.message);
+      return res.data;
+    },
+    enabled: isReportsPage && !!hubId,
+  });
+
+  const { data: reportCategories } = useQuery({
+    queryKey: ["reports", "detailed-categories", hubId, from, to],
+    queryFn: async () => {
+      if (!hubId) return null;
+      const res = await getDetailedCategories(hubId, from || undefined, to || undefined);
+      if (!res.success) throw new Error(res.message);
+      return res.data;
+    },
+    enabled: isReportsPage && !!hubId,
+  });
+
+  const { data: reportMonthly } = useQuery({
+    queryKey: ["reports", "monthly", hubId, from, to, groupBy],
+    queryFn: async () => {
+      if (!hubId) return null;
+      const res = await getMonthlyReports(hubId, from || undefined, to || undefined, groupBy);
+      if (!res.success) throw new Error(res.message);
+      return res.data;
+    },
+    enabled: isReportsPage && !!hubId,
+  });
+
+  const { exportAllDataJSON, exportALLCSVTemplates, exportFullReport } = useExportCSV();
 
   const goToPrevMonth = () => {
     setDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1));
@@ -195,12 +248,18 @@ export default function SidebarHeader() {
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
+                onClick={() => exportFullReport({
+                  summary: reportSummary ?? null,
+                  categories: reportCategories ?? null,
+                  monthlyReports: reportMonthly ?? null,
+                  groupBy
+                })}
                 className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2"
               >
                 <Download />
                 <span className="hidden sm:block">{t("export")}</span>
               </Button>
-              <FilterDialog />
+              <FilterDialog initialFrom={initialFrom} initialTo={initialTo} />
             </div>
           )}
 

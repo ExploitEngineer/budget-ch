@@ -10,14 +10,16 @@ export async function GET(request: Request) {
     return apiError({ message: "Hub ID is required", status: 400 });
   }
 
-  console.log("[me/reports/monthly] hubId", hubId);
   const access = await validateHubAccess(hubId);
-  console.log("[me/reports/monthly] access", access);
   if (!access.success) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
 
-  const reports = await getMonthlyReportAction(hubId);
+  const from = searchParams.get("from") ?? undefined;
+  const to = searchParams.get("to") ?? undefined;
+  const groupBy = searchParams.get("group_by") ?? undefined;
+
+  const reports = await getMonthlyReportAction(hubId, from, to, groupBy);
 
   if (!reports.success) {
     return apiError({ message: reports.message ?? "Failed to fetch monthly reports", status: 500 });

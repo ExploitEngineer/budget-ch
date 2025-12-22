@@ -2,7 +2,7 @@ import Papa from "papaparse";
 import type { Transaction } from "@/lib/types/dashboard-types";
 import type { BudgetRow, AccountRow } from "@/lib/types/row-types";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import type { CategoryDetail } from "@/lib/api";
+import type { CategoryDetail, MonthlyReport } from "@/lib/api";
 import type { SavingGoal } from "@/lib/types/domain-types";
 
 export type TransactionExportArgs = {
@@ -33,6 +33,24 @@ export type CategoriesExportArgs = {
 export type SavingGoalsExportArgs = {
   goals: SavingGoal[] | null;
   t: (key: string) => string;
+};
+
+export type MonthlyReportExportArgs = {
+  tableHeadings: string[];
+  monthlyReports: MonthlyReport[] | null;
+};
+
+export type FullReportExportArgs = {
+  summary: {
+    income: number;
+    expense: number;
+    balance: number;
+    savingRate: number;
+  } | null;
+  categories: CategoryDetail[] | null;
+  monthlyReports: MonthlyReport[] | null;
+  t: (key: string) => string;
+  trendHeadings: string[];
 };
 
 const triggerCSVDownload = (csv: string, filename: string) => {
@@ -85,11 +103,11 @@ export const exportBudgetsToCSV = ({
 
   const data = budgets.map((budget) => ({
     [headers[0]]: budget.category,
-    [headers[1]]: budget.allocated.toFixed(2),
-    [headers[2]]: budget.ist.toFixed(2), // IST column
-    [headers[3]]: budget.spent.toFixed(2), // Spent column
-    [headers[4]]: budget.remaining.toFixed(2),
-    [headers[5]]: `${budget.progress.toFixed(1)}%`,
+    [headers[1]]: (budget.allocated ?? 0).toFixed(2),
+    [headers[2]]: (budget.ist ?? 0).toFixed(2), // IST column
+    [headers[3]]: (budget.spent ?? 0).toFixed(2), // Spent column
+    [headers[4]]: (budget.remaining ?? 0).toFixed(2),
+    [headers[5]]: `${(budget.progress ?? 0).toFixed(1)}%`,
   }));
 
   const csv = Papa.unparse(data);
@@ -143,7 +161,82 @@ export const exportLatestTransfersToCSV = ({
   triggerCSVDownload(csv, "transfers");
 };
 
-// Categories export
+// Monthly Reports (Trend) export
+export const exportMonthlyReportsToCSV = ({
+  tableHeadings,
+  monthlyReports,
+}: MonthlyReportExportArgs) => {
+  if (!monthlyReports || monthlyReports.length === 0) {
+    console.warn("No monthly reports to export.");
+    return;
+  }
+
+  const headers = tableHeadings;
+
+  const data = monthlyReports.map((report) => ({
+    [headers[0]]: report.month,
+    [headers[1]]: report.income.toFixed(2),
+    [headers[2]]: report.expenses.toFixed(2),
+    [headers[3]]: report.balance.toFixed(2),
+  }));
+
+  const csv = Papa.unparse(data);
+  triggerCSVDownload(csv, "monthly-reports-trend");
+};
+
+// Full Report Export (Summary + Categories + Trend)
+export const exportFullReportToCSV = ({
+  summary,
+  categories,
+  monthlyReports,
+  t,
+  trendHeadings,
+}: FullReportExportArgs) => {
+  const csvRows: any[][] = [];
+
+  // 1. Summary Section
+  csvRows.push([t("summary-title")]);
+  csvRows.push([t("income"), summary?.income.toFixed(2) || "0.00"]);
+  csvRows.push([t("expenses"), summary?.expense.toFixed(2) || "0.00"]);
+  csvRows.push([t("balance"), summary?.balance.toFixed(2) || "0.00"]);
+  csvRows.push([
+    t("savings-rate"),
+    `${(summary?.savingRate || 0).toFixed(1)}%`,
+  ]);
+  csvRows.push([]); // Empty row as separator
+
+  // 2. Categories Section
+  csvRows.push([t("categories-title")]);
+  csvRows.push([t("category"), t("amount")]);
+  if (categories && categories.length > 0) {
+    categories.forEach((cat) => {
+      csvRows.push([cat.name, cat.totalAmount.toFixed(2)]);
+    });
+  } else {
+    csvRows.push([t("no-data")]);
+  }
+  csvRows.push([]); // Empty row as separator
+
+  // 3. Trend Section
+  csvRows.push([t("trend-title")]);
+  csvRows.push(trendHeadings);
+  if (monthlyReports && monthlyReports.length > 0) {
+    monthlyReports.forEach((report) => {
+      csvRows.push([
+        report.month,
+        report.income.toFixed(2),
+        report.expenses.toFixed(2),
+        report.balance.toFixed(2),
+      ]);
+    });
+  } else {
+    csvRows.push([t("no-data")]);
+  }
+
+  const csv = Papa.unparse(csvRows);
+  triggerCSVDownload(csv, "financial-report");
+};
+
 export const exportCategoriesToCSV = ({
   categories,
   t,

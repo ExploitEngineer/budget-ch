@@ -156,34 +156,83 @@ export interface ExpenseCategoryProgress {
   percent: number;
 }
 
-export async function getDetailedCategories(hubId: string) {
-  const response = await apiInstance.get(`/api/me/reports/detailed-categories`, {
-    searchParams: {
-      hub: hubId
-    }
-  });
+export interface ReportSummary {
+  income: number;
+  expense: number;
+  balance: number;
+  savingRate: number;
+}
+
+export async function getDetailedCategories(
+  hubId: string,
+  from?: string,
+  to?: string,
+) {
+  const response = await apiInstance.get(
+    `/api/me/reports/detailed-categories`,
+    {
+      searchParams: {
+        hub: hubId,
+        ...(from && { from }),
+        ...(to && { to }),
+      },
+    },
+  );
   const data = await response.json();
   return data as ApiResponse<CategoryDetail[]>;
 }
 
-export async function getMonthlyReports(hubId: string) {
+export async function getMonthlyReports(
+  hubId: string,
+  from?: string,
+  to?: string,
+  groupBy?: string,
+) {
   const response = await apiInstance.get(`/api/me/reports/monthly`, {
     searchParams: {
-      hub: hubId
-    }
+      hub: hubId,
+      ...(from && { from }),
+      ...(to && { to }),
+      ...(groupBy && { group_by: groupBy }),
+    },
   });
   const data = await response.json();
   return data as ApiResponse<MonthlyReport[]>;
 }
 
-export async function getExpenseCategoriesProgress(hubId: string) {
-  const response = await apiInstance.get(`/api/me/reports/expense-categories-progress`, {
+export async function getExpenseCategoriesProgress(
+  hubId: string,
+  from?: string,
+  to?: string,
+) {
+  const response = await apiInstance.get(
+    `/api/me/reports/expense-categories-progress`,
+    {
+      searchParams: {
+        hub: hubId,
+        ...(from && { from }),
+        ...(to && { to }),
+      },
+    },
+  );
+  const data = await response.json();
+  return data as ApiResponse<ExpenseCategoryProgress[]>;
+}
+
+export async function getReportSummary(
+  hubId: string,
+  from?: string,
+  to?: string,
+) {
+  const response = await apiInstance.get(`/api/me/reports/summary`, {
     searchParams: {
-      hub: hubId
-    }
+      hub: hubId,
+      ...(from && { from }),
+      ...(to && { to }),
+    },
   });
   const data = await response.json();
-  return data as ApiResponse<{ data: ExpenseCategoryProgress[] }>;
+  return data as ApiResponse<ReportSummary>;
 }
 
 // Transfers

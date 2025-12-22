@@ -179,7 +179,7 @@ export default function EditBudgetDialog({
 
   async function onSubmit(values: BudgetDialogValues) {
     try {
-      if (budget) {
+      if (budget && budget.id) {
         await updateBudgetMutation.mutateAsync({
           budgetId: budget.id,
           updatedData: {
@@ -205,7 +205,7 @@ export default function EditBudgetDialog({
   }
 
   async function handleDelete() {
-    if (!budget) return;
+    if (!budget || !budget.id) return;
     try {
       await deleteBudgetMutation.mutateAsync(budget.id);
     } catch (err: any) {

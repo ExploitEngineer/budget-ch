@@ -884,7 +884,19 @@
             "loading": "Wird geladen...",
             "no-reports": "Noch keine Monatsberichte",
             "no-categories-yet": "Noch keine Kategorien",
-            "cards": {
+            "export": {
+                "summary-title": "Finanzübersicht",
+                "income": "Gesamteinnahmen",
+                "expenses": "Gesamtausgaben",
+                "balance": "Bilanz",
+                "savings-rate": "Sparquote",
+                "categories-title": "Ausgaben nach Kategorien",
+                "category": "Kategorie",
+                "amount": "Betrag",
+                "trend-title": "Trendanalyse",
+                "no-data": "Keine Daten verfügbar"
+            },
+            "sidebar-header": {
                 "card-1": {
                     "title": "Einkommen",
                     "content": "CHF 5’800.00",
@@ -909,6 +921,9 @@
             "analysis-table-data": {
                 "title": "Analyse",
                 "badge-last-month": "Letzter Monat: ",
+                "badge-this-quarter": "Dieses Quartal: ",
+                "badge-this-year": "Dieses Jahr: ",
+                "badge-period": "Ausgewählter Zeitraum: ",
                 "badge-income": "Einkommen • ",
                 "badge-expense": "Ausgaben ",
                 "toggle-groups": {
@@ -928,18 +943,22 @@
                     }
                 }
             },
-            "income-exp": {
-                "title": "Einnahmen vs. Ausgaben (letzte 9 Monate)",
-                "data-table": {
-                    "headings": {
-                        "month": "MONAT",
-                        "income": "EINKOMMEN",
-                        "expenses": "Ausgaben",
-                        "balance": "Saldo"
-                    }
-                }
-            },
             "detailed-table": {
+                "income-exp": {
+                    "title": "Einnahmen vs. Ausgaben (letzte 9 Monate)",
+                    "title-quarter": "Einnahmen vs. Ausgaben (nach Quartal)",
+                    "title-year": "Einnahmen vs. Ausgaben (nach Jahr)",
+                    "data-table": {
+                        "headings": {
+                            "month": "MONAT",
+                            "quarter": "QUARTAL",
+                            "year": "JAHR",
+                            "income": "EINKOMMEN",
+                            "expenses": "Ausgaben",
+                            "balance": "Saldo"
+                        }
+                    }
+                },
                 "title": "Detaillierte Tabelle",
                 "loading": "Wird geladen...",
                 "buttons": {

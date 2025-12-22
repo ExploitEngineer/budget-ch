@@ -30,18 +30,70 @@ import {
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function FilterDialog() {
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
+
+export default function FilterDialog({
+  initialFrom,
+  initialTo,
+}: {
+  initialFrom?: string;
+  initialTo?: string;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const getInitialDates = () => {
+    const fromStr = searchParams.get("from") || initialFrom;
+    const toStr = searchParams.get("to") || initialTo;
+    return {
+      from: fromStr ? new Date(fromStr) : undefined,
+      to: toStr ? new Date(toStr) : undefined,
+    };
+  };
+
   const form = useForm<FilterDialogValues>({
     resolver: zodResolver(filterDialogSchema) as any,
-    defaultValues: { from: undefined, to: undefined, text: "" },
+    defaultValues: {
+      ...getInitialDates(),
+      text: searchParams.get("text") ?? "",
+    },
   });
+
+  useEffect(() => {
+    form.reset({
+      ...getInitialDates(),
+      text: searchParams.get("text") ?? "",
+    });
+  }, [searchParams, initialFrom, initialTo]);
 
   const t = useTranslations(
     "main-dashboard.report-page.sidebar-header.filter-dialog",
   );
 
   function onSubmit(values: FilterDialogValues) {
-    console.log(values);
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (values.from) {
+      params.set("from", values.from.toISOString());
+    } else {
+      params.delete("from");
+    }
+
+    if (values.to) {
+      params.set("to", values.to.toISOString());
+    } else {
+      params.delete("to");
+    }
+
+    if (values.text) {
+      params.set("text", values.text);
+    } else {
+      params.delete("text");
+    }
+
+    router.push(`${pathname}?${params.toString()}`);
   }
 
   return (

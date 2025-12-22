@@ -14,30 +14,51 @@ import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
-import { getDetailedCategories, type CategoryDetail } from "@/lib/api";
+import { getDetailedCategories, getMonthlyReports, type CategoryDetail, type MonthlyReport } from "@/lib/api";
 import { reportKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 
-export function DetailedTable() {
+export function DetailedTable({
+  initialFrom,
+  initialTo,
+}: {
+  initialFrom?: string;
+  initialTo?: string;
+}) {
   const t = useTranslations("main-dashboard.report-page.detailed-table");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const from = searchParams.get("from") || initialFrom;
+  const to = searchParams.get("to") || initialTo;
 
-  const { exportCategories } = useExportCSV();
+  const { exportCategories, exportMonthlyReports } = useExportCSV();
 
   const {
     data: categories,
     isLoading: loading,
   } = useQuery<CategoryDetail[]>({
-    queryKey: reportKeys.detailedCategories(hubId),
+    queryKey: reportKeys.detailedCategories(hubId, from, to),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getDetailedCategories(hubId);
+      const res = await getDetailedCategories(hubId, from, to);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch categories");
       }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
+
+  const {
+    data: monthlyReports,
+  } = useQuery<MonthlyReport[]>({
+    queryKey: reportKeys.monthly(hubId, from, to),
+    queryFn: async () => {
+      if (!hubId) throw new Error("Hub ID is required");
+      const res = await getMonthlyReports(hubId, from, to);
+      if (!res.success) throw new Error(res.message || "Failed to fetch monthly reports");
       return res.data ?? [];
     },
     enabled: !!hubId,
@@ -60,6 +81,7 @@ export function DetailedTable() {
             </Button>
             <Button
               variant="outline"
+              onClick={() => exportMonthlyReports({ monthlyReports: monthlyReports ?? null })}
               className="!bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.trend-csv")}
@@ -87,7 +109,10 @@ export function DetailedTable() {
                   <TableRow key={cat.id} className="dark:border-border-blue">
                     <TableCell>{cat.name}</TableCell>
                     <TableCell>
-                      CHF {cat.totalAmount.toLocaleString()}
+                      CHF{" "}
+                      {cat.totalAmount.toLocaleString("de-CH", {
+                        minimumFractionDigits: 2,
+                      })}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -96,7 +121,10 @@ export function DetailedTable() {
                     {t("data-table.data.total")}
                   </TableCell>
                   <TableCell className="font-bold opacity-60">
-                    CHF {categoriesTotal.toLocaleString()}
+                    CHF{" "}
+                    {categoriesTotal.toLocaleString("de-CH", {
+                      minimumFractionDigits: 2,
+                    })}
                   </TableCell>
                 </TableRow>
               </TableBody>

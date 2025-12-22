@@ -16,7 +16,7 @@ import {
   notifications,
   budgetInstances,
 } from "./schema";
-import { eq, desc, gte, lte, sql, inArray, and, or, isNull } from "drizzle-orm";
+import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, between } from "drizzle-orm";
 import type {
   QuickTask,
   UserType,
@@ -2220,8 +2220,19 @@ export async function getTransactionCategoriesDB(hubId: string) {
 }
 
 // GET Transaction & Budget Categories with Amount
-export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
+export async function getTransactionCategoriesWithAmountsDB(
+  hubId: string,
+  startDate?: Date,
+  endDate?: Date,
+) {
   try {
+    const filters = [
+      eq(transactions.hubId, hubId),
+      eq(transactions.type, "expense"),
+    ];
+    if (startDate) filters.push(gte(transactions.createdAt, startDate));
+    if (endDate) filters.push(lte(transactions.createdAt, endDate));
+
     const transactionTotals = db
       .select({
         categoryId: transactions.transactionCategoryId,
@@ -2231,7 +2242,7 @@ export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
           ),
       })
       .from(transactions)
-      .where(eq(transactions.hubId, hubId))
+      .where(and(...filters))
       .groupBy(transactions.transactionCategoryId)
       .as("transactionTotals");
 
@@ -2293,23 +2304,86 @@ export async function getTransactionCategoriesWithAmountsDB(hubId: string) {
 }
 
 // GET Monthly Report
-export async function getMonthlyReportDB(hubId: string) {
+export async function getMonthlyReportDB(
+  hubId: string,
+  startDate?: Date,
+  endDate?: Date,
+  groupBy: "month" | "quarter" | "year" = "month",
+) {
   try {
+    const filters = [eq(transactions.hubId, hubId)];
+    if (startDate) filters.push(gte(transactions.createdAt, startDate));
+    if (endDate) filters.push(lte(transactions.createdAt, endDate));
+
+    let groupingSql;
+    switch (groupBy) {
+      case "quarter":
+        groupingSql = sql`TO_CHAR(${transactions.createdAt}, 'YYYY-"Q"Q')`;
+        break;
+      case "year":
+        groupingSql = sql`TO_CHAR(${transactions.createdAt}, 'YYYY')`;
+        break;
+      default:
+        groupingSql = sql`TO_CHAR(${transactions.createdAt}, 'Month YYYY')`;
+    }
+
     const result = await db
       .select({
-        month: sql<string>`TO_CHAR(${transactions.createdAt}, 'Month')`,
+        month: groupingSql,
         income: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0)`,
         expenses: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`,
-        balance: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE -${transactions.amount} END), 0)`,
+        balance: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} WHEN ${transactions.type} = 'expense' THEN -${transactions.amount} ELSE 0 END), 0)`,
       })
       .from(transactions)
-      .where(eq(transactions.hubId, hubId))
-      .groupBy(sql`TO_CHAR(${transactions.createdAt}, 'Month')`)
+      .where(and(...filters))
+      .groupBy(groupingSql)
       .orderBy(sql`MIN(${transactions.createdAt})`);
 
     return { success: true, data: result };
   } catch (err: any) {
     console.error("DB Error: getMonthlyReportDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+// GET Report Summary (Income, Expense, Balance, Saving Rate)
+export async function getReportSummaryDB(
+  hubId: string,
+  startDate?: Date,
+  endDate?: Date,
+) {
+  try {
+    const filters = [eq(transactions.hubId, hubId)];
+    if (startDate) filters.push(gte(transactions.createdAt, startDate));
+    if (endDate) filters.push(lte(transactions.createdAt, endDate));
+
+    const result = await db
+      .select({
+        income: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'income' THEN ${transactions.amount} ELSE 0 END), 0)`,
+        expense: sql<number>`COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)`,
+      })
+      .from(transactions)
+      .where(and(...filters));
+
+    console.log("DEBUG: getReportSummaryDB - Filters applied:", filters.length);
+    console.log("DEBUG: getReportSummaryDB - SQL Result:", result);
+
+    const { income, expense } = result[0] || { income: 0, expense: 0 };
+    const balance = income - expense;
+    const savingRate =
+      income > 0 ? Number(((balance / income) * 100).toFixed(1)) : 0;
+
+    return {
+      success: true,
+      data: {
+        income,
+        expense,
+        balance,
+        savingRate,
+      },
+    };
+  } catch (err: any) {
+    console.error("DB Error: getReportSummaryDB:", err);
     return { success: false, message: err.message };
   }
 }
@@ -2398,59 +2472,59 @@ export async function deleteAllTransactionsAndCategoriesDB(hubId: string) {
 }
 
 // GET Categoreis by Expenses
-export async function getCategoriesByExpensesDB(hubId: string) {
+export async function getCategoriesByExpensesDB(
+  hubId: string,
+  startDate?: Date,
+  endDate?: Date,
+) {
   try {
+    const filters = [
+      eq(transactions.hubId, hubId),
+      eq(transactions.type, "expense"),
+    ];
+    if (startDate) filters.push(gte(transactions.createdAt, startDate));
+    if (endDate) filters.push(lte(transactions.createdAt, endDate));
+
     const expenseTxs = await db
       .select({
         categoryId: transactions.transactionCategoryId,
-        amount: transactions.amount,
-        financialAccountId: transactions.financialAccountId,
+        amount: sql<number>`SUM(${transactions.amount})`.as("amount"),
       })
       .from(transactions)
-      .where(
-        and(eq(transactions.hubId, hubId), eq(transactions.type, "expense")),
-      );
+      .where(and(...filters))
+      .groupBy(transactions.transactionCategoryId);
 
-    const grouped: Record<
-      string,
-      { amount: number; financialAccountId: string }
-    > = {};
-
-    for (const tx of expenseTxs) {
-      const key = `${tx.categoryId}:${tx.financialAccountId}`;
-      if (!grouped[key]) {
-        grouped[key] = {
-          amount: 0,
-          financialAccountId: tx.financialAccountId,
-        };
-      }
-      grouped[key].amount += tx.amount;
-    }
+    const totalAmount = expenseTxs.reduce((sum, tx) => sum + Math.abs(Number(tx.amount || 0)), 0);
 
     const results: {
       category: string;
       amount: number;
       accountBalance: number;
+      percent: number;
     }[] = [];
 
-    for (const [key, value] of Object.entries(grouped)) {
-      const [categoryId, financialAccountId] = key.split(":");
-      const categoryRow = await db.query.transactionCategories.findFirst({
-        where: (cat) => eq(cat.id, categoryId),
-        columns: { name: true },
-      });
-      const accountRow = await db.query.financialAccounts.findFirst({
-        where: (acc) =>
-          and(eq(acc.hubId, hubId), eq(acc.id, financialAccountId)),
-        columns: { initialBalance: true },
-      });
+    for (const tx of expenseTxs) {
+      const amount = Math.abs(Number(tx.amount || 0));
+      let categoryName = "Uncategorized";
+
+      if (tx.categoryId) {
+        const categoryRow = await db.query.transactionCategories.findFirst({
+          where: (cat) => eq(cat.id, tx.categoryId!),
+          columns: { name: true },
+        });
+        categoryName = categoryRow?.name ?? "Unknown";
+      }
 
       results.push({
-        category: categoryRow?.name ?? "Unknown",
-        amount: Math.abs(value.amount),
-        accountBalance: accountRow?.initialBalance ?? 0,
+        category: categoryName,
+        amount,
+        percent: totalAmount > 0 ? (amount / totalAmount) * 100 : 0,
+        accountBalance: 0,
       });
     }
+
+    // Sort by amount descending
+    results.sort((a, b) => b.amount - a.amount);
 
     return { success: true, data: results };
   } catch (err: any) {

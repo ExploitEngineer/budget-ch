@@ -885,6 +885,18 @@
             "loading": "loading...",
             "no-reports": "No monthly reports yet",
             "no-categories-yet": "No categories yet",
+            "export": {
+                "summary-title": "Financial Summary",
+                "income": "Total Income",
+                "expenses": "Total Expenses",
+                "balance": "Balance",
+                "savings-rate": "Savings Rate",
+                "categories-title": "Expenses by Categories",
+                "category": "Category",
+                "amount": "Amount",
+                "trend-title": "Trend Analysis",
+                "no-data": "No data available"
+            },
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filter",
@@ -932,6 +944,9 @@
             "analysis-table-data": {
                 "title": "Analysis",
                 "badge-last-month": "Last month: ",
+                "badge-this-quarter": "This quarter: ",
+                "badge-this-year": "This year: ",
+                "badge-period": "Selected period: ",
                 "badge-income": "Income • ",
                 "badge-expense": "Expenses ",
                 "toggle-groups": {
@@ -951,18 +966,22 @@
                     }
                 }
             },
-            "income-exp": {
-                "title": "Income vs. Expenses (last 9 months)",
-                "data-table": {
-                    "headings": {
-                        "month": "MONTH",
-                        "income": "INCOME",
-                        "expenses": "Expenses",
-                        "balance": "Balance"
-                    }
-                }
-            },
             "detailed-table": {
+                "income-exp": {
+                    "title": "Income vs. Expenses (last 9 months)",
+                    "title-quarter": "Income vs. Expenses (by Quarter)",
+                    "title-year": "Income vs. Expenses (by Year)",
+                    "data-table": {
+                        "headings": {
+                            "month": "MONTH",
+                            "quarter": "QUARTER",
+                            "year": "YEAR",
+                            "income": "INCOME",
+                            "expenses": "Expenses",
+                            "balance": "Balance"
+                        }
+                    }
+                },
                 "title": "Detailed table",
                 "loading": "loading...",
                 "buttons": {

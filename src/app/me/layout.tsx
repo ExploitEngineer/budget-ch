@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { HubSync } from "@/components/hub-sync";
+import { UpgradeToastListener } from "@/components/upgrade-toast-listener";
 
 export default async function DashboardLayout({
   children,
@@ -24,6 +25,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
+      <UpgradeToastListener />
       <AppSidebar
         user={{
           name: session.user.name,

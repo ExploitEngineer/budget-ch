@@ -880,6 +880,18 @@
             "loading": "Caricamento...",
             "no-reports": "Nessun rapporto mensile ancora",
             "no-categories-yet": "Nessuna categoria ancora",
+            "export": {
+                "summary-title": "Riepilogo finanziario",
+                "income": "Entrate totali",
+                "expenses": "Spese totali",
+                "balance": "Saldo",
+                "savings-rate": "Tasso di risparmio",
+                "categories-title": "Spese per categorie",
+                "category": "Categoria",
+                "amount": "Importo",
+                "trend-title": "Analisi dei trend",
+                "no-data": "Nessun dato disponibile"
+            },
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filtro",
@@ -927,6 +939,9 @@
             "analysis-table-data": {
                 "title": "Analisi",
                 "badge-last-month": "Il mese scorso: ",
+                "badge-this-quarter": "Questo trimestre: ",
+                "badge-this-year": "Quest'anno: ",
+                "badge-period": "Periodo selezionato: ",
                 "badge-income": "Entrate • ",
                 "badge-expense": "Spese ",
                 "toggle-groups": {
@@ -946,18 +961,18 @@
                     }
                 }
             },
-            "income-exp": {
-                "title": "Entrate vs Spese (ultimi 9 mesi)",
-                "data-table": {
-                    "headings": {
-                        "month": "MESE",
-                        "income": "ENTRATE",
-                        "expenses": "Spese",
-                        "balance": "Saldo"
-                    }
-                }
-            },
             "detailed-table": {
+                "income-exp": {
+                    "title": "Entrate vs Spese (ultimi 9 mesi)",
+                    "data-table": {
+                        "headings": {
+                            "month": "MESE",
+                            "income": "ENTRATE",
+                            "expenses": "Spese",
+                            "balance": "Saldo"
+                        }
+                    }
+                },
                 "title": "Tabella dettagliata",
                 "loading": "Caricamento...",
                 "buttons": {

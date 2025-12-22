@@ -13,98 +13,132 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
+import { subMonths, subQuarters, subYears, format, startOfMonth, startOfQuarter, startOfYear, endOfMonth, endOfQuarter, endOfYear } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getMonthlyReports, getExpenseCategoriesProgress, type MonthlyReport, type ExpenseCategoryProgress } from "@/lib/api";
-import { reportKeys, transactionKeys } from "@/lib/query-keys";
-import { useSearchParams } from "next/navigation";
-import { getTransactions } from "@/lib/api";
-import type { Transaction } from "@/lib/types/dashboard-types";
-import type { TransactionWithDetails } from "@/lib/types/domain-types";
-import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
-import { useMemo } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { getMonthlyReports, getExpenseCategoriesProgress, getReportSummary, type MonthlyReport, type ExpenseCategoryProgress, type ReportSummary } from "@/lib/api";
+import { reportKeys } from "@/lib/query-keys";
 
-export function AnalysisTable() {
+export function AnalysisTable({
+  initialFrom,
+  initialTo,
+}: {
+  initialFrom?: string;
+  initialTo?: string;
+}) {
   const t = useTranslations("main-dashboard.report-page");
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const hubId = searchParams.get("hub");
+  const from = searchParams.get("from") || initialFrom;
+  const to = searchParams.get("to") || initialTo;
+  const groupBy = (searchParams.get("group_by") as "month" | "quarter" | "year") ?? "month";
+
+  // If no explicit 'from' is provided, we default the trend chart to a wider range
+  const trendFrom = searchParams.get("from") || (() => {
+    const now = new Date();
+    if (groupBy === "quarter") return startOfQuarter(subQuarters(now, 4)).toISOString();
+    if (groupBy === "year") return startOfYear(subYears(now, 2)).toISOString();
+    return startOfMonth(subMonths(now, 8)).toISOString(); // Default 9 months including current
+  })();
 
   const {
     data: monthlyReports,
     isLoading: reportsLoading,
     error: reportsError,
   } = useQuery<MonthlyReport[]>({
-    queryKey: reportKeys.monthly(hubId),
+    queryKey: reportKeys.monthly(hubId, trendFrom, to, groupBy),
     queryFn: async () => {
-      if (!hubId) {
-        throw new Error("Hub ID is required");
-      }
-      const res = await getMonthlyReports(hubId);
-      if (!res.success) {
-        throw new Error(res.message || "Failed to fetch monthly reports");
-      }
+      if (!hubId) throw new Error("Hub ID is required");
+      const res = await getMonthlyReports(hubId, trendFrom, to, groupBy);
+      if (!res.success) throw new Error(res.message);
       return res.data ?? [];
     },
     enabled: !!hubId,
   });
 
   const {
-    data: expenseCategoriesProgressData,
+    data: expenseCategoriesProgress,
     isLoading: expenseCategoriesProgressLoading,
     error: expenseCategoriesProgressError,
-  } = useQuery<{ data: ExpenseCategoryProgress[] }>({
-    queryKey: reportKeys.expenseCategoriesProgress(hubId),
+  } = useQuery<ExpenseCategoryProgress[]>({
+    queryKey: reportKeys.expenseCategoriesProgress(hubId, from, to),
     queryFn: async () => {
-      if (!hubId) {
-        throw new Error("Hub ID is required");
-      }
-      const res = await getExpenseCategoriesProgress(hubId);
-      if (!res.success) {
-        throw new Error(res.message || "Failed to fetch expense categories progress");
-      }
-      return res.data ?? { data: [] };
+      if (!hubId) throw new Error("Hub ID is required");
+      const res = await getExpenseCategoriesProgress(hubId, from, to);
+      if (!res.success) throw new Error(res.message);
+      return res.data!;
     },
     enabled: !!hubId,
   });
 
-  const expenseCategoriesProgress = expenseCategoriesProgressData?.data ?? null;
+  // Context-aware summary timeframe
+  const summaryTimeframe = searchParams.get("from") || searchParams.get("to")
+    ? { from, to }
+    : (() => {
+      const now = new Date();
+      if (groupBy === "quarter") return {
+        from: startOfQuarter(now).toISOString(),
+        to: endOfQuarter(now).toISOString(),
+        label: t("analysis-table-data.badge-this-quarter")
+      };
+      if (groupBy === "year") return {
+        from: startOfYear(now).toISOString(),
+        to: endOfYear(now).toISOString(),
+        label: t("analysis-table-data.badge-this-year")
+      };
+      return {
+        from,
+        to,
+        label: t("analysis-table-data.badge-last-month")
+      };
+    })();
 
-  // Calculate income and expense from transactions for the badge
   const {
-    data: domainTransactions,
-  } = useQuery<TransactionWithDetails[]>({
-    queryKey: transactionKeys.list(hubId),
+    data: summary,
+  } = useQuery<ReportSummary>({
+    queryKey: reportKeys.summary(hubId, summaryTimeframe.from, summaryTimeframe.to),
     queryFn: async () => {
-      if (!hubId) {
-        throw new Error("Hub ID is required");
-      }
-      const res = await getTransactions(hubId);
-      if (!res.success) {
-        throw new Error(res.message || "Failed to fetch transactions");
-      }
-      return res.data ?? [];
+      if (!hubId) throw new Error("Hub ID is required");
+      const res = await getReportSummary(hubId, summaryTimeframe.from, summaryTimeframe.to);
+      if (!res.success) throw new Error(res.message);
+      return res.data!;
     },
     enabled: !!hubId,
   });
 
-  const transactions = useMemo(() => {
-    if (!domainTransactions) return undefined;
-    return mapTransactionsToRows(domainTransactions);
-  }, [domainTransactions]);
+  const handleGroupByChange = (value: string) => {
+    if (!value) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("group_by", value);
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
-  const income = transactions?.reduce((sum, tx) => {
-    return tx.type === "income" ? sum + tx.amount : sum;
-  }, 0) ?? 0;
+  const income = summary?.income ?? 0;
+  const expense = summary?.expense ?? 0;
 
-  const expense = transactions?.reduce((sum, tx) => {
-    return tx.type === "expense" ? sum + tx.amount : sum;
-  }, 0) ?? 0;
+  const badgeLabel = searchParams.get("from") || searchParams.get("to")
+    ? t("analysis-table-data.badge-period")
+    : (summaryTimeframe as any).label;
+
+  const trendTitle = groupBy === "month"
+    ? t("detailed-table.income-exp.title")
+    : groupBy === "quarter"
+      ? t("detailed-table.income-exp.title-quarter")
+      : t("detailed-table.income-exp.title-year");
 
   const tableHeadings: string[] = [
-    t("income-exp.data-table.headings.month"),
-    t("income-exp.data-table.headings.income"),
-    t("income-exp.data-table.headings.expenses"),
-    t("income-exp.data-table.headings.balance"),
+    groupBy === "month"
+      ? t("detailed-table.income-exp.data-table.headings.month")
+      : groupBy === "quarter"
+        ? t("detailed-table.income-exp.data-table.headings.quarter")
+        : t("detailed-table.income-exp.data-table.headings.year"),
+    t("detailed-table.income-exp.data-table.headings.income"),
+    t("detailed-table.income-exp.data-table.headings.expenses"),
+    t("detailed-table.income-exp.data-table.headings.balance"),
   ];
 
   return (
@@ -117,14 +151,18 @@ export function AnalysisTable() {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2 whitespace-pre-wrap"
               variant="outline"
             >
-              {t("analysis-table-data.badge-last-month")} {income}{" "}
+              {badgeLabel}
+              {income.toLocaleString("de-CH", { minimumFractionDigits: 2 })}{" "}
               {t("analysis-table-data.badge-income")}
-              {expense} {t("analysis-table-data.badge-expense")}
+              {expense.toLocaleString("de-CH", { minimumFractionDigits: 2 })}{" "}
+              {t("analysis-table-data.badge-expense")}
             </Badge>
           </div>
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background border"
             type="single"
+            value={groupBy}
+            onValueChange={handleGroupByChange}
           >
             <ToggleGroupItem
               className="px-3"
@@ -158,8 +196,8 @@ export function AnalysisTable() {
             <div className="flex flex-col gap-3">
               {expenseCategoriesProgressError ? (
                 <p className="text-sm text-red-500">
-                  {expenseCategoriesProgressError instanceof Error 
-                    ? expenseCategoriesProgressError.message 
+                  {expenseCategoriesProgressError instanceof Error
+                    ? expenseCategoriesProgressError.message
                     : "Failed to load expense categories progress"}
                 </p>
               ) : expenseCategoriesProgressLoading ? (
@@ -190,7 +228,7 @@ export function AnalysisTable() {
             </div>
           </div>
           <div className="overflow-x-auto">
-            <h2 className="mb-4 font-bold">{t("income-exp.title")}</h2>
+            <h2 className="mb-4 font-bold">{trendTitle}</h2>
             <Table>
               <TableHeader>
                 <TableRow className="dark:border-border-blue">
@@ -209,8 +247,8 @@ export function AnalysisTable() {
                   <TableRow>
                     <TableCell colSpan={4}>
                       <p className="px-6 text-sm text-red-500">
-                        {reportsError instanceof Error 
-                          ? reportsError.message 
+                        {reportsError instanceof Error
+                          ? reportsError.message
                           : "Failed to load monthly reports"}
                       </p>
                     </TableCell>

@@ -6,19 +6,32 @@ import {
   getTransactionCategoriesWithAmountsDB,
   getMonthlyReportDB,
   getCategoriesByExpensesDB,
+  getReportSummaryDB,
 } from "@/db/queries";
 
 // GET Transaction & Budget Categories with Amount [Action]
-export async function getDetailedCategories() {
+export async function getDetailedCategories(
+  hubIdArg?: string,
+  from?: string,
+  to?: string,
+) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };
     }
 
-    const res = await getTransactionCategoriesWithAmountsDB(hubId);
+    const startDate = from ? new Date(from) : undefined;
+    const endDate = to ? new Date(to) : undefined;
+
+    const res = await getTransactionCategoriesWithAmountsDB(
+      hubId,
+      startDate,
+      endDate,
+    );
     if (!res.success || !res.data) {
       return {
         success: false,
@@ -41,7 +54,12 @@ export async function getDetailedCategories() {
 }
 
 // GET Monthly Report [Action]
-export async function getMonthlyReportAction(hubIdArg?: string) {
+export async function getMonthlyReportAction(
+  hubIdArg?: string,
+  from?: string,
+  to?: string,
+  groupBy?: string,
+) {
   try {
     const hdrs = await headers();
     const { hubId: sessionHubId } = await getContext(hdrs, false);
@@ -51,7 +69,10 @@ export async function getMonthlyReportAction(hubIdArg?: string) {
       return { success: false, message: "Missing hubId parameter." };
     }
 
-    const res = await getMonthlyReportDB(hubId);
+    const startDate = from ? new Date(from) : undefined;
+    const endDate = to ? new Date(to) : undefined;
+
+    const res = await getMonthlyReportDB(hubId, startDate, endDate, groupBy as any);
     if (!res.success || !res.data) {
       return {
         success: false,
@@ -74,20 +95,66 @@ export async function getMonthlyReportAction(hubIdArg?: string) {
 }
 
 // GET Categories by Expenses
-export async function getCategoriesByExpenses() {
+export async function getCategoriesByExpenses(
+  hubIdArg?: string,
+  from?: string,
+  to?: string,
+) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
 
     if (!hubId) throw new Error("No hubId");
 
-    const data = await getCategoriesByExpensesDB(hubId);
+    const startDate = from ? new Date(from) : undefined;
+    const endDate = to ? new Date(to) : undefined;
 
-    return { success: true, data };
+    return await getCategoriesByExpensesDB(hubId, startDate, endDate);
   } catch (err: any) {
     return {
       success: false,
       message: err.message || "Failed to fetch expense categories progress",
+    };
+  }
+}
+
+// GET Report Summary [Action]
+export async function getReportSummaryAction(
+  hubIdArg?: string,
+  from?: string,
+  to?: string,
+) {
+  try {
+    const hdrs = await headers();
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId parameter." };
+    }
+
+    const startDate = from ? new Date(from) : undefined;
+    const endDate = to ? new Date(to) : undefined;
+
+    const res = await getReportSummaryDB(hubId, startDate, endDate);
+    if (!res.success || !res.data) {
+      return {
+        success: false,
+        message: res.message || "Failed to fetch report summary",
+      };
+    }
+
+    return {
+      success: true,
+      message: "Fetched report summary successfully.",
+      data: res.data,
+    };
+  } catch (err: any) {
+    console.error("Server Action Error (getReportSummaryAction)");
+    return {
+      success: false,
+      message: err.message || "Unexpected server error.",
     };
   }
 }

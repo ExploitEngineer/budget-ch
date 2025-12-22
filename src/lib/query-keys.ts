@@ -70,9 +70,17 @@ export const savingGoalKeys = {
  */
 export const reportKeys = {
   all: ["reports"] as const,
-  detailedCategories: (hubId: string | null) => [...reportKeys.all, "detailed-categories", hubId] as const,
-  monthly: (hubId: string | null) => [...reportKeys.all, "monthly", hubId] as const,
-  expenseCategoriesProgress: (hubId: string | null) => [...reportKeys.all, "expense-categories-progress", hubId] as const,
+  detailedCategories: (hubId: string | null, from?: string, to?: string) =>
+    [...reportKeys.all, "detailed-categories", hubId, from, to] as const,
+  monthly: (hubId: string | null, from?: string, to?: string, groupBy?: string) =>
+    [...reportKeys.all, "monthly", hubId, from, to, groupBy] as const,
+  expenseCategoriesProgress: (
+    hubId: string | null,
+    from?: string,
+    to?: string,
+  ) => [...reportKeys.all, "expense-categories-progress", hubId, from, to] as const,
+  summary: (hubId: string | null, from?: string, to?: string) =>
+    [...reportKeys.all, "summary", hubId, from, to] as const,
 };
 
 /**

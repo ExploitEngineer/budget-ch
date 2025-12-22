@@ -13,6 +13,8 @@ import {
   exportAccountsTemplateToCSV,
   exportSavingGoalsTemplateToCSV,
   exportTransfersTemplateToCSV,
+  exportMonthlyReportsToCSV,
+  exportFullReportToCSV,
 } from "@/lib/utils/export-csv";
 import type {
   TransactionExportArgs,
@@ -21,6 +23,8 @@ import type {
   LatestTranfersExportArgs,
   CategoriesExportArgs,
   SavingGoalsExportArgs,
+  MonthlyReportExportArgs,
+  FullReportExportArgs,
 } from "@/lib/utils/export-csv";
 import { exportAllDataToJSON } from "@/lib/utils/export-json";
 import Papa from "papaparse";
@@ -40,6 +44,7 @@ export const useExportCSV = () => {
   const savingGoalsT = useTranslations(
     "main-dashboard.saving-goals-page.active-goals-section",
   );
+  const reportExportT = useTranslations("main-dashboard.report-page.export");
 
   const budgetDataTableHeadings: string[] = [
     budgetT("data-table.headings.category"),
@@ -65,6 +70,12 @@ export const useExportCSV = () => {
     latestTransfert("data-table.headings.to"),
     latestTransfert("data-table.headings.note"),
     latestTransfert("data-table.headings.amount"),
+  ];
+  const trendTableHeadings: string[] = [
+    categoriesT("income-exp.data-table.headings.month"),
+    categoriesT("income-exp.data-table.headings.income"),
+    categoriesT("income-exp.data-table.headings.expenses"),
+    categoriesT("income-exp.data-table.headings.balance"),
   ];
 
   // Modified function to combine all templates into one CSV
@@ -126,9 +137,8 @@ export const useExportCSV = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `all-templates-${
-      new Date().toISOString().split("T")[0]
-    }.csv`;
+    link.download = `all-templates-${new Date().toISOString().split("T")[0]
+      }.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -151,6 +161,13 @@ export const useExportCSV = () => {
       exportCategoriesToCSV({ categories, t: categoriesT }),
     exportSavingGoals: ({ goals }: Omit<SavingGoalsExportArgs, "t">) =>
       exportSavingGoalsToCSV({ goals, t: savingGoalsT }),
+    exportMonthlyReports: ({
+      monthlyReports,
+    }: Omit<MonthlyReportExportArgs, "tableHeadings">) =>
+      exportMonthlyReportsToCSV({
+        tableHeadings: trendTableHeadings,
+        monthlyReports,
+      }),
 
     // CSV Templates
     exportTransactionTemplate: () =>
@@ -167,5 +184,23 @@ export const useExportCSV = () => {
 
     // All csv templates export
     exportALLCSVTemplates,
+
+    // Full Report Export
+    exportFullReport: (args: Omit<FullReportExportArgs, "t" | "trendHeadings"> & { groupBy: string }) => {
+      const exportT = (key: string) => reportExportT(key);
+
+      const dynamicTrendHeadings = [
+        categoriesT(`income-exp.data-table.headings.${args.groupBy}`),
+        categoriesT("income-exp.data-table.headings.income"),
+        categoriesT("income-exp.data-table.headings.expenses"),
+        categoriesT("income-exp.data-table.headings.balance"),
+      ];
+
+      return exportFullReportToCSV({
+        ...args,
+        t: exportT,
+        trendHeadings: dynamicTrendHeadings,
+      });
+    },
   };
 };
