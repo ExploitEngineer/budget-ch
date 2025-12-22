@@ -48,25 +48,33 @@ export function ContentCardsSection() {
     return mapAccountsToRows(domainAccounts);
   }, [domainAccounts]);
 
-  const parsedAccounts = (accounts ?? []).map((acc) => ({
-    ...acc,
-    numericBalance:
-      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0,
-  }));
-
-  const totalBalance = parsedAccounts.reduce(
-    (sum, acc) => sum + acc.numericBalance,
-    0,
+  const totalBalance = useMemo(() =>
+    (accounts ?? []).reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
   );
-  const checkingCashTotal = parsedAccounts
-    .filter((a) => a.type === "checking" || a.type === "cash")
-    .reduce((sum, acc) => sum + acc.numericBalance, 0);
-  const savingsBalance = parsedAccounts
-    .filter((a) => a.type === "savings")
-    .reduce((sum, acc) => sum + acc.numericBalance, 0);
-  const creditCardTotal = parsedAccounts
-    .filter((a) => a.type === "credit-card")
-    .reduce((sum, acc) => sum + acc.numericBalance, 0);
+
+  const checkingCashTotal = useMemo(() =>
+    (accounts ?? []).filter((a) => a.type === "checking" || a.type === "cash")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const savingsBalance = useMemo(() =>
+    (accounts ?? []).filter((a) => a.type === "savings")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const creditCardTotal = useMemo(() =>
+    (accounts ?? []).filter((a) => a.type === "credit-card")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const savingsPercent = useMemo(() =>
+    totalBalance > 0 ? Math.round((savingsBalance / totalBalance) * 100) : 0,
+    [totalBalance, savingsBalance]
+  );
 
   const cards = [
     {
@@ -88,7 +96,7 @@ export function ContentCardsSection() {
       content: `CHF ${savingsBalance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
-      badge: t("cards.card-3.badge"),
+      badge: t("cards.card-3.badge", { percent: savingsPercent }),
     },
     {
       title: t("cards.card-4.title"),
@@ -127,21 +135,23 @@ export function ContentCardsSection() {
                 {accountsLoading ? "..." : accountsError ? "—" : content}
               </h1>
             </CardContent>
-            <CardFooter className="mt-2">
-              <Badge
-                variant="outline"
-                className={cn(
-                  "bg-badge-background rounded-full px-4 py-2 whitespace-pre-wrap",
-                  idx === 2
-                    ? "border-[#308BA4]"
-                    : idx === 3
-                      ? "border-[#9A4249]"
-                      : "dark:border-border-blue",
-                )}
-              >
-                <p className="w-full text-xs">{card.badge}</p>
-              </Badge>
-            </CardFooter>
+            {card.badge && (
+              <CardFooter className="mt-2">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "bg-badge-background rounded-full px-4 py-2 whitespace-pre-wrap",
+                    idx === 2
+                      ? "border-[#308BA4]"
+                      : idx === 3
+                        ? "border-[#9A4249]"
+                        : "dark:border-border-blue",
+                  )}
+                >
+                  <p className="w-full text-xs">{card.badge}</p>
+                </Badge>
+              </CardFooter>
+            )}
           </Card>
         );
       })}

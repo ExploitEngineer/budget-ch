@@ -3,7 +3,10 @@ import { apiError, apiSuccess } from "@/lib/api-response";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const transfers = await getAccountTransfers();
+  const { searchParams } = new URL(request.url);
+  const hubId = searchParams.get("hub") || undefined;
+
+  const transfers = await getAccountTransfers(hubId);
 
   if (!transfers.status) {
     return apiError({ message: transfers.message ?? "Failed to fetch transfers", status: 500 });

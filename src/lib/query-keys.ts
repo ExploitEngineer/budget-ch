@@ -80,7 +80,7 @@ export const reportKeys = {
  */
 export const transferKeys = {
   all: ["transfers"] as const,
-  list: () => [...transferKeys.all, "list"] as const,
+  list: (hubId: string | null) => [...transferKeys.all, "list", hubId] as const,
 };
 
 /**

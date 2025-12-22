@@ -837,8 +837,8 @@
             },
             "data-table": {
                 "loading": "Caricamento dei dati...",
-                "title": "Tutte le categorie",
-                "badge": "5 conti • Liquidità CHF 2’620.00",
+                "title": "Tutti i conti",
+                "badge": "{count, plural, one {1 conto} other {# conti}} • Liquidità CHF {amount}",
                 "buttons": {
                     "export": "Esporta CSV",
                     "reset": "Reimposta"

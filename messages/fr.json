@@ -829,7 +829,7 @@
                 "card-3": {
                     "title": "Solde d'épargne",
                     "content": "CHF 13’200.00",
-                    "badge": "y compris Pilier 3a"
+                    "badge": "{percent}% des actifs"
                 },
                 "card-4": {
                     "title": "Cartes de crédit",
@@ -839,8 +839,8 @@
             },
             "data-table": {
                 "loading": "Chargement des données...",
-                "title": "Toutes les catégories",
-                "badge": "5 comptes • Liquidité CHF 2’620.00",
+                "title": "Tous les comptes",
+                "badge": "{count, plural, one {1 compte} other {# comptes}} • Liquidité CHF {amount}",
                 "buttons": {
                     "export": "Exporter CSV",
                     "reset": "Réinitialiser"

@@ -187,8 +187,12 @@ export async function getExpenseCategoriesProgress(hubId: string) {
 }
 
 // Transfers
-export async function getAccountTransfers() {
-  const response = await apiInstance.get(`/api/me/transfers`);
+export async function getAccountTransfers(hubId: string) {
+  const response = await apiInstance.get(`/api/me/transfers`, {
+    searchParams: {
+      hub: hubId
+    }
+  });
   const data = await response.json();
   return data as ApiResponse<any[]>;
 }

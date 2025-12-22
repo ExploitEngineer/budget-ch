@@ -2131,6 +2131,68 @@ export async function getAccountTransfersDB(financialAccountId: string) {
   }
 }
 
+// GET Hub Transfers
+export async function getHubTransfersDB(hubId: string) {
+  try {
+    const results = await db
+      .select({
+        id: transactions.id,
+        date: transactions.createdAt,
+        amount: transactions.amount,
+        note: transactions.note,
+        sourceAccountId: transactions.financialAccountId,
+        destinationAccountId: transactions.destinationAccountId,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.hubId, hubId),
+          eq(transactions.type, "transfer"),
+        ),
+      )
+      .orderBy(desc(transactions.createdAt));
+
+    // Fetch account names separately
+    const accountIds = new Set<string>();
+    results.forEach((tx) => {
+      if (tx.sourceAccountId) accountIds.add(tx.sourceAccountId);
+      if (tx.destinationAccountId) accountIds.add(tx.destinationAccountId);
+    });
+
+    const accountsMap = new Map<string, string>();
+    if (accountIds.size > 0) {
+      const accounts = await db
+        .select({
+          id: financialAccounts.id,
+          name: financialAccounts.name,
+        })
+        .from(financialAccounts)
+        .where(inArray(financialAccounts.id, Array.from(accountIds)));
+
+      accounts.forEach((acc) => {
+        accountsMap.set(acc.id, acc.name);
+      });
+    }
+
+    const formatted = results.map((tx) => ({
+      date: tx.date,
+      source: accountsMap.get(tx.sourceAccountId) || "Unknown",
+      destination: accountsMap.get(tx.destinationAccountId || "") || "Unknown",
+      amount: Number(tx.amount),
+      note: tx.note || "",
+    }));
+
+    return { status: true, data: formatted };
+  } catch (err: any) {
+    console.error("Error fetching hub transfers:", err);
+    return {
+      status: false,
+      message: err.message || "Failed to fetch hub transfers",
+      data: [],
+    };
+  }
+}
+
 // GET All Transaction Categories for a Hub
 export async function getTransactionCategoriesDB(hubId: string) {
   try {

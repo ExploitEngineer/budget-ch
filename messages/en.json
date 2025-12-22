@@ -831,7 +831,7 @@
                 "card-3": {
                     "title": "Savings Balance",
                     "content": "CHF 13’200.00",
-                    "badge": "including Pillar 3a"
+                    "badge": "{percent}% of Total Assets"
                 },
                 "card-4": {
                     "title": "Credit Cards",
@@ -841,8 +841,8 @@
             },
             "data-table": {
                 "loading": "Loading...",
-                "title": "All categories",
-                "badge": "5 Konten • Liquid CHF 2’620.00",
+                "title": "All Accounts",
+                "badge": "{count, plural, one {1 Account} other {# Accounts}} • Liquid CHF {amount}",
                 "buttons": {
                     "export": "Export CSV",
                     "reset": "Reset"

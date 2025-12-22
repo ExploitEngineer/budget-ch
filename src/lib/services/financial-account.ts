@@ -61,14 +61,20 @@ export async function createFinancialAccount({
 }
 
 // READ Financial Accounts [Action]
-export async function getFinancialAccounts(): Promise<{
+export async function getFinancialAccounts(hubIdArg?: string): Promise<{
   status: boolean;
   data?: FinancialAccount[];
   message?: string;
 }> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { status: false, message: "Hub ID is required" };
+    }
 
     const accounts = await getFinancialAccountsDB(hubId);
 

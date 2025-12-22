@@ -831,7 +831,7 @@
                 "card-3": {
                     "title": "Sparguthaben",
                     "content": "CHF 13’200.00",
-                    "badge": "inkl. Säule 3a"
+                    "badge": "{percent}% des Vermögens"
                 },
                 "card-4": {
                     "title": "Kreditkarten",
@@ -841,8 +841,8 @@
             },
             "data-table": {
                 "loading": "Daten werden geladen...",
-                "title": "Alle Kategorien",
-                "badge": "5 Konten • Liquidität CHF 2’620.00",
+                "title": "Alle Konten",
+                "badge": "{count, plural, one {1 Konto} other {# Konten}} • Liquidität CHF {amount}",
                 "buttons": {
                     "export": "CSV exportieren",
                     "reset": "Zurücksetzen"

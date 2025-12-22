@@ -64,11 +64,16 @@ export function ContentDataTable() {
     return mapAccountsToRows(domainAccounts);
   }, [domainAccounts]);
 
-  const totalBalance = (accounts ?? []).reduce((sum, acc) => {
-    const amount =
-      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0;
-    return sum + amount;
-  }, 0);
+  const totalBalance = useMemo(() =>
+    (accounts ?? []).reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const liquidBalance = useMemo(() =>
+    (accounts ?? []).filter(acc => acc.type === "checking" || acc.type === "cash")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
 
   const accountTableHeadings: string[] = [
     t("headings.name"),
@@ -88,7 +93,12 @@ export function ContentDataTable() {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
               variant="outline"
             >
-              {t("badge")}
+              {t("badge", {
+                count: accounts?.length ?? 0,
+                amount: liquidBalance.toLocaleString("de-CH", {
+                  minimumFractionDigits: 2,
+                })
+              })}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
@@ -99,12 +109,12 @@ export function ContentDataTable() {
             >
               {t("buttons.export")}
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.reset")}
-            </Button>
+            </Button> */}
           </div>
         </CardHeader>
 

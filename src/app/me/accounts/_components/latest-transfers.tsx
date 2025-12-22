@@ -16,6 +16,7 @@ import { getAccountTransfers } from "@/lib/api";
 import { transferKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { useExportCSV } from "@/hooks/use-export-csv";
+import { useSearchParams } from "next/navigation";
 
 export interface TransferData {
   date: string;
@@ -31,20 +32,24 @@ export function LatestTransfers() {
   );
 
   const { exportTransfers } = useExportCSV();
+  const searchParams = useSearchParams();
+  const hubId = searchParams.get("hub");
 
   const {
     data,
     isLoading: loading,
     error: queryError,
   } = useQuery<{ data: TransferData[]; message?: string }>({
-    queryKey: transferKeys.list(),
+    queryKey: transferKeys.list(hubId),
     queryFn: async () => {
-      const res = await getAccountTransfers();
+      if (!hubId) return { data: [] };
+      const res = await getAccountTransfers(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch transfers");
       }
       return { data: res.data ?? [], message: res.message };
     },
+    enabled: !!hubId,
   });
 
   const transfers = data?.data;
