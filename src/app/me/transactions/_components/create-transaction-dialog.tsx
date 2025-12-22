@@ -86,6 +86,7 @@ export default function CreateTransactionDialog({
       endDate?: Date | null;
       recurringStatus?: "active" | "inactive";
       hubIdArg?: string;
+      createdAt?: Date;
     }) => {
       const result = await createTransaction({
         categoryName: data.category?.trim() || "",
@@ -101,6 +102,7 @@ export default function CreateTransactionDialog({
         endDate: data.endDate,
         recurringStatus: data.recurringStatus,
         hubIdArg: data.hubIdArg,
+        createdAt: data.createdAt,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -208,6 +210,7 @@ export default function CreateTransactionDialog({
           ? values.recurringStatus
           : undefined,
         hubIdArg: hubId || undefined,
+        createdAt: values.date,
       });
 
       form.reset();

@@ -58,6 +58,7 @@ export async function createTransaction({
   hubIdArg,
   recurringTemplateId,
   userIdArg,
+  createdAt,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -66,6 +67,7 @@ export async function createTransaction({
   | "source"
   | "transactionType"
   | "destinationAccountId"
+  | "createdAt"
 > & {
   accountId: string;
   isRecurring?: boolean;
@@ -230,6 +232,7 @@ export async function createTransaction({
       transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
       recurringTemplateId: recurringTemplateId || null,
+      createdAt,
     });
 
     // Create recurring transaction template if isRecurring is true
@@ -353,6 +356,8 @@ export async function createTransaction({
         console.error("Error checking budget thresholds:", err);
       }
     }
+
+    revalidatePath("/me/transactions");
 
     return { success: true };
   } catch (err: any) {
@@ -651,7 +656,7 @@ export async function updateTransaction(
 ) {
   try {
     const hdrs = await headers();
-    const { userId, userRole, hubId: sessionHubId, financialAccountId } = await getContext(
+    const { userId, userRole, hubId: sessionHubId } = await getContext(
       hdrs,
       false,
     );
@@ -663,20 +668,41 @@ export async function updateTransaction(
 
     requireAdminRole(userRole);
 
-    if (!financialAccountId) {
-      return {
-        success: false,
-        message: "No financial account found. Please create a financial account in settings to update transactions.",
-      };
+    // Get the existing transaction to handle balance reversal
+    const existingTxResult = await getTransactionsDB(hubId);
+    if (!existingTxResult.success || !existingTxResult.data) {
+      return { success: false, message: "Could not fetch existing transaction for update." };
+    }
+    const existingTx = existingTxResult.data.find(t => t.id === transactionId);
+
+    if (!existingTx) {
+      return { success: false, message: "Transaction not found." };
     }
 
     const source = formData.get("source")?.toString().trim() || "";
     const amount = parseFloat(formData.get("amount")?.toString() || "0");
     const note = formData.get("note")?.toString() || null;
-    const addedAtStr = formData.get("addedAt")?.toString() || "";
-    const addedAt = addedAtStr ? new Date(addedAtStr) : new Date();
+    const createdAtStr = formData.get("createdAt")?.toString() || "";
+    const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
+
+    /* 
+    console.log('DEBUG: updateTransaction - formData entries:');
+    formData.forEach((v, k) => console.log(`  ${k}: ${v}`));
+
+    console.log('DEBUG: updateTransaction - parsed date:', {
+      createdAtStr,
+      parsedDate: createdAt.toISOString(),
+      isDefaulted: !createdAtStr
+    });
+    */
+
     const transactionType = formData.get("transactionType")?.toString() as TransactionType | undefined;
+    const accountId = formData.get("accountId")?.toString(); // Get new account ID from form
     const destinationAccountId = formData.get("destinationAccountId")?.toString() || null;
+
+    if (!accountId) {
+      return { success: false, message: "Account ID is required." };
+    }
 
     const categoryName =
       formData.get("categoryName")?.toString().trim().toLowerCase() || null;
@@ -707,6 +733,77 @@ export async function updateTransaction(
       }
     }
 
+    // --- BALANCE SYNCHRONIZATION LOGIC ---
+
+    // 1. Reverse old transaction impact
+    const oldAccount = await getFinancialAccountById(existingTx.financialAccountId, hubId);
+    if (oldAccount) {
+      let restoredBalance = Number(oldAccount.initialBalance ?? 0);
+      if (existingTx.type === "expense") {
+        restoredBalance += Number(existingTx.amount);
+      } else if (existingTx.type === "income") {
+        restoredBalance -= Number(existingTx.amount);
+      } else if (existingTx.type === "transfer") {
+        restoredBalance += Number(existingTx.amount);
+        // Also reverse destination account for transfers
+        if (existingTx.destinationAccountId) {
+          const oldDestAccount = await getFinancialAccountById(existingTx.destinationAccountId, hubId);
+          if (oldDestAccount) {
+            const restoredDestBalance = Number(oldDestAccount.initialBalance ?? 0) - Number(existingTx.amount);
+            await updateFinancialAccountDB({
+              hubId,
+              accountId: oldDestAccount.id,
+              updatedData: { balance: restoredDestBalance },
+            });
+          }
+        }
+      }
+      await updateFinancialAccountDB({
+        hubId,
+        accountId: oldAccount.id,
+        updatedData: { balance: restoredBalance },
+      });
+    }
+
+    // 2. Apply new transaction impact
+    const newAccount = await getFinancialAccountById(accountId, hubId);
+    if (!newAccount) {
+      return { success: false, message: "Target account not found." };
+    }
+
+    let nextBalance = Number(newAccount.initialBalance ?? 0);
+    if (transactionType === "expense") {
+      if (nextBalance < amount) {
+        throw new Error("Insufficient funds in selected account.");
+      }
+      nextBalance -= amount;
+    } else if (transactionType === "income") {
+      nextBalance += amount;
+    } else if (transactionType === "transfer") {
+      if (nextBalance < amount) {
+        return { success: false, message: "Insufficient funds in source account." };
+      }
+      nextBalance -= amount;
+      // Also apply to destination account for transfers
+      if (destinationAccountId) {
+        const newDestAccount = await getFinancialAccountById(destinationAccountId, hubId);
+        if (newDestAccount) {
+          const nextDestBalance = Number(newDestAccount.initialBalance ?? 0) + amount;
+          await updateFinancialAccountDB({
+            hubId,
+            accountId: newDestAccount.id,
+            updatedData: { balance: nextDestBalance },
+          });
+        }
+      }
+    }
+
+    await updateFinancialAccountDB({
+      hubId,
+      accountId: newAccount.id,
+      updatedData: { balance: nextBalance },
+    });
+
     const res = await updateTransactionDB({
       hubId,
       transactionId,
@@ -714,8 +811,8 @@ export async function updateTransaction(
         source,
         amount,
         note,
-        addedAt,
-        financialAccountId,
+        createdAt,
+        financialAccountId: accountId,
         transactionCategoryId,
         destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
         transactionType,
@@ -729,7 +826,7 @@ export async function updateTransaction(
       };
     }
 
-    revalidatePath("/dashboard/transactions");
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -761,6 +858,41 @@ export async function deleteTransaction(
 
     requireAdminRole(userRole);
 
+    // Get transaction details for balance reversal
+    const existingTxResult = await getTransactionsDB(hubId);
+    const existingTx = existingTxResult.data?.find(t => t.id === transactionId);
+
+    if (existingTx) {
+      // Reverse balance impact
+      const account = await getFinancialAccountById(existingTx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (existingTx.type === "expense") {
+          restoredBalance += Number(existingTx.amount);
+        } else if (existingTx.type === "income") {
+          restoredBalance -= Number(existingTx.amount);
+        } else if (existingTx.type === "transfer") {
+          restoredBalance += Number(existingTx.amount);
+          if (existingTx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(existingTx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(existingTx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteTransactionDB({ hubId, transactionId });
 
     if (!res.success) {
@@ -769,6 +901,8 @@ export async function deleteTransaction(
         message: res.message || "Failed to delete transaction.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -798,6 +932,40 @@ export async function deleteTransactions(transactionIds: string[]) {
       };
     }
 
+    // Get transactions to handle balance reversal
+    const existingTxsResult = await getTransactionsDB(hubId);
+    const transactionsToReverse = existingTxsResult.data?.filter(t => transactionIds.includes(t.id)) || [];
+
+    for (const tx of transactionsToReverse) {
+      const account = await getFinancialAccountById(tx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (tx.type === "expense") {
+          restoredBalance += Number(tx.amount);
+        } else if (tx.type === "income") {
+          restoredBalance -= Number(tx.amount);
+        } else if (tx.type === "transfer") {
+          restoredBalance += Number(tx.amount);
+          if (tx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(tx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(tx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteTransactionsDB({ hubId, transactionIds });
 
     if (!res.success) {
@@ -806,6 +974,8 @@ export async function deleteTransactions(transactionIds: string[]) {
         message: res.message || "Failed to delete transactions.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -832,6 +1002,40 @@ export async function deleteAllTransactions() {
       return { success: false, message: "Missing hubId parameter." };
     }
 
+    // Get ALL transactions in the hub to handle balance reversal
+    const existingTxsResult = await getTransactionsDB(hubId);
+    const transactionsToReverse = existingTxsResult.data || [];
+
+    for (const tx of transactionsToReverse) {
+      const account = await getFinancialAccountById(tx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (tx.type === "expense") {
+          restoredBalance += Number(tx.amount);
+        } else if (tx.type === "income") {
+          restoredBalance -= Number(tx.amount);
+        } else if (tx.type === "transfer") {
+          restoredBalance += Number(tx.amount);
+          if (tx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(tx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(tx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteAllTransactionsDB(hubId);
 
     if (!res.success) {
@@ -840,6 +1044,8 @@ export async function deleteAllTransactions() {
         message: res.message || "Failed to delete all transactions.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -855,7 +1061,7 @@ export async function deleteAllTransactions() {
   }
 }
 
-// DELETE ALL Transactions and related Categories [Action]
+// DELETE ALL Transactions and Categories [Action]
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
@@ -867,6 +1073,40 @@ export async function deleteAllTransactionsAndCategories() {
       return { success: false, message: "Missing hubId parameter." };
     }
 
+    // Get ALL transactions in the hub to handle balance reversal
+    const existingTxsResult = await getTransactionsDB(hubId);
+    const transactionsToReverse = existingTxsResult.data || [];
+
+    for (const tx of transactionsToReverse) {
+      const account = await getFinancialAccountById(tx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (tx.type === "expense") {
+          restoredBalance += Number(tx.amount);
+        } else if (tx.type === "income") {
+          restoredBalance -= Number(tx.amount);
+        } else if (tx.type === "transfer") {
+          restoredBalance += Number(tx.amount);
+          if (tx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(tx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(tx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteAllTransactionsAndCategoriesDB(hubId);
 
     if (!res.success) {
@@ -876,6 +1116,8 @@ export async function deleteAllTransactionsAndCategories() {
           res.message || "Failed to delete all transactions and categories.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,

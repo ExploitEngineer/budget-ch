@@ -19,7 +19,7 @@ export function mapTransactionToTransactionRow(
     ? new Date(transaction.createdAt).toLocaleDateString("en-GB")
     : null;
 
-  // DEBUG: Log first 3 transactions to see raw data
+  /* DEBUG: Log first 3 transactions to see raw data
   if (Math.random() < 0.05) { // Log ~5% of transactions
     console.log('🔍 TRANSACTION ADAPTER - Raw Data:', {
       id: transaction.id,
@@ -28,7 +28,7 @@ export function mapTransactionToTransactionRow(
       hasRecurringTemplateId: !!transaction.recurringTemplateId,
       type: transaction.type
     });
-  }
+  } */
 
   const mapped = {
     id: transaction.id,

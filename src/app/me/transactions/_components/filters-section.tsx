@@ -102,7 +102,8 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
   });
 
   const handleApply = async (values: TransactionFiltersFormValues) => {
-    onFilter(values)
+    onFilter(values);
+    form.reset(values, { keepValues: true });
   };
 
   const handleReset = () => {
@@ -389,8 +390,8 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                   <Button
                     type="submit"
                     variant="outline"
-                    disabled={isApplying}
-                    className="btn-gradient cursor-pointer border-transparent hover:text-white"
+                    disabled={isApplying || !form.formState.isDirty}
+                    className="btn-gradient cursor-pointer border-transparent hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isApplying ? <Spinner /> : t("buttons.apply")}
                   </Button>

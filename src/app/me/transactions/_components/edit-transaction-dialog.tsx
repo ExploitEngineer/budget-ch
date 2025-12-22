@@ -317,7 +317,8 @@ export default function EditTransactionDialog({
         const fd = new FormData();
         Object.entries({
           ...payload,
-          addedAt: values.date.toISOString(),
+          accountId: values.accountId,
+          createdAt: values.date.toISOString(),
           categoryName: payload.category || "",
           destinationAccountId: payload.destinationAccountId || "",
         }).forEach(([k, v]) => {

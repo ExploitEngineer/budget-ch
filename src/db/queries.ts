@@ -74,6 +74,7 @@ export type createTransactionArgs = {
   categoryName: string;
   transactionType: TransactionType;
   destinationAccountId?: string | null;
+  createdAt?: Date;
 };
 
 export type updateTransactionArgs = {
@@ -83,7 +84,7 @@ export type updateTransactionArgs = {
     source?: string;
     amount?: number;
     note?: string | null;
-    addedAt?: Date | string;
+    createdAt?: Date | string;
     transactionCategoryId?: string | null;
     financialAccountId?: string | null;
     destinationAccountId?: string | null;
@@ -693,6 +694,7 @@ export async function createTransactionDB({
   transactionType,
   destinationAccountId,
   recurringTemplateId,
+  createdAt,
 }: Omit<createTransactionArgs, "categoryName"> & {
   recurringTemplateId?: string | null;
 }) {
@@ -708,6 +710,7 @@ export async function createTransactionDB({
       type: transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
       recurringTemplateId: recurringTemplateId || null,
+      createdAt: createdAt || new Date(),
     });
 
     return { success: true, message: "Transaction created successfully" };
@@ -791,10 +794,10 @@ export async function updateTransactionDB({
       source: updatedData.source,
       amount: updatedData.amount,
       note: updatedData.note,
-      addedAt:
-        typeof updatedData.addedAt === "string"
-          ? new Date(updatedData.addedAt)
-          : updatedData.addedAt,
+      createdAt:
+        typeof updatedData.createdAt === "string"
+          ? new Date(updatedData.createdAt)
+          : updatedData.createdAt,
       transactionCategoryId: updatedData.transactionCategoryId,
       financialAccountId: updatedData.financialAccountId,
       destinationAccountId: updatedData.destinationAccountId,
