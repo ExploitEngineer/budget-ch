@@ -72,7 +72,9 @@ export const exportTransactionsToCSV = ({
   const headers = [
     t("data-table.headings.date"),
     t("data-table.headings.category"),
+    t("data-table.headings.account"),
     t("data-table.headings.amount"),
+    t("data-table.headings.type"),
     t("data-table.headings.recipient"),
     t("data-table.headings.note"),
   ];
@@ -80,9 +82,11 @@ export const exportTransactionsToCSV = ({
   const data = transactions.map((tx) => ({
     [headers[0]]: tx.date,
     [headers[1]]: tx.category,
-    [headers[2]]: tx.amount,
-    [headers[3]]: tx.recipient || "-",
-    [headers[4]]: tx.note || "-",
+    [headers[2]]: tx.account || "-",
+    [headers[3]]: tx.amount,
+    [headers[4]]: "expense", // Default to expense for simple export if type is missing
+    [headers[5]]: tx.recipient || "-",
+    [headers[6]]: tx.note || "-",
   }));
 
   const csv = Papa.unparse(data);
@@ -108,6 +112,8 @@ export const exportBudgetsToCSV = ({
     [headers[3]]: (budget.spent ?? 0).toFixed(2), // Spent column
     [headers[4]]: (budget.remaining ?? 0).toFixed(2),
     [headers[5]]: `${(budget.progress ?? 0).toFixed(1)}%`,
+    [headers[6]]: budget.month || (new Date().getMonth() + 1),
+    [headers[7]]: budget.year || new Date().getFullYear(),
   }));
 
   const csv = Papa.unparse(data);
@@ -269,10 +275,9 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
 
   const headers = [
     t("cards.tax-reserves.content.goal"),
+    t("cards.tax-reserves.content.rest"),
     t("cards.tax-reserves.content.saved"),
-    t("cards.tax-reserves.content.remaining"),
     t("cards.tax-reserves.content.monthly-allocated"),
-    "Progress",
     "Account",
     "Due Date",
     "Status",
@@ -318,7 +323,9 @@ export const exportTransactionsTemplateToCSV = (t: (key: string) => string) => {
   const headers = [
     t("data-table.headings.date"),
     t("data-table.headings.category"),
+    t("data-table.headings.account"),
     t("data-table.headings.amount"),
+    t("data-table.headings.type"),
     t("data-table.headings.recipient"),
     t("data-table.headings.note"),
   ];
@@ -332,31 +339,48 @@ export const exportBudgetsTemplateToCSV = (t: (key: string) => string) => {
     t("data-table.headings.category"),
     t("data-table.headings.budget"),
     t("data-table.headings.ist"),
-    t("data-table.headings.spent"),
-    t("data-table.headings.rest"),
-    t("data-table.headings.progress"),
+    t("data-table.headings.month"),
+    t("data-table.headings.year"),
+    t("sidebar-header.dialog.labels.warning"),
+    t("sidebar-header.dialog.labels.color-marker.title"),
   ];
 
   const csv = Papa.unparse([headers]);
   triggerCSVDownload(csv, "budgets-template");
 };
 
-export const exportAccountsTemplateToCSV = (headers: string[]) => {
+export const exportAccountsTemplateToCSV = (t: (key: string) => string) => {
+  const headers = [
+    t("sidebar-header.new-account-dialog.labels.name.title"),
+    t("sidebar-header.new-account-dialog.labels.type.title"),
+    t("sidebar-header.new-account-dialog.labels.balance"),
+    t("sidebar-header.new-account-dialog.labels.iban.title"),
+    t("sidebar-header.new-account-dialog.labels.note.title"),
+  ];
   const csv = Papa.unparse([headers]);
   triggerCSVDownload(csv, "accounts-template");
 };
 
-export const exportTransfersTemplateToCSV = (headers: string[]) => {
+export const exportTransfersTemplateToCSV = (t: (key: string) => string) => {
+  const headers = [
+    t("data-table.headings.date"),
+    t("data-table.headings.from"),
+    t("data-table.headings.to"),
+    t("data-table.headings.note"),
+    t("data-table.headings.amount"),
+  ];
   const csv = Papa.unparse([headers]);
   triggerCSVDownload(csv, "transfers-template");
 };
 
 export const exportSavingGoalsTemplateToCSV = (t: (key: string) => string) => {
   const headers = [
-    t("cards.tax-reserves.content.goal"),
-    t("cards.tax-reserves.content.saved"),
-    t("cards.tax-reserves.content.remaining"),
-    t("cards.tax-reserves.content.monthly-allocated"),
+    t("sidebar-header.dialog.labels.name.title"),
+    t("sidebar-header.dialog.labels.goal-amount"),
+    t("sidebar-header.dialog.labels.saved-amount"),
+    t("sidebar-header.dialog.labels.monthly-allocation"),
+    t("sidebar-header.dialog.labels.account.title"),
+    t("sidebar-header.dialog.labels.due-date.title"),
   ];
 
   const csv = Papa.unparse([headers]);

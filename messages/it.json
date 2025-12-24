@@ -1,4 +1,14 @@
 {
+    "common": {
+        "loading": "Caricamento...",
+        "updating": "Aggiornamento...",
+        "update": "Aggiorna",
+        "add": "Aggiungi",
+        "error": "Qualcosa è andato storto. Riprova.",
+        "retry": "Riprova",
+        "currency": "CHF",
+        "percent": "{value}%"
+    },
     "two-factor": {
         "title": "Autenticazione a due fattori",
         "description": "Inserisci il tuo codice di verifica per continuare",
@@ -30,12 +40,6 @@
             "backup-code-error": "Codice di backup non valido. Riprova.",
             "backup-code-success": "Codice di backup accettato. Reindirizzamento..."
         }
-    },
-    "common": {
-        "loading": "Caricamento...",
-        "updating": "Aggiornamento...",
-        "update": "Aggiorna",
-        "add": "Aggiungi"
     },
     "greeting": {
         "title": "Come stai?",
@@ -227,10 +231,10 @@
                 },
                 "card-3": {
                     "title": "Disponibile",
-                    "badge": "+40% margine"
+                    "badge": "margine"
                 },
                 "card-4": {
-                    "title": "Previsione fino al 30/09/2025",
+                    "title": "Previsione fino al",
                     "content": "4’980 franchi svizzeri",
                     "badge": "incl. Ricorrenti"
                 }
@@ -300,7 +304,11 @@
                 },
                 "card-3": {
                     "title": "3 nuove transazioni da ieri"
-                }
+                },
+                "budget-exceeded": "Budget {category} superato",
+                "budget-at-percent": "Budget {category} al {percent}%",
+                "no-warnings": "Nessun avviso. Il tuo budget è in salute!",
+                "currency": "CHF"
             },
             "recent-transactions-table": {
                 "title": "Transazioni recenti",
@@ -595,7 +603,9 @@
                     "spent": "SPESO",
                     "rest": "RIMANENTE",
                     "progress": "PROGRESSO",
-                    "action": "AZIONE"
+                    "action": "AZIONE",
+                    "month": "MESE",
+                    "year": "ANNO"
                 },
                 "data": {
                     "category": {
@@ -1039,7 +1049,33 @@
                     "replace-existing": "Sostituisci esistenti"
                 },
                 "input": "Trascina il file qui o clicca",
-                "supported-files": "Supportato: .csv, .json. Separatore ‘;’ o ‘,’ riconosciuto."
+                "supported-files": "Supportato: .csv, .json. Separatore ‘;’ o ‘,’ riconosciuto.",
+                "validation-results": "Risultati della validazione",
+                "valid-rows": "{count} righe valide.",
+                "invalid-rows": "{count} righe non valide (controlla date/importi).",
+                "potential-duplicates": "{count} potenziali duplicati rilevati",
+                "new-categories-info": "{count} nuove categorie saranno create.",
+                "categories-found": "{count} categorie trovate nel file.",
+                "new-accounts-found": "{count} nuovi conti trovati nel file.",
+                "missing-accounts-title": "Mappatura conti mancanti",
+                "missing-accounts-desc": "I conti qui sotto sono stati trovati nel file ma mancano nel tuo dashboard. Mappali a conti esistenti per continuare.",
+                "select-existing": "Seleziona conto esistente",
+                "create-missing-button": "Crea tutti i conti mancanti",
+                "new-accounts-auto-info": "Tutti i {count} conti mancanti saranno creati automaticamente.",
+                "skip-duplicates-label": "Salta potenziali duplicati",
+                "duplicates-ignored-info": "I duplicati rilevati saranno ignorati.",
+                "replace-confirmation": {
+                    "title": "Sei sicuro?",
+                    "desc": "Questo eliminerà tutti i {type} esistenti per questo hub prima dell'importazione. Questa azione non può essere annullata.",
+                    "confirm": "Sì, sostituisci tutto",
+                    "cancel": "Annulla"
+                },
+                "full-json-validation": {
+                    "title": "Riepilogo esportazione completa",
+                    "total": "Totale: {count} elementi saranno importati",
+                    "exported-at": "Esportato"
+                },
+                "cancel": "Annulla"
             }
         },
         "settings-page": {

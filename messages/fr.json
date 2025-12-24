@@ -1,4 +1,14 @@
 {
+    "common": {
+        "loading": "Chargement...",
+        "updating": "Mise à jour...",
+        "update": "Mettre à jour",
+        "add": "Ajouter",
+        "error": "Quelque chose s'est mal passé. Veuillez réessayer.",
+        "retry": "Réessayer",
+        "currency": "CHF",
+        "percent": "{value}%"
+    },
     "two-factor": {
         "title": "Authentification à deux facteurs",
         "description": "Veuillez entrer votre code de vérification pour continuer",
@@ -30,14 +40,6 @@
             "backup-code-error": "Code de secours invalide. Veuillez réessayer.",
             "backup-code-success": "Code de secours accepté. Redirection..."
         }
-    },
-    "common": {
-        "loading": "Chargement...",
-        "updating": "Mise à jour...",
-        "update": "Mettre à jour",
-        "add": "Ajouter",
-        "error": "Quelque chose s'est mal passé. Veuillez réessayer.",
-        "retry": "Réessayer"
     },
     "greeting": {
         "title": "Comment ça va ?",
@@ -232,7 +234,7 @@
                     "badge": "de marge"
                 },
                 "card-4": {
-                    "title": "Prévision jusqu’au 30/09/2025",
+                    "title": "Prévision jusqu’au",
                     "content": "4’980 francs suisses",
                     "badge": "incl. Répétitif"
                 }
@@ -302,7 +304,11 @@
                 },
                 "card-3": {
                     "title": "3 nouvelles transactions depuis hier"
-                }
+                },
+                "budget-exceeded": "Budget {category} dépassé",
+                "budget-at-percent": "Budget {category} à {percent}%",
+                "no-warnings": "Aucun avertissement. Votre budget est sain !",
+                "currency": "CHF"
             },
             "recent-transactions-table": {
                 "title": "Dernières transactions",
@@ -597,7 +603,9 @@
                     "spent": "DÉPENSÉ",
                     "rest": "RESTE",
                     "progress": "PROGRÈS",
-                    "action": "ACTION"
+                    "action": "ACTION",
+                    "month": "MOIS",
+                    "year": "ANNÉE"
                 },
                 "data": {
                     "category": {
@@ -1041,7 +1049,33 @@
                     "replace-existing": "Remplacer existant"
                 },
                 "input": "Déposez le fichier ici ou cliquez",
-                "supported-files": "Pris en charge : .csv, .json. Le séparateur ‘;’ ou ‘,’ sera reconnu."
+                "supported-files": "Pris en charge : .csv, .json. Le séparateur ‘;’ ou ‘,’ sera reconnu.",
+                "validation-results": "Résultats de la validation",
+                "valid-rows": "{count} lignes valides.",
+                "invalid-rows": "{count} lignes invalides (vérifiez les dates/montants).",
+                "potential-duplicates": "{count} doublons potentiels détectés",
+                "new-categories-info": "{count} nouvelles catégories seront créées.",
+                "categories-found": "{count} catégories trouvées dans le fichier.",
+                "new-accounts-found": "{count} nouveaux comptes trouvés dans le fichier.",
+                "missing-accounts-title": "Mappage des comptes manquants",
+                "missing-accounts-desc": "Les comptes ci-dessous ont été trouvés dans votre fichier mais sont absents de votre tableau de bord. Mappez-les sur des comptes existants pour continuer.",
+                "select-existing": "Sélectionner un compte existant",
+                "create-missing-button": "Créer tous les comptes manquants",
+                "new-accounts-auto-info": "Les {count} comptes manquants seront tous créés automatiquement.",
+                "skip-duplicates-label": "Ignorer les doublons potentiels",
+                "duplicates-ignored-info": "Les doublons détectés seront ignorés.",
+                "replace-confirmation": {
+                    "title": "Êtes-vous sûr ?",
+                    "desc": "Cela supprimera tous les {type} existants pour ce hub avant l'importation. Cette action est irréversible.",
+                    "confirm": "Oui, tout remplacer",
+                    "cancel": "Annuler"
+                },
+                "full-json-validation": {
+                    "title": "Résumé de l'export complet",
+                    "total": "Total : {count} éléments seront importés",
+                    "exported-at": "Exporté"
+                },
+                "cancel": "Annuler"
             }
         },
         "settings-page": {

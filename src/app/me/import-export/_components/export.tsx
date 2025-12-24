@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
-import { getAccountTransfers, getFinancialAccounts, getRecentTransactions, getBudgets, getSavingGoals } from "@/lib/api";
+import { getAccountTransfers, getFinancialAccounts, getTransactions, getBudgets, getSavingGoals } from "@/lib/api";
 import {
   accountKeys,
   transactionKeys,
@@ -68,14 +68,14 @@ export function Export() {
   const accounts = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
   const { data: domainTransactions } = useQuery<TransactionWithDetails[]>({
-    queryKey: transactionKeys.recent(hubId),
+    queryKey: transactionKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getRecentTransactions(hubId);
+      const res = await getTransactions(hubId);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch recent transactions");
+        throw new Error(res.message || "Failed to fetch transactions");
       }
       return res.data ?? [];
     },

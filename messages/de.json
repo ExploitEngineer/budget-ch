@@ -232,7 +232,7 @@
                     "badge": "Puffer"
                 },
                 "card-4": {
-                    "title": "Prognose bis 30.09.2025",
+                    "title": "Prognose bis",
                     "content": "4’980 Schweizer Franken",
                     "badge": "inkl. Wiederkehrend"
                 }
@@ -302,7 +302,11 @@
                 },
                 "card-3": {
                     "title": "3 neue Transaktionen seit gestern"
-                }
+                },
+                "budget-exceeded": "{category} Budget überschritten",
+                "budget-at-percent": "{category} Budget bei {percent}%",
+                "no-warnings": "Keine Warnungen. Dein Budget ist gesund!",
+                "currency": "CHF"
             },
             "recent-transactions-table": {
                 "title": "Letzte Transaktionen",
@@ -599,7 +603,9 @@
                     "spent": "AUSGEGEBEN",
                     "rest": "REST",
                     "progress": "FORTSCHRITT",
-                    "action": "AKTION"
+                    "action": "AKTION",
+                    "month": "MONAT",
+                    "year": "JAHR"
                 },
                 "data": {
                     "category": {
@@ -1025,7 +1031,33 @@
                     "replace-existing": "Bestehende ersetzen"
                 },
                 "input": "Datei hier ablegen oder klicken",
-                "supported-files": "Unterstützt: .csv, .json. Trenner ‘;’ oder ‘,’ wird erkannt."
+                "supported-files": "Unterstützt: .csv, .json. Trenner ‘;’ oder ‘,’ wird erkannt.",
+                "validation-results": "Validierungsergebnisse",
+                "valid-rows": "{count} gültige Zeilen.",
+                "invalid-rows": "{count} ungültige Zeilen (Daten/Beträge prüfen).",
+                "potential-duplicates": "{count} potenzielle Duplikate erkannt",
+                "new-categories-info": "{count} neue Kategorien werden erstellt.",
+                "categories-found": "{count} Kategorien in der Datei gefunden.",
+                "new-accounts-found": "{count} neue Konten in der Datei gefunden.",
+                "missing-accounts-title": "Fehlende Kontozuordnungen",
+                "missing-accounts-desc": "Die unten aufgeführten Konten wurden in Ihrer Datei gefunden, fehlen jedoch in Ihrem Dashboard. Ordnen Sie sie vorhandenen Konten zu, um fortzufahren.",
+                "select-existing": "Vorhandenes Konto auswählen",
+                "create-missing-button": "Alle fehlenden Konten erstellen",
+                "new-accounts-auto-info": "Alle {count} fehlenden Konten werden automatisch erstellt.",
+                "skip-duplicates-label": "Potenzielle Duplikate überspringen",
+                "duplicates-ignored-info": "Erkannte Duplikate werden ignoriert.",
+                "replace-confirmation": {
+                    "title": "Sind Sie sicher?",
+                    "desc": "Dies wird alle vorhandenen {type} für diesen Hub vor dem Import löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+                    "confirm": "Ja, alles ersetzen",
+                    "cancel": "Abbrechen"
+                },
+                "full-json-validation": {
+                    "title": "Vollexport-Zusammenfassung",
+                    "total": "Gesamt: {count} Elemente werden importiert",
+                    "exported-at": "Exportiert"
+                },
+                "cancel": "Abbrechen"
             }
         },
         "settings-page": {

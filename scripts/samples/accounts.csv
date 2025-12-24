@@ -1,0 +1,9 @@
+Account Name,Type,Initial Balance (CHF),IBAN,Note
+Checking,checking,2450.50,CH12 3456 7890 1234 5,Main household account
+Savings,savings,15000.00,,High yield savings
+Credit Card,credit-card,-350.25,,Visa ending in 4455
+Cash,cash,120.00,,Physical wallet
+Retirement 3a,savings,5500.00,,Pillar 3a account
+Business,checking,3200.00,,Freelance income account
+Vacation,savings,800.00,,Dedicated travel fund
+Emergency,savings,5000.00,,Rainy day fund

@@ -1,4 +1,14 @@
 {
+    "common": {
+        "loading": "Loading...",
+        "updating": "Updating...",
+        "update": "Update",
+        "add": "Add",
+        "error": "Something went wrong. Please try again.",
+        "retry": "Retry",
+        "currency": "CHF",
+        "percent": "{value}%"
+    },
     "two-factor": {
         "title": "Two-Factor Authentication",
         "description": "Please enter your verification code to continue",
@@ -30,14 +40,6 @@
             "backup-code-error": "Invalid backup code. Please try again.",
             "backup-code-success": "Backup code accepted. Redirecting..."
         }
-    },
-    "common": {
-        "loading": "Loading...",
-        "updating": "Updating...",
-        "update": "Update",
-        "add": "Add",
-        "error": "Something went wrong. Please try again.",
-        "retry": "Retry"
     },
     "greeting": {
         "cta": "Dashboard"
@@ -303,7 +305,11 @@
                 },
                 "card-3": {
                     "title": "3 new transactions since yesterday"
-                }
+                },
+                "budget-exceeded": "{category} budget exceeded",
+                "budget-at-percent": "{category} budget at {percent}%",
+                "no-warnings": "No warnings. Your budget is healthy!",
+                "currency": "CHF"
             },
             "recent-transactions-table": {
                 "button": "Show all",
@@ -599,7 +605,9 @@
                     "spent": "SPENT",
                     "rest": "REST",
                     "progress": "PROGRESS",
-                    "action": "ACTION"
+                    "action": "ACTION",
+                    "month": "MONTH",
+                    "year": "YEAR"
                 },
                 "data": {
                     "category": {
@@ -1048,7 +1056,33 @@
                     "replace-existing": "Replace Existing"
                 },
                 "input": "Drop file here or click",
-                "supported-files": "Supported: .csv, .json. Separator ‘;’ or ‘,’ will be recognized."
+                "supported-files": "Supported: .csv, .json. Separator ‘;’ or ‘,’ will be recognized.",
+                "validation-results": "Validation Results",
+                "valid-rows": "{count} valid rows.",
+                "invalid-rows": "{count} invalid rows (check dates/amounts).",
+                "potential-duplicates": "{count} potential duplicates detected",
+                "new-categories-info": "{count} new categories will be created.",
+                "categories-found": "{count} categories found in file.",
+                "new-accounts-found": "{count} new accounts found in file.",
+                "missing-accounts-title": "Missing Account Mappings",
+                "missing-accounts-desc": "The accounts below were found in your file but are missing in your dashboard. Map them to existing accounts to continue.",
+                "select-existing": "Select existing account",
+                "create-missing-button": "Create all missing accounts",
+                "new-accounts-auto-info": "All {count} missing accounts will be created automatically.",
+                "skip-duplicates-label": "Skip potential duplicates",
+                "duplicates-ignored-info": "Detected duplicates will be ignored.",
+                "replace-confirmation": {
+                    "title": "Are you sure?",
+                    "desc": "This will delete all existing {type} for this hub before importing. This action cannot be undone.",
+                    "confirm": "Yes, replace all",
+                    "cancel": "Cancel"
+                },
+                "full-json-validation": {
+                    "title": "Full Export Summary",
+                    "total": "Total: {count} items will be imported",
+                    "exported-at": "Exported"
+                },
+                "cancel": "Cancel"
             }
         },
         "settings-page": {

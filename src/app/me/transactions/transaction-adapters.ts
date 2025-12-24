@@ -39,6 +39,7 @@ export function mapTransactionToTransactionRow(
     note: transaction.note ?? "—",
     amount: Number(transaction.amount ?? 0),
     accountId: transaction.financialAccountId ?? null,
+    account: transaction.accountName ?? "—",
     destinationAccountId: transaction.destinationAccountId ?? null,
     recurringTemplateId: transaction.recurringTemplateId ?? null,
     isRecurring: !!transaction.recurringTemplateId,

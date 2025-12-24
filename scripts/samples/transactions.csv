@@ -1,0 +1,9 @@
+Date,Category,Account,Amount,Type,Recipient,Note
+2025-12-01,Groceries,Checking,45.50,expense,Coop,Weekly groceries
+2025-12-02,Salary,Checking,5000.00,income,Employer,Monthly paycheck
+2025-12-05,Rent,Checking,1200.00,expense,Apartment Management,Monthly rent
+2025-12-10,Restaurant,Credit Card,65.00,expense,Pizza Palace,Dinner with friends
+2025-12-12,Groceries,Checking,32.40,expense,Migros,Quick snack
+2025-12-15,Transport,Credit Card,8.50,expense,SBB,Train ticket
+2025-12-18,Household,Checking,120.00,expense,IKEA,New cushions
+2025-12-20,Health,Credit Card,15.00,expense,Pharmacy,Medicine

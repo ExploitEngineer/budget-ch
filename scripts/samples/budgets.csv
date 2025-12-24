@@ -1,0 +1,9 @@
+Category,Budget (CHF),IST,Month,Year,Warning at (%),Color Marker
+Groceries,600,50,1,2024,80,orange
+Rent,1200,0,1,2024,95,red
+Restaurant,200,20,1,2024,80,orange
+Transport,150,0,1,2024,90,std
+Household,100,5,1,2024,80,std
+Health,50,0,1,2024,95,green
+Leisure,150,10,1,2024,80,orange
+Education,100,0,1,2024,90,blue

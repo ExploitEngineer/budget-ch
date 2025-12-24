@@ -177,19 +177,24 @@ export function WarningSection() {
                   )}
                 >
                   <p className="text-sm">
-                    {b.categoryName} {isExceeded ? "budget exceeded" : `budget at ${Math.round(percent)}%`}
+                    {isExceeded
+                      ? t("warning-cards.budget-exceeded", { category: b.categoryName ?? "" })
+                      : t("warning-cards.budget-at-percent", {
+                        category: b.categoryName ?? "",
+                        percent: Math.round(percent),
+                      })}
                   </p>
                   <Badge
                     variant="outline"
                     className="bg-dark-blue-background rounded-full px-2 py-1 ml-auto"
                   >
-                    CHF {totalSpent.toLocaleString()} / {totalAllocated.toLocaleString()}
+                    {t("warning-cards.currency")} {totalSpent.toLocaleString()} / {totalAllocated.toLocaleString()}
                   </Badge>
                 </div>
               );
             })
           ) : (
-            <p className="text-muted-foreground text-sm italic">No warnings. Your budget is healthy!</p>
+            <p className="text-muted-foreground text-sm italic">{t("warning-cards.no-warnings")}</p>
           )}
         </CardContent>
       </Card>

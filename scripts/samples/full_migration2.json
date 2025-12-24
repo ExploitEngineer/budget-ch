@@ -1,0 +1,390 @@
+{
+    "accounts": [
+        {
+            "name": "Checking",
+            "type": "checking",
+            "balance": 2450.5,
+            "iban": "CH12 3456 7890 1234 5",
+            "note": "Main household account"
+        },
+        {
+            "name": "Savings",
+            "type": "savings",
+            "balance": 15000,
+            "iban": null,
+            "note": "High yield savings"
+        },
+        {
+            "name": "Credit Card",
+            "type": "credit-card",
+            "balance": -350.25,
+            "iban": null,
+            "note": "Visa ending in 4455"
+        },
+        {
+            "name": "Cash",
+            "type": "cash",
+            "balance": 120,
+            "iban": null,
+            "note": "Physical wallet"
+        },
+        {
+            "name": "Retirement 3a",
+            "type": "savings",
+            "balance": 5500,
+            "iban": null,
+            "note": "Pillar 3a account"
+        },
+        {
+            "name": "Business",
+            "type": "checking",
+            "balance": 3200,
+            "iban": null,
+            "note": "Freelance income account"
+        },
+        {
+            "name": "Vacation",
+            "type": "savings",
+            "balance": 800,
+            "iban": null,
+            "note": "Dedicated travel fund"
+        },
+        {
+            "name": "Emergency",
+            "type": "savings",
+            "balance": 5000,
+            "iban": null,
+            "note": "Rainy day fund"
+        }
+    ],
+    "budgets": [
+        {
+            "category": "Leisure",
+            "allocated": 150,
+            "ist": 10,
+            "warning": 80,
+            "color": "orange"
+        },
+        {
+            "category": "Groceries",
+            "allocated": 600,
+            "ist": 50,
+            "warning": 80,
+            "color": "orange"
+        },
+        {
+            "category": "Education",
+            "allocated": 100,
+            "ist": 0,
+            "warning": 90,
+            "color": "blue"
+        },
+        {
+            "category": "Household",
+            "allocated": 100,
+            "ist": 5,
+            "warning": 80,
+            "color": "std"
+        },
+        {
+            "category": "Transport",
+            "allocated": 150,
+            "ist": 0,
+            "warning": 90,
+            "color": "std"
+        },
+        {
+            "category": "Restaurant",
+            "allocated": 200,
+            "ist": 20,
+            "warning": 80,
+            "color": "orange"
+        },
+        {
+            "category": "Health",
+            "allocated": 50,
+            "ist": 0,
+            "warning": 95,
+            "color": "green"
+        },
+        {
+            "category": "Rent",
+            "allocated": 1200,
+            "ist": 0,
+            "warning": 95,
+            "color": "red"
+        }
+    ],
+    "transactions": [
+        {
+            "date": "21/12/2025",
+            "category": "—",
+            "account": "Cash",
+            "amount": 10,
+            "type": "transfer",
+            "source": "—",
+            "note": "Deposit"
+        },
+        {
+            "date": "20/12/2025",
+            "category": "Health",
+            "account": "Credit Card",
+            "amount": 15,
+            "type": "expense",
+            "source": "Pharmacy",
+            "note": "Medicine"
+        },
+        {
+            "date": "18/12/2025",
+            "category": "Household",
+            "account": "Checking",
+            "amount": 120,
+            "type": "expense",
+            "source": "IKEA",
+            "note": "New cushions"
+        },
+        {
+            "date": "17/12/2025",
+            "category": "—",
+            "account": "Checking",
+            "amount": 45,
+            "type": "transfer",
+            "source": "—",
+            "note": "Expense reimbursement"
+        },
+        {
+            "date": "15/12/2025",
+            "category": "Transport",
+            "account": "Credit Card",
+            "amount": 8.5,
+            "type": "expense",
+            "source": "SBB",
+            "note": "Train ticket"
+        },
+        {
+            "date": "14/12/2025",
+            "category": "—",
+            "account": "Savings",
+            "amount": 300,
+            "type": "transfer",
+            "source": "—",
+            "note": "Unexpected bill"
+        },
+        {
+            "date": "12/12/2025",
+            "category": "Groceries",
+            "account": "Checking",
+            "amount": 32.4,
+            "type": "expense",
+            "source": "Migros",
+            "note": "Quick snack"
+        },
+        {
+            "date": "11/12/2025",
+            "category": "—",
+            "account": "Checking",
+            "amount": 50,
+            "type": "transfer",
+            "source": "—",
+            "note": "Safety net"
+        },
+        {
+            "date": "10/12/2025",
+            "category": "Restaurant",
+            "account": "Credit Card",
+            "amount": 65,
+            "type": "expense",
+            "source": "Pizza Palace",
+            "note": "Dinner with friends"
+        },
+        {
+            "date": "08/12/2025",
+            "category": "—",
+            "account": "Credit Card",
+            "amount": 350,
+            "type": "transfer",
+            "source": "—",
+            "note": "Repayment"
+        },
+        {
+            "date": "06/12/2025",
+            "category": "—",
+            "account": "Checking",
+            "amount": 100,
+            "type": "transfer",
+            "source": "—",
+            "note": "Travel fund"
+        },
+        {
+            "date": "05/12/2025",
+            "category": "Rent",
+            "account": "Checking",
+            "amount": 1200,
+            "type": "expense",
+            "source": "Apartment Management",
+            "note": "Monthly rent"
+        },
+        {
+            "date": "04/12/2025",
+            "category": "—",
+            "account": "Checking",
+            "amount": 200,
+            "type": "transfer",
+            "source": "—",
+            "note": "Atm withdrawal"
+        },
+        {
+            "date": "03/12/2025",
+            "category": "—",
+            "account": "Checking",
+            "amount": 500,
+            "type": "transfer",
+            "source": "—",
+            "note": "Monthly savings"
+        },
+        {
+            "date": "02/12/2025",
+            "category": "Salary",
+            "account": "Checking",
+            "amount": 5000,
+            "type": "income",
+            "source": "Employer",
+            "note": "Monthly paycheck"
+        },
+        {
+            "date": "01/12/2025",
+            "category": "Groceries",
+            "account": "Checking",
+            "amount": 45.5,
+            "type": "expense",
+            "source": "Coop",
+            "note": "Weekly groceries"
+        }
+    ],
+    "saving-goals": [
+        {
+            "name": "Emergency Fund",
+            "goal": 10000,
+            "saved": 5000,
+            "monthlyAllocation": 100,
+            "account": null,
+            "dueDate": null
+        },
+        {
+            "name": "Home Deposit",
+            "goal": 100000,
+            "saved": 15000,
+            "monthlyAllocation": 1000,
+            "account": null,
+            "dueDate": "2028-01-01"
+        },
+        {
+            "name": "New Car",
+            "goal": 25000,
+            "saved": 5000,
+            "monthlyAllocation": 500,
+            "account": null,
+            "dueDate": "2026-12-31"
+        },
+        {
+            "name": "Vacation 2026",
+            "goal": 5000,
+            "saved": 1200,
+            "monthlyAllocation": 200,
+            "account": null,
+            "dueDate": "2026-06-15"
+        },
+        {
+            "name": "Insurance Premium",
+            "goal": 1200,
+            "saved": 600,
+            "monthlyAllocation": 60,
+            "account": null,
+            "dueDate": "2026-01-01"
+        },
+        {
+            "name": "Christmas Gifts",
+            "goal": 1000,
+            "saved": 200,
+            "monthlyAllocation": 20,
+            "account": null,
+            "dueDate": "2025-12-15"
+        },
+        {
+            "name": "Furniture",
+            "goal": 2000,
+            "saved": 300,
+            "monthlyAllocation": 50,
+            "account": null,
+            "dueDate": "2025-10-01"
+        },
+        {
+            "name": "New Laptop",
+            "goal": 1500,
+            "saved": 800,
+            "monthlyAllocation": 100,
+            "account": null,
+            "dueDate": "2025-09-20"
+        }
+    ],
+    "transfers": [
+        {
+            "date": "2025-12-21",
+            "from": "Cash",
+            "to": "Checking",
+            "amount": 10,
+            "note": "Deposit"
+        },
+        {
+            "date": "2025-12-17",
+            "from": "Checking",
+            "to": "Business",
+            "amount": 45,
+            "note": "Expense reimbursement"
+        },
+        {
+            "date": "2025-12-14",
+            "from": "Savings",
+            "to": "Checking",
+            "amount": 300,
+            "note": "Unexpected bill"
+        },
+        {
+            "date": "2025-12-11",
+            "from": "Checking",
+            "to": "Emergency",
+            "amount": 50,
+            "note": "Safety net"
+        },
+        {
+            "date": "2025-12-08",
+            "from": "Credit Card",
+            "to": "Checking",
+            "amount": 350,
+            "note": "Repayment"
+        },
+        {
+            "date": "2025-12-06",
+            "from": "Checking",
+            "to": "Vacation",
+            "amount": 100,
+            "note": "Travel fund"
+        },
+        {
+            "date": "2025-12-04",
+            "from": "Checking",
+            "to": "Cash",
+            "amount": 200,
+            "note": "Atm withdrawal"
+        },
+        {
+            "date": "2025-12-03",
+            "from": "Checking",
+            "to": "Savings",
+            "amount": 500,
+            "note": "Monthly savings"
+        }
+    ],
+    "exportedAt": "2025-12-24T09:31:49.470Z",
+    "version": "1.0"
+}

@@ -33,6 +33,8 @@ export interface BudgetRow {
   progress: number; // Computed: ((spent + ist) / allocated) * 100
   warningThreshold: number | null;
   colorMarker: string | null;
+  month?: number;
+  year?: number;
 }
 
 /**
@@ -63,6 +65,7 @@ export interface TransactionRow {
   note: string;
   amount: number;
   accountId?: string | null;
+  account?: string | null;
   destinationAccountId?: string | null;
   recurringTemplateId?: string | null;
   isRecurring?: boolean;
