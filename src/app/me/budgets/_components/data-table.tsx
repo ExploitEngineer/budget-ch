@@ -96,6 +96,19 @@ export function BudgetDataTable() {
   const available = amounts?.available ?? null;
 
   const [warnFilter, setWarnFilter] = useState<string | null>(null);
+  const [periodFilter, setPeriodFilter] = useState<"month" | "week">("month");
+
+  // Fetch transactions for weekly calculation
+  const { data: transactionsData } = useQuery({
+    queryKey: ["transactions", hubId],
+    queryFn: async () => {
+      if (!hubId) return [];
+      const { getTransactions } = await import("@/lib/api");
+      const res = await getTransactions(hubId);
+      return res.data ?? [];
+    },
+    enabled: !!hubId && periodFilter === "week",
+  });
 
   const budgetDataTableHeadings: string[] = [
     t("data-table.headings.category"),
@@ -110,16 +123,49 @@ export function BudgetDataTable() {
   const filteredBudgets = useMemo(() => {
     if (!budgets) return [];
 
-    if (warnFilter === "warn-80") {
-      return budgets.filter((b) => b.progress >= 80 && b.progress < 90);
-    } else if (warnFilter === "warn-90") {
-      return budgets.filter((b) => b.progress >= 90 && b.progress < 100);
-    } else if (warnFilter === "warn-100") {
-      return budgets.filter((b) => b.progress >= 100);
+    let processedBudgets = [...budgets];
+
+    // If week filter is active, recalculate spent from transactions
+    if (periodFilter === "week" && transactionsData) {
+      const { startOfWeek, endOfWeek } = require("date-fns");
+      const now = new Date();
+      const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
+      const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+      // Calculate weekly spent per category
+      const weeklySpentByCategory = new Map<string, number>();
+
+      transactionsData.forEach((tx: any) => {
+        const txDate = new Date(tx.createdAt);
+        if (txDate >= weekStart && txDate <= weekEnd && tx.type === "expense" && tx.categoryName) {
+          const current = weeklySpentByCategory.get(tx.categoryName) || 0;
+          weeklySpentByCategory.set(tx.categoryName, current + Number(tx.amount));
+        }
+      });
+
+      // Update budgets with weekly spent
+      processedBudgets = budgets.map((b) => {
+        const weeklySpent = weeklySpentByCategory.get(b.category) || 0;
+        return {
+          ...b,
+          spent: weeklySpent,
+          remaining: (b.allocated ?? 0) - weeklySpent,
+          progress: b.allocated ? Math.min((weeklySpent / b.allocated) * 100, 100) : 0,
+        };
+      });
     }
 
-    return budgets;
-  }, [budgets, warnFilter]);
+    // Apply warning filter
+    if (warnFilter === "warn-80") {
+      return processedBudgets.filter((b) => b.progress >= 80 && b.progress < 90);
+    } else if (warnFilter === "warn-90") {
+      return processedBudgets.filter((b) => b.progress >= 90 && b.progress < 100);
+    } else if (warnFilter === "warn-100") {
+      return processedBudgets.filter((b) => b.progress >= 100);
+    }
+
+    return processedBudgets;
+  }, [budgets, warnFilter, periodFilter, transactionsData]);
 
   return (
     <section>
@@ -148,13 +194,13 @@ export function BudgetDataTable() {
             >
               {t("data-table.buttons.export")}
             </Button>
-            {/* <Button
+            <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
               onClick={() => setWarnFilter(null)}
             >
               {t("data-table.buttons.reset")}
-            </Button> */}
+            </Button>
           </div>
         </CardHeader>
 
@@ -251,6 +297,8 @@ export function BudgetDataTable() {
           <ToggleGroup
             className="dark:border-border-blue bg-dark-blue-background border"
             type="single"
+            value={periodFilter}
+            onValueChange={(val) => val && setPeriodFilter(val as "month" | "week")}
           >
             <ToggleGroupItem value="month" aria-label="toggle-month">
               {t("data-table.toggle-groups.month")}
