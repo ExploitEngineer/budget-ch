@@ -148,13 +148,13 @@ export function BudgetDataTable() {
             >
               {t("data-table.buttons.export")}
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
               onClick={() => setWarnFilter(null)}
             >
               {t("data-table.buttons.reset")}
-            </Button>
+            </Button> */}
           </div>
         </CardHeader>
 
