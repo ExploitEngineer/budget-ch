@@ -133,14 +133,14 @@ export function DataPrivacy() {
       const { error } = await authClient.deleteUser();
 
       if (error) {
-        toast.error(error?.message || "Error deleting user");
+        toast.error(error?.message || t("messages.delete-error"));
         return;
       }
 
       router.push("/goodbye");
     } catch (err: any) {
       console.error(err);
-      toast.error(err.message || "Unexpected error occurred");
+      toast.error(err.message || t("messages.unexpected-error"));
     } finally {
       setLoading(false);
       setConfirmOpen(false);
@@ -188,12 +188,11 @@ export function DataPrivacy() {
 
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Confirm Account Deletion</DialogTitle>
+                    <DialogTitle>{t("delete-dialog.title")}</DialogTitle>
                   </DialogHeader>
 
                   <p className="text-muted-foreground mb-4 text-sm">
-                    Are you sure you want to delete your account? This action is
-                    permanent and cannot be undone.
+                    {t("delete-dialog.description")}
                   </p>
 
                   <DialogFooter className="flex justify-end gap-2">
@@ -202,14 +201,14 @@ export function DataPrivacy() {
                       className="cursor-pointer"
                       onClick={(): void => setConfirmOpen(false)}
                     >
-                      Cancel
+                      {t("delete-dialog.cancel")}
                     </Button>
                     <Button
                       className="cursor-pointer bg-[#EF4444] text-white transition-all duration-300 dark:hover:bg-red-600"
                       onClick={handleAccountDelete}
                       disabled={loading}
                     >
-                      {loading ? <Spinner /> : "Delete Account"}
+                      {loading ? <Spinner /> : t("delete-dialog.confirm")}
                     </Button>
                   </DialogFooter>
                 </DialogContent>

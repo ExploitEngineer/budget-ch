@@ -28,6 +28,7 @@ export function AnalysisTable({
   initialTo?: string;
 }) {
   const t = useTranslations("main-dashboard.report-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -210,7 +211,7 @@ export function AnalysisTable({
                       <div className="flex items-center justify-between">
                         <h3>{data.category}</h3>
                         <h3>
-                          CHF{" "}
+                          {commonT("currency")}{" "}
                           {data.amount.toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                           })}

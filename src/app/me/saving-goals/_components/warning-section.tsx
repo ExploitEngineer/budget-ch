@@ -50,14 +50,14 @@ export function WarningSection() {
               onClick={() => setShowAll(!showAll)}
               className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
             >
-              {showAll ? "Hide All" : "Show All"}
+              {showAll ? t("hide-all") : t("show-all")}
             </Button>
           )}
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="pt-4">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-muted-foreground">{t("loading")}</p>
           ) : !hasWarnings ? (
             <Badge
               variant="outline"
@@ -77,7 +77,7 @@ export function WarningSection() {
                     <div className="flex flex-col">
                       <span className="font-semibold">{goal.name}</span>
                       <span className="text-xs opacity-90">
-                        Due: {new Date(goal.dueDate!).toLocaleDateString()}
+                        {t("due")}{new Date(goal.dueDate!).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -89,13 +89,13 @@ export function WarningSection() {
                       ).toFixed(1)}
                       %
                     </div>
-                    <div className="text-xs opacity-80">Funded</div>
+                    <div className="text-xs opacity-80">{t("active-goals-section.cards.tax-reserves.content.funded")}</div>
                   </div>
                 </div>
               ))}
               {!showAll && overdueGoals.length > 3 && (
                 <p className="text-center text-xs text-muted-foreground">
-                  ...and {overdueGoals.length - 3} more overdue goals
+                  {t("more-overdue", { count: overdueGoals.length - 3 })}
                 </p>
               )}
             </div>

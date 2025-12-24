@@ -19,6 +19,7 @@ import type { CardsContent } from "@/lib/types/common-types";
 
 export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.budgets-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
@@ -34,7 +35,7 @@ export function BudgetCardsSection() {
       if (!hubId) return null;
       const res = await getBudgetsAmounts(hubId, month, year);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch budget amounts");
+        throw new Error(res.message || commonT("error-loading"));
       }
       return res.data;
     },
@@ -51,7 +52,7 @@ export function BudgetCardsSection() {
       if (!hubId) return [];
       const res = await getBudgets(hubId, month, year);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch budgets");
+        throw new Error(res.message || commonT("error-loading"));
       }
       return res.data ?? [];
     },
@@ -68,7 +69,7 @@ export function BudgetCardsSection() {
       if (!hubId) return 0;
       const res = await getCategoriesCount(hubId);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch categories count");
+        throw new Error(res.message || commonT("error-loading"));
       }
       return Number(res.data?.count ?? 0);
     },
@@ -92,17 +93,17 @@ export function BudgetCardsSection() {
   const cards: CardsContent[] = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${allocated?.toLocaleString() ?? "—"}`,
+      content: `${commonT("currency")} ${allocated?.toLocaleString() ?? "—"}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${spent?.toLocaleString() ?? "—"}`,
+      content: `${commonT("currency")} ${spent?.toLocaleString() ?? "—"}`,
       badge: percent.toFixed(0) + "% " + t("cards.card-2.badge"),
     },
     {
       title: (available ?? 0) < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
-      content: `CHF ${available?.toLocaleString() ?? "—"}`,
+      content: `${commonT("currency")} ${available?.toLocaleString() ?? "—"}`,
       badge: (available ?? 0) < 0
         ? `${Math.ceil(Math.abs(percent - 100))}% ` + t("cards.card-3.badge-over")
         : `+${(100 - percent).toFixed(0)}% ` + t("cards.card-3.badge"),
@@ -110,13 +111,13 @@ export function BudgetCardsSection() {
     {
       title: t("cards.card-4.title"),
       content: categoriesLoading
-        ? "..."
+        ? commonT("loading")
         : categoriesError
           ? "—"
           : String(categoriesCount ?? "—"),
       badge:
         budgetsLoading || categoriesLoading
-          ? "..."
+          ? commonT("loading")
           : `${t("cards.card-4.badge")}: ${warningCount ?? 0}`,
     },
   ];
@@ -133,7 +134,7 @@ export function BudgetCardsSection() {
           </CardHeader>
           <CardContent>
             <h1 className="text-2xl font-bold">
-              {amountsLoading ? "..." : amountsError ? "—" : card.content}
+              {amountsLoading ? commonT("loading") : amountsError ? "—" : card.content}
             </h1>
           </CardContent>
           <CardFooter className="mt-2">

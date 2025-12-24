@@ -23,30 +23,30 @@ export const metadata: Metadata = {
   description: "Budget Calculator for Switzerland",
 };
 
-export default function RootLayout({  
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <QueryProvider>
-        <NextIntlClientProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <PreferencesSync />
-            <BrowserNotificationPrompt />
-            <>{children}</>
-            <Toaster position="top-center" richColors />
-          </ThemeProvider>
-        </NextIntlClientProvider>
+          <NextIntlClientProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <PreferencesSync />
+              <BrowserNotificationPrompt />
+              <>{children}</>
+              <Toaster position="top-center" richColors />
+            </ThemeProvider>
+          </NextIntlClientProvider>
         </QueryProvider>
       </body>
     </html>

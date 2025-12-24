@@ -55,7 +55,7 @@ export default function CreateCategoryDialog({
     if (!newCategory) return;
 
     if (!hubId) {
-      toast.error("Hub ID is required");
+      toast.error(t("dialog-box.messages.id-required"));
       return;
     }
 
@@ -63,25 +63,25 @@ export default function CreateCategoryDialog({
 
     try {
       const result = await createTransactionCategory(newCategory, hubId);
-      
+
       if (!result.success) {
         if (result.reason === "DUPLICATE_CATEGORY") {
-          toast.error(`Category "${newCategory}" already exists`);
+          toast.error(t("dialog-box.messages.category-exists", { name: newCategory }));
         } else {
-          toast.error(result.message || "Something went wrong while adding category.");
+          toast.error(result.message || t("common.error"));
         }
         setIsLoading(false);
         return;
       }
 
       onCategoryAddedAction(newCategory);
-      toast.success(`Category "${newCategory}" added`);
+      toast.success(t("dialog-box.messages.category-added", { name: newCategory }));
       onOpenChangeAction(false);
       form.reset();
       setIsLoading(false);
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong while adding category.");
+      toast.error(t("common.error"));
       setIsLoading(false);
     }
   }
@@ -117,7 +117,7 @@ export default function CreateCategoryDialog({
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="e.g. groceries, bills..."
+                      placeholder={t("dialog-box.placeholders.category-name")}
                       disabled={isLoading}
                     />
                   </FormControl>

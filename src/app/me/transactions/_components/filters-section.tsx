@@ -50,6 +50,7 @@ interface FiltersSectionProps {
 
 export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
@@ -153,7 +154,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
                                   ? format(field.value, "dd/MM/yyyy")
-                                  : "Pick a date"}
+                                  : t("transaction-edit-dialog.dialog.placeholders.pick-date")}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -185,7 +186,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
                                   ? format(field.value, "dd/MM/yyyy")
-                                  : "Pick a date"}
+                                  : t("transaction-edit-dialog.dialog.placeholders.pick-date")}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -216,7 +217,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                             }}
                           >
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select or add a category" />
+                              <SelectValue placeholder={t("transaction-edit-dialog.dialog.placeholders.category-selector")} />
                             </SelectTrigger>
 
                             <SelectContent>
@@ -234,7 +235,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                               {availableCategories.length === 0 ? (
                                 <SelectItem value="none" disabled>
                                   {categoriesLoading
-                                    ? t("loading")
+                                    ? commonT("loading")
                                     : t("labels.category.data.no-category")}
                                 </SelectItem>
                               ) : (
@@ -260,7 +261,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     name="amountMin"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Min (CHF)</FormLabel>
+                        <FormLabel>Min ({commonT("currency")})</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -279,7 +280,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     name="amountMax"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Max (CHF)</FormLabel>
+                        <FormLabel>Max ({commonT("currency")})</FormLabel>
                         <FormControl>
                           <Input
                             type="number"

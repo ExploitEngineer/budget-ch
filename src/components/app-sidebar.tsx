@@ -61,6 +61,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
                     resolvedTheme === "dark" ? "pe-10" : "pe-0",
                   )}
                   priority
+                  sizes="100vw"
                 />
               </div>
             </>
@@ -72,6 +73,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
                 fill
                 className="m-0 object-cover p-0"
                 priority
+                sizes="30px"
               />
             </div>
           )}

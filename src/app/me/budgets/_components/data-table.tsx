@@ -36,6 +36,7 @@ import { mapBudgetsToRows } from "../budget-adapters";
 
 export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
@@ -55,7 +56,7 @@ export function BudgetDataTable() {
       }
       const res = await getBudgets(hubId, month, year);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch budgets");
+        throw new Error(res.message || t("data-table.error-loading"));
       }
       return res.data ?? [];
     },
@@ -71,6 +72,7 @@ export function BudgetDataTable() {
   const {
     data: amounts,
     isLoading: amountsLoading,
+    error: amountsError,
   } = useQuery({
     queryKey: budgetKeys.amounts(hubId, month, year),
     queryFn: async () => {
@@ -79,21 +81,17 @@ export function BudgetDataTable() {
       }
       const res = await getBudgetsAmounts(hubId, month, year);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch budget amounts");
+        throw new Error(res.message || t("data-table.error-loading"));
       }
-      const totalAllocated = res.data?.totalAllocated ?? 0;
-      const totalSpent = res.data?.totalSpent ?? 0;
-      return {
-        allocated: totalAllocated,
-        spent: totalSpent,
-        available: totalAllocated - totalSpent,
-      };
+      return res.data;
     },
     enabled: !!hubId,
   });
 
-  const allocated = amounts?.allocated ?? null;
-  const available = amounts?.available ?? null;
+  const allocated = amounts?.totalAllocated ?? null;
+  const available = (amounts?.totalAllocated !== undefined && amounts?.totalSpent !== undefined)
+    ? amounts.totalAllocated - amounts.totalSpent
+    : null;
 
   const [warnFilter, setWarnFilter] = useState<string | null>(null);
   const [periodFilter, setPeriodFilter] = useState<"month" | "week">("month");
@@ -178,8 +176,8 @@ export function BudgetDataTable() {
               variant="outline"
             >
               {t("data-table.total-budget")}
-              {allocated ?? "..."} • {t("data-table.rest-budget")}
-              {available ?? "..."}
+              {commonT("currency")} {allocated?.toLocaleString() ?? commonT("loading")} • {t("data-table.rest-budget")}
+              {commonT("currency")} {available?.toLocaleString() ?? commonT("loading")}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
@@ -228,13 +226,13 @@ export function BudgetDataTable() {
               ) : budgetsLoading || budgets === undefined ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center">
-                    Loading...
+                    {commonT("loading")}
                   </TableCell>
                 </TableRow>
               ) : filteredBudgets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-gray-400">
-                    No Budgets Found
+                    {t("data-table.no-budgets")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -258,10 +256,10 @@ export function BudgetDataTable() {
                           {row.category}
                         </div>
                       </TableCell>
-                      <TableCell>{row.allocated !== null ? row.allocated : "—"}</TableCell>
-                      <TableCell>{row.ist !== null ? row.ist : "—"}</TableCell>
-                      <TableCell>{row.spent}</TableCell>
-                      <TableCell>{row.allocated !== null ? row.remaining : "—"}</TableCell>
+                      <TableCell>{row.allocated !== null ? row.allocated.toLocaleString() : "—"}</TableCell>
+                      <TableCell>{row.ist !== null ? row.ist.toLocaleString() : "—"}</TableCell>
+                      <TableCell>{row.spent.toLocaleString()}</TableCell>
+                      <TableCell>{row.allocated !== null ? row.remaining.toLocaleString() : "—"}</TableCell>
                       <TableCell>
                         <Progress
                           value={row.progress}
@@ -273,13 +271,13 @@ export function BudgetDataTable() {
                         {row.id ? (
                           <EditBudgetDialog
                             variant="outline"
-                            text="Edit"
+                            text={t("data-table.edit")}
                             budget={domainBudget}
                           />
                         ) : (
                           <CreateBudgetDialog
                             variant="outline"
-                            text="Set Budget"
+                            text={t("data-table.set-budget")}
                             defaultCategory={row.category}
                           />
                         )}

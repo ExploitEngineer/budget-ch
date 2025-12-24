@@ -88,7 +88,7 @@ export function Import() {
         await runValidation(processedData);
       } catch (err) {
         console.error("Invalid JSON:", err);
-        toast.error("Invalid JSON file");
+        toast.error(t("errors.invalid-json"));
       }
     } else if (file.name.endsWith(".csv")) {
       Papa.parse(file, {
@@ -103,12 +103,12 @@ export function Import() {
         },
         error: (error) => {
           console.error("CSV parse error:", error);
-          toast.error("Error parsing CSV");
+          toast.error(t("errors.parse-csv"));
         },
       });
     } else {
       console.warn("Unsupported file type");
-      toast.error("Unsupported file type. Please use .csv or .json");
+      toast.error(t("errors.unsupported-file"));
     }
   };
 
@@ -142,7 +142,7 @@ export function Import() {
         setValidationReport(report);
       }
     } catch (err) {
-      toast.error("Validation failed");
+      toast.error(t("errors.validation-failed"));
     } finally {
       setIsValidating(false);
     }
@@ -177,12 +177,12 @@ export function Import() {
 
   const handleImport = async () => {
     if (!currentImport.data || currentImport.data.length === 0) {
-      toast.error("Please select a file first");
+      toast.error(t("errors.select-file-first"));
       return;
     }
 
     if (!hubId) {
-      toast.error("Hub ID not found");
+      toast.error(t("errors.hub-not-found"));
       return;
     }
 
@@ -203,7 +203,7 @@ export function Import() {
       );
 
       if (result.success) {
-        toast.success(`Successfully imported ${result.data?.count ?? 0} items!`);
+        toast.success(t("messages.import-success", { count: result.data?.count ?? 0 }));
         setImports({});
         setValidationReport(null);
         setAutoCreateAccounts(false);
@@ -301,7 +301,7 @@ export function Import() {
           {isValidating && (
             <div className="mt-6 flex items-center justify-center p-4 border rounded-lg border-dashed">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              <span>Validating data...</span>
+              <span>{t("validating")}</span>
             </div>
           )}
 
@@ -479,16 +479,16 @@ export function Import() {
           {/* --- DATA PREVIEW --- */}
           {currentImport.data && currentImport.data.length > 0 && !validationReport && (
             <div className="dark:bg-dark-blue-background mt-6 max-h-64 overflow-auto rounded-md bg-white p-4">
-              <h4 className="mb-2 font-semibold">Preview:</h4>
+              <h4 className="mb-2 font-semibold">{t("preview")}</h4>
               <pre className="text-xs whitespace-pre-wrap">
                 {JSON.stringify(currentImport.data.slice(0, 5), null, 2)}
-                {currentImport.data.length > 5 && `\n... and ${currentImport.data.length - 5} more rows`}
+                {currentImport.data.length > 5 && `\n${t("more-rows", { count: currentImport.data.length - 5 })}`}
               </pre>
             </div>
           )}
 
           <p className="mt-2 text-xs text-gray-500 italic">
-            Imported as: {selectedType}
+            {t("imported-as", { type: selectedType })}
           </p>
 
           <Button
@@ -505,12 +505,12 @@ export function Import() {
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Importing...
+                {t("importing")}
               </>
             ) : !autoCreateAccounts && (validationReport?.missingAccounts.length ?? 0) > 0 ? (
               t("create-missing-button")
             ) : (
-              "Start Import"
+              t("start-import")
             )}
           </Button>
         </CardContent>

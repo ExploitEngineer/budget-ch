@@ -24,6 +24,7 @@ import { useMemo } from "react";
 
 export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
@@ -102,7 +103,7 @@ export function RecentTransactionsTableSection() {
                       <TableCell>{tx.recipient}</TableCell>
                       <TableCell>{tx.category}</TableCell>
                       <TableCell>{tx.note}</TableCell>
-                      <TableCell>{`CHF ${tx.amount}`}</TableCell>
+                      <TableCell>{`${commonT("currency")} ${tx.amount}`}</TableCell>
                     </TableRow>
                   ))
                 ) : (

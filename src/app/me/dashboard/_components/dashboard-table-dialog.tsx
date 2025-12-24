@@ -67,6 +67,7 @@ export default function DashboardTableAdjustDialog({
   const t = useTranslations(
     "main-dashboard.dashboard-page.dashbaord-table-adjust-dialog",
   );
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
@@ -135,11 +136,11 @@ export default function DashboardTableAdjustDialog({
       queryClient.invalidateQueries({
         queryKey: ["recurring-template", templateId],
       });
-      toast.success("Recurring transaction updated successfully!");
+      toast.success(t("dialog.messages.success"));
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update recurring transaction");
+      toast.error(error.message || t("dialog.messages.error"));
     },
   });
 
@@ -183,7 +184,7 @@ export default function DashboardTableAdjustDialog({
           <div className="py-8 text-center text-red-500">
             {templateError instanceof Error
               ? templateError.message
-              : "Failed to load template"}
+              : t("dialog.messages.load-error")}
           </div>
         ) : templateData ? (
           <div className="space-y-6">
@@ -206,7 +207,7 @@ export default function DashboardTableAdjustDialog({
                     {t("dialog.labels.amount")}
                   </p>
                   <p className="text-sm font-medium">
-                    CHF {templateData.amount.toFixed(2)}
+                    {commonT("currency")} {templateData.amount.toFixed(2)}
                   </p>
                 </div>
               </div>

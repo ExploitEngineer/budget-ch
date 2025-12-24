@@ -8,12 +8,14 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 type StatusType = "pending" | "accepted" | "error";
 
 export default function AcceptInvitationPage() {
   const router = useRouter();
   const token = useSearchParams().get("token");
+  const t = useTranslations("public-pages.accept-invitation");
 
   const [status, setStatus] = useState<StatusType>("pending");
   const [countdown, setCountdown] = useState<number>(3);
@@ -29,7 +31,7 @@ export default function AcceptInvitationPage() {
       const res = await acceptHubInvitation(token);
 
       if (res.success && res.data?.hubId) {
-        toast.success("Invitation accepted!");
+        toast.success(t("success.toast"));
         setStatus("accepted");
         setAcceptedHubId(res.data.hubId);
 
@@ -41,7 +43,7 @@ export default function AcceptInvitationPage() {
           }, 2000)
         } catch (err) {
           console.error("Failed to set hub cookie:", err);
-          toast.error("Invitation accepted but failed to set active hub");
+          toast.error(t("error.set-hub-failed"));
           setStatus("error");
         }
       } else {
@@ -51,7 +53,7 @@ export default function AcceptInvitationPage() {
     };
 
     run();
-  }, [token, router]);
+  }, [token, router, t]);
 
   const renderContent = () => {
     switch (status) {
@@ -59,7 +61,7 @@ export default function AcceptInvitationPage() {
         return (
           <div className="flex flex-col items-center gap-4">
             <Spinner className="h-10 w-10" />
-            <p className="text-gray-500">Processing your invitation...</p>
+            <p className="text-gray-500">{t("pending")}</p>
           </div>
         );
 
@@ -68,11 +70,10 @@ export default function AcceptInvitationPage() {
           <div className="flex flex-col items-center gap-4">
             <CheckCircle className="h-12 w-12 text-green-500" />
             <h2 className="text-lg font-semibold text-green-600">
-              Invitation Accepted!
+              {t("success.title")}
             </h2>
             <p className="text-gray-600">
-              Redirecting to your dashboard in {countdown}{" "}
-              {countdown === 1 ? "second" : "seconds"}...
+              {t("success.redirecting", { countdown })}
             </p>
             <Button
               variant="outline"
@@ -86,7 +87,7 @@ export default function AcceptInvitationPage() {
               }}
               className="mt-2"
             >
-              Go Now
+              {t("success.button")}
             </Button>
           </div>
         );
@@ -96,10 +97,10 @@ export default function AcceptInvitationPage() {
           <div className="flex flex-col items-center gap-4">
             <XCircle className="h-12 w-12 text-red-500" />
             <h2 className="text-lg font-semibold text-red-600">
-              Invalid or Expired Invitation
+              {t("error.title")}
             </h2>
             <p className="text-gray-600">
-              The invitation link is not valid or has already expired.
+              {t("error.description")}
             </p>
           </div>
         );

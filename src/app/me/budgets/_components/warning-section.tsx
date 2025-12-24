@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 
 export function WarningSection() {
   const t = useTranslations("main-dashboard.budgets-page.warning-section");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
@@ -53,7 +54,7 @@ export function WarningSection() {
         <CardContent className="flex flex-wrap items-center gap-2">
           {isLoading ? (
             <p className="text-sm text-muted-foreground italic">
-              {t("loading") || "Checking for warnings..."}
+              {t("loading")}
             </p>
           ) : warnings && warnings.length > 0 ? (
             warnings.map((w) => {
@@ -78,13 +79,13 @@ export function WarningSection() {
                   )}
                   variant="outline"
                 >
-                  {w.categoryName}: {percent.toFixed(0)}% (CHF {totalSpent})
+                  {w.categoryName}: {percent.toFixed(0)}% ({commonT("currency")} {totalSpent})
                 </Badge>
               );
             })
           ) : (
             <p className="text-sm text-muted-foreground italic">
-              {t("no-warnings") || "Your budget is looking healthy! No warnings."}
+              {t("no-warnings")}
             </p>
           )}
         </CardContent>

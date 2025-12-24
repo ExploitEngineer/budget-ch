@@ -17,6 +17,7 @@ import { transferKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useSearchParams } from "next/navigation";
+import { format } from "date-fns";
 
 export interface TransferData {
   date: string;
@@ -30,6 +31,7 @@ export function LatestTransfers() {
   const t = useTranslations(
     "main-dashboard.content-page.latest-tranfers-section",
   );
+  const commonT = useTranslations("common");
 
   const { exportTransfers } = useExportCSV();
   const searchParams = useSearchParams();
@@ -55,7 +57,7 @@ export function LatestTransfers() {
   const transfers = data?.data;
   const apiMessage = data?.message;
 
-  const error = queryError ? (queryError instanceof Error ? queryError.message : "Failed to load transfers") : null;
+  const error = queryError ? (queryError instanceof Error ? queryError.message : t("error-loading")) : null;
 
   const tableHeadings: string[] = [
     t("data-table.headings.date"),
@@ -69,7 +71,7 @@ export function LatestTransfers() {
     return (
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader>
-          <CardTitle>Loading Data...</CardTitle>
+          <CardTitle>{commonT("loading")}</CardTitle>
         </CardHeader>
       </Card>
     );
@@ -117,12 +119,12 @@ export function LatestTransfers() {
               {(transfers ?? []).map((tx, index) => (
                 <TableRow key={index} className="dark:border-border-blue">
                   <TableCell>
-                    {new Date(tx.date).toLocaleDateString("en-US")}
+                    {format(new Date(tx.date), "dd.MM.yyyy")}
                   </TableCell>
                   <TableCell>{tx.source}</TableCell>
                   <TableCell>{tx.destination}</TableCell>
                   <TableCell>{tx.note || "-"}</TableCell>
-                  <TableCell>CHF {tx.amount.toFixed(2)}</TableCell>
+                  <TableCell>{commonT("currency")} {tx.amount.toFixed(2)}</TableCell>
                 </TableRow>
               ))}
               {(transfers ?? []).length === 0 && (

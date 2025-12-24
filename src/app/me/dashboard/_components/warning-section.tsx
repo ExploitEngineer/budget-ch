@@ -22,12 +22,14 @@ import { getBudgets } from "@/lib/services/budget";
 import { budgetKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import { useSessionReady } from "@/hooks/use-session-ready";
 
 export function WarningSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
+  const { isSessionReady } = useSessionReady();
 
   const {
     data: upcomingTransactions,
@@ -42,7 +44,7 @@ export function WarningSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const {
@@ -58,7 +60,7 @@ export function WarningSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const upComingTableHeadings: string[] = [

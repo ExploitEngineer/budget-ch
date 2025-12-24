@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     ? parseInt(searchParams.get("year")!)
     : undefined;
 
-  const amounts = await getBudgetsAmounts(month, year);
+  const amounts = await getBudgetsAmounts(month, year, hubId);
 
   if (!amounts.success) {
     return apiError({ message: amounts.message ?? "Failed to fetch budget amounts", status: 500 });

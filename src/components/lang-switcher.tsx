@@ -1,6 +1,7 @@
 "use client";
 import { useLocale } from "next-intl";
 import { setLanguage } from "@/app/actions";
+import { setLocalUserPreferences } from "@/lib/services/locat-store";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,9 @@ export function LangSwitcher() {
   const currentLocale = useLocale();
 
   const handleLanguageChange = async (locale: string) => {
+    // Update localStorage to keep in sync with Settings page preference
+    setLocalUserPreferences({ language: locale as "en" | "fr" | "de" | "it" });
+
     const formData = new FormData();
     formData.append("locale", locale);
     formData.append("pathname", window.location.pathname);
@@ -51,6 +55,9 @@ export function LangSwitcherDefault() {
   const currentLocale = useLocale();
 
   const handleLanguageChange = async (locale: string) => {
+    // Update localStorage to keep in sync with Settings page preference
+    setLocalUserPreferences({ language: locale as "en" | "fr" | "de" | "it" });
+
     const formData = new FormData();
     formData.append("locale", locale);
     formData.append("pathname", window.location.pathname);

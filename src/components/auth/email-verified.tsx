@@ -5,9 +5,11 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function EmailVerified() {
   const params = useSearchParams();
+  const t = useTranslations("public-pages.email-verified");
 
   const error = params.get("error");
   const isSuccess = !error;
@@ -21,17 +23,16 @@ export default function EmailVerified() {
               <CheckCircle2 className="mb-4 h-16 w-16 text-green-500" />
 
               <h1 className="mb-2 text-2xl font-bold">
-                Email Verified Successfully!
+                {t("success.title")}
               </h1>
 
               <p className="text-muted-foreground mb-6 text-sm">
-                Your email has been verified. You can now access your dashboard
-                and start using all features.
+                {t("success.description")}
               </p>
 
               <Link href="/signin" className="w-full">
                 <Button className="btn-gradient w-full cursor-pointer rounded-xl py-5 font-semibold">
-                  Go to SignIn
+                  {t("success.button")}
                 </Button>
               </Link>
             </>
@@ -39,17 +40,17 @@ export default function EmailVerified() {
             <>
               <XCircle className="mb-4 h-16 w-16 text-red-500" />
 
-              <h1 className="mb-2 text-2xl font-bold">Verification Failed</h1>
+              <h1 className="mb-2 text-2xl font-bold">{t("error.title")}</h1>
 
               <p className="text-muted-foreground mb-6 text-sm">
                 {error
-                  ? "The verification link is invalid or expired."
-                  : "Something went wrong while verifying your email."}
+                  ? t("error.invalid-link")
+                  : t("error.generic")}
               </p>
 
               <Link href="/signin" className="w-full">
                 <Button className="btn-gradient w-full cursor-pointer rounded-xl py-5 font-semibold">
-                  Try Signing In Again
+                  {t("error.button")}
                 </Button>
               </Link>
             </>

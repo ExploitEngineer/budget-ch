@@ -19,13 +19,23 @@ import {
 } from "@/hooks/use-notifications";
 import { useBrowserNotifications } from "@/hooks/use-browser-notifications";
 import { formatDistanceToNow } from "date-fns";
+import { de, fr, it, enUS } from "date-fns/locale";
 import { cn } from "@/lib/utils";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+
+// Map locale codes to date-fns locales
+const dateFnsLocales: Record<string, typeof enUS> = {
+  en: enUS,
+  de: de,
+  fr: fr,
+  it: it,
+};
 
 export function NotificationsBell() {
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const t = useTranslations("notifications");
+  const currentLocale = useLocale();
 
   const { data: notifications = [], isLoading } = useNotifications({
     hubId,
@@ -74,6 +84,37 @@ export function NotificationsBell() {
     }
   };
 
+  // Map stored English titles to translation keys
+  const getTranslatedContent = (notification: { title: string; message: string; metadata?: unknown }) => {
+    // Map English titles to translation type keys
+    const titleToTypeKey: Record<string, string> = {
+      "Budget Threshold Reached": "budget-threshold-80",
+      "Budget Exceeded": "budget-exceeded",
+      "Subscription Expiring Soon": "subscription-expiring-3-days",
+      "Subscription Expiring Tomorrow": "subscription-expiring-1-day",
+      "Subscription Expired": "subscription-expired",
+    };
+
+    const typeKey = titleToTypeKey[notification.title];
+
+    if (typeKey) {
+      // Get category name from metadata if available
+      const metadata = notification.metadata as { categoryName?: string } | null;
+      const categoryName = metadata?.categoryName || "category";
+
+      return {
+        title: t(`types.${typeKey}.title`),
+        message: t(`types.${typeKey}.message`, { categoryName }),
+      };
+    }
+
+    // Fallback to original content for unknown notification types
+    return {
+      title: notification.title,
+      message: notification.message,
+    };
+  };
+
   if (!hubId) {
     return null;
   }
@@ -119,50 +160,54 @@ export function NotificationsBell() {
               {t("noNotifications")}
             </div>
           ) : (
-            notifications.map((notification) => (
-              <DropdownMenuItem
-                key={notification.id}
-                className="flex flex-col items-start gap-1 p-3 cursor-pointer"
-                onClick={() => {
-                  if (!notification.isRead && hubId) {
-                    handleMarkAsRead(notification.id);
-                  }
-                }}
-              >
-                <div className="flex items-start gap-2 w-full">
-                  <div
-                    className={cn(
-                      "h-2 w-2 rounded-full mt-1.5 flex-shrink-0",
-                      getNotificationTypeColor(notification.type),
-                      notification.isRead && "opacity-50",
-                    )}
-                  />
-                  <div className="flex-1 min-w-0">
+            notifications.map((notification) => {
+              const translated = getTranslatedContent(notification);
+              return (
+                <DropdownMenuItem
+                  key={notification.id}
+                  className="flex flex-col items-start gap-1 p-3 cursor-pointer"
+                  onClick={() => {
+                    if (!notification.isRead && hubId) {
+                      handleMarkAsRead(notification.id);
+                    }
+                  }}
+                >
+                  <div className="flex items-start gap-2 w-full">
                     <div
                       className={cn(
-                        "font-medium text-sm",
-                        notification.isRead && "text-muted-foreground",
+                        "h-2 w-2 rounded-full mt-1.5 flex-shrink-0",
+                        getNotificationTypeColor(notification.type),
+                        notification.isRead && "opacity-50",
                       )}
-                    >
-                      {notification.title}
-                    </div>
-                    <div
-                      className={cn(
-                        "text-xs text-muted-foreground mt-1",
-                        notification.isRead && "opacity-75",
-                      )}
-                    >
-                      {notification.message}
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {formatDistanceToNow(new Date(notification.createdAt), {
-                        addSuffix: true,
-                      })}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div
+                        className={cn(
+                          "font-medium text-sm",
+                          notification.isRead && "text-muted-foreground",
+                        )}
+                      >
+                        {translated.title}
+                      </div>
+                      <div
+                        className={cn(
+                          "text-xs text-muted-foreground mt-1",
+                          notification.isRead && "opacity-75",
+                        )}
+                      >
+                        {translated.message}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {formatDistanceToNow(new Date(notification.createdAt), {
+                          addSuffix: true,
+                          locale: dateFnsLocales[currentLocale] || enUS,
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </DropdownMenuItem>
-            ))
+                </DropdownMenuItem>
+              )
+            })
           )}
         </div>
       </DropdownMenuContent>

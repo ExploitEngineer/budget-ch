@@ -215,7 +215,7 @@ export function Export() {
                   key={btn.title}
                   onClick={btn.onClick}
                   variant="outline"
-                  className="!bg-dark-blue-background dark:border-border-blue text-foreground cursor-pointer"
+                  className="!bg-dark-blue-background dark:border-border-blue text-foreground cursor-pointer h-auto min-h-10 py-2 text-center whitespace-normal text-xs"
                 >
                   {btn.title}
                 </Button>
@@ -241,7 +241,7 @@ export function Export() {
                     transfers: transfers ?? [],
                   })
                 }
-                className="btn-gradient dark:text-foreground w-[38%] cursor-pointer hover:text-white"
+                className="btn-gradient dark:text-foreground w-auto cursor-pointer hover:text-white"
               >
                 {t("export-json-card.button")}
               </Button>
@@ -259,7 +259,7 @@ export function Export() {
                   key={btn.title}
                   onClick={btn.onClick}
                   variant="outline"
-                  className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl cursor-pointer border-dashed"
+                  className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl cursor-pointer border-dashed h-auto min-h-10 py-2 text-center whitespace-normal text-xs"
                 >
                   {btn.title}
                 </Button>

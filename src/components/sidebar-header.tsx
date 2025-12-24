@@ -41,20 +41,6 @@ import type { SavingGoal } from "@/lib/types/domain-types";
 import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
 import { NotificationsBell } from "@/components/notifications-bell";
 
-const monthNames: string[] = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
 
 export default function SidebarHeader({
   initialFrom,
@@ -65,6 +51,7 @@ export default function SidebarHeader({
 }) {
   const today = new Date();
   const t = useTranslations("main-dashboard");
+  const commonT = useTranslations("common");
   const [date, setDate] = useState(
     new Date(today.getFullYear(), today.getMonth()),
   );
@@ -220,7 +207,7 @@ export default function SidebarHeader({
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-center text-sm font-medium whitespace-nowrap sm:min-w-[120px]">
-              {monthNames[date.getMonth()]} {date.getFullYear()}
+              {commonT(`months.${date.getMonth()}`)} {date.getFullYear()}
             </span>
             <Button variant="ghost" size="icon" onClick={goToNextMonth}>
               <ChevronRight className="h-4 w-4" />
@@ -331,7 +318,7 @@ export default function SidebarHeader({
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <span className="text-center text-xs font-medium whitespace-nowrap sm:text-sm">
-            {monthNames[date.getMonth()]} {date.getFullYear()}
+            {commonT(`months.${date.getMonth()}`)} {date.getFullYear()}
           </span>
           <Button variant="ghost" size="icon" onClick={goToNextMonth}>
             <ChevronRight className="h-4 w-4" />

@@ -33,13 +33,13 @@ export function Settings() {
     onSuccess: (result) => {
       if (result.success) {
         queryClient.invalidateQueries({ queryKey: hubKeys.settings(hubId) });
-        toast.success("Settings updated successfully");
+        toast.success(t("messages.updated"));
       } else {
-        toast.error(result.message || "Failed to update settings");
+        toast.error(result.message || t("messages.error"));
       }
     },
     onError: (err: any) => {
-      toast.error(err.message || "An error occurred");
+      toast.error(err.message || t("messages.error"));
     },
   });
 

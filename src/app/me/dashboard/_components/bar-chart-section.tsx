@@ -14,12 +14,14 @@ import type { SavingGoal } from "@/lib/types/domain-types";
 import { mapSavingGoalsToRows } from "@/app/me/saving-goals/saving-goal-adapters";
 import { useMemo } from "react";
 import { ErrorState } from "@/components/ui/error-state";
+import { useSessionReady } from "@/hooks/use-session-ready";
 
 export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page.progress-cards");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
+  const { isSessionReady } = useSessionReady();
 
   const {
     data: domainSavingGoals,
@@ -37,7 +39,7 @@ export function BarChartSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const savingGoals = useMemo(() => {

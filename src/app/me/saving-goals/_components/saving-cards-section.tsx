@@ -18,6 +18,7 @@ import { useTranslations } from "next-intl";
 
 export function SavingCardsSection() {
   const t = useTranslations("main-dashboard.saving-goals-page");
+  const tc = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
@@ -30,7 +31,7 @@ export function SavingCardsSection() {
     queryFn: async () => {
       const res = await getSavingGoalsSummary();
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch saving goals summary");
+        throw new Error(res.message || t("active-goals-section.error-loading"));
       }
       return res.data!;
     },
@@ -46,24 +47,24 @@ export function SavingCardsSection() {
     {
       title: t("cards.card-1.title"),
       content: summary?.totalTarget !== null && summary?.totalTarget !== undefined
-        ? `CHF ${summary.totalTarget.toLocaleString()}`
+        ? `${tc("currency")} ${summary.totalTarget.toLocaleString()}`
         : "—",
       badge: t("cards.card-1.badge"), // "All Active Goals" is fine as-is
     },
     {
       title: t("cards.card-2.title"),
       content: summary?.totalSaved !== null && summary?.totalSaved !== undefined
-        ? `CHF ${summary.totalSaved.toLocaleString()}`
+        ? `${tc("currency")} ${summary.totalSaved.toLocaleString()}`
         : "—",
-      badge: `${achievementPercent}% Achieved`,
+      badge: t("cards.card-2.badge-pattern", { percent: achievementPercent }),
     },
     {
       title: t("cards.card-3.title"),
       content: summary?.remainingToSave !== null && summary?.remainingToSave !== undefined
-        ? `CHF ${summary.remainingToSave.toLocaleString()}`
+        ? `${tc("currency")} ${summary.remainingToSave.toLocaleString()}`
         : "—",
       badge: summary?.totalMonthlyAllocation !== null && summary?.totalMonthlyAllocation !== undefined
-        ? `Monthly per: CHF ${summary.totalMonthlyAllocation.toLocaleString()}`
+        ? t("cards.card-3.badge-pattern", { currency: tc("currency"), amount: summary.totalMonthlyAllocation.toLocaleString() })
         : t("cards.card-3.badge"),
     },
     {
@@ -72,8 +73,8 @@ export function SavingCardsSection() {
         ? `${summary.totalGoals}`
         : "—",
       badge: summary?.overdueGoalsCount && summary.overdueGoalsCount > 0
-        ? `⚠️ ${summary.overdueGoalsCount} Overdue`
-        : "No Urgent Due Items",
+        ? t("cards.card-4.badge-overdue", { count: summary.overdueGoalsCount })
+        : t("cards.card-4.badge-none"),
     },
   ];
 
@@ -92,7 +93,7 @@ export function SavingCardsSection() {
               {summaryLoading
                 ? "..."
                 : summaryError
-                  ? "—"
+                  ? tc("error-loading")
                   : card.content}
             </h1>
           </CardContent>

@@ -23,6 +23,7 @@ export function ReportCardsSection({
   initialTo?: string;
 }) {
   const t = useTranslations("main-dashboard.report-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const from = searchParams.get("from") || initialFrom;
@@ -59,21 +60,21 @@ export function ReportCardsSection({
   const cards = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${income.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${income.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${expense.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${expense.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),
-      content: `CHF ${balance.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${balance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-3.badge"),

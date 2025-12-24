@@ -35,6 +35,7 @@ export interface AccountData {
 
 export function ContentDataTable() {
   const t = useTranslations("main-dashboard.content-page.data-table");
+  const commonT = useTranslations("common");
 
   const { exportAccounts } = useExportCSV();
   const searchParams = useSearchParams();
@@ -139,7 +140,7 @@ export function ContentDataTable() {
                   <TableCell colSpan={5} className="text-center text-red-500">
                     {accountsError instanceof Error
                       ? accountsError.message
-                      : "Failed to load accounts"}
+                      : t("error-loading")}
                   </TableCell>
                 </TableRow>
               ) : accountsLoading || !accounts ? (
@@ -151,7 +152,7 @@ export function ContentDataTable() {
               ) : accounts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-gray-400">
-                    No Accounts Yet
+                    {t("no-accounts")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -179,7 +180,7 @@ export function ContentDataTable() {
                     </TableCell>
                     <TableCell colSpan={2} />
                     <TableCell className="font-bold opacity-60">
-                      CHF{" "}
+                      {commonT("currency")}{" "}
                       {totalBalance.toLocaleString("de-CH", {
                         minimumFractionDigits: 2,
                       })}

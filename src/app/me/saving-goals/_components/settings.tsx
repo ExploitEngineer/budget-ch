@@ -44,7 +44,7 @@ export function Settings() {
 
   const handleExport = () => {
     if (!goals || goals.length === 0) {
-      toast.error("No goals to export");
+      toast.error(t("messages.no-export"));
       return;
     }
 
@@ -53,7 +53,7 @@ export function Settings() {
       t: tCommon,
     });
 
-    toast.success("Savings goals exported to CSV");
+    toast.success(t("messages.exported"));
   };
 
   // Calculate global auto-alloc state (if any goal is enabled, we consider the master switch ON?)
@@ -63,7 +63,7 @@ export function Settings() {
 
   const handleAutoAllocToggle = async (newValue: boolean) => {
     // Optimistic / Loading feedback could be added here
-    toast.info(newValue ? "Enabling auto-allocation..." : "Disabling auto-allocation...");
+    toast.info(newValue ? t("messages.enabling-auto") : t("messages.disabling-auto"));
 
     // We import this dynamically or assume it's imported (need to add import in next step or strictly here if possible)
     // To safe, I will add import in separate step or assume I can modify imports too. 
@@ -74,10 +74,10 @@ export function Settings() {
     const result = await toggleHubAutoAllocation(newValue);
 
     if (result.success) {
-      toast.success(newValue ? "Auto-allocation enabled for all goals" : "Auto-allocation disabled");
+      toast.success(newValue ? t("messages.auto-enabled") : t("messages.auto-disabled"));
       refetch(); // Refresh data to confirm DB update
     } else {
-      toast.error("Failed to update settings");
+      toast.error(t("messages.error"));
     }
   };
 
@@ -91,7 +91,7 @@ export function Settings() {
             onClick={handleExport}
             className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
           >
-            Export CSV
+            {t("export-btn")}
           </Button>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />

@@ -26,6 +26,7 @@ export function DetailedTable({
   initialTo?: string;
 }) {
   const t = useTranslations("main-dashboard.report-page.detailed-table");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const from = searchParams.get("from") || initialFrom;
@@ -109,7 +110,7 @@ export function DetailedTable({
                   <TableRow key={cat.id} className="dark:border-border-blue">
                     <TableCell>{cat.name}</TableCell>
                     <TableCell>
-                      CHF{" "}
+                      {commonT("currency")}{" "}
                       {cat.totalAmount.toLocaleString("de-CH", {
                         minimumFractionDigits: 2,
                       })}
@@ -121,7 +122,7 @@ export function DetailedTable({
                     {t("data-table.data.total")}
                   </TableCell>
                   <TableCell className="font-bold opacity-60">
-                    CHF{" "}
+                    {commonT("currency")}{" "}
                     {categoriesTotal.toLocaleString("de-CH", {
                       minimumFractionDigits: 2,
                     })}

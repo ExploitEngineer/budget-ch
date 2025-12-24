@@ -13,6 +13,7 @@ import { ErrorState } from "@/components/ui/error-state";
 
 export function BudgetHealthSection() {
   const t = useTranslations("main-dashboard.dashboard-page.budget-health");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
@@ -65,11 +66,11 @@ export function BudgetHealthSection() {
       title: t("card-1.title"),
       value: amountsLoading
         ? "..."
-        : `CHF ${allocated?.toLocaleString() ?? "-"}`,
+        : `${commonT("currency")} ${allocated?.toLocaleString() ?? "-"}`,
     },
     {
       title: t("card-2.title"),
-      value: amountsLoading ? "..." : `CHF ${spent?.toLocaleString() ?? "-"}`,
+      value: amountsLoading ? "..." : `${commonT("currency")} ${spent?.toLocaleString() ?? "-"}`,
     },
     {
       title: t("card-3.title"),

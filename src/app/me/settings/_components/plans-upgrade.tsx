@@ -37,6 +37,7 @@ export function PlansUpgrade({
   const t = useTranslations(
     "main-dashboard.settings-page.plans-upgrade-section",
   );
+  const commonT = useTranslations("common");
   const { cards } = usePricingCardsData();
   const [planDuration, setPlanDuration] = useState<"monthly" | "yearly">(
     "monthly",
@@ -55,7 +56,7 @@ export function PlansUpgrade({
     if (data?.url) {
       router.push(data.url);
     } else {
-      toast.error(message || "Failed to create checkout session");
+      toast.error(message || t("plans-cards.errors.checkout-failed"));
     }
   }
 
@@ -130,11 +131,11 @@ export function PlansUpgrade({
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {cards.map((card) => {
+          {cards.map((card) => {
             const isFreePlan = card.planId === "free";
             const isCurrentPlan =
               hasSubscription &&
-                !isFreePlan &&
+              !isFreePlan &&
               subscriptionPlanId === card.planId;
             const planButtonText = isCurrentPlan
               ? t("plans-cards.manage-plan-button")
@@ -167,7 +168,7 @@ export function PlansUpgrade({
                   </div>
                   {card.planId !== "free" && planPrice != null && (
                     <h1 className="text-lg font-bold">
-                      CHF {planPrice} /{" "}
+                      {commonT("currency")} {planPrice} /{" "}
                       {planDuration === "monthly"
                         ? t("plans-cards.individual-card.month")
                         : t("plans-cards.individual-card.year")}

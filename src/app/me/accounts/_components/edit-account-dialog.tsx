@@ -80,10 +80,10 @@ export default function EditAccountDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
-      toast.success("Account updated successfully!");
+      toast.success(t("messages.updated"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update account");
+      toast.error(error.message || t("messages.error.update"));
     },
   });
 
@@ -97,10 +97,10 @@ export default function EditAccountDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
-      toast.success("Account deleted successfully!");
+      toast.success(t("messages.deleted"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete account");
+      toast.error(error.message || t("messages.error.delete"));
     },
   });
 

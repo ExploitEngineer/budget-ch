@@ -15,11 +15,14 @@ import { getBudgetsAmounts, getBudgetForecast } from "@/lib/services/budget";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { DashboardCards } from "@/lib/types/dashboard-types";
+import { useSessionReady } from "@/hooks/use-session-ready";
 
 export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const { isSessionReady } = useSessionReady();
 
   const {
     data: budgetAmounts,
@@ -34,7 +37,7 @@ export function BudgetCardsSection() {
       }
       return res.data;
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const {
@@ -49,7 +52,7 @@ export function BudgetCardsSection() {
       }
       return res.data;
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const totalAllocated = budgetAmounts?.totalAllocated ?? 0;
@@ -63,24 +66,24 @@ export function BudgetCardsSection() {
   const cards: DashboardCards[] = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${(totalAllocated).toLocaleString()}`,
+      content: `${commonT("currency")} ${(totalAllocated).toLocaleString()}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${(totalSpent).toLocaleString()}`,
+      content: `${commonT("currency")} ${(totalSpent).toLocaleString()}`,
       badge: percent.toFixed(0) + "% " + t("cards.card-2.badge"),
     },
     {
       title: available < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
-      content: `CHF ${available.toLocaleString()}`,
+      content: `${commonT("currency")} ${available.toLocaleString()}`,
       badge: available < 0
         ? `${Math.ceil(Math.abs(percent - 100))}% ` + t("cards.card-3.badge-over")
         : `+${Math.floor(100 - percent)}% ` + t("cards.card-3.badge"),
     },
     {
       title: t("cards.card-4.title") + " " + (forecastData?.forecastDate ?? ""),
-      content: `CHF ${forecastData?.forecastValue.toLocaleString() ?? "-"}`,
+      content: `${commonT("currency")} ${forecastData?.forecastValue.toLocaleString() ?? "-"}`,
       badge: t("cards.card-4.badge"),
     },
   ];

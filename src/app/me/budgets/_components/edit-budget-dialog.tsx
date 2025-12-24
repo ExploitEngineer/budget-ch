@@ -79,12 +79,12 @@ export default function EditBudgetDialog({
       queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
-      toast.success("Budget created successfully!");
+      toast.success(t("messages.created"));
       form.reset();
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create budget");
+      toast.error(error.message || t("messages.error.create"));
     },
   });
 
@@ -112,12 +112,12 @@ export default function EditBudgetDialog({
       queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
-      toast.success("Budget updated successfully!");
+      toast.success(t("messages.updated"));
       form.reset();
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update budget");
+      toast.error(error.message || t("messages.error.update"));
     },
   });
 
@@ -133,11 +133,11 @@ export default function EditBudgetDialog({
       queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
-      toast.success("Budget deleted successfully!");
+      toast.success(t("messages.deleted"));
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete budget");
+      toast.error(error.message || t("messages.error.delete"));
     },
   });
 

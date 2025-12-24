@@ -100,13 +100,13 @@ export function ProfileHousehold({
       });
 
       if (result.success) {
-        toast.success("Profile and household settings updated successfully");
+        toast.success(t("messages.update-success"));
       } else {
-        toast.error(result.message || "Failed to update settings");
+        toast.error(result.message || t("messages.update-error"));
       }
     } catch (err: any) {
       console.error("Error updating profile:", err);
-      toast.error(err.message || "An unexpected error occurred");
+      toast.error(err.message || t("messages.unexpected-error"));
     } finally {
       setLoading(false);
     }

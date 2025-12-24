@@ -145,6 +145,7 @@ export function DataTable({
   error,
 }: DataTableProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const commonT = useTranslations("common");
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -185,13 +186,13 @@ export function DataTable({
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
       setConfirmDialogOpen(false);
       setRowSelection({});
-      toast.success("All transactions deleted!");
+      toast.success(t("messages.all-deleted"));
     },
     onError: (error: Error) => {
       setConfirmDialogOpen(false);
       toast.error(
         error.message ||
-        "Something went wrong while deleting all transactions.",
+        t("messages.error.delete-all"),
       );
     },
   });
@@ -300,10 +301,7 @@ export function DataTable({
       cell: ({ row }) => {
         const amount = row.original.amount ?? 0;
         const type = row.original.type;
-        const formatted = new Intl.NumberFormat("de-CH", {
-          style: "currency",
-          currency: "CHF",
-        }).format(amount);
+        const formatted = `${commonT("currency")} ${amount.toLocaleString()}`;
 
         // Color based on transaction type:
         // expense & transfer = red (deduct)
@@ -600,7 +598,7 @@ export function DataTable({
                     colSpan={columns.length}
                     className="h-24 text-center"
                   >
-                    No results.
+                    {t("data-table.no-results")}
                   </TableCell>
                 </TableRow>
               )}
@@ -611,8 +609,10 @@ export function DataTable({
         {/* Footer */}
         <CardFooter className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
           <div className="text-muted-foreground text-sm">
-            {table.getFilteredSelectedRowModel().rows.length} of{" "}
-            {table.getFilteredRowModel().rows.length} row(s) selected.
+            {t("data-table.rows-selected", {
+              selected: table.getFilteredSelectedRowModel().rows.length,
+              total: table.getFilteredRowModel().rows.length,
+            })}
           </div>
           <div className="flex gap-2">
             <Button

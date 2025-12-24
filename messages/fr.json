@@ -7,7 +7,28 @@
         "error": "Quelque chose s'est mal passé. Veuillez réessayer.",
         "retry": "Réessayer",
         "currency": "CHF",
-        "percent": "{value}%"
+        "percent": "{value}%",
+        "validations": {
+            "required": "Requis",
+            "name-required": "Le nom est requis",
+            "amount-required": "Le montant est requis",
+            "date-required": "La date est requise",
+            "min-1-day": "Doit être d'au moins 1 jour"
+        },
+        "months": {
+            "0": "Janvier",
+            "1": "Février",
+            "2": "Mars",
+            "3": "Avril",
+            "4": "Mai",
+            "5": "Juin",
+            "6": "Juillet",
+            "7": "Août",
+            "8": "Septembre",
+            "9": "Octobre",
+            "10": "Novembre",
+            "11": "Décembre"
+        }
     },
     "two-factor": {
         "title": "Authentification à deux facteurs",
@@ -39,6 +60,40 @@
             "verify-success": "Vérification réussie. Redirection...",
             "backup-code-error": "Code de secours invalide. Veuillez réessayer.",
             "backup-code-success": "Code de secours accepté. Redirection..."
+        }
+    },
+    "public-pages": {
+        "accept-invitation": {
+            "pending": "Traitement de votre invitation...",
+            "success": {
+                "title": "Invitation acceptée !",
+                "toast": "Invitation acceptée !",
+                "redirecting": "Redirection vers votre tableau de bord dans {countdown} {countdown, plural, =1 {seconde} other {secondes}}...",
+                "button": "Y aller maintenant"
+            },
+            "error": {
+                "title": "Invitation invalide ou expirée",
+                "description": "Le lien d'invitation n'est pas valide ou a déjà expiré.",
+                "set-hub-failed": "Invitation acceptée mais impossible de définir le hub actif"
+            }
+        },
+        "goodbye": {
+            "title": "Compte supprimé avec succès",
+            "description": "Votre compte a été supprimé. Nous sommes désolés de vous voir partir ! Vous pouvez toujours revenir et créer un nouveau compte à tout moment.",
+            "button": "Retour à l'accueil"
+        },
+        "email-verified": {
+            "success": {
+                "title": "E-mail vérifié avec succès !",
+                "description": "Votre e-mail a été vérifié. Vous pouvez maintenant accéder à votre tableau de bord et utiliser toutes les fonctionnalités.",
+                "button": "Aller à la connexion"
+            },
+            "error": {
+                "title": "Échec de la vérification",
+                "invalid-link": "Le lien de vérification est invalide ou expiré.",
+                "generic": "Une erreur s'est produite lors de la vérification de votre e-mail.",
+                "button": "Réessayer de se connecter"
+            }
         }
     },
     "greeting": {
@@ -164,6 +219,14 @@
                         "placeholder": "Optionnel"
                     }
                 },
+                "placeholders": {
+                    "category-name": "p. ex. courses, factures..."
+                },
+                "messages": {
+                    "category-added": "Catégorie \"{name}\" ajoutée",
+                    "category-exists": "La catégorie \"{name}\" existe déjà",
+                    "id-required": "L'ID du Hub est requis"
+                },
                 "no-categories-yet": "Aucune catégorie pour le moment",
                 "buttons": {
                     "save": "Enregistrer comme modèle",
@@ -217,6 +280,11 @@
                         "delete": "Supprimer",
                         "save": "Enregistrer",
                         "saving": "Enregistrement..."
+                    },
+                    "messages": {
+                        "success": "Transaction récurrente mise à jour avec succès !",
+                        "error": "Échec de la mise à jour de la transaction récurrente",
+                        "load-error": "Échec du chargement du modèle"
                     }
                 }
             },
@@ -258,6 +326,7 @@
                 "title": "Tâches rapides",
                 "placeholder": "Ajouter une tâche…",
                 "no-tasks": "Aucune tâche pour le moment..",
+                "double-click": "Double-cliquez pour modifier",
                 "created": "Tâche créée avec succès !",
                 "updated": "Tâche mise à jour avec succès !",
                 "deleted": "Tâche supprimée avec succès !"
@@ -353,6 +422,15 @@
         "transactions-page": {
             "loading": "Chargement...",
             "no-transactions": "Aucune transaction pour le moment",
+            "messages": {
+                "created": "Transaction créée avec succès !",
+                "updated": "Transaction mise à jour avec succès !",
+                "deleted": "Transaction supprimée avec succès !",
+                "all-deleted": "Toutes les transactions ont été supprimées !",
+                "error": {
+                    "delete-all": "Une erreur s'est produite lors de la suppression de toutes les transactions."
+                }
+            },
             "transaction-edit-dialog": {
                 "title-1": "Modifier",
                 "title-2": "Nouvelle transaction",
@@ -390,11 +468,13 @@
                         "account": "Choisir un compte",
                         "recipient": "Saisir le bénéficiaire",
                         "category": "Choisir une catégorie",
+                        "category-selector": "Choisir ou ajouter une catégorie",
                         "note": "Saisir une remarque",
                         "note-optional": "Remarque (optionnelle)",
                         "destinationAccount": "Choisir le compte de destination",
                         "startDate": "Sélectionner la date de début",
-                        "endDate": "Aucune date de fin"
+                        "endDate": "Aucune date de fin",
+                        "pick-date": "Choisir une date"
                     },
                     "options": {
                         "checking": "Compte courant",
@@ -449,7 +529,9 @@
                 "search": {
                     "title": "Recherche",
                     "placeholder": "ex. Coop, Loyer, Carte de crédit…"
-                }
+                },
+                "loading-accounts": "Chargement des comptes...",
+                "no-accounts": "Aucun compte disponible"
             },
             "checkboxes": {
                 "recipient": "Avec Destinataire",
@@ -532,7 +614,9 @@
                 "pagination": {
                     "previous": "Précédent",
                     "next": "Suivant"
-                }
+                },
+                "no-results": "Aucun résultat.",
+                "rows-selected": "{selected} sur {total} ligne(s) sélectionnée(s)."
             }
         },
         "budgets-page": {
@@ -563,7 +647,18 @@
                     },
                     "delete-btn": "Supprimer",
                     "cancel": "Annuler",
-                    "save": "Enregistrer"
+                    "save": "Enregistrer",
+                    "create-budget": "Créer un budget",
+                    "messages": {
+                        "created": "Budget créé avec succès !",
+                        "updated": "Budget mis à jour avec succès !",
+                        "deleted": "Budget supprimé avec succès !",
+                        "error": {
+                            "create": "Échec de la création du budget",
+                            "update": "Échec de la mise à jour du budget",
+                            "delete": "Échec de la suppression du budget"
+                        }
+                    }
                 }
             },
             "cards": {
@@ -592,6 +687,11 @@
                 "title": "Toutes les catégories",
                 "total-budget": "Budget total : ",
                 "rest-budget": "Restant : ",
+                "loading": "Chargement...",
+                "no-budgets": "Aucun budget trouvé",
+                "set-budget": "Définir le budget",
+                "edit": "Modifier",
+                "error-loading": "Échec du chargement des budgets",
                 "buttons": {
                     "export": "Exporter CSV",
                     "reset": "Réinitialiser"
@@ -639,6 +739,10 @@
                     "checkboxes": {
                         "carry": "Reporter le surplus/déficit au mois suivant",
                         "e-mail": "Envoyer les alertes par email à 80% / 100%"
+                    },
+                    "messages": {
+                        "updated": "Paramètres mis à jour avec succès",
+                        "error": "Échec de la mise à jour des paramètres"
                     }
                 }
             }
@@ -674,7 +778,19 @@
                         },
                         "monthly-allocation": "Allocation mensuelle (CHF)"
                     },
-                    "save": "Enregistrer"
+                    "save": "Enregistrer",
+                    "loading-accounts": "Chargement des comptes...",
+                    "no-accounts": "Aucun compte disponible",
+                    "messages": {
+                        "created": "Objectif d’épargne créé avec succès !",
+                        "updated": "Objectif d’épargne mis à jour avec succès !",
+                        "deleted": "Objectif d’épargne supprimé avec succès !",
+                        "error": {
+                            "create": "Échec de la création de l’objectif d’épargne",
+                            "update": "Échec de la mise à jour de l’objectif d’épargne",
+                            "delete": "Échec de la suppression de l’objectif d’épargne"
+                        }
+                    }
                 }
             },
             "cards": {
@@ -686,22 +802,28 @@
                 "card-2": {
                     "title": "Économisé jusqu'à présent",
                     "content": "CHF 8’610.00",
-                    "badge": "48% atteint"
+                    "badge": "48% atteint",
+                    "badge-pattern": "{percent}% atteint"
                 },
                 "card-3": {
                     "title": "Restant à épargner",
                     "content": "CHF 9’390.00",
-                    "badge": "Objectif mensuel : CHF 700.00"
+                    "badge": "Objectif mensuel : CHF 700.00",
+                    "badge-pattern": "Mensuel par : {currency} {amount}"
                 },
                 "card-4": {
                     "title": "Nombre d'objectifs",
                     "content": "3",
-                    "badge": "Aucun élément urgent"
+                    "badge": "Aucun élément urgent",
+                    "badge-overdue": "⚠️ {count} En retard",
+                    "badge-none": "Aucun élément urgent"
                 }
             },
             "active-goals-section": {
                 "title": "Objectifs actifs",
                 "badge": "3 objectifs • Allocation automatique : CHF 700.00",
+                "badge-pattern": "{count} objectifs • Allocation automatique : {currency} {amount}",
+                "error-loading": "Échec du chargement des objectifs d’épargne",
                 "no-goals": "Aucun objectif d’épargne trouvé.",
                 "loading": "Chargement...",
                 "buttons": {
@@ -732,7 +854,9 @@
                             "checking-account": "Compte courant",
                             "button": "Allocation",
                             "new-balance": "Nouveau solde",
-                            "placeholder": "Montant"
+                            "placeholder": "Montant",
+                            "updating": "Mise à jour...",
+                            "funded": "Financé"
                         }
                     }
                 }
@@ -740,6 +864,11 @@
             "warning-section": {
                 "title": "Notes & Avertissements",
                 "button": "Tout masquer",
+                "show-all": "Tout afficher",
+                "hide-all": "Tout masquer",
+                "loading": "Chargement...",
+                "due": "Échéance : ",
+                "more-overdue": "...et {count} autres objectifs en retard",
                 "badge": "Aucune note"
             },
             "settings-section": {
@@ -748,6 +877,16 @@
                 "checkboxes": {
                     "monthly": "Allocation automatique mensuelle active",
                     "goals": "Afficher les objectifs surfinancés"
+                },
+                "export-btn": "Exporter CSV",
+                "messages": {
+                    "no-export": "Aucun objectif à exporter",
+                    "exported": "Objectifs d’épargne exportés au format CSV",
+                    "enabling-auto": "Activation de l’allocation automatique...",
+                    "disabling-auto": "Désactivation de l’allocation automatique...",
+                    "auto-enabled": "Allocation automatique activée pour tous les objectifs",
+                    "auto-disabled": "Allocation automatique désactivée",
+                    "error": "Échec de la mise à jour des paramètres"
                 }
             }
         },
@@ -785,7 +924,12 @@
                         }
                     },
                     "save": "Enregistrer",
-                    "delete": "Supprimer"
+                    "delete": "Supprimer",
+                    "messages": {
+                        "created": "Compte créé avec succès !",
+                        "updated": "Compte mis à jour avec succès !",
+                        "deleted": "Compte supprimé avec succès !"
+                    }
                 },
                 "dialog-box": {
                     "title": "Transfert entre comptes",
@@ -848,6 +992,8 @@
             "data-table": {
                 "loading": "Chargement des données...",
                 "title": "Tous les comptes",
+                "no-accounts": "Aucun compte pour le moment",
+                "error-loading": "Échec du chargement des comptes",
                 "badge": "{count, plural, one {1 compte} other {# comptes}} • Liquidité CHF {amount}",
                 "buttons": {
                     "export": "Exporter CSV",
@@ -875,6 +1021,9 @@
             "latest-tranfers-section": {
                 "title": "Derniers transferts",
                 "button": "Exporter CSV",
+                "no-transfers": "Aucun transfert pour le moment",
+                "loading": "Chargement des données...",
+                "error-loading": "Échec du chargement des transferts",
                 "data-table": {
                     "headings": {
                         "date": "DATE",
@@ -1075,7 +1224,24 @@
                     "total": "Total : {count} éléments seront importés",
                     "exported-at": "Exporté"
                 },
-                "cancel": "Annuler"
+                "cancel": "Annuler",
+                "errors": {
+                    "invalid-json": "Fichier JSON invalide",
+                    "parse-csv": "Erreur lors de l'analyse du CSV",
+                    "unsupported-file": "Type de fichier non pris en charge. Utilisez .csv ou .json",
+                    "validation-failed": "La validation a échoué",
+                    "select-file-first": "Veuillez d'abord sélectionner un fichier",
+                    "hub-not-found": "ID du hub non trouvé"
+                },
+                "messages": {
+                    "import-success": "{count} éléments importés avec succès !"
+                },
+                "validating": "Validation des données...",
+                "preview": "Aperçu :",
+                "more-rows": "... et {count} lignes de plus",
+                "imported-as": "Importé en tant que : {type}",
+                "importing": "Importation...",
+                "start-import": "Démarrer l'import"
             }
         },
         "settings-page": {
@@ -1107,6 +1273,11 @@
                 "address": {
                     "title": "Adresse (optionnelle)",
                     "placeholder": "Rue & Numéro, Code postal, Ville"
+                },
+                "messages": {
+                    "update-success": "Profil et paramètres du foyer mis à jour avec succès",
+                    "update-error": "Échec de la mise à jour des paramètres",
+                    "unexpected-error": "Une erreur inattendue s'est produite"
                 }
             },
             "plans-upgrade-section": {
@@ -1156,7 +1327,8 @@
                     },
                     "errors": {
                         "no-price": "Ce forfait n'est pas encore disponible.",
-                        "portal-failed": "Impossible d'ouvrir le portail Stripe pour le moment. Réessayez plus tard."
+                        "portal-failed": "Impossible d'ouvrir le portail Stripe pour le moment. Réessayez plus tard.",
+                        "checkout-failed": "Échec de la création de la session de paiement"
                     },
                     "current-plan-badge": "Forfait actuel",
                     "manage-plan-button": "Gérer le forfait",
@@ -1242,6 +1414,12 @@
                         "action": "ACTION"
                     },
                     "content": "Pas encore d'invitations ou de membres."
+                },
+                "messages": {
+                    "load-error": "Échec du chargement des invitations et membres",
+                    "invitation-sent": "Invitation envoyée",
+                    "send-error": "Échec de l'envoi de l'invitation",
+                    "send-unexpected-error": "Erreur lors de l'envoi de l'invitation"
                 }
             },
             "appearance-section": {
@@ -1436,6 +1614,16 @@
                             "delete-account": "Supprimer le compte"
                         }
                     }
+                },
+                "delete-dialog": {
+                    "title": "Confirmer la suppression du compte",
+                    "description": "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est permanente et ne peut pas être annulée.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer le compte"
+                },
+                "messages": {
+                    "delete-error": "Erreur lors de la suppression de l'utilisateur",
+                    "unexpected-error": "Une erreur inattendue s'est produite"
                 }
             },
             "billing-details-section": {
@@ -1555,6 +1743,28 @@
         "loading": "Chargement des notifications...",
         "noNotifications": "Aucune notification",
         "markAllAsRead": "Tout marquer comme lu",
+        "types": {
+            "budget-threshold-80": {
+                "title": "Seuil budgétaire atteint",
+                "message": "Votre budget pour \"{categoryName}\" a atteint 80% du montant alloué."
+            },
+            "budget-exceeded": {
+                "title": "Budget dépassé",
+                "message": "Votre budget pour \"{categoryName}\" a été dépassé."
+            },
+            "subscription-expiring-3-days": {
+                "title": "Abonnement expire bientôt",
+                "message": "Votre abonnement expirera dans 3 jours. Veuillez le renouveler pour continuer à utiliser toutes les fonctionnalités."
+            },
+            "subscription-expiring-1-day": {
+                "title": "Abonnement expire demain",
+                "message": "Votre abonnement expirera demain. Veuillez le renouveler immédiatement pour éviter toute interruption de service."
+            },
+            "subscription-expired": {
+                "title": "Abonnement expiré",
+                "message": "Votre abonnement a expiré. Veuillez le renouveler pour restaurer l'accès à toutes les fonctionnalités."
+            }
+        },
         "browser": {
             "prompt": {
                 "title": "Activer les notifications du navigateur",

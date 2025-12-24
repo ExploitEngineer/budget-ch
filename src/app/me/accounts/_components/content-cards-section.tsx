@@ -21,6 +21,7 @@ import { useMemo } from "react";
 
 export function ContentCardsSection() {
   const t = useTranslations("main-dashboard.content-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
@@ -79,28 +80,28 @@ export function ContentCardsSection() {
   const cards = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${totalBalance.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${totalBalance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${checkingCashTotal.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${checkingCashTotal.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),
-      content: `CHF ${savingsBalance.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${savingsBalance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-3.badge", { percent: savingsPercent }),
     },
     {
       title: t("cards.card-4.title"),
-      content: `CHF ${creditCardTotal.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${creditCardTotal.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-4.badge"),
@@ -132,7 +133,7 @@ export function ContentCardsSection() {
                   accountsError && "text-red-500",
                 )}
               >
-                {accountsLoading ? "..." : accountsError ? "—" : content}
+                {accountsLoading ? commonT("loading") : accountsError ? "—" : content}
               </h1>
             </CardContent>
             {card.badge && (
