@@ -15,7 +15,7 @@ export default $config({
     };
   },
   async run() {
-    const web = new sst.aws.Nextjs("MyWeb");
+    // const web = new sst.aws.Nextjs("MyWeb");
 
     // Subscription Expiry Check (Daily at 9 AM UTC)
     new sst.aws.Cron("SubscriptionNotifications", {
@@ -111,7 +111,7 @@ export default $config({
     });
 
     return {
-      web,
+      // web,
     };
   },
 });
