@@ -11,21 +11,25 @@ import { Settings } from "./_components/settings";
 import { budgetKeys } from "@/lib/query-keys";
 import { getBudgets, getBudgetsAmounts } from "@/lib/services/budget";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import { MonthSelector } from "./_components/month-selector";
 
 interface BudgetsPageProps {
-  searchParams: Promise<{ hub?: string }>;
+  searchParams: Promise<{ hub?: string; month?: string; year?: string }>;
 }
 
 export default async function Transactions({ searchParams }: BudgetsPageProps) {
-  const { hub: hubId } = await searchParams;
+  const { hub: hubId, month: monthParam, year: yearParam } = await searchParams;
+
+  const month = monthParam ? parseInt(monthParam) : undefined;
+  const year = yearParam ? parseInt(yearParam) : undefined;
 
   const queryClient = new QueryClient();
-  
+
   if (hubId) {
     await queryClient.prefetchQuery<BudgetWithCategory[]>({
-      queryKey: budgetKeys.list(hubId),
+      queryKey: budgetKeys.list(hubId, month, year),
       queryFn: async () => {
-        const res = await getBudgets();
+        const res = await getBudgets(month, year);
         if (!res.success) {
           throw new Error(res.message || "Failed to fetch budgets");
         }
@@ -34,19 +38,13 @@ export default async function Transactions({ searchParams }: BudgetsPageProps) {
     });
 
     await queryClient.prefetchQuery({
-      queryKey: budgetKeys.amounts(hubId),
+      queryKey: budgetKeys.amounts(hubId, month, year),
       queryFn: async () => {
-        const res = await getBudgetsAmounts();
+        const res = await getBudgetsAmounts(month, year);
         if (!res.success) {
           throw new Error(res.message || "Failed to fetch budget amounts");
         }
-        const totalAllocated = res.data?.totalAllocated ?? 0;
-        const totalSpent = res.data?.totalSpent ?? 0;
-        return {
-          allocated: totalAllocated,
-          spent: totalSpent,
-          available: totalAllocated - totalSpent,
-        };
+        return res.data;
       },
     });
   }
@@ -59,6 +57,9 @@ export default async function Transactions({ searchParams }: BudgetsPageProps) {
         </div>
 
         <div className="flex flex-1 flex-col gap-4 p-4">
+          <div className="flex justify-end">
+            <MonthSelector />
+          </div>
           <BudgetCardsSection />
           <BudgetDataTable />
           <WarningSection />

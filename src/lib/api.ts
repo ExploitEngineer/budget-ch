@@ -38,21 +38,33 @@ export async function getRecentTransactions(hubId: string) {
 }
 
 // Budgets
-export async function getBudgets(hubId: string) {
+export async function getBudgets(
+  hubId: string,
+  month?: number,
+  year?: number,
+) {
   const response = await apiInstance.get(`/api/me/budgets`, {
     searchParams: {
-      hub: hubId
-    }
+      hub: hubId,
+      ...(month && { month: month.toString() }),
+      ...(year && { year: year.toString() }),
+    },
   });
   const data = await response.json();
   return data as ApiResponse<BudgetWithCategory[]>;
 }
 
-export async function getBudgetsAmounts(hubId: string) {
+export async function getBudgetsAmounts(
+  hubId: string,
+  month?: number,
+  year?: number,
+) {
   const response = await apiInstance.get(`/api/me/budgets/amounts`, {
     searchParams: {
-      hub: hubId
-    }
+      hub: hubId,
+      ...(month && { month: month.toString() }),
+      ...(year && { year: year.toString() }),
+    },
   });
   const data = await response.json();
   return data as ApiResponse<BudgetAmounts>;

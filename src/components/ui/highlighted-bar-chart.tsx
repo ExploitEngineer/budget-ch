@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/chart";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getMonthlyReports, type MonthlyReport } from "@/lib/api";
 import { reportKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
+import { ErrorState } from "@/components/ui/error-state";
 
 const chartConfig = {
   expenses: {
@@ -45,6 +46,7 @@ export function HighlightedBarChart() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const queryClient = useQueryClient();
 
   const {
     data: monthlyReports,
@@ -91,11 +93,7 @@ export function HighlightedBarChart() {
 
       <CardContent className="flex justify-center">
         {reportsError ? (
-          <p className="text-sm text-red-500">
-            {reportsError instanceof Error
-              ? reportsError.message
-              : "Failed to load monthly reports"}
-          </p>
+          <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: reportKeys.monthly(hubId) })} />
         ) : reportsLoading ? (
           <Spinner />
         ) : (

@@ -1,6 +1,6 @@
 "use server";
 
-import { countDistinct } from "drizzle-orm";
+import { countDistinct, eq } from "drizzle-orm";
 import db from "@/db/db";
 import { transactionCategories } from "@/db/schema";
 import {
@@ -11,11 +11,12 @@ import {
 import { headers } from "next/headers";
 import { getContext } from "../auth/actions";
 
-export async function getCategoriesCount() {
+export async function getCategoriesCount(hubId: string) {
   try {
     const result = await db
       .select({ count: countDistinct(transactionCategories.id) })
-      .from(transactionCategories);
+      .from(transactionCategories)
+      .where(eq(transactionCategories.hubId, hubId));
 
     return { success: true, data: { count: result[0].count } };
   } catch (error) {

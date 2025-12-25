@@ -17,6 +17,7 @@ import { createTask, updateTask, deleteTask } from "@/lib/services/tasks";
 import { taskKeys, budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { ErrorState } from "@/components/ui/error-state";
 import type { QuickTask } from "@/db/schema";
 import type { DashboardSavingsGoalsCards } from "@/lib/types/dashboard-types";
 
@@ -171,18 +172,18 @@ export function BudgetProgressSection() {
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("line-progress-cards.title")}</CardTitle>
           <Link href="/me/budgets">
-          <Button
-            variant="outline"
-            className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-          >
-            {t("line-progress-cards.button")}
-          </Button>
+            <Button
+              variant="outline"
+              className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
+            >
+              {t("line-progress-cards.button")}
+            </Button>
           </Link>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <div className="grid grid-cols-2 gap-4 pb-10">
           {categoriesError ? (
-            <p className="px-6 text-sm text-red-500">{categoriesError.message}</p>
+            <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: budgetKeys.topCategories(hubId) })} />
           ) : topCategories === null || categoriesLoading ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("line-progress-cards.loading")}
@@ -198,7 +199,11 @@ export function BudgetProgressSection() {
                   <h3 className="text-sm sm:text-base">{card.title}</h3>
                   <h3 className="text-sm sm:text-base">{card.content}</h3>
                 </div>
-                <Progress value={card.value} />
+                <Progress
+                  value={card.value}
+                  warningThreshold={card.warningThreshold ?? 80}
+                  markerColor={card.markerColor ?? "standard"}
+                />
               </CardContent>
             ))
           )}
@@ -221,7 +226,7 @@ export function BudgetProgressSection() {
           {/* Task List */}
           <div className="flex flex-col gap-3 px-6 pb-4">
             {tasksError ? (
-              <p className="text-sm text-red-500">{tasksError.message}</p>
+              <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) })} />
             ) : tasks === null || tasksLoading ? (
               <p className="text-muted-foreground text-sm">
                 {t("line-progress-cards.loading")}
@@ -260,9 +265,8 @@ export function BudgetProgressSection() {
                       />
                     ) : (
                       <h3
-                        className={`text-sm ${
-                          task.checked ? "line-through opacity-70" : ""
-                        }`}
+                        className={`text-sm ${task.checked ? "line-through opacity-70" : ""
+                          }`}
                         onDoubleClick={() => startEditing(task.id, task.name)}
                         title="Double click to edit"
                       >

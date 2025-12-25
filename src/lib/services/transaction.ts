@@ -21,6 +21,9 @@ import {
   getRecurringTransactionTemplateByIdDB,
   updateRecurringTransactionTemplateDB,
   getBudgetsDB,
+  getActiveRecurringTemplatesDB,
+  updateTemplateLastGeneratedDB,
+  markTemplateFailureDB,
 } from "@/db/queries";
 import type { createTransactionArgs } from "@/db/queries";
 import { headers } from "next/headers";
@@ -52,6 +55,9 @@ export async function createTransaction({
   startDate,
   endDate,
   recurringStatus,
+  hubIdArg,
+  recurringTemplateId,
+  userIdArg,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -67,23 +73,47 @@ export async function createTransaction({
   startDate?: Date;
   endDate?: Date | null;
   recurringStatus?: "active" | "inactive";
+  hubIdArg?: string;
+  recurringTemplateId?: string;
+  userIdArg?: string; // For Lambda/cron context - bypasses auth checks
 }) {
   try {
-    const hdrs = await headers();
-    const { userId, userRole, hubId } = await getContext(hdrs, false);
+    // For system operations (cron jobs), skip auth checks if userIdArg is provided
+    let userId: string;
+    let hubId: string;
 
-    requireAdminRole(userRole);
+    if (userIdArg && hubIdArg) {
+      // System operation (e.g., recurring transaction generation)
+      // Skip auth checks - trust the provided IDs
+      userId = userIdArg;
+      hubId = hubIdArg;
+    } else {
+      // Normal user operation - require auth
+      const hdrs = await headers();
+      const context = await getContext(hdrs, false);
+      userId = context.userId;
+      hubId = hubIdArg || context.hubId;
 
-    const subscription = await getSubscriptionByUserId(userId);
+      if (!hubId) {
+        return { success: false, message: "Hub ID is required." };
+      }
 
-    if (!subscription) {
-      const txCount = await getMonthlyTransactionCount(userId);
-      if (txCount >= 300) {
-        return {
-          success: false,
-          message:
-            "Free plan limit reached: You can only create 300 transactions per month.",
-        };
+      requireAdminRole(context.userRole);
+    }
+
+    // Subscription check - skip for system operations
+    if (!userIdArg) {
+      const subscription = await getSubscriptionByUserId(userId);
+
+      if (!subscription) {
+        const txCount = await getMonthlyTransactionCount(userId);
+        if (txCount >= 300) {
+          return {
+            success: false,
+            message:
+              "Free plan limit reached: You can only create 300 transactions per month.",
+          };
+        }
       }
     }
 
@@ -160,7 +190,7 @@ export async function createTransaction({
 
     // For transfers, category is optional (can be null)
     let transactionCategoryId: string | null = null;
-    
+
     if (transactionType !== "transfer" && categoryName) {
       const normalizedName = categoryName.trim().toLowerCase();
 
@@ -199,6 +229,7 @@ export async function createTransaction({
       note,
       transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+      recurringTemplateId: recurringTemplateId || null,
     });
 
     // Create recurring transaction template if isRecurring is true
@@ -434,6 +465,7 @@ export interface UpcomingRecurringTransaction {
 
 export async function getUpcomingRecurringTransactions(
   days: number = 14,
+  hubIdArg?: string,
 ): Promise<{
   success: boolean;
   data?: UpcomingRecurringTransaction[];
@@ -441,7 +473,12 @@ export async function getUpcomingRecurringTransactions(
 }> {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId" };
+    }
 
     const templates = await getRecurringTransactionTemplatesDB(hubId);
 
@@ -454,23 +491,16 @@ export async function getUpcomingRecurringTransactions(
       let currentDate = startDate;
 
       // If start date is in the past, calculate next occurrence
-      if (isBefore(startDate, today)) {
-        // Calculate next occurrence after today
-        const daysSinceStart = Math.floor(
-          (today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
-        );
-        const occurrencesSinceStart = Math.floor(
-          daysSinceStart / template.frequencyDays,
-        );
-        currentDate = startOfDay(
-          addDays(startDate, (occurrencesSinceStart + 1) * template.frequencyDays),
-        );
+      if (template.frequencyDays > 0) {
+        while (isBefore(currentDate, today)) {
+          currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+        }
       }
 
       // Generate occurrences up to specified days ahead
       let iterations = 0;
       const maxIterations = 100; // Safety limit
-      
+
       while (
         (isBefore(currentDate, nextDays) || isSameDay(currentDate, nextDays)) &&
         iterations < maxIterations
@@ -498,6 +528,10 @@ export async function getUpcomingRecurringTransactions(
             date: format(currentDate, "d.M.yyyy"),
             templateId: template.id,
           });
+
+          // Optimization: Only show the next occurrence for each recurring template 
+          // to prevent high-frequency transactions (e.g., daily) from crowding out others.
+          break;
         }
 
         // Move to next occurrence
@@ -613,20 +647,26 @@ export async function updateRecurringTransactionTemplate(
 export async function updateTransaction(
   transactionId: string,
   formData: FormData,
+  hubIdArg?: string,
 ) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole, financialAccountId } = await getContext(
+    const { userId, userRole, hubId: sessionHubId, financialAccountId } = await getContext(
       hdrs,
-      true,
+      false,
     );
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Hub ID is required." };
+    }
 
     requireAdminRole(userRole);
 
     if (!financialAccountId) {
       return {
         success: false,
-        message: "No financial account found in context",
+        message: "No financial account found. Please create a financial account in settings to update transactions.",
       };
     }
 
@@ -706,10 +746,18 @@ export async function updateTransaction(
 }
 
 // DELETE Transaction
-export async function deleteTransaction(transactionId: string) {
+export async function deleteTransaction(
+  transactionId: string,
+  hubIdArg?: string,
+) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { userId, userRole, hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Hub ID is required." };
+    }
 
     requireAdminRole(userRole);
 
@@ -739,7 +787,7 @@ export async function deleteTransaction(transactionId: string) {
 export async function deleteTransactions(transactionIds: string[]) {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -776,7 +824,7 @@ export async function deleteTransactions(transactionIds: string[]) {
 export async function deleteAllTransactions() {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -811,7 +859,7 @@ export async function deleteAllTransactions() {
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
-    const { hubId, userRole } = await getContext(hdrs, true);
+    const { hubId, userRole } = await getContext(hdrs, false);
 
     requireAdminRole(userRole);
 
@@ -842,4 +890,149 @@ export async function deleteAllTransactionsAndCategories() {
         "Unexpected error while deleting all transactions and categories.",
     };
   }
+}
+
+// GENERATE Recurring Transactions
+export async function generateRecurringTransactions() {
+  try {
+    const templatesResult = await getActiveRecurringTemplatesDB();
+
+    if (!templatesResult.success || !templatesResult.data) {
+      return {
+        success: false,
+        message: templatesResult.message || "Failed to fetch templates",
+        stats: { success: 0, failed: 0, skipped: 0, errors: [] },
+      };
+    }
+
+    const templates = templatesResult.data;
+    const results = {
+      success: 0,
+      failed: 0,
+      skipped: 0,
+      errors: [] as Array<{ templateId: string; error: string }>,
+    };
+
+    const today = startOfDay(new Date());
+
+    for (const template of templates) {
+      try {
+        // Check if template is due for generation
+        const isDue = isTemplateDue(template, today);
+
+        if (!isDue) {
+          results.skipped++;
+          continue;
+        }
+
+        // Use existing createTransaction service - handles ALL balance logic!
+        const result = await createTransaction({
+          categoryName: template.categoryName || "",
+          amount: template.amount,
+          note: template.note || "Auto-generated from recurring template",
+          source: template.source,
+          transactionType: template.type,
+          accountId: template.financialAccountId,
+          destinationAccountId: template.destinationAccountId,
+          hubIdArg: template.hubId,
+          userIdArg: template.userId || undefined, // Bypass auth checks for system operation
+          // Pass template ID for linking
+          recurringTemplateId: template.id,
+        });
+
+        if (result.success) {
+          // Mark template as successfully generated
+          await updateTemplateLastGeneratedDB(template.id);
+          results.success++;
+
+          // Send in-app notification to user (no email)
+          if (template.userId) {
+            await sendNotification({
+              userId: template.userId,
+              hubId: template.hubId,
+              type: "success",
+              title: "Recurring Transaction Created",
+              message: `Your recurring transaction "${template.source || template.categoryName}" (${new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(template.amount)}) was automatically created.`,
+              channel: "web", // In-app only, no email
+              metadata: {
+                templateId: template.id,
+                transactionAmount: template.amount,
+              },
+            });
+          }
+        } else {
+          // Handle failure - mark template and send notification
+          await markTemplateFailureDB(template.id, result.message || "Unknown error");
+          results.failed++;
+          results.errors.push({
+            templateId: template.id,
+            error: result.message || "Unknown error",
+          });
+
+          // Send in-app notification to user (no email)
+          if (template.userId) {
+            await sendNotification({
+              userId: template.userId,
+              hubId: template.hubId,
+              type: "warning",
+              title: "Recurring Transaction Failed",
+              message: `Your recurring transaction "${template.source || template.categoryName}" failed: ${result.message}`,
+              channel: "web", // In-app only, no email
+              metadata: {
+                templateId: template.id,
+                reason: result.message,
+              },
+            });
+          }
+        }
+      } catch (error: any) {
+        results.failed++;
+        results.errors.push({
+          templateId: template.id,
+          error: error.message || "Unexpected error",
+        });
+
+        // Mark failure in database
+        await markTemplateFailureDB(
+          template.id,
+          error.message || "Unexpected error"
+        );
+      }
+    }
+
+    return {
+      success: true,
+      message: `Generated ${results.success} transactions, ${results.failed} failed, ${results.skipped} skipped`,
+      stats: results,
+    };
+  } catch (err: any) {
+    console.error("Error in generateRecurringTransactions:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to generate recurring transactions",
+      stats: { success: 0, failed: 0, skipped: 0, errors: [] },
+    };
+  }
+}
+
+// Helper function to check if a template is due for generation
+function isTemplateDue(
+  template: {
+    lastGeneratedDate: Date | null;
+    frequencyDays: number;
+    startDate: Date;
+  },
+  today: Date
+): boolean {
+  // If never generated, check if start date has passed
+  if (!template.lastGeneratedDate) {
+    const startDate = startOfDay(new Date(template.startDate));
+    return isBefore(startDate, today) || isSameDay(startDate, today);
+  }
+
+  // Check if enough days have passed since last generation
+  const lastGenerated = startOfDay(new Date(template.lastGeneratedDate));
+  const nextDueDate = addDays(lastGenerated, template.frequencyDays);
+
+  return isBefore(nextDueDate, today) || isSameDay(nextDueDate, today);
 }

@@ -15,22 +15,19 @@ import {
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import DashboardTableAdjustDialog from "./dashboard-table-dialog";
-import type { WarningCards } from "./data";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ErrorState } from "@/components/ui/error-state";
 import { getUpcomingRecurringTransactions } from "@/lib/services/transaction";
-import { transactionKeys } from "@/lib/query-keys";
+import { getBudgets } from "@/lib/services/budget";
+import { budgetKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
+import type { BudgetWithCategory } from "@/lib/types/domain-types";
 
-interface WarningSectionProps {
-  warningCards: WarningCards[];
-}
-
-export function WarningSection({
-  warningCards,
-}: WarningSectionProps) {
+export function WarningSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const queryClient = useQueryClient();
 
   const {
     data: upcomingTransactions,
@@ -39,9 +36,25 @@ export function WarningSection({
   } = useQuery({
     queryKey: transactionKeys.upcomingRecurring(hubId),
     queryFn: async () => {
-      const res = await getUpcomingRecurringTransactions();
+      const res = await getUpcomingRecurringTransactions(14, hubId || undefined);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch upcoming transactions");
+      }
+      return res.data ?? [];
+    },
+    enabled: !!hubId,
+  });
+
+  const {
+    data: budgets,
+    isLoading: budgetsLoading,
+    error: budgetsError,
+  } = useQuery({
+    queryKey: budgetKeys.list(hubId),
+    queryFn: async () => {
+      const res = await getBudgets(undefined, undefined, hubId || undefined);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
       }
       return res.data ?? [];
     },
@@ -54,6 +67,21 @@ export function WarningSection({
     t("upcoming-cards.table-data.table-heading.account.title"),
     t("upcoming-cards.table-data.table-heading.amount"),
   ];
+
+  const budgetWarnings = budgets ? budgets.filter((b: BudgetWithCategory) => {
+    const allocated = Number(b.allocatedAmount ?? 0);
+    const carried = Number(b.carriedOverAmount ?? 0);
+    const totalAllocated = allocated + (allocated > 0 ? carried : 0);
+
+    const ist = Number(b.spentAmount ?? 0);
+    const spent = Number(b.calculatedSpentAmount ?? 0);
+    const totalSpent = ist + spent;
+
+    const threshold = b.warningPercentage ?? 80;
+    const percent = totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
+
+    return percent >= threshold;
+  }) : [];
 
   return (
     <section className="grid auto-rows-min grid-cols-7 gap-4">
@@ -70,31 +98,27 @@ export function WarningSection({
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
           {upcomingError ? (
-            <p className="px-6 text-sm text-red-500">
-              {upcomingError instanceof Error
-                ? upcomingError.message
-                : String(upcomingError)}
-            </p>
+            <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: transactionKeys.upcomingRecurring(hubId) })} />
           ) : upcomingLoading || !upcomingTransactions ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("upcoming-cards.loading")}
             </p>
           ) : (
-          <div className="min-w-full">
-            <Table className="min-w-[600px]">
-              <TableHeader>
-                <TableRow className="dark:border-border-blue">
-                  {upComingTableHeadings.map((heading) => (
-                    <TableHead
-                      className="font-bold text-gray-500 dark:text-gray-400/80"
-                      key={heading}
-                    >
-                      {heading}
-                    </TableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody className="overflow-x-scroll">
+            <div className="min-w-full">
+              <Table className="min-w-[600px]">
+                <TableHeader>
+                  <TableRow className="dark:border-border-blue">
+                    {upComingTableHeadings.map((heading) => (
+                      <TableHead
+                        className="font-bold text-gray-500 dark:text-gray-400/80"
+                        key={heading}
+                      >
+                        {heading}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody className="overflow-x-scroll">
                   {upcomingTransactions.length > 0 ? (
                     upcomingTransactions.map((data) => (
                       <TableRow className="dark:border-border-blue" key={data.id}>
@@ -117,44 +141,56 @@ export function WarningSection({
                       </TableCell>
                     </TableRow>
                   )}
-              </TableBody>
-            </Table>
-          </div>
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
       <Card className="bg-blue-background dark:border-border-blue col-span-full lg:col-span-3">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("warning-cards.title")}</CardTitle>
-          <Button
-            variant="outline"
-            className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
-          >
-            {t("warning-cards.button")}
-          </Button>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
-        <CardContent className="space-y-3">
-          {warningCards.map((card, idx) => (
-            <div
-              key={card.title}
-              className={cn(
-                "bg-badge-background flex items-center gap-2 rounded-full border px-4 py-2",
-                idx === 0 && "border-[#9A6F42]",
-                idx === 1 && "border-[#9A4249]",
-              )}
-            >
-              <p className="text-sm">{card.title}</p>
-              {card.badge && (
-                <Badge
-                  variant="outline"
-                  className="bg-dark-blue-background rounded-full px-2 py-1"
+        <CardContent className="space-y-3 pt-6">
+          {budgetsLoading ? (
+            <p className="text-muted-foreground text-sm">{t("upcoming-cards.loading")}</p>
+          ) : budgetsError ? (
+            <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) })} />
+          ) : budgetWarnings.length > 0 ? (
+            budgetWarnings.map((b: BudgetWithCategory) => {
+              const allocated = Number(b.allocatedAmount ?? 0);
+              const carried = Number(b.carriedOverAmount ?? 0);
+              const totalAllocated = allocated + (allocated > 0 ? carried : 0);
+              const ist = Number(b.spentAmount ?? 0);
+              const spent = Number(b.calculatedSpentAmount ?? 0);
+              const totalSpent = ist + spent;
+              const percent = totalAllocated > 0 ? (totalSpent / totalAllocated) * 100 : 0;
+              const isExceeded = percent >= 100;
+
+              return (
+                <div
+                  key={b.id}
+                  className={cn(
+                    "bg-badge-background flex items-center gap-2 rounded-full border px-4 py-2",
+                    isExceeded ? "border-[#9A4249]" : "border-[#9A6F42]",
+                  )}
                 >
-                  {card.badge}
-                </Badge>
-              )}
-            </div>
-          ))}
+                  <p className="text-sm">
+                    {b.categoryName} {isExceeded ? "budget exceeded" : `budget at ${Math.round(percent)}%`}
+                  </p>
+                  <Badge
+                    variant="outline"
+                    className="bg-dark-blue-background rounded-full px-2 py-1 ml-auto"
+                  >
+                    CHF {totalSpent.toLocaleString()} / {totalAllocated.toLocaleString()}
+                  </Badge>
+                </div>
+              );
+            })
+          ) : (
+            <p className="text-muted-foreground text-sm italic">No warnings. Your budget is healthy!</p>
+          )}
         </CardContent>
       </Card>
     </section>

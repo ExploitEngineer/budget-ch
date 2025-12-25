@@ -35,7 +35,9 @@
         "loading": "Chargement...",
         "updating": "Mise à jour...",
         "update": "Mettre à jour",
-        "add": "Ajouter"
+        "add": "Ajouter",
+        "error": "Quelque chose s'est mal passé. Veuillez réessayer.",
+        "retry": "Réessayer"
     },
     "greeting": {
         "title": "Comment ça va ?",
@@ -223,11 +225,11 @@
                 },
                 "card-2": {
                     "title": "Dépenses (Réelles)",
-                    "badge": "% du budget"
+                    "badge": "du budget"
                 },
                 "card-3": {
                     "title": "Disponible",
-                    "badge": "+40% de marge"
+                    "badge": "de marge"
                 },
                 "card-4": {
                     "title": "Prévision jusqu’au 30/09/2025",
@@ -444,7 +446,7 @@
                 }
             },
             "checkboxes": {
-                "receipt": "Avec reçu",
+                "recipient": "Avec Destinataire",
                 "recurring": "Récurrent",
                 "transfers": "Transferts uniquement"
             },
@@ -455,14 +457,14 @@
             "data-table": {
                 "header": {
                     "checkbox": "Tous",
-                "buttons": {
-                    "delete": "Supprimer",
-                    "deleteAll": "Tout supprimer",
-                    "deleteSelected": "Supprimer la sélection",
-                    "category": "Catégorie",
-                    "export": "Exporter",
-                    "update": "Mettre à jour"
-                },
+                    "buttons": {
+                        "delete": "Supprimer",
+                        "deleteAll": "Tout supprimer",
+                        "deleteSelected": "Supprimer la sélection",
+                        "category": "Catégorie",
+                        "export": "Exporter",
+                        "update": "Mettre à jour"
+                    },
                     "badge": "Solde :"
                 },
                 "confirmation": {
@@ -567,7 +569,7 @@
                 "card-2": {
                     "title": "Dépensé jusqu'à présent",
                     "content": "CHF 1’915.00",
-                    "badge": "% du budget"
+                    "badge": "du budget"
                 },
                 "card-3": {
                     "title": "Disponible",
@@ -586,7 +588,7 @@
                 "rest-budget": "Restant : ",
                 "buttons": {
                     "export": "Exporter CSV",
-                    "reset": "Réinitialiser (Demo)"
+                    "reset": "Réinitialiser"
                 },
                 "headings": {
                     "category": "CATÉGORIE",
@@ -734,7 +736,7 @@
             },
             "settings-section": {
                 "title": "Paramètres",
-                "button": "Réinitialiser la démo",
+                "button": "Réinitialiser",
                 "checkboxes": {
                     "monthly": "Allocation automatique mensuelle active",
                     "goals": "Afficher les objectifs surfinancés"
@@ -841,7 +843,7 @@
                 "badge": "5 comptes • Liquidité CHF 2’620.00",
                 "buttons": {
                     "export": "Exporter CSV",
-                    "reset": "Réinitialiser la démo"
+                    "reset": "Réinitialiser"
                 },
                 "headings": {
                     "name": "NOM",

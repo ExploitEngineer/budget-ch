@@ -12,7 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useTranslations } from "next-intl";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { ErrorState } from "@/components/ui/error-state";
 import { getRecentTransactions } from "@/lib/api";
 import { transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
@@ -25,6 +26,7 @@ export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const queryClient = useQueryClient();
 
   const {
     data: domainTransactions,
@@ -73,11 +75,7 @@ export function RecentTransactionsTableSection() {
         <Separator className="dark:bg-border-blue" />
         <CardContent className="overflow-x-auto">
           {transactionError ? (
-            <p className="px-6 text-sm text-red-500">
-              {transactionError instanceof Error
-                ? transactionError.message
-                : String(transactionError)}
-            </p>
+            <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) })} />
           ) : transactionLoading || !transactions ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("upcoming-cards.loading")}

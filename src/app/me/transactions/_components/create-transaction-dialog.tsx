@@ -85,6 +85,7 @@ export default function CreateTransactionDialog({
       startDate?: Date;
       endDate?: Date | null;
       recurringStatus?: "active" | "inactive";
+      hubIdArg?: string;
     }) => {
       const result = await createTransaction({
         categoryName: data.category?.trim() || "",
@@ -99,6 +100,7 @@ export default function CreateTransactionDialog({
         startDate: data.startDate,
         endDate: data.endDate,
         recurringStatus: data.recurringStatus,
+        hubIdArg: data.hubIdArg,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -124,7 +126,7 @@ export default function CreateTransactionDialog({
       ) {
         toast.error(
           error.message ||
-            "Something went wrong while creating the transaction.",
+          "Something went wrong while creating the transaction.",
         );
       } else {
         toast.error(error.message);
@@ -146,7 +148,7 @@ export default function CreateTransactionDialog({
     },
     enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
   });
-  
+
   // Transform domain accounts to UI rows
   const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
@@ -205,6 +207,7 @@ export default function CreateTransactionDialog({
         recurringStatus: values.isRecurring
           ? values.recurringStatus
           : undefined,
+        hubIdArg: hubId || undefined,
       });
 
       form.reset();
@@ -463,8 +466,8 @@ export default function CreateTransactionDialog({
                                   accountsLoading
                                     ? "Loading accounts..."
                                     : t(
-                                        "dialog.placeholders.destinationAccount",
-                                      )
+                                      "dialog.placeholders.destinationAccount",
+                                    )
                                 }
                               />
                             </SelectTrigger>

@@ -44,9 +44,11 @@ import CategorySelector from "@/components/category-selector";
 export default function CreateBudgetDialog({
   variant = "gradient",
   text,
+  defaultCategory = "",
 }: {
   variant?: "gradient" | "outline";
   text?: string;
+  defaultCategory?: string;
 }) {
   const t = useTranslations(
     "main-dashboard.budgets-page.sidebar-header.dialog",
@@ -87,7 +89,7 @@ export default function CreateBudgetDialog({
   const form = useForm<BudgetDialogValues>({
     resolver: zodResolver(BudgetDialogSchema) as any,
     defaultValues: {
-      category: "",
+      category: defaultCategory,
       budgetChf: 0,
       istChf: 0,
       warning: 0,
@@ -115,185 +117,185 @@ export default function CreateBudgetDialog({
 
   return (
     <Dialog
-        open={open}
-        onOpenChange={(isOpen) => {
-          setOpen(isOpen);
-          if (!isOpen) {
-            // Reset form when dialog closes
-            form.reset();
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          // Reset form when dialog closes
+          form.reset();
+        }
+      }}
+    >
+      <DialogTrigger className="cursor-pointer" asChild>
+        <Button
+          className={
+            variant === "gradient"
+              ? "btn-gradient flex items-center gap-2 dark:text-white"
+              : "bg-dark-blue-background! dark:border-border-blue flex cursor-pointer items-center gap-2"
           }
-        }}
-      >
-        <DialogTrigger className="cursor-pointer" asChild>
-          <Button
-            className={
-              variant === "gradient"
-                ? "btn-gradient flex items-center gap-2 dark:text-white"
-                : "bg-dark-blue-background! dark:border-border-blue flex cursor-pointer items-center gap-2"
-            }
-            variant={variant === "gradient" ? "default" : "outline"}
-          >
-            <Plus className="h-5 w-5" />
-            <span className="hidden text-sm sm:block">
-              {variant === "gradient" ? t("title") : text}
-            </span>
-          </Button>
-        </DialogTrigger>
+          variant={variant === "gradient" ? "default" : "outline"}
+        >
+          <Plus className="h-5 w-5" />
+          <span className="hidden text-sm sm:block">
+            {variant === "gradient" ? t("title") : text}
+          </span>
+        </Button>
+      </DialogTrigger>
 
-        <DialogContent className="max-w-2xl [&>button]:hidden">
-          <div className="flex items-center justify-between border-b pb-3">
-            <DialogTitle className="text-lg font-semibold">
-              {t("title")}
-            </DialogTitle>
-            <DialogClose asChild>
+      <DialogContent className="max-w-2xl [&>button]:hidden">
+        <div className="flex items-center justify-between border-b pb-3">
+          <DialogTitle className="text-lg font-semibold">
+            {t("title")}
+          </DialogTitle>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant="ghost"
+              className="cursor-pointer border"
+            >
+              {t("button")}
+            </Button>
+          </DialogClose>
+        </div>
+
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 pt-4"
+          >
+            {/* Row 1: Category */}
+            <CategorySelector
+              control={form.control}
+              name="category"
+              hubId={hubId}
+              label={t("labels.category.title")}
+              enabled={open}
+              onCategoryAdded={handleCategoryAdded}
+            />
+            {/* Row 2: Budget & Ist */}
+            <div className="flex items-center justify-between gap-3">
+              <FormField
+                control={form.control}
+                name="budgetChf"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.budget-chf")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step={0.5}
+                        min={0}
+                        {...field}
+                        placeholder="0.00"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="istChf"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.1-chf")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step={0.5}
+                        min={0}
+                        {...field}
+                        placeholder="0.00"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Row 3: Warning and Color Marker */}
+            <div className="flex items-center justify-between gap-3">
+              <FormField
+                control={form.control}
+                name="warning"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.warning")}</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step={1}
+                        min={0}
+                        max={100}
+                        {...field}
+                        placeholder="0"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="colorMarker"
+                render={({ field }) => (
+                  <FormItem className="flex flex-1 flex-col">
+                    <FormLabel>{t("labels.color-marker.title")}</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue
+                            placeholder={t("labels.color-marker.title")}
+                          />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="standard">
+                            {t("labels.color-marker.options.std")}
+                          </SelectItem>
+                          <SelectItem value="green">
+                            {t("labels.color-marker.options.green")}
+                          </SelectItem>
+                          <SelectItem value="orange">
+                            {t("labels.color-marker.options.orange")}
+                          </SelectItem>
+                          <SelectItem value="red">
+                            {t("labels.color-marker.options.red")}
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* Footer buttons */}
+            <div className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
-                variant="ghost"
-                className="cursor-pointer border"
+                className="cursor-pointer"
+                variant="outline"
+                onClick={() => setOpen(false)}
               >
-                {t("button")}
+                {t("cancel")}
               </Button>
-            </DialogClose>
-          </div>
-
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 pt-4"
-            >
-              {/* Row 1: Category */}
-              <CategorySelector
-                control={form.control}
-                name="category"
-                hubId={hubId}
-                label={t("labels.category.title")}
-                enabled={open}
-                onCategoryAdded={handleCategoryAdded}
-              />
-              {/* Row 2: Budget & Ist */}
-              <div className="flex items-center justify-between gap-3">
-                <FormField
-                  control={form.control}
-                  name="budgetChf"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col">
-                      <FormLabel>{t("labels.budget-chf")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step={0.5}
-                          min={0}
-                          {...field}
-                          placeholder="0.00"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="istChf"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col">
-                      <FormLabel>{t("labels.1-chf")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step={0.5}
-                          min={0}
-                          {...field}
-                          placeholder="0.00"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Row 3: Warning and Color Marker */}
-              <div className="flex items-center justify-between gap-3">
-                <FormField
-                  control={form.control}
-                  name="warning"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col">
-                      <FormLabel>{t("labels.warning")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          step={1}
-                          min={0}
-                          max={100}
-                          {...field}
-                          placeholder="0"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="colorMarker"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-1 flex-col">
-                      <FormLabel>{t("labels.color-marker.title")}</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          value={field.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue
-                              placeholder={t("labels.color-marker.title")}
-                            />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="standard">
-                              {t("labels.color-marker.options.std")}
-                            </SelectItem>
-                            <SelectItem value="green">
-                              {t("labels.color-marker.options.green")}
-                            </SelectItem>
-                            <SelectItem value="orange">
-                              {t("labels.color-marker.options.orange")}
-                            </SelectItem>
-                            <SelectItem value="red">
-                              {t("labels.color-marker.options.red")}
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              {/* Footer buttons */}
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  type="button"
-                  className="cursor-pointer"
-                  variant="outline"
-                  onClick={() => setOpen(false)}
-                >
-                  {t("cancel")}
-                </Button>
-                <Button
-                  className="cursor-pointer"
-                  disabled={createBudgetMutation.isPending}
-                  type="submit"
-                >
-                  {createBudgetMutation.isPending ? <Spinner /> : t("save")}
-                </Button>
-              </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+              <Button
+                className="cursor-pointer"
+                disabled={createBudgetMutation.isPending}
+                type="submit"
+              >
+                {createBudgetMutation.isPending ? <Spinner /> : t("save")}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

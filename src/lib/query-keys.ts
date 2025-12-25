@@ -38,10 +38,12 @@ export const transactionKeys = {
 export const budgetKeys = {
   all: ["budgets"] as const,
   lists: () => [...budgetKeys.all, "list"] as const,
-  list: (hubId: string | null) => [...budgetKeys.lists(), hubId] as const,
-  amounts: (hubId: string | null) => [...budgetKeys.all, "amounts", hubId] as const,
+  list: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.lists(), hubId, month, year] as const,
+  amounts: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.all, "amounts", hubId, month, year] as const,
   topCategories: (hubId: string | null) => [...budgetKeys.all, "top-categories", hubId] as const,
   categoriesCount: (hubId: string | null) => [...budgetKeys.all, "categories-count", hubId] as const,
+  warningsCount: (hubId: string | null, month?: number, year?: number) => [...budgetKeys.all, "warnings-count", hubId, month, year] as const,
+  forecast: (hubId: string | null) => [...budgetKeys.all, "forecast", hubId] as const,
 };
 
 /**
@@ -91,5 +93,13 @@ export const notificationKeys = {
     [...notificationKeys.lists(), hubId, unreadOnly, limit] as const,
   count: (hubId: string | null) =>
     [...notificationKeys.all, "count", hubId] as const,
+};
+
+/**
+ * Query key factory for hubs
+ */
+export const hubKeys = {
+  all: ["hubs"] as const,
+  settings: (hubId: string | null) => [...hubKeys.all, "settings", hubId] as const,
 };
 

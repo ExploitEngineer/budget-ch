@@ -9,12 +9,13 @@ export interface ApiResponse<T = unknown> {
 export function apiSuccess<T = unknown>({
   data,
   status = 200,
+  message,
 }: {
   data: T;
   status?: number;
   message?: string;
 }) {
-  return NextResponse.json({ success: true, data }, { status });
+  return NextResponse.json({ success: true, data, message }, { status });
 }
 
 export function apiError<T = unknown>({

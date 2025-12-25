@@ -19,7 +19,7 @@ export const TransactionDialogSchema = z.object({
   recipient: z.string().optional().nullable(),
   category: z.string().optional(),
   destinationAccountId: z.string().optional(),
-  amount: z.coerce.number({ message: "Amount must be 0 or more" }),
+  amount: z.coerce.number().positive({ message: "Amount must be greater than 0" }),
   note: z.string().optional(),
   splits: z.array(splitSchema).optional(),
   // Recurring transaction fields

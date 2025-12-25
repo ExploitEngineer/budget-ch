@@ -41,10 +41,11 @@ export async function getDetailedCategories() {
 }
 
 // GET Monthly Report [Action]
-export async function getMonthlyReportAction() {
+export async function getMonthlyReportAction(hubIdArg?: string) {
   try {
     const hdrs = await headers();
-    const { hubId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
 
     if (!hubId) {
       return { success: false, message: "Missing hubId parameter." };

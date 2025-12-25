@@ -111,9 +111,10 @@ const transactionFilterFn: FilterFn<Transaction> = (
     if (!matchesRecipient && !matchesNote && !matchesCategory) return false;
   }
 
-  // Recurring filter (only show recurring transactions when checked)
-  if (filterValue.isRecurring) {
-    if (tx.recurringTemplateId) return false;
+  // With Recipient filter
+  if (filterValue.withReceipt) {
+    const recipient = tx.recipient?.trim();
+    if (!recipient || recipient === "—") return false;
   }
 
   // Transfers only filter
@@ -121,10 +122,17 @@ const transactionFilterFn: FilterFn<Transaction> = (
     if (tx.type !== "transfer") return false;
   }
 
-  // With receipt filter - currently transactions don't have receipt field
-  // This filter is ready for when the feature is implemented
-  if (filterValue.withReceipt) {
-    if (!tx.recipient) return false;
+  // Recurring filter (only show recurring transactions when checked)
+  if (filterValue.isRecurring) {
+    console.log('🔍 RECURRING FILTER CHECK:', {
+      isRecurringFilterActive: filterValue.isRecurring,
+      txId: tx.id,
+      txRecipient: tx.recipient,
+      txRecurringTemplateId: tx.recurringTemplateId,
+      txIsRecurring: tx.isRecurring,
+      willShow: !!tx.recurringTemplateId
+    });
+    if (!tx.recurringTemplateId) return false;
   }
 
   return true;
@@ -183,7 +191,7 @@ export function DataTable({
       setConfirmDialogOpen(false);
       toast.error(
         error.message ||
-          "Something went wrong while deleting all transactions.",
+        "Something went wrong while deleting all transactions.",
       );
     },
   });
@@ -210,7 +218,7 @@ export function DataTable({
       setConfirmDeleteSelectedDialogOpen(false);
       toast.error(
         error.message ||
-          t("data-table.delete-selected.error"),
+        t("data-table.delete-selected.error"),
       );
     },
   });
@@ -291,16 +299,19 @@ export function DataTable({
       header: t("data-table.headings.amount"),
       cell: ({ row }) => {
         const amount = row.original.amount ?? 0;
+        const type = row.original.type;
         const formatted = new Intl.NumberFormat("de-CH", {
           style: "currency",
           currency: "CHF",
         }).format(amount);
+
+        // Color based on transaction type:
+        // expense & transfer = red (deduct)
+        // income = green (add)
+        const colorClass = type === "income" ? "text-green-600" : "text-red-600";
+
         return (
-          <span
-            className={`font-semibold ${
-              amount < 0 ? "text-red-600" : "text-green-600"
-            }`}
-          >
+          <span className={`font-semibold ${colorClass}`}>
             {formatted}
           </span>
         );
@@ -557,9 +568,9 @@ export function DataTable({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   ))}
                 </TableRow>

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getBudgetsAmounts } from "@/lib/services/budget";
+import { getBudgetsAmounts, getBudgets } from "@/lib/api";
 import { getCategoriesCount } from "@/lib/services/category";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
@@ -21,29 +21,39 @@ export function BudgetCardsSection() {
   const t = useTranslations("main-dashboard.budgets-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
+  const year = searchParams.get("year") ? parseInt(searchParams.get("year")!) : undefined;
 
   const {
     data: amounts,
     isLoading: amountsLoading,
     error: amountsError,
   } = useQuery({
-    queryKey: budgetKeys.amounts(hubId),
+    queryKey: budgetKeys.amounts(hubId, month, year),
     queryFn: async () => {
-      const res = await getBudgetsAmounts();
+      if (!hubId) return null;
+      const res = await getBudgetsAmounts(hubId, month, year);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch budget amounts");
       }
-      const totalAllocated = res.data?.totalAllocated ?? 0;
-      const totalSpent = res.data?.totalSpent ?? 0;
-      return {
-        allocated: totalAllocated,
-        spent: totalSpent,
-        available: totalAllocated - totalSpent,
-        percent:
-          totalAllocated > 0
-            ? Math.min((totalSpent / totalAllocated) * 100, 100)
-            : 0,
-      };
+      return res.data;
+    },
+    enabled: !!hubId,
+  });
+
+
+  const {
+    data: budgets,
+    isLoading: budgetsLoading,
+  } = useQuery({
+    queryKey: budgetKeys.list(hubId, month, year),
+    queryFn: async () => {
+      if (!hubId) return [];
+      const res = await getBudgets(hubId, month, year);
+      if (!res.success) {
+        throw new Error(res.message || "Failed to fetch budgets");
+      }
+      return res.data ?? [];
     },
     enabled: !!hubId,
   });
@@ -55,7 +65,8 @@ export function BudgetCardsSection() {
   } = useQuery({
     queryKey: budgetKeys.categoriesCount(hubId),
     queryFn: async () => {
-      const res = await getCategoriesCount();
+      if (!hubId) return 0;
+      const res = await getCategoriesCount(hubId);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch categories count");
       }
@@ -64,10 +75,19 @@ export function BudgetCardsSection() {
     enabled: !!hubId,
   });
 
-  const allocated = amounts?.allocated ?? null;
-  const spent = amounts?.spent ?? null;
-  const available = amounts?.available ?? null;
-  const percent = amounts?.percent ?? 0;
+  const warningCount = budgets?.filter((b) => {
+    const ist = Number(b.spentAmount ?? 0);
+    const spent = Number(b.calculatedSpentAmount ?? 0);
+    const totalSpent = ist + spent;
+    const allocated = Number(b.allocatedAmount ?? 0);
+    const threshold = (allocated * (b.warningPercentage ?? 100)) / 100;
+    return allocated > 0 && totalSpent > threshold;
+  }).length;
+
+  const allocated = amounts?.totalAllocated ?? null;
+  const spent = amounts?.totalSpent ?? null;
+  const available = (allocated !== null && spent !== null) ? allocated - spent : null;
+  const percent = (allocated !== null && spent !== null && allocated > 0) ? (spent / allocated) * 100 : 0;
 
   const cards: CardsContent[] = [
     {
@@ -78,12 +98,14 @@ export function BudgetCardsSection() {
     {
       title: t("cards.card-2.title"),
       content: `CHF ${spent?.toLocaleString() ?? "—"}`,
-      badge: percent + t("cards.card-2.badge"),
+      badge: percent.toFixed(0) + "% " + t("cards.card-2.badge"),
     },
     {
-      title: t("cards.card-3.title"),
+      title: (available ?? 0) < 0 ? t("cards.card-3.title-over") : t("cards.card-3.title"),
       content: `CHF ${available?.toLocaleString() ?? "—"}`,
-      badge: t("cards.card-3.badge"),
+      badge: (available ?? 0) < 0
+        ? `${Math.ceil(Math.abs(percent - 100))}% ` + t("cards.card-3.badge-over")
+        : `+${(100 - percent).toFixed(0)}% ` + t("cards.card-3.badge"),
     },
     {
       title: t("cards.card-4.title"),
@@ -92,7 +114,10 @@ export function BudgetCardsSection() {
         : categoriesError
           ? "—"
           : String(categoriesCount ?? "—"),
-      badge: t("cards.card-4.badge"),
+      badge:
+        budgetsLoading || categoriesLoading
+          ? "..."
+          : `${t("cards.card-4.badge")}: ${warningCount ?? 0}`,
     },
   ];
 

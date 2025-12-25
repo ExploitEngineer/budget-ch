@@ -23,13 +23,16 @@ import type {
  * Derived from BudgetWithCategory with UI-specific field names and computed values
  */
 export interface BudgetRow {
-  id: BudgetWithCategory["id"];
-  category: string; // Maps from categoryName, with fallback to "Uncategorized"
-  allocated: BudgetWithCategory["allocatedAmount"];
-  ist: BudgetWithCategory["spentAmount"]; // Initial stored spent amount
+  id: string | null; // Null if category is not budgeted
+  category: string; // Maps from categoryName
+  allocated: number | null;
+  ist: number | null; // Initial stored spent amount
   spent: number; // Calculated spent amount from transactions
-  remaining: number; // Computed: allocated - spent (using calculated spent)
-  progress: number; // Computed: (spent / allocated) * 100 (using calculated spent)
+  carriedOver: number | null; // Carried over from previous month
+  remaining: number; // Computed: allocated - (spent + ist)
+  progress: number; // Computed: ((spent + ist) / allocated) * 100
+  warningThreshold: number | null;
+  colorMarker: string | null;
 }
 
 /**

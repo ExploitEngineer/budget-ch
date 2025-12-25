@@ -113,7 +113,7 @@ export const auth = betterAuth({
           }
         }
       }
-      if(ctx.path.startsWith("/sign-out")) {}
+      if (ctx.path.startsWith("/sign-out")) { }
     }),
   },
   emailAndPassword: {
@@ -146,7 +146,7 @@ export const auth = betterAuth({
 `;
       try {
         await mailer.sendMail({
-          from: `"Budget-ch" <${process.env.MAIL_USER!}`,
+          from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
           to: user.email,
           subject: "Reset Your Password",
           html,

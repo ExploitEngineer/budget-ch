@@ -14,6 +14,7 @@ import {
   userSettings,
   recurringTransactionTemplates,
   notifications,
+  budgetInstances,
 } from "./schema";
 import { eq, desc, gte, lte, sql, inArray, and, or, isNull } from "drizzle-orm";
 import type {
@@ -22,6 +23,7 @@ import type {
   SubscriptionType,
   UserSettingsType,
   Notification,
+  BudgetInstance,
 } from "./schema";
 import type {
   CreateBudgetInput,
@@ -296,7 +298,7 @@ export async function deleteSubscriptionRecord(
 export async function getUserByEmailDB(email: string) {
   try {
     const user = await db.query.users.findFirst({
-      where: eq(users.email, email),
+      where: eq(sql`lower(${users.email})`, email.toLowerCase()),
       columns: {
         id: true,
         name: true,
@@ -690,7 +692,10 @@ export async function createTransactionDB({
   note,
   transactionType,
   destinationAccountId,
-}: Omit<createTransactionArgs, "categoryName">) {
+  recurringTemplateId,
+}: Omit<createTransactionArgs, "categoryName"> & {
+  recurringTemplateId?: string | null;
+}) {
   try {
     await db.insert(transactions).values({
       financialAccountId,
@@ -702,6 +707,7 @@ export async function createTransactionDB({
       note,
       type: transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+      recurringTemplateId: recurringTemplateId || null,
     });
 
     return { success: true, message: "Transaction created successfully" };
@@ -1347,6 +1353,22 @@ export async function getSavingGoalsDB(
       );
       const remainingToSave = totalTarget - totalSaved;
 
+      // Sum total monthly allocation across all goals
+      const totalMonthlyAllocation = goals.reduce(
+        (sum, g) => sum + (g.monthlyAllocation ?? 0),
+        0,
+      );
+
+      // Count overdue goals (past due date and not achieved)
+      const today = new Date();
+      const overdueGoalsCount = goals.filter(g => {
+        if (!g.dueDate) return false; // No due date = not overdue
+        const dueDate = new Date(g.dueDate);
+        const amountSaved = g.amountSaved ?? 0;
+        const goalAmount = g.goalAmount ?? 0;
+        return dueDate < today && amountSaved < goalAmount;
+      }).length;
+
       return {
         success: true,
         data: {
@@ -1354,6 +1376,8 @@ export async function getSavingGoalsDB(
           totalSaved,
           remainingToSave,
           totalGoals: goals.length,
+          overdueGoalsCount,
+          totalMonthlyAllocation,
         },
       };
     }
@@ -1546,17 +1570,17 @@ export async function getBudgetsDB(
 ): Promise<{
   success: boolean;
   data?: Array<{
-    id: string;
+    id: string | null;
     hubId: string;
     userId: string | null;
-    transactionCategoryId: string | null;
-    allocatedAmount: number;
-    spentAmount: number;
+    transactionCategoryId: string;
+    allocatedAmount: number | null;
+    spentAmount: number | null;
     calculatedSpentAmount: number;
-    warningPercentage: number;
-    markerColor: string;
-    createdAt: Date;
-    updatedAt: Date;
+    warningPercentage: number | null;
+    markerColor: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
     categoryName: string | null;
   }>;
   message?: string;
@@ -1592,9 +1616,9 @@ export async function getBudgetsDB(
     const query = db
       .select({
         id: budgets.id,
-        hubId: budgets.hubId,
+        hubId: transactionCategories.hubId,
         userId: budgets.userId,
-        transactionCategoryId: budgets.transactionCategoryId,
+        transactionCategoryId: transactionCategories.id,
         allocatedAmount: budgets.allocatedAmount,
         spentAmount: budgets.spentAmount, // IST - stored initial spent amount
         calculatedSpentAmount: sql<number>`COALESCE(${spentAmountsSubquery.totalSpent}, 0)`.as(
@@ -1606,20 +1630,20 @@ export async function getBudgetsDB(
         updatedAt: budgets.updatedAt,
         categoryName: transactionCategories.name,
       })
-      .from(budgets)
+      .from(transactionCategories)
       .leftJoin(
-        transactionCategories,
-        eq(transactionCategories.id, budgets.transactionCategoryId),
+        budgets,
+        eq(budgets.transactionCategoryId, transactionCategories.id),
       )
       .leftJoin(
         spentAmountsSubquery,
         eq(
           spentAmountsSubquery.transactionCategoryId,
-          budgets.transactionCategoryId,
+          transactionCategories.id,
         ),
       )
-      .where(eq(budgets.hubId, hubId))
-      .orderBy(desc(budgets.createdAt));
+      .where(eq(transactionCategories.hubId, hubId))
+      .orderBy(desc(transactionCategories.createdAt));
 
     if (limit) {
       const results = await query.limit(limit);
@@ -1635,6 +1659,251 @@ export async function getBudgetsDB(
       message: err.message || "Failed to fetch budgets",
     };
   }
+}
+
+// GET Budgets by Month - Returns canonical BudgetWithCategory[] domain type
+export async function getBudgetsByMonthDB(
+  hubId: string,
+  month: number,
+  year: number,
+  limit?: number,
+): Promise<{
+  success: boolean;
+  data?: Array<{
+    id: string | null;
+    hubId: string;
+    userId: string | null;
+    transactionCategoryId: string;
+    allocatedAmount: number | null;
+    spentAmount: number | null;
+    calculatedSpentAmount: number;
+    carriedOverAmount: number;
+    warningPercentage: number | null;
+    markerColor: string | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+    categoryName: string | null;
+    isInstance: boolean; // Flag to indicate if this is from an instance
+  }>;
+  message?: string;
+}> {
+  try {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+
+    // Create a subquery to calculate gross spent amounts from transactions for each category
+    // Gross spent = sum of expenses
+    // FILTERED by Month/Year
+    const spentAmountsSubquery = db
+      .select({
+        transactionCategoryId: transactions.transactionCategoryId,
+        totalSpent: sql<number>`
+          COALESCE(SUM(CASE WHEN ${transactions.type} = 'expense' THEN ${transactions.amount} ELSE 0 END), 0)
+        `.as("totalSpent"),
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.hubId, hubId),
+          gte(transactions.createdAt, startDate),
+          lte(transactions.createdAt, endDate),
+          or(
+            eq(transactions.type, "expense"),
+            eq(transactions.type, "income"),
+          ),
+          sql`${transactions.transactionCategoryId} IS NOT NULL`,
+        ),
+      )
+      .groupBy(transactions.transactionCategoryId)
+      .as("spentAmounts");
+
+    const query = db
+      .selectDistinctOn([transactionCategories.id], {
+        id: budgets.id,
+        hubId: transactionCategories.hubId,
+        userId: budgets.userId,
+        transactionCategoryId: transactionCategories.id,
+        // Coalesce: Use Instance amount if exists, else Template amount
+        allocatedAmount: sql<number>`COALESCE(${budgetInstances.allocatedAmount}, ${budgets.allocatedAmount})`.as(
+          "allocatedAmount",
+        ),
+        spentAmount: budgets.spentAmount, // IST - stored initial spent amount (Warning: this is static!)
+        calculatedSpentAmount: sql<number>`COALESCE(${spentAmountsSubquery.totalSpent}, 0)`.as(
+          "calculatedSpentAmount",
+        ),
+        carriedOverAmount: sql<number>`COALESCE(${budgetInstances.carriedOverAmount}, 0)`.as("carriedOverAmount"),
+        warningPercentage: budgets.warningPercentage,
+        markerColor: budgets.markerColor,
+        createdAt: budgets.createdAt,
+        updatedAt: budgets.updatedAt,
+        categoryName: transactionCategories.name,
+        isInstance: sql<boolean>`CASE WHEN ${budgetInstances.id} IS NOT NULL THEN true ELSE false END`.as("isInstance"),
+      })
+      .from(transactionCategories)
+      .leftJoin(
+        budgets,
+        and(
+          eq(budgets.transactionCategoryId, transactionCategories.id),
+          lte(budgets.createdAt, endDate),
+        ),
+      )
+      .leftJoin(
+        budgetInstances,
+        and(
+          eq(budgetInstances.budgetId, budgets.id),
+          eq(budgetInstances.month, month),
+          eq(budgetInstances.year, year),
+        ),
+      )
+      .leftJoin(
+        spentAmountsSubquery,
+        eq(
+          spentAmountsSubquery.transactionCategoryId,
+          transactionCategories.id,
+        ),
+      )
+      .where(eq(transactionCategories.hubId, hubId))
+      .orderBy(transactionCategories.id, desc(transactionCategories.createdAt));
+
+    const results = await query;
+
+    // Sort in memory to respect original createdAt ordering preference
+    // since DISTINCT ON required us to order by ID first
+    results.sort((a, b) => {
+      const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return bTime - aTime;
+    });
+
+    if (limit) {
+      return { success: true, data: results.slice(0, limit) };
+    }
+
+    return { success: true, data: results };
+  } catch (err: any) {
+    console.error("Error fetching budgets by month:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch budgets",
+    };
+  }
+}
+
+// UPSERT Budget Instance
+export async function upsertBudgetInstanceDB(data: {
+  budgetId: string;
+  month: number;
+  year: number;
+  allocatedAmount?: number;
+  carriedOverAmount?: number;
+}): Promise<{ success: boolean; message: string; data?: any }> {
+  try {
+    // Check if exists
+    const existing = await db.query.budgetInstances.findFirst({
+      where: and(
+        eq(budgetInstances.budgetId, data.budgetId),
+        eq(budgetInstances.month, data.month),
+        eq(budgetInstances.year, data.year),
+      ),
+    });
+
+    if (existing) {
+      // Update
+      // Only update fields that are provided
+      const updatePayload: any = {};
+      if (data.allocatedAmount !== undefined) updatePayload.allocatedAmount = data.allocatedAmount;
+      if (data.carriedOverAmount !== undefined) updatePayload.carriedOverAmount = data.carriedOverAmount;
+      updatePayload.updatedAt = new Date();
+
+      if (Object.keys(updatePayload).length === 0) return { success: true, message: "No changes needed" };
+
+      const [updated] = await db
+        .update(budgetInstances)
+        .set(updatePayload)
+        .where(eq(budgetInstances.id, existing.id))
+        .returning();
+
+      return { success: true, message: "Budget instance updated", data: updated };
+    } else {
+      // Create
+      // Need to know required fields. allocatedAmount is required by schema default 0, same for carriedOver.
+      // If undefined, use 0 or fetching existing budget template amount?
+      // The caller should ideally provide the specific amount.
+
+      const [inserted] = await db.insert(budgetInstances).values({
+        budgetId: data.budgetId,
+        month: data.month,
+        year: data.year,
+        allocatedAmount: data.allocatedAmount ?? 0,
+        carriedOverAmount: data.carriedOverAmount ?? 0,
+      }).returning();
+
+      return { success: true, message: "Budget instance created", data: inserted };
+    }
+  } catch (err: any) {
+    console.error("Error upserting budget instance:", err);
+    return { success: false, message: err.message || "Failed to upsert budget instance" };
+  }
+}
+
+// CHECK Budget Instances Exist
+export async function checkBudgetInstancesExistDB(
+  hubId: string,
+  month: number,
+  year: number,
+): Promise<boolean> {
+  // Check if any instance exists for this hub/month/year
+  // We need to join with budgets to filter by hubId
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(budgetInstances)
+    .innerJoin(budgets, eq(budgetInstances.budgetId, budgets.id))
+    .where(
+      and(
+        eq(budgets.hubId, hubId),
+        eq(budgetInstances.month, month),
+        eq(budgetInstances.year, year),
+      ),
+    );
+
+  return Number(result[0]?.count ?? 0) > 0;
+}
+
+// GET Existing Budget Instances (Helper for deduplication)
+export async function getExistingBudgetInstancesDB(
+  hubId: string,
+  month: number,
+  year: number,
+) {
+  // Join budgetInstances with budgets to filter by hubId
+  return await db
+    .select({
+      id: budgetInstances.id,
+      budgetId: budgetInstances.budgetId,
+    })
+    .from(budgetInstances)
+    .innerJoin(budgets, eq(budgetInstances.budgetId, budgets.id))
+    .where(
+      and(
+        eq(budgets.hubId, hubId),
+        eq(budgetInstances.month, month),
+        eq(budgetInstances.year, year),
+      ),
+    );
+}
+
+// BULK CREATE Budget Instances
+export async function createBudgetInstancesDB(
+  instances: {
+    budgetId: string;
+    month: number;
+    year: number;
+    allocatedAmount: number;
+    carriedOverAmount: number;
+  }[],
+) {
+  if (instances.length === 0) return;
+  await db.insert(budgetInstances).values(instances).onConflictDoNothing();
 }
 
 // UPDATE Budget
@@ -1666,71 +1935,47 @@ export async function updateBudgetDB({
     if (updatedData.categoryName) {
       const newName = updatedData.categoryName.trim().toLowerCase();
 
-      // If budget doesn't have a category associated, find or create one
-      if (!budget.transactionCategoryId) {
-        const existingCategory = await db.query.transactionCategories.findFirst(
-          {
-            where: (cat, { and, eq, sql }) =>
+      // Find if a category with this name already exists in the hub
+      let targetCategory = await db.query.transactionCategories.findFirst({
+        where: (cat, { and, eq, sql }) =>
+          and(eq(cat.hubId, hubId), sql`LOWER(${cat.name}) = ${newName}`),
+      });
+
+      if (targetCategory) {
+        // If it's a different category than current, check for budget collision
+        if (targetCategory.id !== budget.transactionCategoryId) {
+          const otherBudget = await db.query.budgets.findFirst({
+            where: (b, { and, eq, ne }) =>
               and(
-                eq(cat.hubId, hubId),
-                sql`LOWER(${cat.name}) = ${newName}`,
+                eq(b.hubId, hubId),
+                eq(b.transactionCategoryId, targetCategory!.id),
+                ne(b.id, budgetId),
               ),
-          },
-        );
+          });
 
-        if (existingCategory) {
-          transactionCategoryId = existingCategory.id;
-        } else {
-          // Create new category
-          const [newCategory] = await db
-            .insert(transactionCategories)
-            .values({
-              hubId,
-              name: newName,
-            })
-            .returning({ id: transactionCategories.id });
-
-          transactionCategoryId = newCategory.id;
-        }
-      } else {
-        // Budget has an existing category, update it if needed
-        const currentCategory = await db.query.transactionCategories.findFirst({
-          where: (cat) => eq(cat.id, budget.transactionCategoryId!),
-        });
-
-        if (!currentCategory) {
-          return {
-            success: false,
-            message: "Current category not found.",
-          };
-        }
-
-        if (currentCategory.name.toLowerCase() === newName) {
-          transactionCategoryId = currentCategory.id;
-        } else {
-          const existingCategory = await db.query.transactionCategories.findFirst(
-            {
-              where: (cat, { and, eq, sql }) =>
-                and(
-                  eq(cat.hubId, hubId),
-                  sql`LOWER(${cat.name}) = ${newName}`,
-                ),
-            },
-          );
-
-          if (existingCategory) {
+          if (otherBudget) {
             return {
               success: false,
-              message: "A category with this name already exists in your hub.",
+              message: `A budget already exists for category "${updatedData.categoryName}"`,
             };
           }
-
+        }
+        transactionCategoryId = targetCategory.id;
+      } else {
+        // No existing category with this name. 
+        // If current budget has a category, rename it. Otherwise create new.
+        if (budget.transactionCategoryId) {
           await db
             .update(transactionCategories)
             .set({ name: newName })
-            .where(eq(transactionCategories.id, currentCategory.id));
-
-          transactionCategoryId = currentCategory.id;
+            .where(eq(transactionCategories.id, budget.transactionCategoryId));
+          transactionCategoryId = budget.transactionCategoryId;
+        } else {
+          const [newCategory] = await db
+            .insert(transactionCategories)
+            .values({ hubId, name: newName })
+            .returning({ id: transactionCategories.id });
+          transactionCategoryId = newCategory.id;
         }
       }
     }
@@ -2000,6 +2245,37 @@ export async function getMonthlyReportDB(hubId: string) {
     return { success: true, data: result };
   } catch (err: any) {
     console.error("DB Error: getMonthlyReportDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+// GET HUB Total Expenses (Gross) for a specific month
+export async function getHubTotalExpensesDB(
+  hubId: string,
+  month: number,
+  year: number,
+) {
+  try {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+
+    const result = await db
+      .select({
+        total: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
+      })
+      .from(transactions)
+      .where(
+        and(
+          eq(transactions.hubId, hubId),
+          eq(transactions.type, "expense"),
+          gte(transactions.createdAt, startDate),
+          lte(transactions.createdAt, endDate),
+        ),
+      );
+
+    return { success: true, data: result[0]?.total || 0 };
+  } catch (err: any) {
+    console.error("DB Error: getHubTotalExpensesDB:", err);
     return { success: false, message: err.message };
   }
 }
@@ -2315,6 +2591,55 @@ export async function getHubMembersDB(hubId: string) {
   }
 }
 
+// GET Hub Settings
+export async function getHubSettingsDB(hubId: string) {
+  try {
+    const hub = await db.query.hubs.findFirst({
+      where: eq(hubs.id, hubId),
+      columns: {
+        budgetCarryOver: true,
+        budgetEmailWarnings: true,
+      },
+    });
+
+    if (!hub) return { success: false, message: "Hub not found" };
+
+    return {
+      success: true,
+      data: hub,
+    };
+  } catch (err: any) {
+    console.error("Error in getHubSettingsDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+// UPDATE Hub Settings
+export async function updateHubSettingsDB(
+  hubId: string,
+  data: Partial<{ budgetCarryOver: boolean; budgetEmailWarnings: boolean }>,
+) {
+  try {
+    const [updatedHub] = await db
+      .update(hubs)
+      .set({
+        ...data,
+        updatedAt: new Date(),
+      })
+      .where(eq(hubs.id, hubId))
+      .returning();
+
+    return {
+      success: true,
+      message: "Hub settings updated successfully",
+      data: updatedHub,
+    };
+  } catch (err: any) {
+    console.error("Error in updateHubSettingsDB:", err);
+    return { success: false, message: err.message };
+  }
+}
+
 // Functions for getContext
 export async function getHubByIdDB(hubId: string) {
   return await db.query.hubs.findFirst({
@@ -2355,9 +2680,12 @@ export async function getHubMemberRoleDB(userId: string, hubId: string) {
   });
 }
 
-export async function getFinancialAccountDB(userId: string) {
+export async function getFinancialAccountDB(userId: string, hubId: string) {
   return await db.query.financialAccounts.findFirst({
-    where: eq(financialAccounts.userId, userId),
+    where: and(
+      eq(financialAccounts.userId, userId),
+      eq(financialAccounts.hubId, hubId),
+    ),
   });
 }
 
@@ -2545,9 +2873,9 @@ export async function getNotificationsDB(
           eq(notifications.hubId, hubId),
           userId
             ? or(
-                eq(notifications.userId, userId),
-                isNull(notifications.userId),
-              )
+              eq(notifications.userId, userId),
+              isNull(notifications.userId),
+            )
             : undefined,
           unreadOnly ? eq(notifications.isRead, false) : undefined,
         ),
@@ -2633,9 +2961,9 @@ export async function markAllNotificationsAsReadDB(
           eq(notifications.hubId, hubId),
           userId
             ? or(
-                eq(notifications.userId, userId),
-                isNull(notifications.userId),
-              )
+              eq(notifications.userId, userId),
+              isNull(notifications.userId),
+            )
             : undefined,
           eq(notifications.isRead, false),
         ),
@@ -2669,9 +2997,9 @@ export async function getUnreadNotificationCountDB(
         eq(notifications.hubId, hubId),
         userId
           ? or(
-              eq(notifications.userId, userId),
-              isNull(notifications.userId),
-            )
+            eq(notifications.userId, userId),
+            isNull(notifications.userId),
+          )
           : undefined,
         eq(notifications.isRead, false),
       ),
@@ -2742,6 +3070,127 @@ export async function deleteNotificationDB(
     return {
       success: false,
       message: err.message || "Failed to delete notification",
+    };
+  }
+}
+
+// GET Active Recurring Templates for Generation
+export async function getActiveRecurringTemplatesDB() {
+  try {
+    const today = new Date();
+
+    const templates = await db
+      .select({
+        id: recurringTransactionTemplates.id,
+        hubId: recurringTransactionTemplates.hubId,
+        userId: recurringTransactionTemplates.userId,
+        financialAccountId: recurringTransactionTemplates.financialAccountId,
+        destinationAccountId: recurringTransactionTemplates.destinationAccountId,
+        transactionCategoryId: recurringTransactionTemplates.transactionCategoryId,
+        type: recurringTransactionTemplates.type,
+        source: recurringTransactionTemplates.source,
+        amount: recurringTransactionTemplates.amount,
+        note: recurringTransactionTemplates.note,
+        frequencyDays: recurringTransactionTemplates.frequencyDays,
+        startDate: recurringTransactionTemplates.startDate,
+        endDate: recurringTransactionTemplates.endDate,
+        status: recurringTransactionTemplates.status,
+        lastGeneratedDate: recurringTransactionTemplates.lastGeneratedDate,
+        consecutiveFailures: recurringTransactionTemplates.consecutiveFailures,
+        categoryName: transactionCategories.name,
+      })
+      .from(recurringTransactionTemplates)
+      .leftJoin(
+        transactionCategories,
+        eq(recurringTransactionTemplates.transactionCategoryId, transactionCategories.id)
+      )
+      .where(
+        and(
+          eq(recurringTransactionTemplates.status, "active"),
+          lte(recurringTransactionTemplates.startDate, today),
+          or(
+            isNull(recurringTransactionTemplates.endDate),
+            gte(recurringTransactionTemplates.endDate, today)
+          )
+        )
+      );
+
+    return { success: true, data: templates };
+  } catch (err: any) {
+    console.error("Error fetching active recurring templates:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to fetch active recurring templates",
+    };
+  }
+}
+
+// UPDATE Template Last Generated Date
+export async function updateTemplateLastGeneratedDB(templateId: string) {
+  try {
+    await db
+      .update(recurringTransactionTemplates)
+      .set({
+        lastGeneratedDate: new Date(),
+        consecutiveFailures: 0, // Reset on success
+      })
+      .where(eq(recurringTransactionTemplates.id, templateId));
+
+    return { success: true, message: "Template updated successfully" };
+  } catch (err: any) {
+    console.error("Error updating template last generated date:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update template",
+    };
+  }
+}
+
+// MARK Template Failure
+export async function markTemplateFailureDB(
+  templateId: string,
+  reason: string
+) {
+  try {
+    // Get current template to increment failures
+    const template = await db.query.recurringTransactionTemplates.findFirst({
+      where: (t, { eq }) => eq(t.id, templateId),
+      columns: {
+        id: true,
+        consecutiveFailures: true,
+      },
+    });
+
+    if (!template) {
+      return {
+        success: false,
+        message: "Template not found",
+      };
+    }
+
+    const currentFailures = template.consecutiveFailures || 0;
+    const newFailures = currentFailures + 1;
+
+    await db
+      .update(recurringTransactionTemplates)
+      .set({
+        lastFailedDate: new Date(),
+        failureReason: reason,
+        consecutiveFailures: newFailures,
+        // Note: Auto-pause logic will be handled in service layer for now
+      })
+      .where(eq(recurringTransactionTemplates.id, templateId));
+
+    return {
+      success: true,
+      message: "Template failure marked",
+      consecutiveFailures: newFailures,
+    };
+  } catch (err: any) {
+    console.error("Error marking template failure:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to mark template failure",
     };
   }
 }

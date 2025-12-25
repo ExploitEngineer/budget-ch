@@ -35,7 +35,9 @@
         "loading": "Wird geladen...",
         "updating": "Aktualisieren...",
         "update": "Aktualisieren",
-        "add": "Hinzufügen"
+        "add": "Hinzufügen",
+        "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
+        "retry": "Wiederholen"
     },
     "greeting": {
         "title": "Wie geht es dir?",
@@ -223,11 +225,11 @@
                 },
                 "card-2": {
                     "title": "Ausgaben (Aktuell)",
-                    "badge": "% des Budgets"
+                    "badge": "des Budgets"
                 },
                 "card-3": {
                     "title": "Verfügbar",
-                    "badge": "+40% Puffer"
+                    "badge": "Puffer"
                 },
                 "card-4": {
                     "title": "Prognose bis 30.09.2025",
@@ -444,7 +446,7 @@
                 }
             },
             "checkboxes": {
-                "receipt": "Mit Beleg",
+                "recipient": "Mit Empfänger",
                 "recurring": "Wiederkehrend",
                 "transfers": "Nur Überweisungen"
             },
@@ -457,7 +459,7 @@
                     "checkbox": "Alle",
                     "buttons": {
                         "delete": "Löschen",
-                    "deleteAll": "Alles löschen",
+                        "deleteAll": "Alles löschen",
                         "deleteSelected": "Ausgewählte löschen",
                         "category": "Kategorie",
                         "export": "Exportieren",
@@ -541,7 +543,7 @@
                             "placeholder": "z. B. Lebensmittel"
                         },
                         "budget-chf": "Budget (CHF)",
-                        "1-chf": "Ist (CHF)",
+                        "1-chf": "IST (CHF)",
                         "warning": "Warnung bei (%)",
                         "color-marker": {
                             "title": "Farbmarker",
@@ -567,12 +569,14 @@
                 "card-2": {
                     "title": "Bisher ausgegeben",
                     "content": "CHF 1’915.00",
-                    "badge": "% des Budgets"
+                    "badge": "des Budgets"
                 },
                 "card-3": {
                     "title": "Verfügbar",
+                    "title-over": "Über Budget",
                     "content": "CHF 985.00",
-                    "badge": "+34% verfügbar"
+                    "badge": "+34% verfügbar",
+                    "badge-over": "Überzogen"
                 },
                 "card-4": {
                     "title": "Anzahl Kategorien",
@@ -586,7 +590,7 @@
                 "rest-budget": "Verbleibend: ",
                 "buttons": {
                     "export": "CSV exportieren",
-                    "reset": "Zurücksetzen (Demo)"
+                    "reset": "Zurücksetzen"
                 },
                 "headings": {
                     "category": "KATEGORIE",
@@ -734,7 +738,7 @@
             },
             "settings-section": {
                 "title": "Einstellungen",
-                "button": "Demo zurücksetzen",
+                "button": "Zurücksetzen",
                 "checkboxes": {
                     "monthly": "Monatliche Auto-Zuweisung aktiv",
                     "goals": "Überfinanzierte Ziele anzeigen"
@@ -841,7 +845,7 @@
                 "badge": "5 Konten • Liquidität CHF 2’620.00",
                 "buttons": {
                     "export": "CSV exportieren",
-                    "reset": "Demo zurücksetzen"
+                    "reset": "Zurücksetzen"
                 },
                 "headings": {
                     "name": "NAME",
