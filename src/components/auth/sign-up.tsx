@@ -40,6 +40,7 @@ export default function SignUp() {
       name: "",
       email: "",
       password: "",
+      acceptTerms: false,
     },
   });
 
@@ -167,33 +168,48 @@ export default function SignUp() {
           </FormItem>
 
           {/* Terms & Privacy */}
-          <FormItem className="flex items-center border-0">
-            <Checkbox className="cursor-pointer" />
-            <span className="text-sm">
-              {t.rich("checkboxes.terms", {
-                terms: (chunks) => (
-                  <a
-                    className="text-[#235FE3] underline dark:text-[#6371FF]"
-                    href="/terms"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    {chunks}
-                  </a>
-                ),
-                privacy: (chunks) => (
-                  <a
-                    className="text-[#235FE3] underline dark:text-[#6371FF]"
-                    href="/privacy"
-                    target="_blank"
-                    rel="noopener"
-                  >
-                    {chunks}
-                  </a>
-                ),
-              })}
-            </span>
-          </FormItem>
+          <FormField
+            control={form.control}
+            name="acceptTerms"
+            render={({ field }) => (
+              <FormItem className="flex flex-col gap-1 border-0">
+                <div className="flex items-center gap-2">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="cursor-pointer"
+                    />
+                  </FormControl>
+                  <span className="text-sm">
+                    {t.rich("checkboxes.terms", {
+                      terms: (chunks) => (
+                        <a
+                          className="text-[#235FE3] underline dark:text-[#6371FF]"
+                          href="/terms"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                      privacy: (chunks) => (
+                        <a
+                          className="text-[#235FE3] underline dark:text-[#6371FF]"
+                          href="/privacy"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                    })}
+                  </span>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Submit */}
           <Button

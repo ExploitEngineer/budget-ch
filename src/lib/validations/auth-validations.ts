@@ -6,6 +6,9 @@ export const userSignUpSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters." }),
+  acceptTerms: z.boolean().refine((val) => val === true, {
+    message: "You must accept the terms and privacy policy.",
+  }),
 });
 
 export type UserSignUpValues = z.infer<typeof userSignUpSchema>;

@@ -56,11 +56,21 @@ export default function SignIn() {
         console.error(error);
 
         if (error.code === "EMAIL_NOT_VERIFIED") {
-          toast.error(
-            `Please verify your email before signing in. Check your inbox for the verification link.`,
-          );
-          // Don't auto-resend - the email was already sent on signup
-          // Redirect to a page where they can request a resend if needed
+          // Try to resend verification email
+          const { error: resendError } = await authClient.sendVerificationEmail({
+            email: values.email,
+          });
+
+          if (resendError) {
+            // If resend fails (e.g., rate limit), just show the check inbox message
+            toast.error(
+              `Please verify your email before signing in. Check your inbox for the verification link.`,
+            );
+          } else {
+            toast.success(
+              `Verification email sent! Please check your inbox and verify your email.`,
+            );
+          }
           form.reset();
           return;
         } else {

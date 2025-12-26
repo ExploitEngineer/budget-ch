@@ -24,7 +24,7 @@ import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSidebar } from "@/components/ui/sidebar";
 import { useTranslations } from "next-intl";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth/auth-client";
@@ -34,7 +34,6 @@ import {
   FeatureAccessResult,
 } from "@/lib/services/features-permission";
 import { toast } from "sonner";
-import { getUrlWithHubFromCookie } from "@/hooks/use-hub-sync";
 import { clearQueryCache } from "@/components/providers/query-provider";
 
 interface Items {
@@ -53,6 +52,16 @@ export function NavMain() {
   const router = useRouter();
   const t = useTranslations("main-dashboard");
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentHubId = searchParams.get("hub");
+
+  // Build URL with current hub ID preserved
+  const getUrlWithHub = (path: string): string => {
+    if (currentHubId) {
+      return `${path}?hub=${currentHubId}`;
+    }
+    return path;
+  };
 
   useEffect((): void => {
     canAccessFeature("reports").then((res: FeatureAccessResult): void => {
@@ -189,7 +198,7 @@ export function NavMain() {
                   isRestricted
                     ? "#"
                     : item.url
-                      ? getUrlWithHubFromCookie(item.url)
+                      ? getUrlWithHub(item.url)
                       : ""
                 }
                 onClick={(e) => handleNavigation(e, item, isRestricted)}
