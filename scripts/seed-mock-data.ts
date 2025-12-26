@@ -165,7 +165,6 @@ async function main() {
                 transactionCategoryId: categoryIds[catName],
                 type: type,
                 amount: amount,
-                // Schema uses createdAt for transaction date, no explicit date column
                 createdAt: date,
                 updatedAt: date,
                 source: "Mock Script",

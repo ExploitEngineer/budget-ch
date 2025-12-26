@@ -179,18 +179,18 @@ export default function EditBudgetDialog({
 
   async function onSubmit(values: BudgetDialogValues) {
     try {
-      if (budget && budget.id) {
-        await updateBudgetMutation.mutateAsync({
-          budgetId: budget.id,
-          updatedData: {
-            categoryName: values.category,
-            allocatedAmount: values.budgetChf,
-            spentAmount: values.istChf,
-            warningPercentage: values.warning,
-            markerColor: values.colorMarker.toLowerCase(),
-          },
-        });
-      } else {
+    if (budget?.id) {
+      await updateBudgetMutation.mutateAsync({
+        budgetId: budget.id,
+        updatedData: {
+          categoryName: values.category,
+          allocatedAmount: values.budgetChf,
+          spentAmount: values.istChf,
+          warningPercentage: values.warning,
+          markerColor: values.colorMarker.toLowerCase(),
+        },
+      });
+    } else {
         await createBudgetMutation.mutateAsync({
           categoryName: values.category,
           allocatedAmount: values.budgetChf,
@@ -205,7 +205,7 @@ export default function EditBudgetDialog({
   }
 
   async function handleDelete() {
-    if (!budget || !budget.id) return;
+    if (!budget?.id) return;
     try {
       await deleteBudgetMutation.mutateAsync(budget.id);
     } catch (err: any) {
