@@ -165,9 +165,6 @@ async function main() {
                 transactionCategoryId: categoryIds[catName],
                 type: type,
                 amount: amount,
-                date: date.toISOString(), // Assuming date field exists or createdAt used?
-                // Schema checks:
-                // createdAt is used for sorting usually.
                 createdAt: date,
                 updatedAt: date,
                 source: "Mock Script",
