@@ -58,6 +58,7 @@ export async function createTransaction({
   hubIdArg,
   recurringTemplateId,
   userIdArg,
+  createdAt,
 }: Pick<
   createTransactionArgs,
   | "categoryName"
@@ -66,6 +67,7 @@ export async function createTransaction({
   | "source"
   | "transactionType"
   | "destinationAccountId"
+  | "createdAt"
 > & {
   accountId: string;
   isRecurring?: boolean;
@@ -230,6 +232,7 @@ export async function createTransaction({
       transactionType,
       destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
       recurringTemplateId: recurringTemplateId || null,
+      createdAt,
     });
 
     // Create recurring transaction template if isRecurring is true
@@ -285,24 +288,28 @@ export async function createTransaction({
             const allocatedAmount = Number(budget.allocatedAmount ?? 0);
 
             if (allocatedAmount > 0) {
-              const percentage = totalSpent / allocatedAmount;
+              const currentPercentage = totalSpent / allocatedAmount;
+              // Calculate PREVIOUS percentage (before this transaction)
+              const previousSpent = totalSpent - amount;
+              const previousPercentage = previousSpent / allocatedAmount;
 
-              // Check if we've already sent a notification for this threshold recently (within last 24 hours)
-              const oneDayAgo = subHours(new Date(), 24);
-              const recentNotificationsResult = await db
+              // Get current month boundaries for duplicate checking
+              const now = new Date();
+              const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+              // Check existing notifications for this budget this month
+              const monthlyNotificationsResult = await db
                 .select()
                 .from(notifications)
                 .where(
                   and(
                     eq(notifications.hubId, hubId),
-                    eq(notifications.type, percentage >= 1 ? "error" : "warning"),
-                    gte(notifications.createdAt, oneDayAgo),
+                    gte(notifications.createdAt, startOfMonth),
                   ),
-                )
-                .limit(1);
+                );
 
-              // Check if any recent notification has matching budgetId in metadata
-              const hasRecentNotification = recentNotificationsResult.some((n) => {
+              // Find the most recent notification for this budget to check if it was "reset"
+              const budgetNotifications = monthlyNotificationsResult.filter((n) => {
                 if (!n.metadata) return false;
                 try {
                   const metadata =
@@ -315,35 +322,88 @@ export async function createTransaction({
                 }
               });
 
-              // Only send notification if threshold crossed and no recent notification exists
-              if (!hasRecentNotification) {
-                if (percentage >= 1) {
-                  // Budget exceeded (100%) - hub-wide notification, emails sent to all hub members
-                  await sendNotification({
-                    typeKey: BUDGET_THRESHOLD_100,
-                    hubId,
-                    userId: null, // Hub-wide notification, visible to all members
-                    metadata: {
-                      budgetId: budget.id,
-                      categoryName: budget.categoryName,
-                      spentAmount: totalSpent,
-                      allocatedAmount: allocatedAmount,
-                    },
-                  });
-                } else if (percentage >= 0.8) {
-                  // Budget reached 80% threshold - hub-wide notification, emails sent to all hub members
-                  await sendNotification({
-                    typeKey: BUDGET_THRESHOLD_80,
-                    hubId,
-                    userId: null, // Hub-wide notification, visible to all members
-                    metadata: {
-                      budgetId: budget.id,
-                      categoryName: budget.categoryName,
-                      spentAmount: totalSpent,
-                      allocatedAmount: allocatedAmount,
-                    },
-                  });
+              // Check if we've already sent 80% or 100% notification this month
+              const has80Notification = budgetNotifications.some((n) => {
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.thresholdType === "80";
+                } catch {
+                  return false;
                 }
+              });
+
+              const has100Notification = budgetNotifications.some((n) => {
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.thresholdType === "100";
+                } catch {
+                  return false;
+                }
+              });
+
+              // Check if budget was reset (dropped below 60% after a notification)
+              // We look for a "reset" marker in notifications or check if previous was below 60%
+              const wasReset = budgetNotifications.some((n) => {
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.thresholdType === "reset";
+                } catch {
+                  return false;
+                }
+              });
+
+              // Only send notification if:
+              // 1. We're actually CROSSING the threshold (previous < threshold, current >= threshold)
+              // 2. AND no notification for this threshold exists this month (or was reset)
+
+              const shouldSend100 =
+                currentPercentage >= 1 &&
+                previousPercentage < 1 &&
+                (!has100Notification || wasReset);
+
+              const shouldSend80 =
+                currentPercentage >= 0.8 &&
+                currentPercentage < 1 &&
+                previousPercentage < 0.8 &&
+                (!has80Notification || wasReset);
+
+              if (shouldSend100) {
+                // Budget exceeded (100%) - hub-wide notification, emails sent to all hub members
+                await sendNotification({
+                  typeKey: BUDGET_THRESHOLD_100,
+                  hubId,
+                  userId: null, // Hub-wide notification, visible to all members
+                  metadata: {
+                    budgetId: budget.id,
+                    categoryName: budget.categoryName,
+                    spentAmount: totalSpent,
+                    allocatedAmount: allocatedAmount,
+                    thresholdType: "100",
+                  },
+                });
+              } else if (shouldSend80) {
+                // Budget reached 80% threshold - hub-wide notification, emails sent to all hub members
+                await sendNotification({
+                  typeKey: BUDGET_THRESHOLD_80,
+                  hubId,
+                  userId: null, // Hub-wide notification, visible to all members
+                  metadata: {
+                    budgetId: budget.id,
+                    categoryName: budget.categoryName,
+                    spentAmount: totalSpent,
+                    allocatedAmount: allocatedAmount,
+                    thresholdType: "80",
+                  },
+                });
               }
             }
           }
@@ -353,6 +413,8 @@ export async function createTransaction({
         console.error("Error checking budget thresholds:", err);
       }
     }
+
+    revalidatePath("/me/transactions");
 
     return { success: true };
   } catch (err: any) {
@@ -651,7 +713,7 @@ export async function updateTransaction(
 ) {
   try {
     const hdrs = await headers();
-    const { userId, userRole, hubId: sessionHubId, financialAccountId } = await getContext(
+    const { userId, userRole, hubId: sessionHubId } = await getContext(
       hdrs,
       false,
     );
@@ -663,20 +725,41 @@ export async function updateTransaction(
 
     requireAdminRole(userRole);
 
-    if (!financialAccountId) {
-      return {
-        success: false,
-        message: "No financial account found. Please create a financial account in settings to update transactions.",
-      };
+    // Get the existing transaction to handle balance reversal
+    const existingTxResult = await getTransactionsDB(hubId);
+    if (!existingTxResult.success || !existingTxResult.data) {
+      return { success: false, message: "Could not fetch existing transaction for update." };
+    }
+    const existingTx = existingTxResult.data.find(t => t.id === transactionId);
+
+    if (!existingTx) {
+      return { success: false, message: "Transaction not found." };
     }
 
     const source = formData.get("source")?.toString().trim() || "";
     const amount = parseFloat(formData.get("amount")?.toString() || "0");
     const note = formData.get("note")?.toString() || null;
-    const addedAtStr = formData.get("addedAt")?.toString() || "";
-    const addedAt = addedAtStr ? new Date(addedAtStr) : new Date();
+    const createdAtStr = formData.get("createdAt")?.toString() || "";
+    const createdAt = createdAtStr ? new Date(createdAtStr) : new Date();
+
+    /* 
+    console.log('DEBUG: updateTransaction - formData entries:');
+    formData.forEach((v, k) => console.log(`  ${k}: ${v}`));
+
+    console.log('DEBUG: updateTransaction - parsed date:', {
+      createdAtStr,
+      parsedDate: createdAt.toISOString(),
+      isDefaulted: !createdAtStr
+    });
+    */
+
     const transactionType = formData.get("transactionType")?.toString() as TransactionType | undefined;
+    const accountId = formData.get("accountId")?.toString(); // Get new account ID from form
     const destinationAccountId = formData.get("destinationAccountId")?.toString() || null;
+
+    if (!accountId) {
+      return { success: false, message: "Account ID is required." };
+    }
 
     const categoryName =
       formData.get("categoryName")?.toString().trim().toLowerCase() || null;
@@ -707,6 +790,77 @@ export async function updateTransaction(
       }
     }
 
+    // --- BALANCE SYNCHRONIZATION LOGIC ---
+
+    // 1. Reverse old transaction impact
+    const oldAccount = await getFinancialAccountById(existingTx.financialAccountId, hubId);
+    if (oldAccount) {
+      let restoredBalance = Number(oldAccount.initialBalance ?? 0);
+      if (existingTx.type === "expense") {
+        restoredBalance += Number(existingTx.amount);
+      } else if (existingTx.type === "income") {
+        restoredBalance -= Number(existingTx.amount);
+      } else if (existingTx.type === "transfer") {
+        restoredBalance += Number(existingTx.amount);
+        // Also reverse destination account for transfers
+        if (existingTx.destinationAccountId) {
+          const oldDestAccount = await getFinancialAccountById(existingTx.destinationAccountId, hubId);
+          if (oldDestAccount) {
+            const restoredDestBalance = Number(oldDestAccount.initialBalance ?? 0) - Number(existingTx.amount);
+            await updateFinancialAccountDB({
+              hubId,
+              accountId: oldDestAccount.id,
+              updatedData: { balance: restoredDestBalance },
+            });
+          }
+        }
+      }
+      await updateFinancialAccountDB({
+        hubId,
+        accountId: oldAccount.id,
+        updatedData: { balance: restoredBalance },
+      });
+    }
+
+    // 2. Apply new transaction impact
+    const newAccount = await getFinancialAccountById(accountId, hubId);
+    if (!newAccount) {
+      return { success: false, message: "Target account not found." };
+    }
+
+    let nextBalance = Number(newAccount.initialBalance ?? 0);
+    if (transactionType === "expense") {
+      if (nextBalance < amount) {
+        throw new Error("Insufficient funds in selected account.");
+      }
+      nextBalance -= amount;
+    } else if (transactionType === "income") {
+      nextBalance += amount;
+    } else if (transactionType === "transfer") {
+      if (nextBalance < amount) {
+        return { success: false, message: "Insufficient funds in source account." };
+      }
+      nextBalance -= amount;
+      // Also apply to destination account for transfers
+      if (destinationAccountId) {
+        const newDestAccount = await getFinancialAccountById(destinationAccountId, hubId);
+        if (newDestAccount) {
+          const nextDestBalance = Number(newDestAccount.initialBalance ?? 0) + amount;
+          await updateFinancialAccountDB({
+            hubId,
+            accountId: newDestAccount.id,
+            updatedData: { balance: nextDestBalance },
+          });
+        }
+      }
+    }
+
+    await updateFinancialAccountDB({
+      hubId,
+      accountId: newAccount.id,
+      updatedData: { balance: nextBalance },
+    });
+
     const res = await updateTransactionDB({
       hubId,
       transactionId,
@@ -714,8 +868,8 @@ export async function updateTransaction(
         source,
         amount,
         note,
-        addedAt,
-        financialAccountId,
+        createdAt,
+        financialAccountId: accountId,
         transactionCategoryId,
         destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
         transactionType,
@@ -729,7 +883,7 @@ export async function updateTransaction(
       };
     }
 
-    revalidatePath("/dashboard/transactions");
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -761,6 +915,41 @@ export async function deleteTransaction(
 
     requireAdminRole(userRole);
 
+    // Get transaction details for balance reversal
+    const existingTxResult = await getTransactionsDB(hubId);
+    const existingTx = existingTxResult.data?.find(t => t.id === transactionId);
+
+    if (existingTx) {
+      // Reverse balance impact
+      const account = await getFinancialAccountById(existingTx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (existingTx.type === "expense") {
+          restoredBalance += Number(existingTx.amount);
+        } else if (existingTx.type === "income") {
+          restoredBalance -= Number(existingTx.amount);
+        } else if (existingTx.type === "transfer") {
+          restoredBalance += Number(existingTx.amount);
+          if (existingTx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(existingTx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(existingTx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteTransactionDB({ hubId, transactionId });
 
     if (!res.success) {
@@ -769,6 +958,97 @@ export async function deleteTransaction(
         message: res.message || "Failed to delete transaction.",
       };
     }
+
+    // Check if deleting this expense caused any budget to drop below 60%
+    // If so, create a "reset" marker so that future threshold crossings will trigger new emails
+    if (existingTx && existingTx.type === "expense" && existingTx.transactionCategoryId) {
+      try {
+        const budgetsResult = await getBudgetsDB(hubId);
+        if (budgetsResult.success && budgetsResult.data) {
+          const categoryBudgets = budgetsResult.data.filter(
+            (b) => b.transactionCategoryId === existingTx.transactionCategoryId,
+          );
+
+          for (const budget of categoryBudgets) {
+            // Calculate NEW total spent (after deletion)
+            const spentResult = await db
+              .select({
+                totalSpent: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
+              })
+              .from(transactions)
+              .where(
+                and(
+                  eq(transactions.hubId, hubId),
+                  eq(transactions.transactionCategoryId, existingTx.transactionCategoryId),
+                  eq(transactions.type, "expense"),
+                ),
+              );
+
+            const totalSpent = Number(spentResult[0]?.totalSpent ?? 0);
+            const allocatedAmount = Number(budget.allocatedAmount ?? 0);
+
+            if (allocatedAmount > 0) {
+              const currentPercentage = totalSpent / allocatedAmount;
+              // Calculate what percentage was BEFORE deletion
+              const previousSpent = totalSpent + Number(existingTx.amount);
+              const previousPercentage = previousSpent / allocatedAmount;
+
+              // If we dropped below 60% from 80%+, create a reset marker
+              if (currentPercentage < 0.6 && previousPercentage >= 0.8) {
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                // Check if there's already a reset marker this month
+                const existingResetResult = await db
+                  .select()
+                  .from(notifications)
+                  .where(
+                    and(
+                      eq(notifications.hubId, hubId),
+                      gte(notifications.createdAt, startOfMonth),
+                    ),
+                  );
+
+                const hasResetMarker = existingResetResult.some((n) => {
+                  try {
+                    const metadata =
+                      typeof n.metadata === "string"
+                        ? JSON.parse(n.metadata)
+                        : n.metadata;
+                    return metadata?.budgetId === budget.id && metadata?.thresholdType === "reset";
+                  } catch {
+                    return false;
+                  }
+                });
+
+                if (!hasResetMarker) {
+                  // Create an internal "reset" marker notification (channel: "web" so no email is sent)
+                  await sendNotification({
+                    hubId,
+                    userId: null,
+                    type: "info",
+                    title: "Budget Reset",
+                    message: `${budget.categoryName} budget has dropped below 60%`,
+                    channel: "web",
+                    metadata: {
+                      budgetId: budget.id,
+                      categoryName: budget.categoryName,
+                      thresholdType: "reset",
+                      currentPercentage: Math.round(currentPercentage * 100),
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // Don't fail deletion if reset marker creation fails
+        console.error("Error creating budget reset marker:", err);
+      }
+    }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -798,6 +1078,40 @@ export async function deleteTransactions(transactionIds: string[]) {
       };
     }
 
+    // Get transactions to handle balance reversal
+    const existingTxsResult = await getTransactionsDB(hubId);
+    const transactionsToReverse = existingTxsResult.data?.filter(t => transactionIds.includes(t.id)) || [];
+
+    for (const tx of transactionsToReverse) {
+      const account = await getFinancialAccountById(tx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (tx.type === "expense") {
+          restoredBalance += Number(tx.amount);
+        } else if (tx.type === "income") {
+          restoredBalance -= Number(tx.amount);
+        } else if (tx.type === "transfer") {
+          restoredBalance += Number(tx.amount);
+          if (tx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(tx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(tx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteTransactionsDB({ hubId, transactionIds });
 
     if (!res.success) {
@@ -806,6 +1120,8 @@ export async function deleteTransactions(transactionIds: string[]) {
         message: res.message || "Failed to delete transactions.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -832,6 +1148,40 @@ export async function deleteAllTransactions() {
       return { success: false, message: "Missing hubId parameter." };
     }
 
+    // Get ALL transactions in the hub to handle balance reversal
+    const existingTxsResult = await getTransactionsDB(hubId);
+    const transactionsToReverse = existingTxsResult.data || [];
+
+    for (const tx of transactionsToReverse) {
+      const account = await getFinancialAccountById(tx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (tx.type === "expense") {
+          restoredBalance += Number(tx.amount);
+        } else if (tx.type === "income") {
+          restoredBalance -= Number(tx.amount);
+        } else if (tx.type === "transfer") {
+          restoredBalance += Number(tx.amount);
+          if (tx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(tx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(tx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteAllTransactionsDB(hubId);
 
     if (!res.success) {
@@ -840,6 +1190,8 @@ export async function deleteAllTransactions() {
         message: res.message || "Failed to delete all transactions.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -855,7 +1207,7 @@ export async function deleteAllTransactions() {
   }
 }
 
-// DELETE ALL Transactions and related Categories [Action]
+// DELETE ALL Transactions and Categories [Action]
 export async function deleteAllTransactionsAndCategories() {
   try {
     const hdrs = await headers();
@@ -867,6 +1219,40 @@ export async function deleteAllTransactionsAndCategories() {
       return { success: false, message: "Missing hubId parameter." };
     }
 
+    // Get ALL transactions in the hub to handle balance reversal
+    const existingTxsResult = await getTransactionsDB(hubId);
+    const transactionsToReverse = existingTxsResult.data || [];
+
+    for (const tx of transactionsToReverse) {
+      const account = await getFinancialAccountById(tx.financialAccountId, hubId);
+      if (account) {
+        let restoredBalance = Number(account.initialBalance ?? 0);
+        if (tx.type === "expense") {
+          restoredBalance += Number(tx.amount);
+        } else if (tx.type === "income") {
+          restoredBalance -= Number(tx.amount);
+        } else if (tx.type === "transfer") {
+          restoredBalance += Number(tx.amount);
+          if (tx.destinationAccountId) {
+            const destAccount = await getFinancialAccountById(tx.destinationAccountId, hubId);
+            if (destAccount) {
+              const restoredDestBalance = Number(destAccount.initialBalance ?? 0) - Number(tx.amount);
+              await updateFinancialAccountDB({
+                hubId,
+                accountId: destAccount.id,
+                updatedData: { balance: restoredDestBalance }
+              });
+            }
+          }
+        }
+        await updateFinancialAccountDB({
+          hubId,
+          accountId: account.id,
+          updatedData: { balance: restoredBalance },
+        });
+      }
+    }
+
     const res = await deleteAllTransactionsAndCategoriesDB(hubId);
 
     if (!res.success) {
@@ -876,6 +1262,8 @@ export async function deleteAllTransactionsAndCategories() {
           res.message || "Failed to delete all transactions and categories.",
       };
     }
+
+    revalidatePath("/me/transactions");
 
     return {
       success: true,

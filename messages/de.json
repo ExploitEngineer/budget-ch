@@ -37,7 +37,63 @@
         "update": "Aktualisieren",
         "add": "Hinzufügen",
         "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
-        "retry": "Wiederholen"
+        "retry": "Wiederholen",
+        "currency": "CHF",
+        "validations": {
+            "required": "Erforderlich",
+            "name-required": "Name ist erforderlich",
+            "amount-required": "Betrag ist erforderlich",
+            "date-required": "Datum ist erforderlich",
+            "min-1-day": "Muss mindestens 1 Tag sein"
+        },
+        "months": {
+            "0": "Januar",
+            "1": "Februar",
+            "2": "März",
+            "3": "April",
+            "4": "Mai",
+            "5": "Juni",
+            "6": "Juli",
+            "7": "August",
+            "8": "September",
+            "9": "Oktober",
+            "10": "November",
+            "11": "Dezember"
+        }
+    },
+    "public-pages": {
+        "accept-invitation": {
+            "pending": "Ihre Einladung wird verarbeitet...",
+            "success": {
+                "title": "Einladung angenommen!",
+                "toast": "Einladung angenommen!",
+                "redirecting": "Weiterleitung zum Dashboard in {countdown} {countdown, plural, =1 {Sekunde} other {Sekunden}}...",
+                "button": "Jetzt los"
+            },
+            "error": {
+                "title": "Ungültige oder abgelaufene Einladung",
+                "description": "Der Einladungslink ist ungültig oder bereits abgelaufen.",
+                "set-hub-failed": "Einladung angenommen, aber Hub konnte nicht aktiviert werden"
+            }
+        },
+        "goodbye": {
+            "title": "Konto erfolgreich gelöscht",
+            "description": "Ihr Konto wurde gelöscht. Es tut uns leid, Sie gehen zu sehen! Sie können jederzeit zurückkommen und ein neues Konto erstellen.",
+            "button": "Zur Startseite"
+        },
+        "email-verified": {
+            "success": {
+                "title": "E-Mail erfolgreich bestätigt!",
+                "description": "Ihre E-Mail wurde bestätigt. Sie können jetzt auf Ihr Dashboard zugreifen und alle Funktionen nutzen.",
+                "button": "Zur Anmeldung"
+            },
+            "error": {
+                "title": "Bestätigung fehlgeschlagen",
+                "invalid-link": "Der Bestätigungslink ist ungültig oder abgelaufen.",
+                "generic": "Bei der Bestätigung Ihrer E-Mail ist etwas schiefgelaufen.",
+                "button": "Erneut anmelden"
+            }
+        }
     },
     "greeting": {
         "title": "Wie geht es dir?",
@@ -87,6 +143,51 @@
             },
             "tip": "Tipp: Überprüfe Spam-/Werbeordner. Suche nach dem Betreff „BudgetHub – Verify your email“.",
             "content": "Nachdem du auf den Link geklickt hast, melden wir dich automatisch an."
+        }
+    },
+    "emails": {
+        "auth": {
+            "reset-password": {
+                "subject": "Setze dein Passwort zurück",
+                "title": "Setze dein Passwort zurück",
+                "hi": "Hallo {name},",
+                "request": "Wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten. Klicke auf die Schaltfläche unten, um ein neues zu wählen.",
+                "button": "Passwort zurücksetzen",
+                "fallback": "Wenn die Schaltfläche nicht funktioniert, kopiere diesen Link und füge ihn in deinen Browser ein:",
+                "expire": "Dieser Link zum Zurücksetzen des Passworts läuft in 24 Stunden ab.",
+                "ignore": "Wenn du kein Zurücksetzen des Passworts angefordert hast, kannst du diese E-Mail ignorieren.",
+                "footer": "© 2024 BudgetHub. Alle Rechte vorbehalten."
+            },
+            "verify-email": {
+                "subject": "Bestätige deine E-Mail-Adresse",
+                "title": "Bestätige deine E-Mail-Adresse",
+                "hi": "Hallo!",
+                "thanks": "Vielen Dank, {name}, für deine Anmeldung! Um deine Registrierung abzuschließen, bestätige bitte deine E-Mail, indem du auf die Schaltfläche unten klickst.",
+                "button": "E-Mail-Adresse bestätigen",
+                "fallback": "Wenn die Schaltfläche nicht funktioniert, kopiere diesen Link und füge ihn in deinen Browser ein:",
+                "expire": "Dieser Bestätigungslink läuft in 24 Stunden ab.",
+                "ignore": "Wenn du kein Konto erstellt hast, kannst du diese E-Mail ignorieren.",
+                "footer": "© 2025 BudgetHub. Alle Rechte vorbehalten."
+            },
+            "otp": {
+                "subject": "Dein Bestätigungscode",
+                "title": "Dein Bestätigungscode",
+                "hi": "Hallo {name},",
+                "code-is": "Dein Bestätigungscode lautet:",
+                "expire": "Dieser Code läuft in 5 Minuten ab.",
+                "ignore": "Wenn du diesen Code nicht angefordert hast, kannst du diese E-Mail ignorieren.",
+                "footer": "© 2025 BudgetHub. Alle Rechte vorbehalten."
+            }
+        },
+        "invitation": {
+            "subject": "Du wurdest eingeladen, einem Hub beizutreten!",
+            "title": "Du wurdest eingeladen, einem Hub beizutreten!",
+            "hello": "Hallo,",
+            "invited": "Du wurdest eingeladen, einem Hub beizutreten mit der Rolle: <strong>{role}</strong>.",
+            "button": "Einladung annehmen",
+            "fallback": "Oder kopiere diesen Link und füge ihn in deinen Browser ein:",
+            "expire": "Diese Einladung läuft in 7 Tagen ab.",
+            "ignore": "Wenn du diese Einladung nicht erwartet hast, kannst du diese E-Mail ignorieren."
         }
     },
     "main-dashboard": {
@@ -162,6 +263,14 @@
                         "placeholder": "Optional"
                     }
                 },
+                "placeholders": {
+                    "category-name": "z. B. Lebensmittel, Rechnungen..."
+                },
+                "messages": {
+                    "category-added": "Kategorie \"{name}\" hinzugefügt",
+                    "category-exists": "Kategorie \"{name}\" existiert bereits",
+                    "id-required": "Hub-ID ist erforderlich"
+                },
                 "no-categories-yet": "Noch keine Kategorien",
                 "buttons": {
                     "save": "Als Vorlage speichern",
@@ -215,13 +324,19 @@
                         "delete": "Löschen",
                         "save": "Speichern",
                         "saving": "Speichert..."
+                    },
+                    "messages": {
+                        "success": "Wiederkehrende Transaktion erfolgreich aktualisiert!",
+                        "error": "Wiederkehrende Transaktion konnte nicht aktualisiert werden",
+                        "load-error": "Vorlage konnte nicht geladen werden"
                     }
                 }
             },
             "cards": {
                 "card-1": {
                     "title": "Gesamtbudget (Monat)",
-                    "badge": "Fix + Variabel • inkl. KK & SERAFE"
+                    "badge": "Fix + Variabel • inkl. KK & SERAFE",
+                    "simple-badge": "Monatsbudget"
                 },
                 "card-2": {
                     "title": "Ausgaben (Aktuell)",
@@ -232,7 +347,7 @@
                     "badge": "Puffer"
                 },
                 "card-4": {
-                    "title": "Prognose bis 30.09.2025",
+                    "title": "Prognose bis",
                     "content": "4’980 Schweizer Franken",
                     "badge": "inkl. Wiederkehrend"
                 }
@@ -256,6 +371,7 @@
                 "title": "Schnelle Aufgaben",
                 "placeholder": "Aufgabe hinzufügen…",
                 "no-tasks": "Noch keine Aufgaben..",
+                "double-click": "Doppelklick zum Bearbeiten",
                 "created": "Aufgabe wurde erfolgreich erstellt!",
                 "updated": "Aufgabe wurde erfolgreich aktualisiert!",
                 "deleted": "Aufgabe wurde erfolgreich gelöscht!"
@@ -302,7 +418,11 @@
                 },
                 "card-3": {
                     "title": "3 neue Transaktionen seit gestern"
-                }
+                },
+                "budget-exceeded": "{category} Budget überschritten",
+                "budget-at-percent": "{category} Budget bei {percent}%",
+                "no-warnings": "Keine Warnungen. Dein Budget ist gesund!",
+                "currency": "CHF"
             },
             "recent-transactions-table": {
                 "title": "Letzte Transaktionen",
@@ -347,6 +467,15 @@
         "transactions-page": {
             "loading": "Wird geladen...",
             "no-transactions": "Noch keine Transaktionen",
+            "messages": {
+                "created": "Transaktion erfolgreich erstellt!",
+                "updated": "Transaktion erfolgreich aktualisiert!",
+                "deleted": "Transaktion erfolgreich gelöscht!",
+                "all-deleted": "Alle Transaktionen gelöscht!",
+                "error": {
+                    "delete-all": "Beim Löschen aller Transaktionen ist ein Fehler aufgetreten."
+                }
+            },
             "transaction-edit-dialog": {
                 "title-1": "Bearbeiten",
                 "title-2": "Neue Transaktion",
@@ -384,11 +513,13 @@
                         "account": "Konto auswählen",
                         "recipient": "Empfänger eingeben",
                         "category": "Kategorie auswählen",
+                        "category-selector": "Kategorie auswählen oder hinzufügen",
                         "note": "Notiz eingeben",
                         "note-optional": "Notiz (optional)",
                         "destinationAccount": "Zielkonto auswählen",
                         "startDate": "Startdatum auswählen",
-                        "endDate": "Kein Enddatum"
+                        "endDate": "Kein Enddatum",
+                        "pick-date": "Datum auswählen"
                     },
                     "options": {
                         "checking": "Checking",
@@ -443,7 +574,9 @@
                 "search": {
                     "title": "Suche",
                     "placeholder": "z. B. Coop, Miete, Kreditkarte…"
-                }
+                },
+                "loading-accounts": "Lade Konten...",
+                "no-accounts": "Keine Konten verfügbar"
             },
             "checkboxes": {
                 "recipient": "Mit Empfänger",
@@ -526,7 +659,9 @@
                 "pagination": {
                     "previous": "Zurück",
                     "next": "Weiter"
-                }
+                },
+                "no-results": "Keine Ergebnisse.",
+                "rows-selected": "{selected} von {total} Zeile(n) ausgewählt."
             }
         },
         "budgets-page": {
@@ -557,7 +692,18 @@
                     },
                     "delete-btn": "Löschen",
                     "cancel": "Abbrechen",
-                    "save": "Speichern"
+                    "save": "Speichern",
+                    "create-budget": "Budget erstellen",
+                    "messages": {
+                        "created": "Budget erfolgreich erstellt!",
+                        "updated": "Budget erfolgreich aktualisiert!",
+                        "deleted": "Budget erfolgreich gelöscht!",
+                        "error": {
+                            "create": "Fehler beim Erstellen des Budgets",
+                            "update": "Fehler beim Aktualisieren des Budgets",
+                            "delete": "Fehler beim Löschen des Budgets"
+                        }
+                    }
                 }
             },
             "cards": {
@@ -575,19 +721,24 @@
                     "title": "Verfügbar",
                     "title-over": "Über Budget",
                     "content": "CHF 985.00",
-                    "badge": "+34% verfügbar",
+                    "badge": "verfügbar",
                     "badge-over": "Überzogen"
                 },
                 "card-4": {
                     "title": "Anzahl Kategorien",
                     "content": "8",
-                    "badge": "Warnungen: 2"
+                    "badge": "Warnungen"
                 }
             },
             "data-table": {
                 "title": "Alle Kategorien",
                 "total-budget": "Gesamtbudget: ",
                 "rest-budget": "Verbleibend: ",
+                "loading": "Wird geladen...",
+                "no-budgets": "Keine Budgets gefunden",
+                "set-budget": "Budget festlegen",
+                "edit": "Bearbeiten",
+                "error-loading": "Fehler beim Laden der Budgets",
                 "buttons": {
                     "export": "CSV exportieren",
                     "reset": "Zurücksetzen"
@@ -599,7 +750,9 @@
                     "spent": "AUSGEGEBEN",
                     "rest": "REST",
                     "progress": "FORTSCHRITT",
-                    "action": "AKTION"
+                    "action": "AKTION",
+                    "month": "MONAT",
+                    "year": "JAHR"
                 },
                 "data": {
                     "category": {
@@ -615,6 +768,7 @@
                 "toggle-groups": {
                     "month": "Monat",
                     "week": "Woche",
+                    "warn-50": "Warnung bei 50%",
                     "warn-80": "Warnung bei 80%",
                     "warn-90": "Warnung bei 90%",
                     "warn-100": "Warnung bei 100%"
@@ -627,12 +781,18 @@
                     "restaurant": "Budget Restaurant & Café bei 82%",
                     "health": "Budget Gesundheit bei 96%"
                 },
+                "loading": "Warnungen werden überprüft...",
+                "no-warnings": "Dein Budget sieht gut aus! Keine Warnungen.",
                 "settings": {
                     "title": "Einstellungen (Monat)",
-                    "button": "+ Budget",
+                    "button": "Budget",
                     "checkboxes": {
                         "carry": "Überschuss/Defizit in den nächsten Monat übertragen",
                         "e-mail": "Warnungen per E-Mail bei 80% / 100%"
+                    },
+                    "messages": {
+                        "updated": "Einstellungen erfolgreich aktualisiert",
+                        "error": "Fehler beim Aktualisieren der Einstellungen"
                     }
                 }
             }
@@ -668,7 +828,19 @@
                         },
                         "monthly-allocation": "Monatliche Zuweisung (CHF)"
                     },
-                    "save": "Speichern"
+                    "save": "Speichern",
+                    "loading-accounts": "Konten werden geladen...",
+                    "no-accounts": "Keine Konten verfügbar",
+                    "messages": {
+                        "created": "Sparziel erfolgreich erstellt!",
+                        "updated": "Sparziel erfolgreich aktualisiert!",
+                        "deleted": "Sparziel erfolgreich gelöscht!",
+                        "error": {
+                            "create": "Fehler beim Erstellen des Sparziels",
+                            "update": "Fehler beim Aktualisieren des Sparziels",
+                            "delete": "Fehler beim Löschen des Sparziels"
+                        }
+                    }
                 }
             },
             "cards": {
@@ -680,23 +852,35 @@
                 "card-2": {
                     "title": "Bisher gespart",
                     "content": "CHF 8’610.00",
-                    "badge": "48% erreicht"
+                    "badge": "48% erreicht",
+                    "badge-pattern": "{percent}% erreicht"
                 },
                 "card-3": {
                     "title": "Noch zu sparen",
                     "content": "CHF 9’390.00",
-                    "badge": "Monatliches Ziel: CHF 700.00"
+                    "badge": "Monatliches Ziel: CHF 700.00",
+                    "badge-pattern": "Monatliche Zuweisungen: {currency} {amount}"
                 },
                 "card-4": {
                     "title": "Anzahl Ziele",
                     "content": "3",
-                    "badge": "Keine dringenden Posten"
+                    "badge": "Keine dringenden Posten",
+                    "badge-overdue": "⚠️ {count} Überfällig",
+                    "badge-none": "Keine dringenden Posten"
                 }
             },
             "active-goals-section": {
                 "title": "Aktive Ziele",
                 "badge": "3 Ziele • Automatische Zuweisung: CHF 700.00",
+                "badge-pattern": "{count} Ziele • Automatische Zuweisung: {currency} {amount}",
+                "error-loading": "Sparziele konnten nicht geladen werden",
                 "no-goals": "Keine Sparziele gefunden.",
+                "messages": {
+                    "updated": "Sparziel erfolgreich aktualisiert!",
+                    "error": {
+                        "update": "Fehler beim Aktualisieren des Sparziels"
+                    }
+                },
                 "loading": "Wird geladen...",
                 "buttons": {
                     "due": "Fällig",
@@ -726,7 +910,9 @@
                             "checking-account": "Girokonto",
                             "button": "Zuweisung",
                             "new-balance": "Neuer Kontostand",
-                            "placeholder": "Betrag"
+                            "placeholder": "Betrag",
+                            "updating": "Wird aktualisiert...",
+                            "funded": "Finanziert"
                         }
                     }
                 }
@@ -734,7 +920,13 @@
             "warning-section": {
                 "title": "Notizen & Warnungen",
                 "button": "Alle ausblenden",
-                "badge": "Keine Notizen"
+                "show-all": "Alle anzeigen",
+                "hide-all": "Alle ausblenden",
+                "loading": "Wird geladen...",
+                "due": "Fällig: ",
+                "more-overdue": "...und {count} weitere überfällige Ziele",
+                "badge": "Keine Notizen",
+                "funded": "Finanziert"
             },
             "settings-section": {
                 "title": "Einstellungen",
@@ -742,6 +934,16 @@
                 "checkboxes": {
                     "monthly": "Monatliche Auto-Zuweisung aktiv",
                     "goals": "Überfinanzierte Ziele anzeigen"
+                },
+                "export-btn": "CSV exportieren",
+                "messages": {
+                    "no-export": "Keine Ziele zum Exportieren",
+                    "exported": "Sparziele als CSV exportiert",
+                    "enabling-auto": "Automatische Zuweisung wird aktiviert...",
+                    "disabling-auto": "Automatische Zuweisung wird deaktiviert...",
+                    "auto-enabled": "Automatische Zuweisung für alle Ziele aktiviert",
+                    "auto-disabled": "Automatische Zuweisung deaktiviert",
+                    "error": "Fehler beim Aktualisieren der Einstellungen"
                 }
             }
         },
@@ -779,7 +981,12 @@
                         }
                     },
                     "save": "Speichern",
-                    "delete": "Löschen"
+                    "delete": "Löschen",
+                    "messages": {
+                        "created": "Konto erfolgreich erstellt!",
+                        "updated": "Konto erfolgreich aktualisiert!",
+                        "deleted": "Konto erfolgreich gelöscht!"
+                    }
                 },
                 "dialog-box": {
                     "title": "Transfer zwischen Konten",
@@ -831,7 +1038,7 @@
                 "card-3": {
                     "title": "Sparguthaben",
                     "content": "CHF 13’200.00",
-                    "badge": "inkl. Säule 3a"
+                    "badge": "{percent}% des Vermögens"
                 },
                 "card-4": {
                     "title": "Kreditkarten",
@@ -841,8 +1048,10 @@
             },
             "data-table": {
                 "loading": "Daten werden geladen...",
-                "title": "Alle Kategorien",
-                "badge": "5 Konten • Liquidität CHF 2’620.00",
+                "title": "Alle Konten",
+                "no-accounts": "Noch keine Konten",
+                "error-loading": "Fehler beim Laden der Konten",
+                "badge": "{count, plural, one {1 Konto} other {# Konten}} • Liquidität CHF {amount}",
                 "buttons": {
                     "export": "CSV exportieren",
                     "reset": "Zurücksetzen"
@@ -869,6 +1078,9 @@
             "latest-tranfers-section": {
                 "title": "Letzte Überweisungen",
                 "button": "CSV exportieren",
+                "no-transfers": "Noch keine Überweisungen",
+                "loading": "Daten werden geladen...",
+                "error-loading": "Fehler beim Laden der Überweisungen",
                 "data-table": {
                     "headings": {
                         "date": "DATUM",
@@ -884,6 +1096,40 @@
             "loading": "Wird geladen...",
             "no-reports": "Noch keine Monatsberichte",
             "no-categories-yet": "Noch keine Kategorien",
+            "export": {
+                "summary-title": "Finanzübersicht",
+                "income": "Gesamteinnahmen",
+                "expenses": "Gesamtausgaben",
+                "balance": "Bilanz",
+                "savings-rate": "Sparquote",
+                "categories-title": "Ausgaben nach Kategorien",
+                "category": "Kategorie",
+                "amount": "Betrag",
+                "trend-title": "Trendanalyse",
+                "no-data": "Keine Daten verfügbar"
+            },
+            "sidebar-header": {
+                "filter-dialog": {
+                    "button": "Filter",
+                    "dialog-box": {
+                        "title": "Filter",
+                        "button": "Schließen",
+                        "labels": {
+                            "from": "Von",
+                            "fromPlaceholder": "TT/MM/JJJJ",
+                            "to": "Bis",
+                            "toPlaceholder": "TT/MM/JJJJ",
+                            "text": {
+                                "title": "Text enthält",
+                                "placeholder": "z. B. Coop, Miete "
+                            }
+                        },
+                        "buttons": {
+                            "apply": "Anwenden"
+                        }
+                    }
+                }
+            },
             "cards": {
                 "card-1": {
                     "title": "Einkommen",
@@ -909,6 +1155,9 @@
             "analysis-table-data": {
                 "title": "Analyse",
                 "badge-last-month": "Letzter Monat: ",
+                "badge-this-quarter": "Dieses Quartal: ",
+                "badge-this-year": "Dieses Jahr: ",
+                "badge-period": "Ausgewählter Zeitraum: ",
                 "badge-income": "Einkommen • ",
                 "badge-expense": "Ausgaben ",
                 "toggle-groups": {
@@ -928,18 +1177,22 @@
                     }
                 }
             },
-            "income-exp": {
-                "title": "Einnahmen vs. Ausgaben (letzte 9 Monate)",
-                "data-table": {
-                    "headings": {
-                        "month": "MONAT",
-                        "income": "EINKOMMEN",
-                        "expenses": "Ausgaben",
-                        "balance": "Saldo"
-                    }
-                }
-            },
             "detailed-table": {
+                "income-exp": {
+                    "title": "Einnahmen vs. Ausgaben (letzte 9 Monate)",
+                    "title-quarter": "Einnahmen vs. Ausgaben (nach Quartal)",
+                    "title-year": "Einnahmen vs. Ausgaben (nach Jahr)",
+                    "data-table": {
+                        "headings": {
+                            "month": "MONAT",
+                            "quarter": "QUARTAL",
+                            "year": "JAHR",
+                            "income": "EINKOMMEN",
+                            "expenses": "Ausgaben",
+                            "balance": "Saldo"
+                        }
+                    }
+                },
                 "title": "Detaillierte Tabelle",
                 "loading": "Wird geladen...",
                 "buttons": {
@@ -1006,7 +1259,50 @@
                     "replace-existing": "Bestehende ersetzen"
                 },
                 "input": "Datei hier ablegen oder klicken",
-                "supported-files": "Unterstützt: .csv, .json. Trenner ‘;’ oder ‘,’ wird erkannt."
+                "supported-files": "Unterstützt: .csv, .json. Trenner ‘;’ oder ‘,’ wird erkannt.",
+                "validation-results": "Validierungsergebnisse",
+                "valid-rows": "{count} gültige Zeilen.",
+                "invalid-rows": "{count} ungültige Zeilen (Daten/Beträge prüfen).",
+                "potential-duplicates": "{count} potenzielle Duplikate erkannt",
+                "new-categories-info": "{count} neue Kategorien werden erstellt.",
+                "categories-found": "{count} Kategorien in der Datei gefunden.",
+                "new-accounts-found": "{count} neue Konten in der Datei gefunden.",
+                "missing-accounts-title": "Fehlende Kontozuordnungen",
+                "missing-accounts-desc": "Die unten aufgeführten Konten wurden in Ihrer Datei gefunden, fehlen jedoch in Ihrem Dashboard. Ordnen Sie sie vorhandenen Konten zu, um fortzufahren.",
+                "select-existing": "Vorhandenes Konto auswählen",
+                "create-missing-button": "Alle fehlenden Konten erstellen",
+                "new-accounts-auto-info": "Alle {count} fehlenden Konten werden automatisch erstellt.",
+                "skip-duplicates-label": "Potenzielle Duplikate überspringen",
+                "duplicates-ignored-info": "Erkannte Duplikate werden ignoriert.",
+                "replace-confirmation": {
+                    "title": "Sind Sie sicher?",
+                    "desc": "Dies wird alle vorhandenen {type} für diesen Hub vor dem Import löschen. Diese Aktion kann nicht rückgängig gemacht werden.",
+                    "confirm": "Ja, alles ersetzen",
+                    "cancel": "Abbrechen"
+                },
+                "full-json-validation": {
+                    "title": "Vollexport-Zusammenfassung",
+                    "total": "Gesamt: {count} Elemente werden importiert",
+                    "exported-at": "Exportiert"
+                },
+                "cancel": "Abbrechen",
+                "errors": {
+                    "invalid-json": "Ungültige JSON-Datei",
+                    "parse-csv": "Fehler beim Parsen der CSV-Datei",
+                    "unsupported-file": "Nicht unterstützter Dateityp. Bitte .csv oder .json verwenden",
+                    "validation-failed": "Validierung fehlgeschlagen",
+                    "select-file-first": "Bitte zuerst eine Datei auswählen",
+                    "hub-not-found": "Hub-ID nicht gefunden"
+                },
+                "messages": {
+                    "import-success": "{count} Elemente erfolgreich importiert!"
+                },
+                "validating": "Daten werden validiert...",
+                "preview": "Vorschau:",
+                "more-rows": "... und {count} weitere Zeilen",
+                "imported-as": "Importiert als: {type}",
+                "importing": "Importieren...",
+                "start-import": "Import starten"
             }
         },
         "settings-page": {
@@ -1038,6 +1334,11 @@
                 "address": {
                     "title": "Adresse (optional)",
                     "placeholder": "Straße & Nr., PLZ, Ort"
+                },
+                "messages": {
+                    "update-success": "Profil und Haushaltseinstellungen erfolgreich aktualisiert",
+                    "update-error": "Fehler beim Aktualisieren der Einstellungen",
+                    "unexpected-error": "Ein unerwarteter Fehler ist aufgetreten"
                 }
             },
             "plans-upgrade-section": {
@@ -1087,7 +1388,8 @@
                     },
                     "errors": {
                         "no-price": "Für diese Option sind derzeit keine Preise verfügbar.",
-                        "portal-failed": "Das Stripe-Portal kann im Moment nicht geöffnet werden. Bitte versuche es später."
+                        "portal-failed": "Das Stripe-Portal kann im Moment nicht geöffnet werden. Bitte versuche es später.",
+                        "checkout-failed": "Checkout-Sitzung konnte nicht erstellt werden"
                     },
                     "current-plan-badge": "Aktueller Plan",
                     "manage-plan-button": "Plan verwalten",
@@ -1173,6 +1475,12 @@
                         "action": "AKTION"
                     },
                     "content": "Keine Einladungen oder Mitglieder vorhanden."
+                },
+                "messages": {
+                    "load-error": "Fehler beim Laden von Einladungen & Mitgliedern",
+                    "invitation-sent": "Einladung gesendet",
+                    "send-error": "Fehler beim Senden der Einladung",
+                    "send-unexpected-error": "Fehler beim Senden der Einladung"
                 }
             },
             "appearance-section": {
@@ -1367,6 +1675,16 @@
                             "delete-account": "Konto löschen"
                         }
                     }
+                },
+                "delete-dialog": {
+                    "title": "Kontoloschung bestätigen",
+                    "description": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden.",
+                    "cancel": "Abbrechen",
+                    "confirm": "Konto löschen"
+                },
+                "messages": {
+                    "delete-error": "Fehler beim Löschen des Benutzers",
+                    "unexpected-error": "Ein unerwarteter Fehler ist aufgetreten"
                 }
             },
             "billing-details-section": {
@@ -1403,7 +1721,12 @@
                 "support": {
                     "title": "Support",
                     "placeholder": "Frage oder Feedback …",
-                    "button": "An Support senden"
+                    "button": "An Support senden",
+                    "sending": "Wird gesendet...",
+                    "success": "Ihre Nachricht wurde erfolgreich gesendet!",
+                    "error": "Senden fehlgeschlagen. Bitte versuchen Sie es erneut.",
+                    "error-empty": "Bitte geben Sie eine Nachricht ein",
+                    "error-too-short": "Nachricht ist zu kurz (mind. 10 Zeichen)"
                 }
             }
         },
@@ -1457,7 +1780,12 @@
                     "title": "Nachricht",
                     "placeholder": "Wie können wir helfen? Bitte so genau wie möglich sein."
                 },
-                "button": "Ticket senden"
+                "button": "Ticket senden",
+                "sending": "Wird gesendet...",
+                "success": "Ihr Ticket wurde erfolgreich gesendet!",
+                "error": "Senden fehlgeschlagen. Bitte versuchen Sie es erneut.",
+                "error-empty": "Bitte geben Sie eine Nachricht ein",
+                "error-too-short": "Nachricht ist zu kurz (mind. 10 Zeichen)"
             },
             "keyboard-shortcuts-section": {
                 "title": "Tastenkürzel",
@@ -1486,6 +1814,28 @@
         "loading": "Benachrichtigungen werden geladen...",
         "noNotifications": "Keine Benachrichtigungen",
         "markAllAsRead": "Alle als gelesen markieren",
+        "types": {
+            "budget-threshold-80": {
+                "title": "Budgetgrenze erreicht",
+                "message": "Ihr Budget für \"{categoryName}\" hat 80% des zugewiesenen Betrags erreicht."
+            },
+            "budget-threshold-100": {
+                "title": "Budget überschritten",
+                "message": "Ihr Budget für \"{categoryName}\" wurde überschritten."
+            },
+            "subscription-expiring-3-days": {
+                "title": "Abonnement läuft bald ab",
+                "message": "Ihr Abonnement läuft in 3 Tagen ab. Bitte erneuern Sie es, um alle Funktionen weiter nutzen zu können."
+            },
+            "subscription-expiring-1-day": {
+                "title": "Abonnement läuft morgen ab",
+                "message": "Ihr Abonnement läuft morgen ab. Bitte erneuern Sie es sofort, um eine Unterbrechung des Dienstes zu vermeiden."
+            },
+            "subscription-expired": {
+                "title": "Abonnement abgelaufen",
+                "message": "Ihr Abonnement ist abgelaufen. Bitte erneuern Sie es, um den Zugang zu allen Funktionen wiederherzustellen."
+            }
+        },
         "browser": {
             "prompt": {
                 "title": "Browser-Benachrichtigungen aktivieren",

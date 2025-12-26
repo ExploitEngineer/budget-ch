@@ -3,6 +3,8 @@
 
 import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { updateUserLanguageDB } from "@/db/queries";
+import { auth } from "@/lib/auth/auth";
 
 /**
  * Sets the 'locale' cookie and redirects the user to the current path.
@@ -12,6 +14,7 @@ export async function setLanguage(formData: FormData) {
   // 1. Get the desired locale from the form data
   const locale = formData.get("locale");
   const pathnameFromForm = formData.get("pathname");
+  const persistToDB = formData.get("persistToDB") === "true";
   const headersList = await headers();
   const referer = headersList.get("referer");
 
@@ -20,6 +23,12 @@ export async function setLanguage(formData: FormData) {
   // Basic validation and type checking
   if (typeof locale !== "string" || !supportedLocales.includes(locale)) {
     throw new Error("Invalid locale provided.");
+  }
+
+  // 2. Persist locale in DB for authenticated users only if persistToDB is true
+  const session = await auth.api.getSession({ headers: headersList });
+  if (persistToDB && session?.user?.id) {
+    await updateUserLanguageDB(session.user.id, locale);
   }
 
   let redirectTo = "/"; // Default to home page

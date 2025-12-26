@@ -6,8 +6,9 @@ import * as schema from "@/db/schema";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { ensureUserOnboarding } from "@/lib/services/user";
 import { mailer } from "@/lib/mailer";
+import { getMailTranslations } from "@/lib/mail-translations";
 
-// TODO: clear activeHubId cookie on signout
+
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -84,17 +85,25 @@ export const auth = betterAuth({
       }
     }),
     after: createAuthMiddleware(async (ctx): Promise<void> => {
-      if (ctx.path.startsWith("/sign-up")) {
+      // Handle both regular sign-up and OAuth callbacks (e.g., Google sign-in)
+      const isSignUp = ctx.path.startsWith("/sign-up");
+      const isOAuthCallback = ctx.path.startsWith("/callback");
+
+      if (isSignUp || isOAuthCallback) {
         // access .body to get the user data
         const user = ctx.context.newSession?.user;
 
         if (!user) {
-          console.error("hook-after-sign-up: user not found in new session");
+          // For OAuth, user might not be in newSession for returning users
+          if (isSignUp) {
+            console.error("hook-after-sign-up: user not found in new session");
+          }
           return;
         }
 
         try {
           // Create user onboarding (handles Stripe + DB operations)
+          // This is idempotent - won't duplicate if already onboarded
           const result = await ensureUserOnboarding(user.email);
 
           if (!result.success) {
@@ -105,50 +114,68 @@ export const auth = betterAuth({
           }
 
           console.log(
-            `User onboarding completed successfully for user: ${user.email}`,
+            `[${user.email}] ${result.message}`,
           );
         } catch (err) {
           if (err instanceof Error) {
-            console.error(`Error in sign-up hook: ${err.message}`);
+            console.error(`Error in ${isOAuthCallback ? 'OAuth callback' : 'sign-up'} hook: ${err.message}`);
           }
         }
       }
-      if (ctx.path.startsWith("/sign-out")) { }
+      if (ctx.path.startsWith("/sign-out")) {
+        // Clear activeHubId cookie server-side
+        // Must match all options used when setting the cookie for proper deletion
+        const isProduction = process.env.NODE_ENV === "production";
+        const cookieValue = [
+          "activeHubId=",
+          "path=/",
+          "expires=Thu, 01 Jan 1970 00:00:00 GMT",
+          "Max-Age=0",
+          "HttpOnly",
+          "SameSite=Lax",
+          isProduction ? "Secure" : "",
+        ].filter(Boolean).join("; ");
+        ctx.setHeader("Set-Cookie", cookieValue);
+      }
     }),
   },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
+      const locale = (user as any).language || "en";
+      const t = await getMailTranslations(locale);
+      const name = user.name || user.email;
+
       const html = `
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Reset Your Password</title>
+    <title>${t("emails.auth.reset-password.title")}</title>
   </head>
   <body style="font-family: sans-serif; background: #f4f4f4; padding: 40px;">
     <div style="max-width: 600px; margin: auto; background: #fff; padding: 32px; border-radius: 8px;">
-      <h2 style="text-align: center; color: #111;">Reset Your Password</h2>
-      <p>Hi ${user.name || user.email},</p>
-      <p>We received a request to reset your password. Click the button below to choose a new one.</p>
+      <h2 style="text-align: center; color: #111;">${t("emails.auth.reset-password.title")}</h2>
+      <p>${t("emails.auth.reset-password.hi", { name })}</p>
+      <p>${t("emails.auth.reset-password.request")}</p>
       <p style="text-align: center; margin: 32px 0;">
-        <a href="${url}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Reset Password</a>
+        <a href="${url}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">${t("emails.auth.reset-password.button")}</a>
       </p>
-      <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+      <p>${t("emails.auth.reset-password.fallback")}</p>
       <p style="color: #2563eb; word-break: break-all;">${url}</p>
-      <p>This password reset link will expire in 24 hours.</p>
-      <p>If you didn’t request a password reset, you can safely ignore this email.</p>
+      <p>${t("emails.auth.reset-password.expire")}</p>
+      <p>${t("emails.auth.reset-password.ignore")}</p>
       <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
-      <p style="text-align: center; font-size: 12px; color: #666;">© 2024 Your Company Name. All rights reserved.</p>
+      <p style="text-align: center; font-size: 12px; color: #666;">${t("emails.auth.reset-password.footer")}</p>
     </div>
   </body>
 </html>
 `;
       try {
         await mailer.sendMail({
-          from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
+          from: `"BudgetHub" <${process.env.MAIL_USER!}>`,
           to: user.email,
-          subject: "Reset Your Password",
+          subject: t("emails.auth.reset-password.subject"),
           html,
         });
       } catch (err) {
@@ -157,27 +184,32 @@ export const auth = betterAuth({
     },
   },
   emailVerification: {
+    sendOnSignUp: true, // Automatically send verification email on signup
     sendVerificationEmail: async ({ user, url }) => {
+      const locale = (user as any).language || "en";
+      const t = await getMailTranslations(locale);
+      const name = user.name || user.email;
+
       const html = `
       <html>
         <head>
           <meta charset="UTF-8" />
-          <title>Verify your email</title>
+          <title>${t("emails.auth.verify-email.title")}</title>
         </head>
         <body style="font-family: sans-serif; background: #f4f4f4; padding: 40px;">
           <div style="max-width: 600px; margin: auto; background: #fff; padding: 32px; border-radius: 8px;">
-            <h2 style="text-align: center; color: #111;">Verify Your Email Address</h2>
-            <p>Hi there!</p>
-            <p>Thank you, ${user.name || user.email}, for signing up! To complete your registration, please verify your email by clicking the button below.</p>
+            <h2 style="text-align: center; color: #111;">${t("emails.auth.verify-email.title")}</h2>
+            <p>${t("emails.auth.verify-email.hi")}</p>
+            <p>${t("emails.auth.verify-email.thanks", { name })}</p>
             <p style="text-align: center; margin: 32px 0;">
-              <a href="${url}email-verified" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Verify Email Address</a>
+              <a href="${url}email-verified" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">${t("emails.auth.verify-email.button")}</a>
             </p>
-            <p>If the button doesn’t work, copy and paste this link into your browser:</p>
+            <p>${t("emails.auth.verify-email.fallback")}</p>
             <p style="color: #2563eb; word-break: break-all;">${url}email-verified</p>
-            <p>This verification link will expire in 24 hours.</p>
-            <p>If you didn’t create an account, you can ignore this email.</p>
+            <p>${t("emails.auth.verify-email.expire")}</p>
+            <p>${t("emails.auth.verify-email.ignore")}</p>
             <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
-            <p style="text-align: center; font-size: 12px; color: #666;">© 2025 Budget-ch. All rights reserved.</p>
+            <p style="text-align: center; font-size: 12px; color: #666;">${t("emails.auth.verify-email.footer")}</p>
           </div>
         </body>
       </html>
@@ -185,9 +217,9 @@ export const auth = betterAuth({
 
       try {
         await mailer.sendMail({
-          from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
+          from: `"BudgetHub" <${process.env.MAIL_USER!}>`,
           to: user.email,
-          subject: "Verify your email address",
+          subject: t("emails.auth.verify-email.subject"),
           html,
         });
       } catch (err) {
@@ -211,36 +243,39 @@ export const auth = betterAuth({
         amount: 10,
       },
       */
-      /*
       otpOptions: {
-        async sendOTP({ user, otp }) {
+        sendOTP: async ({ user, otp }) => {
+          const locale = (user as any).language || "en";
+          const t = await getMailTranslations(locale);
+          const name = user.name || user.email;
+
           const html = `
             <html>
               <head>
                 <meta charset="UTF-8" />
-                <title>Your Verification Code</title>
+                <title>${t("emails.auth.otp.title")}</title>
               </head>
               <body style="font-family: sans-serif; background: #f4f4f4; padding: 40px;">
                 <div style="max-width: 600px; margin: auto; background: #fff; padding: 32px; border-radius: 8px;">
-                  <h2 style="text-align: center; color: #111;">Your Verification Code</h2>
-                  <p>Hi ${user.name || user.email},</p>
-                  <p>Your verification code is:</p>
+                  <h2 style="text-align: center; color: #111;">${t("emails.auth.otp.title")}</h2>
+                  <p>${t("emails.auth.otp.hi", { name })}</p>
+                  <p>${t("emails.auth.otp.code-is")}</p>
                   <p style="text-align: center; margin: 32px 0;">
                     <span style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; font-weight: bold; font-size: 24px; letter-spacing: 4px;">${otp}</span>
                   </p>
-                  <p>This code will expire in 5 minutes.</p>
-                  <p>If you didn't request this code, you can safely ignore this email.</p>
+                  <p>${t("emails.auth.otp.expire")}</p>
+                  <p>${t("emails.auth.otp.ignore")}</p>
                   <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />
-                  <p style="text-align: center; font-size: 12px; color: #666;">© 2025 Budget-ch. All rights reserved.</p>
+                  <p style="text-align: center; font-size: 12px; color: #666;">${t("emails.auth.otp.footer")}</p>
                 </div>
               </body>
             </html>
           `;
           try {
             await mailer.sendMail({
-              from: `"Budget-ch" <${process.env.MAIL_USER!}>`,
+              from: `"BudgetHub" <${process.env.MAIL_USER!}>`,
               to: user.email,
-              subject: "Your Verification Code",
+              subject: t("emails.auth.otp.subject"),
               html,
             });
           } catch (err) {
@@ -249,7 +284,6 @@ export const auth = betterAuth({
         },
         period: 3, // 3 minutes (in minutes for OTP)
       },
-      */
     }),
   ],
 });

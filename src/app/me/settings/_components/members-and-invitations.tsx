@@ -201,7 +201,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
       }
     } catch (err) {
       console.error(err);
-      toast.error("Failed to load invitations & members");
+      toast.error(t("messages.load-error"));
     } finally {
       setLoading(false);
     }
@@ -221,7 +221,7 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
         });
 
         if (result.success) {
-          toast.success(result.message || "Invitation sent");
+          toast.success(result.message || t("messages.invitation-sent"));
           form.reset();
 
           const invRes = await getHubInvitations(hubId);
@@ -229,11 +229,11 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
             setInvitations(invRes.data);
           }
         } else {
-          toast.error(result.message || "Failed to send invitation");
+          toast.error(result.message || t("messages.send-error"));
         }
       } catch (e) {
         console.error(e);
-        toast.error("Error sending invitation");
+        toast.error(t("messages.send-unexpected-error"));
       }
     });
   };
@@ -410,9 +410,9 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
                             </TableHead>
                           ))}
                         </TableRow>
@@ -486,9 +486,9 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  )}
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
                             </TableHead>
                           ))}
                         </TableRow>

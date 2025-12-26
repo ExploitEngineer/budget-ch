@@ -67,10 +67,10 @@ export default function NewAccountDialog({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
-      toast.success("Account created successfully!");
+      toast.success(t("messages.created"));
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create account");
+      toast.error(error.message || t("messages.error.create"));
     },
   });
 

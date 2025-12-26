@@ -50,6 +50,7 @@ interface FiltersSectionProps {
 
 export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
   const t = useTranslations("main-dashboard.transactions-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
@@ -102,7 +103,8 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
   });
 
   const handleApply = async (values: TransactionFiltersFormValues) => {
-    onFilter(values)
+    onFilter(values);
+    form.reset(values, { keepValues: true });
   };
 
   const handleReset = () => {
@@ -152,7 +154,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
                                   ? format(field.value, "dd/MM/yyyy")
-                                  : "Pick a date"}
+                                  : t("transaction-edit-dialog.dialog.placeholders.pick-date")}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -184,7 +186,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
                                   ? format(field.value, "dd/MM/yyyy")
-                                  : "Pick a date"}
+                                  : t("transaction-edit-dialog.dialog.placeholders.pick-date")}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -215,7 +217,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                             }}
                           >
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select or add a category" />
+                              <SelectValue placeholder={t("transaction-edit-dialog.dialog.placeholders.category-selector")} />
                             </SelectTrigger>
 
                             <SelectContent>
@@ -233,7 +235,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                               {availableCategories.length === 0 ? (
                                 <SelectItem value="none" disabled>
                                   {categoriesLoading
-                                    ? t("loading")
+                                    ? commonT("loading")
                                     : t("labels.category.data.no-category")}
                                 </SelectItem>
                               ) : (
@@ -259,7 +261,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     name="amountMin"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Min (CHF)</FormLabel>
+                        <FormLabel>Min ({commonT("currency")})</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -278,7 +280,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     name="amountMax"
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel>Max (CHF)</FormLabel>
+                        <FormLabel>Max ({commonT("currency")})</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -313,7 +315,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
               </CardContent>
 
               {/* Footer */}
-              <CardFooter className="flex items-center justify-between gap-2">
+              <CardFooter className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-wrap items-center gap-2">
                   <FormField
                     control={form.control}
@@ -321,14 +323,14 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     render={({ field }) => (
                       <Badge
                         variant="outline"
-                        className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                        className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2 text-xs sm:text-sm"
                       >
                         <label className="flex items-center gap-2">
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
-                          <span className="cursor-pointer">
+                          <span className="cursor-pointer whitespace-nowrap">
                             {t("checkboxes.recipient")}
                           </span>
                         </label>
@@ -341,14 +343,14 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     render={({ field }) => (
                       <Badge
                         variant="outline"
-                        className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                        className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2 text-xs sm:text-sm"
                       >
                         <label className="flex items-center gap-2">
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
-                          <span className="cursor-pointer">
+                          <span className="cursor-pointer whitespace-nowrap">
                             {t("checkboxes.recurring")}
                           </span>
                         </label>
@@ -361,14 +363,14 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                     render={({ field }) => (
                       <Badge
                         variant="outline"
-                        className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2"
+                        className="bg-badge-background dark:border-border-blue cursor-pointer rounded-full px-3 py-2 text-xs sm:text-sm"
                       >
                         <label className="flex items-center gap-2">
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
                           />
-                          <span className="cursor-pointer">
+                          <span className="cursor-pointer whitespace-nowrap">
                             {t("checkboxes.transfers")}
                           </span>
                         </label>
@@ -377,20 +379,20 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                   />
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={handleReset}
-                    className="!bg-dark-blue-background dark:border-border-blue cursor-pointer"
+                    className="!bg-dark-blue-background dark:border-border-blue cursor-pointer flex-1 sm:flex-none"
                   >
                     {t("buttons.reset")}
                   </Button>
                   <Button
                     type="submit"
                     variant="outline"
-                    disabled={isApplying}
-                    className="btn-gradient cursor-pointer border-transparent hover:text-white"
+                    disabled={isApplying || !form.formState.isDirty}
+                    className="btn-gradient cursor-pointer border-transparent hover:text-white disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
                   >
                     {isApplying ? <Spinner /> : t("buttons.apply")}
                   </Button>

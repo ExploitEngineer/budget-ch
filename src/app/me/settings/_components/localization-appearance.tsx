@@ -35,9 +35,14 @@ export function LocalizationAppearance() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const localPrefs = getLocalUserPreferences(true) as UserPreferencesValues;
+
   const form = useForm<UserPreferencesValues>({
     resolver: zodResolver(userPreferencesSchema),
-    defaultValues: getLocalUserPreferences(true) as UserPreferencesValues,
+    defaultValues: {
+      ...localPrefs,
+      language: currentLocale as "en" | "de" | "fr" | "it", // Use actual locale from cookie/DB, not localStorage
+    },
   });
 
   const onSubmit = async (values: UserPreferencesValues) => {
@@ -54,14 +59,15 @@ export function LocalizationAppearance() {
       const formData = new FormData();
       formData.append("locale", values.language);
       // Include search params (e.g., hub parameter) in pathname
-      const fullPath = searchParams.toString() 
+      const fullPath = searchParams.toString()
         ? `${pathname}?${searchParams.toString()}`
         : pathname;
       formData.append("pathname", fullPath);
-      
+      formData.append("persistToDB", "true");
+
       // Show toast before redirect
       toast.success(t("messages.preferences-saved"));
-      
+
       // setLanguage will redirect, so we don't need to do anything else
       await setLanguage(formData);
     } else {
@@ -109,6 +115,7 @@ export function LocalizationAppearance() {
                 )}
               />
 
+              {/* Currency selection hidden for now
               <FormField
                 control={form.control}
                 name="currency"
@@ -135,6 +142,7 @@ export function LocalizationAppearance() {
                   </FormItem>
                 )}
               />
+              */}
 
               <FormField
                 control={form.control}

@@ -4,6 +4,8 @@ import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { HubSync } from "@/components/hub-sync";
+import { UpgradeToastListener } from "@/components/upgrade-toast-listener";
+import { SessionReadyProvider } from "@/hooks/use-session-ready";
 
 export default async function DashboardLayout({
   children,
@@ -24,6 +26,7 @@ export default async function DashboardLayout({
 
   return (
     <SidebarProvider>
+      <UpgradeToastListener />
       <AppSidebar
         user={{
           name: session.user.name,
@@ -32,7 +35,9 @@ export default async function DashboardLayout({
       />
       <HubSync />
       <SidebarInset className="bg-gray-100/55 dark:![background:var(--fancy-gradient)]">
-        {children}
+        <SessionReadyProvider>
+          {children}
+        </SessionReadyProvider>
       </SidebarInset>
     </SidebarProvider>
   );

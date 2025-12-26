@@ -35,6 +35,7 @@ export interface AccountData {
 
 export function ContentDataTable() {
   const t = useTranslations("main-dashboard.content-page.data-table");
+  const commonT = useTranslations("common");
 
   const { exportAccounts } = useExportCSV();
   const searchParams = useSearchParams();
@@ -64,11 +65,16 @@ export function ContentDataTable() {
     return mapAccountsToRows(domainAccounts);
   }, [domainAccounts]);
 
-  const totalBalance = (accounts ?? []).reduce((sum, acc) => {
-    const amount =
-      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0;
-    return sum + amount;
-  }, 0);
+  const totalBalance = useMemo(() =>
+    (accounts ?? []).reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const liquidBalance = useMemo(() =>
+    (accounts ?? []).filter(acc => acc.type === "checking" || acc.type === "cash")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
 
   const accountTableHeadings: string[] = [
     t("headings.name"),
@@ -88,7 +94,12 @@ export function ContentDataTable() {
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
               variant="outline"
             >
-              {t("badge")}
+              {t("badge", {
+                count: accounts?.length ?? 0,
+                amount: liquidBalance.toLocaleString("de-CH", {
+                  minimumFractionDigits: 2,
+                })
+              })}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
@@ -99,12 +110,12 @@ export function ContentDataTable() {
             >
               {t("buttons.export")}
             </Button>
-            <Button
+            {/* <Button
               variant="outline"
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
               {t("buttons.reset")}
-            </Button>
+            </Button> */}
           </div>
         </CardHeader>
 
@@ -129,7 +140,7 @@ export function ContentDataTable() {
                   <TableCell colSpan={5} className="text-center text-red-500">
                     {accountsError instanceof Error
                       ? accountsError.message
-                      : "Failed to load accounts"}
+                      : t("error-loading")}
                   </TableCell>
                 </TableRow>
               ) : accountsLoading || !accounts ? (
@@ -141,7 +152,7 @@ export function ContentDataTable() {
               ) : accounts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-gray-400">
-                    No Accounts Yet
+                    {t("no-accounts")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -169,7 +180,7 @@ export function ContentDataTable() {
                     </TableCell>
                     <TableCell colSpan={2} />
                     <TableCell className="font-bold opacity-60">
-                      CHF{" "}
+                      {commonT("currency")}{" "}
                       {totalBalance.toLocaleString("de-CH", {
                         minimumFractionDigits: 2,
                       })}

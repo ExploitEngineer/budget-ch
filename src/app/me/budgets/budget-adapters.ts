@@ -44,6 +44,8 @@ export function mapBudgetToBudgetRow(budget: BudgetWithCategory): BudgetRow {
     progress,
     warningThreshold: budget.warningPercentage ?? null,
     colorMarker: budget.markerColor ?? null,
+    month: budget.month,
+    year: budget.year,
   };
 }
 

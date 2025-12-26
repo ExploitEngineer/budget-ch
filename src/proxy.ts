@@ -24,12 +24,12 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // Priority 2: If cookie exists but URL doesn't have hub param, add it to URL
-  if (cookieHubId && !urlHubId) {
-    const url = request.nextUrl.clone();
-    url.searchParams.set("hub", cookieHubId);
-    return NextResponse.redirect(url);
-  }
+  // // Priority 2: If cookie exists but URL doesn't have hub param, add it to URL
+  // if (cookieHubId && !urlHubId) {
+  //   const url = request.nextUrl.clone();
+  //   url.searchParams.set("hub", cookieHubId);
+  //   return NextResponse.redirect(url);
+  // }
 
   // No cookie and no URL param - let client component handle default hub
   return response;

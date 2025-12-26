@@ -49,18 +49,18 @@ export function AllocateForm({ amountSaved, goalId }: AllocateFormProps) {
         updatedData,
       });
       if (!result.success) {
-        throw new Error(result.message || "Failed to update saving goal");
+        throw new Error(result.message || t("messages.error.update"));
       }
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
-      toast.success("Saving goal updated successfully!");
+      toast.success(t("messages.updated"));
       form.reset({ amount: "" });
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update saving goal");
+      toast.error(error.message || t("messages.error.update"));
     },
   });
 

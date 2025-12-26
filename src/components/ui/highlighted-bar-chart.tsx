@@ -19,12 +19,6 @@ import { useSearchParams } from "next/navigation";
 import { Spinner } from "@/components/ui/spinner";
 import { ErrorState } from "@/components/ui/error-state";
 
-const chartConfig = {
-  expenses: {
-    label: "Expenses",
-    color: "url(#bar-gradient)",
-  },
-} satisfies ChartConfig;
 
 const ALL_MONTHS = [
   "January",
@@ -43,6 +37,14 @@ const ALL_MONTHS = [
 
 export function HighlightedBarChart() {
   const t = useTranslations("main-dashboard");
+  const commonT = useTranslations("common");
+
+  const chartConfig = {
+    expenses: {
+      label: t("dashboard-page.budget-health.card-2.title"),
+      color: "url(#bar-gradient)",
+    },
+  } satisfies ChartConfig;
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -67,14 +69,15 @@ export function HighlightedBarChart() {
     enabled: !!hubId,
   });
 
-  const chartData = ALL_MONTHS.map((month) => {
+  const chartData = ALL_MONTHS.map((month, index) => {
     const found = monthlyReports?.find((report) => {
       const reportMonth = report.month.toLowerCase();
+      // Match using English months as the DB returns 'Month YYYY' in English
       return reportMonth.includes(month.slice(0, 3).toLowerCase());
     });
 
     return {
-      month,
+      month: commonT(`months.${index}`),
       expenses: found ? Number(found.expenses) || 0 : 0,
     };
   });
@@ -116,7 +119,7 @@ export function HighlightedBarChart() {
 
               <YAxis
                 tickFormatter={(value) =>
-                  `CHF ${value.toLocaleString("de-CH")}`
+                  `${commonT("currency")} ${value.toLocaleString()}`
                 }
                 axisLine
                 tickLine

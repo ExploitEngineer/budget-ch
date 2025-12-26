@@ -36,6 +36,7 @@ import { mapBudgetsToRows } from "../budget-adapters";
 
 export function BudgetDataTable() {
   const t = useTranslations("main-dashboard.budgets-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const month = searchParams.get("month") ? parseInt(searchParams.get("month")!) : undefined;
@@ -55,7 +56,7 @@ export function BudgetDataTable() {
       }
       const res = await getBudgets(hubId, month, year);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch budgets");
+        throw new Error(res.message || t("data-table.error-loading"));
       }
       return res.data ?? [];
     },
@@ -71,6 +72,7 @@ export function BudgetDataTable() {
   const {
     data: amounts,
     isLoading: amountsLoading,
+    error: amountsError,
   } = useQuery({
     queryKey: budgetKeys.amounts(hubId, month, year),
     queryFn: async () => {
@@ -79,23 +81,32 @@ export function BudgetDataTable() {
       }
       const res = await getBudgetsAmounts(hubId, month, year);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch budget amounts");
+        throw new Error(res.message || t("data-table.error-loading"));
       }
-      const totalAllocated = res.data?.totalAllocated ?? 0;
-      const totalSpent = res.data?.totalSpent ?? 0;
-      return {
-        allocated: totalAllocated,
-        spent: totalSpent,
-        available: totalAllocated - totalSpent,
-      };
+      return res.data;
     },
     enabled: !!hubId,
   });
 
-  const allocated = amounts?.allocated ?? null;
-  const available = amounts?.available ?? null;
+  const allocated = amounts?.totalAllocated ?? null;
+  const available = (amounts?.totalAllocated !== undefined && amounts?.totalSpent !== undefined)
+    ? amounts.totalAllocated - amounts.totalSpent
+    : null;
 
   const [warnFilter, setWarnFilter] = useState<string | null>(null);
+  const [periodFilter, setPeriodFilter] = useState<"month" | "week">("month");
+
+  // Fetch transactions for weekly calculation
+  const { data: transactionsData } = useQuery({
+    queryKey: ["transactions", hubId],
+    queryFn: async () => {
+      if (!hubId) return [];
+      const { getTransactions } = await import("@/lib/api");
+      const res = await getTransactions(hubId);
+      return res.data ?? [];
+    },
+    enabled: !!hubId && periodFilter === "week",
+  });
 
   const budgetDataTableHeadings: string[] = [
     t("data-table.headings.category"),
@@ -110,16 +121,51 @@ export function BudgetDataTable() {
   const filteredBudgets = useMemo(() => {
     if (!budgets) return [];
 
-    if (warnFilter === "warn-80") {
-      return budgets.filter((b) => b.progress >= 80 && b.progress < 90);
-    } else if (warnFilter === "warn-90") {
-      return budgets.filter((b) => b.progress >= 90 && b.progress < 100);
-    } else if (warnFilter === "warn-100") {
-      return budgets.filter((b) => b.progress >= 100);
+    let processedBudgets = [...budgets];
+
+    // If week filter is active, recalculate spent from transactions
+    if (periodFilter === "week" && transactionsData) {
+      const { startOfWeek, endOfWeek } = require("date-fns");
+      const now = new Date();
+      const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Monday
+      const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
+
+      // Calculate weekly spent per category
+      const weeklySpentByCategory = new Map<string, number>();
+
+      transactionsData.forEach((tx: any) => {
+        const txDate = new Date(tx.createdAt);
+        if (txDate >= weekStart && txDate <= weekEnd && tx.type === "expense" && tx.categoryName) {
+          const current = weeklySpentByCategory.get(tx.categoryName) || 0;
+          weeklySpentByCategory.set(tx.categoryName, current + Number(tx.amount));
+        }
+      });
+
+      // Update budgets with weekly spent
+      processedBudgets = budgets.map((b) => {
+        const weeklySpent = weeklySpentByCategory.get(b.category) || 0;
+        return {
+          ...b,
+          spent: weeklySpent,
+          remaining: (b.allocated ?? 0) - weeklySpent,
+          progress: b.allocated ? Math.min((weeklySpent / b.allocated) * 100, 100) : 0,
+        };
+      });
     }
 
-    return budgets;
-  }, [budgets, warnFilter]);
+    // Apply warning filter - filters by assigned warning percentage, not progress
+    if (warnFilter === "warn-50") {
+      return processedBudgets.filter((b) => b.warningThreshold === 50);
+    } else if (warnFilter === "warn-80") {
+      return processedBudgets.filter((b) => b.warningThreshold === 80);
+    } else if (warnFilter === "warn-90") {
+      return processedBudgets.filter((b) => b.warningThreshold === 90);
+    } else if (warnFilter === "warn-100") {
+      return processedBudgets.filter((b) => b.warningThreshold === 100);
+    }
+
+    return processedBudgets;
+  }, [budgets, warnFilter, periodFilter, transactionsData]);
 
   return (
     <section>
@@ -132,8 +178,8 @@ export function BudgetDataTable() {
               variant="outline"
             >
               {t("data-table.total-budget")}
-              {allocated ?? "..."} • {t("data-table.rest-budget")}
-              {available ?? "..."}
+              {commonT("currency")} {allocated?.toLocaleString() ?? commonT("loading")} • {t("data-table.rest-budget")}
+              {commonT("currency")} {available?.toLocaleString() ?? commonT("loading")}
             </Badge>
           </div>
           <div className="flex items-center gap-2">
@@ -182,13 +228,13 @@ export function BudgetDataTable() {
               ) : budgetsLoading || budgets === undefined ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center">
-                    Loading...
+                    {commonT("loading")}
                   </TableCell>
                 </TableRow>
               ) : filteredBudgets.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center text-gray-400">
-                    No Budgets Found
+                    {t("data-table.no-budgets")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -212,10 +258,10 @@ export function BudgetDataTable() {
                           {row.category}
                         </div>
                       </TableCell>
-                      <TableCell>{row.allocated !== null ? row.allocated : "—"}</TableCell>
-                      <TableCell>{row.ist !== null ? row.ist : "—"}</TableCell>
-                      <TableCell>{row.spent}</TableCell>
-                      <TableCell>{row.allocated !== null ? row.remaining : "—"}</TableCell>
+                      <TableCell>{row.allocated !== null ? row.allocated.toLocaleString() : "—"}</TableCell>
+                      <TableCell>{row.ist !== null ? row.ist.toLocaleString() : "—"}</TableCell>
+                      <TableCell>{row.spent.toLocaleString()}</TableCell>
+                      <TableCell>{row.allocated !== null ? row.remaining.toLocaleString() : "—"}</TableCell>
                       <TableCell>
                         <Progress
                           value={row.progress}
@@ -227,13 +273,13 @@ export function BudgetDataTable() {
                         {row.id ? (
                           <EditBudgetDialog
                             variant="outline"
-                            text="Edit"
+                            text={t("data-table.edit")}
                             budget={domainBudget}
                           />
                         ) : (
                           <CreateBudgetDialog
                             variant="outline"
-                            text="Set Budget"
+                            text={t("data-table.set-budget")}
                             defaultCategory={row.category}
                           />
                         )}
@@ -247,35 +293,42 @@ export function BudgetDataTable() {
           <Separator className="bg-border-blue mt-2" />
         </CardContent>
 
-        <CardFooter className="flex flex-wrap items-center justify-between gap-2">
+        <CardFooter className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <ToggleGroup
-            className="dark:border-border-blue bg-dark-blue-background border"
+            className="dark:border-border-blue bg-dark-blue-background border w-full sm:w-auto"
             type="single"
+            value={periodFilter}
+            onValueChange={(val) => val && setPeriodFilter(val as "month" | "week")}
           >
-            <ToggleGroupItem value="month" aria-label="toggle-month">
+            <ToggleGroupItem value="month" aria-label="toggle-month" className="flex-1 sm:flex-none text-xs sm:text-sm">
               {t("data-table.toggle-groups.month")}
             </ToggleGroupItem>
-            <ToggleGroupItem value="week" aria-label="toggle-week">
+            <ToggleGroupItem value="week" aria-label="toggle-week" className="flex-1 sm:flex-none text-xs sm:text-sm">
               {t("data-table.toggle-groups.week")}
             </ToggleGroupItem>
           </ToggleGroup>
 
-          <ToggleGroup
-            className="dark:border-border-blue bg-dark-blue-background border"
-            type="single"
-            value={warnFilter ?? ""}
-            onValueChange={(val) => setWarnFilter(val || null)}
-          >
-            <ToggleGroupItem value="warn-80" aria-label="toggle-warn-80">
-              {t("data-table.toggle-groups.warn-80")}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="warn-90" aria-label="toggle-warn-90">
-              {t("data-table.toggle-groups.warn-90")}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="warn-100" aria-label="toggle-warn-100">
-              {t("data-table.toggle-groups.warn-100")}
-            </ToggleGroupItem>
-          </ToggleGroup>
+          <div className="w-full overflow-x-auto sm:w-auto sm:overflow-visible">
+            <ToggleGroup
+              className="dark:border-border-blue bg-dark-blue-background border min-w-max"
+              type="single"
+              value={warnFilter ?? ""}
+              onValueChange={(val) => setWarnFilter(val || null)}
+            >
+              <ToggleGroupItem value="warn-50" aria-label="toggle-warn-50" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-50")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="warn-80" aria-label="toggle-warn-80" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-80")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="warn-90" aria-label="toggle-warn-90" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-90")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="warn-100" aria-label="toggle-warn-100" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-100")}
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </CardFooter>
       </Card>
     </section>

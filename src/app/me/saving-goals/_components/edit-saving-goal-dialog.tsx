@@ -78,13 +78,13 @@ export default function EditSavingGoalDialog({
       }
       const res = await getFinancialAccountsAPI(hubId);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch accounts");
+        throw new Error(res.message || t("messages.error.update"));
       }
       return res.data ?? [];
     },
     enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
   });
-  
+
   // Transform domain accounts to UI rows
   const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
@@ -114,19 +114,19 @@ export default function EditSavingGoalDialog({
         updatedData,
       });
       if (!result.success) {
-        throw new Error(result.message || "Failed to update saving goal");
+        throw new Error(result.message || t("messages.error.update"));
       }
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
-      toast.success("Saving goal updated successfully!");
+      toast.success(t("messages.updated"));
       setOpen(false);
       form.reset();
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update saving goal");
+      toast.error(error.message || t("messages.error.update"));
     },
   });
 
@@ -134,18 +134,18 @@ export default function EditSavingGoalDialog({
     mutationFn: async () => {
       const result = await deleteSavingGoal(goalData.id);
       if (!result.success) {
-        throw new Error(result.message || "Failed to delete saving goal");
+        throw new Error(result.message || t("messages.error.delete"));
       }
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
-      toast.success("Saving goal deleted successfully!");
+      toast.success(t("messages.deleted"));
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete saving goal");
+      toast.error(error.message || t("messages.error.delete"));
     },
   });
 
@@ -303,7 +303,7 @@ export default function EditSavingGoalDialog({
                           <SelectValue
                             placeholder={
                               accountsLoading
-                                ? "Loading accounts..."
+                                ? t("loading-accounts")
                                 : t("labels.account.title")
                             }
                           />
@@ -311,7 +311,7 @@ export default function EditSavingGoalDialog({
                         <SelectContent>
                           {accountsLoading ? (
                             <SelectItem value="loading" disabled>
-                              Loading accounts...
+                              {t("loading-accounts")}
                             </SelectItem>
                           ) : accounts && accounts.length > 0 ? (
                             accounts.map((account) => (
@@ -321,7 +321,7 @@ export default function EditSavingGoalDialog({
                             ))
                           ) : (
                             <SelectItem value="no-accounts" disabled>
-                              No accounts available
+                              {t("no-accounts")}
                             </SelectItem>
                           )}
                         </SelectContent>

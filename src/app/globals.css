@@ -84,16 +84,12 @@
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
   --fancy-light-gradient:
-    radial-gradient(
-      1200px 600px at 75% -80px,
+    radial-gradient(1200px 600px at 75% -80px,
       color-mix(in oklab, #2563eb 10%, transparent),
-      transparent 65%
-    ),
-    radial-gradient(
-      800px 500px at -150px 70%,
+      transparent 65%),
+    radial-gradient(800px 500px at -150px 70%,
       color-mix(in oklab, #10b981 12%, transparent),
-      transparent 60%
-    ),
+      transparent 60%),
     #f7f9ff;
 }
 
@@ -137,16 +133,12 @@
   --badge-background: #0d1b2a;
   --border-blue: #1a2441;
   --fancy-gradient:
-    radial-gradient(
-      1200px 600px at 75% -80px,
+    radial-gradient(1200px 600px at 75% -80px,
       color-mix(in oklab, #6d7cff 10%, transparent),
-      transparent 65%
-    ),
-    radial-gradient(
-      800px 500px at -150px 70%,
+      transparent 65%),
+    radial-gradient(800px 500px at -150px 70%,
       color-mix(in oklab, #22d3ee 12%, transparent),
-      transparent 60%
-    ),
+      transparent 60%),
     #0b0f19;
 }
 
@@ -154,6 +146,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -162,16 +155,12 @@
 @layer components {
   .brand-gradient-bg {
     background:
-      radial-gradient(
-        1200px 600px at 75% -80px,
+      radial-gradient(1200px 600px at 75% -80px,
         color-mix(in oklab, var(--brand) 10%, transparent),
-        transparent 65%
-      ),
-      radial-gradient(
-        800px 500px at -150px 70%,
+        transparent 65%),
+      radial-gradient(800px 500px at -150px 70%,
         color-mix(in oklab, var(--acc) 12%, transparent),
-        transparent 60%
-      ),
+        transparent 60%),
       var(--bg-main);
   }
 
@@ -181,15 +170,39 @@
 
   .btn-gradient {
     @apply text-white;
-    background: linear-gradient(
-      135deg,
-      var(--brand),
-      color-mix(in oklab, var(--brand) 60%, var(--acc))
-    );
+    background: linear-gradient(135deg,
+        var(--brand),
+        color-mix(in oklab, var(--brand) 60%, var(--acc)));
   }
 
   .progress-gradient {
     background: linear-gradient(90deg, var(--brand), var(--acc));
+  }
+
+  /* Professional gradient progress bars - Blue to Orange to Red spectrum */
+  .progress-gradient-green {
+    /* Safe: Blue-ish teal gradient */
+    background: linear-gradient(90deg, #3B82C7, #48A8B8);
+  }
+
+  .progress-gradient-orange {
+    /* Warning: Orange gradient */
+    background: linear-gradient(90deg, #C98B45, #E8A855);
+  }
+
+  .progress-gradient-red {
+    /* Danger: Muted red gradient */
+    background: linear-gradient(90deg, #B85C58, #D07270);
+  }
+
+  .progress-gradient-warning {
+    /* At threshold: Orange-ish gradient */
+    background: linear-gradient(90deg, #CC8E45, #E8A050);
+  }
+
+  .progress-gradient-danger {
+    /* Over budget: Red-ish gradient */
+    background: linear-gradient(90deg, #B85858, #C96565);
   }
 }
 

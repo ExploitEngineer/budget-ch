@@ -11,75 +11,70 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
-import { getTransactions } from "@/lib/api";
-import { transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
-import type { Transaction } from "@/lib/types/dashboard-types";
-import type { TransactionWithDetails } from "@/lib/types/domain-types";
-import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
-import { useMemo } from "react";
+import { getReportSummary, type ReportSummary } from "@/lib/api";
+import { reportKeys } from "@/lib/query-keys";
 
-export function ReportCardsSection() {
+export function ReportCardsSection({
+  initialFrom,
+  initialTo,
+}: {
+  initialFrom?: string;
+  initialTo?: string;
+}) {
   const t = useTranslations("main-dashboard.report-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const from = searchParams.get("from") || initialFrom;
+  const to = searchParams.get("to") || initialTo;
 
   const {
-    data: domainTransactions,
+    data: summary,
     isLoading: loading,
     error: queryError,
-  } = useQuery<TransactionWithDetails[]>({
-    queryKey: transactionKeys.list(hubId),
+  } = useQuery<ReportSummary>({
+    queryKey: reportKeys.summary(hubId, from, to),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getTransactions(hubId);
+      const res = await getReportSummary(hubId, from, to);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch transactions");
+        throw new Error(res.message || "Failed to fetch report summary");
       }
-      return res.data ?? [];
+      return res.data!;
     },
     enabled: !!hubId,
   });
 
-  const transactions = useMemo(() => {
-    if (!domainTransactions) return undefined;
-    return mapTransactionsToRows(domainTransactions);
-  }, [domainTransactions]);
+  console.log("DEBUG: ReportCardsSection - Summary Data:", summary);
 
-  // Calculate income, expense, balance, and saving rate from transactions
-  const income = transactions?.reduce((sum, tx) => {
-    return tx.type === "income" ? sum + tx.amount : sum;
-  }, 0) ?? 0;
-
-  const expense = transactions?.reduce((sum, tx) => {
-    return tx.type === "expense" ? sum + tx.amount : sum;
-  }, 0) ?? 0;
-
-  const balance = income - expense;
-  const savingRate = income > 0 ? Number(((balance / income) * 100).toFixed(1)) : 0;
+  const income = summary?.income ?? 0;
+  const expense = summary?.expense ?? 0;
+  const balance = summary?.balance ?? 0;
+  const savingRate = summary?.savingRate ?? 0;
 
   const error = queryError ? (queryError instanceof Error ? queryError.message : "Failed to load report data") : null;
 
   const cards = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${income.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${income.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${expense.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${expense.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),
-      content: `CHF ${balance.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${balance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-3.badge"),

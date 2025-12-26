@@ -21,6 +21,7 @@ import { useMemo } from "react";
 
 export function ContentCardsSection() {
   const t = useTranslations("main-dashboard.content-page");
+  const commonT = useTranslations("common");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
 
@@ -48,51 +49,59 @@ export function ContentCardsSection() {
     return mapAccountsToRows(domainAccounts);
   }, [domainAccounts]);
 
-  const parsedAccounts = (accounts ?? []).map((acc) => ({
-    ...acc,
-    numericBalance:
-      parseFloat(acc.formattedBalance.replace(/[^\d.-]/g, "")) || 0,
-  }));
-
-  const totalBalance = parsedAccounts.reduce(
-    (sum, acc) => sum + acc.numericBalance,
-    0,
+  const totalBalance = useMemo(() =>
+    (accounts ?? []).reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
   );
-  const checkingCashTotal = parsedAccounts
-    .filter((a) => a.type === "checking" || a.type === "cash")
-    .reduce((sum, acc) => sum + acc.numericBalance, 0);
-  const savingsBalance = parsedAccounts
-    .filter((a) => a.type === "savings")
-    .reduce((sum, acc) => sum + acc.numericBalance, 0);
-  const creditCardTotal = parsedAccounts
-    .filter((a) => a.type === "credit-card")
-    .reduce((sum, acc) => sum + acc.numericBalance, 0);
+
+  const checkingCashTotal = useMemo(() =>
+    (accounts ?? []).filter((a) => a.type === "checking" || a.type === "cash")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const savingsBalance = useMemo(() =>
+    (accounts ?? []).filter((a) => a.type === "savings")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const creditCardTotal = useMemo(() =>
+    (accounts ?? []).filter((a) => a.type === "credit-card")
+      .reduce((sum, acc) => sum + (acc.balance || 0), 0),
+    [accounts]
+  );
+
+  const savingsPercent = useMemo(() =>
+    totalBalance > 0 ? Math.round((savingsBalance / totalBalance) * 100) : 0,
+    [totalBalance, savingsBalance]
+  );
 
   const cards = [
     {
       title: t("cards.card-1.title"),
-      content: `CHF ${totalBalance.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${totalBalance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-1.badge"),
     },
     {
       title: t("cards.card-2.title"),
-      content: `CHF ${checkingCashTotal.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${checkingCashTotal.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-2.badge"),
     },
     {
       title: t("cards.card-3.title"),
-      content: `CHF ${savingsBalance.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${savingsBalance.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
-      badge: t("cards.card-3.badge"),
+      badge: t("cards.card-3.badge", { percent: savingsPercent }),
     },
     {
       title: t("cards.card-4.title"),
-      content: `CHF ${creditCardTotal.toLocaleString("de-CH", {
+      content: `${commonT("currency")} ${creditCardTotal.toLocaleString("de-CH", {
         minimumFractionDigits: 2,
       })}`,
       badge: t("cards.card-4.badge"),
@@ -124,24 +133,26 @@ export function ContentCardsSection() {
                   accountsError && "text-red-500",
                 )}
               >
-                {accountsLoading ? "..." : accountsError ? "—" : content}
+                {accountsLoading ? commonT("loading") : accountsError ? "—" : content}
               </h1>
             </CardContent>
-            <CardFooter className="mt-2">
-              <Badge
-                variant="outline"
-                className={cn(
-                  "bg-badge-background rounded-full px-4 py-2 whitespace-pre-wrap",
-                  idx === 2
-                    ? "border-[#308BA4]"
-                    : idx === 3
-                      ? "border-[#9A4249]"
-                      : "dark:border-border-blue",
-                )}
-              >
-                <p className="w-full text-xs">{card.badge}</p>
-              </Badge>
-            </CardFooter>
+            {card.badge && (
+              <CardFooter className="mt-2">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "bg-badge-background rounded-full px-4 py-2 whitespace-pre-wrap",
+                    idx === 2
+                      ? "border-[#308BA4]"
+                      : idx === 3
+                        ? "border-[#9A4249]"
+                        : "dark:border-border-blue",
+                  )}
+                >
+                  <p className="w-full text-xs">{card.badge}</p>
+                </Badge>
+              </CardFooter>
+            )}
           </Card>
         );
       })}

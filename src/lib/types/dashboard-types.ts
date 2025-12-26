@@ -34,6 +34,7 @@ export type Transaction = {
   note: string;
   amount: number;
   accountId?: string | null;
+  account?: string | null;
   destinationAccountId?: string | null;
   recurringTemplateId?: string | null;
   isRecurring?: boolean;

@@ -5,8 +5,8 @@ import * as schema from "../src/db/schema";
 import { savingGoals, financialAccounts } from "../src/db/schema";
 import { eq } from "drizzle-orm";
 
-const HUB_ID = "3988f642-fdee-4bbe-b633-1e4fb73779c2";
-const USER_EMAIL = "abbasiahsan699@gmail.com";
+const HUB_ID = "bc29a94e-e14c-498b-9bcd-173b8a38011d";
+const USER_EMAIL = "ahsan69999@gmail.com";
 
 async function seedSavingGoals() {
     console.log("🚀 Starting Savings Goals Brutal Test Data Seed...\n");

@@ -85,7 +85,7 @@ export function Security() {
       const res = await getUserEmail();
 
       if (!res.success) {
-        toast.error(res.message || "Error fetching user email");
+        toast.error(res.message || t("labels.password.messages.error"));
         return;
       }
 

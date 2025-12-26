@@ -1,24 +1,24 @@
 "use server";
 
-import { getAccountTransfersDB } from "@/db/queries";
+import { getHubTransfersDB } from "@/db/queries";
 import { getContext } from "@/lib/auth/actions";
 import { headers } from "next/headers";
-
-// GET Account Transfers [Action]
-export async function getAccountTransfers() {
+export async function getAccountTransfers(hubIdArg?: string) {
   try {
     const hdrs = await headers();
-    const { financialAccountId } = await getContext(hdrs, false);
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
 
-    if (!financialAccountId) {
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
       return {
         status: true,
-        message: "No financial account found. Please create a financial account in the settings to continue.",
+        message: "No hub found.",
         data: [],
       };
     }
 
-    const result = await getAccountTransfersDB(financialAccountId);
+    const result = await getHubTransfersDB(hubId);
 
     return {
       status: result?.status ?? false,
@@ -26,7 +26,7 @@ export async function getAccountTransfers() {
       data: result?.data ?? [],
     };
   } catch (err: any) {
-    console.error("Error in getLatestTransactions:", err);
+    console.error("Error in getAccountTransfers:", err);
     return {
       status: false,
       message: err?.message || "Failed to fetch latest transfers",

@@ -79,12 +79,12 @@ export default function EditBudgetDialog({
       queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
-      toast.success("Budget created successfully!");
+      toast.success(t("messages.created"));
       form.reset();
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create budget");
+      toast.error(error.message || t("messages.error.create"));
     },
   });
 
@@ -112,12 +112,12 @@ export default function EditBudgetDialog({
       queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
-      toast.success("Budget updated successfully!");
+      toast.success(t("messages.updated"));
       form.reset();
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to update budget");
+      toast.error(error.message || t("messages.error.update"));
     },
   });
 
@@ -133,11 +133,11 @@ export default function EditBudgetDialog({
       queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.amounts(hubId) });
       queryClient.invalidateQueries({ queryKey: budgetKeys.categoriesCount(hubId) });
-      toast.success("Budget deleted successfully!");
+      toast.success(t("messages.deleted"));
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to delete budget");
+      toast.error(error.message || t("messages.error.delete"));
     },
   });
 
@@ -317,14 +317,20 @@ export default function EditBudgetDialog({
                   <FormItem className="flex flex-1 flex-col">
                     <FormLabel>{t("labels.warning")}</FormLabel>
                     <FormControl>
-                      <Input
-                        type="number"
-                        step={1}
-                        min={0}
-                        max={100}
-                        {...field}
-                        placeholder="0"
-                      />
+                      <Select
+                        onValueChange={(value) => field.onChange(Number(value))}
+                        value={field.value?.toString() || "80"}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder={t("labels.warning")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="50">50%</SelectItem>
+                          <SelectItem value="80">80%</SelectItem>
+                          <SelectItem value="90">90%</SelectItem>
+                          <SelectItem value="100">100%</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -22,12 +22,14 @@ import { getBudgets } from "@/lib/services/budget";
 import { budgetKeys, transactionKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
+import { useSessionReady } from "@/hooks/use-session-ready";
 
 export function WarningSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
+  const { isSessionReady } = useSessionReady();
 
   const {
     data: upcomingTransactions,
@@ -42,7 +44,7 @@ export function WarningSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const {
@@ -58,7 +60,7 @@ export function WarningSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   const upComingTableHeadings: string[] = [
@@ -177,19 +179,24 @@ export function WarningSection() {
                   )}
                 >
                   <p className="text-sm">
-                    {b.categoryName} {isExceeded ? "budget exceeded" : `budget at ${Math.round(percent)}%`}
+                    {isExceeded
+                      ? t("warning-cards.budget-exceeded", { category: b.categoryName ?? "" })
+                      : t("warning-cards.budget-at-percent", {
+                        category: b.categoryName ?? "",
+                        percent: Math.round(percent),
+                      })}
                   </p>
                   <Badge
                     variant="outline"
                     className="bg-dark-blue-background rounded-full px-2 py-1 ml-auto"
                   >
-                    CHF {totalSpent.toLocaleString()} / {totalAllocated.toLocaleString()}
+                    {t("warning-cards.currency")} {totalSpent.toLocaleString()} / {totalAllocated.toLocaleString()}
                   </Badge>
                 </div>
               );
             })
           ) : (
-            <p className="text-muted-foreground text-sm italic">No warnings. Your budget is healthy!</p>
+            <p className="text-muted-foreground text-sm italic">{t("warning-cards.no-warnings")}</p>
           )}
         </CardContent>
       </Card>

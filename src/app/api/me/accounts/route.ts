@@ -5,21 +5,21 @@ import { validateHubAccess } from "@/lib/api-helpers";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const hubId = searchParams.get("hub");
-  
+
   if (!hubId) {
     return apiError({ message: "Hub ID is required", status: 400 });
   }
-  
+
   const access = await validateHubAccess(hubId);
   if (!access.success) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
-  
-  const accounts = await getFinancialAccounts();
-  
+
+  const accounts = await getFinancialAccounts(hubId);
+
   if (!accounts.status || !accounts.data) {
     return apiError({ message: accounts.message ?? "Failed to fetch accounts", status: 500 });
   }
-  
+
   return apiSuccess({ data: accounts.data, status: 200 });
 }

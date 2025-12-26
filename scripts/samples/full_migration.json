@@ -1,0 +1,204 @@
+{
+    "accounts": [
+        {
+            "name": "Checking",
+            "type": "checking",
+            "balance": 2450.50,
+            "iban": "CH9300762011623852957",
+            "note": "Main account"
+        },
+        {
+            "name": "Savings",
+            "type": "savings",
+            "balance": 15000.00,
+            "iban": null,
+            "note": "High interest savings"
+        },
+        {
+            "name": "Credit Card",
+            "type": "credit-card",
+            "balance": -450.00,
+            "iban": null,
+            "note": "Monthly expenses"
+        },
+        {
+            "name": "Cash",
+            "type": "cash",
+            "balance": 200.00,
+            "iban": null,
+            "note": null
+        }
+    ],
+    "budgets": [
+        {
+            "category": "Groceries",
+            "allocated": 600,
+            "ist": 0,
+            "month": 12,
+            "year": 2025,
+            "warning": 80,
+            "color": "green"
+        },
+        {
+            "category": "Rent",
+            "allocated": 1500,
+            "ist": 0,
+            "month": 12,
+            "year": 2025,
+            "warning": 100,
+            "color": "standard"
+        },
+        {
+            "category": "Transportation",
+            "allocated": 200,
+            "ist": 50,
+            "month": 12,
+            "year": 2025,
+            "warning": 90,
+            "color": "orange"
+        },
+        {
+            "category": "Entertainment",
+            "allocated": 150,
+            "ist": 0,
+            "month": 12,
+            "year": 2025,
+            "warning": 80,
+            "color": "standard"
+        },
+        {
+            "category": "Utilities",
+            "allocated": 250,
+            "ist": 0,
+            "month": 12,
+            "year": 2025,
+            "warning": 100,
+            "color": "red"
+        }
+    ],
+    "transactions": [
+        {
+            "date": "2025-12-01",
+            "category": "Groceries",
+            "account": "Checking",
+            "amount": 55.40,
+            "type": "expense",
+            "source": "Coop",
+            "note": "Weekly shopping"
+        },
+        {
+            "date": "2025-12-02",
+            "category": "Salary",
+            "account": "Checking",
+            "amount": 5000,
+            "type": "income",
+            "source": "Employer AG",
+            "note": "December salary"
+        },
+        {
+            "date": "2025-12-03",
+            "category": "Rent",
+            "account": "Checking",
+            "amount": 1500,
+            "type": "expense",
+            "source": "Landlord",
+            "note": "Monthly rent"
+        },
+        {
+            "date": "2025-12-05",
+            "category": "Groceries",
+            "account": "Cash",
+            "amount": 28.50,
+            "type": "expense",
+            "source": "Migros",
+            "note": ""
+        },
+        {
+            "date": "2025-12-07",
+            "category": "Transportation",
+            "account": "Credit Card",
+            "amount": 89.00,
+            "type": "expense",
+            "source": "SBB",
+            "note": "Monthly train pass"
+        },
+        {
+            "date": "2025-12-10",
+            "category": "Entertainment",
+            "account": "Credit Card",
+            "amount": 45.00,
+            "type": "expense",
+            "source": "Netflix",
+            "note": "Annual subscription"
+        },
+        {
+            "date": "2025-12-12",
+            "category": "Utilities",
+            "account": "Checking",
+            "amount": 120.00,
+            "type": "expense",
+            "source": "EWZ",
+            "note": "Electricity bill"
+        },
+        {
+            "date": "2025-12-15",
+            "category": "Freelance",
+            "account": "Checking",
+            "amount": 800,
+            "type": "income",
+            "source": "Client XYZ",
+            "note": "Project payment"
+        }
+    ],
+    "saving-goals": [
+        {
+            "name": "Emergency Fund",
+            "goal": 10000,
+            "saved": 5000,
+            "monthlyAllocation": 500,
+            "account": "Savings",
+            "dueDate": "2026-06-30"
+        },
+        {
+            "name": "Vacation",
+            "goal": 3000,
+            "saved": 800,
+            "monthlyAllocation": 200,
+            "account": "Savings",
+            "dueDate": "2025-07-01"
+        },
+        {
+            "name": "New Laptop",
+            "goal": 2000,
+            "saved": 500,
+            "monthlyAllocation": 150,
+            "account": null,
+            "dueDate": null
+        }
+    ],
+    "transfers": [
+        {
+            "date": "2025-12-01",
+            "from": "Checking",
+            "to": "Savings",
+            "amount": 500,
+            "note": "Monthly savings transfer"
+        },
+        {
+            "date": "2025-12-10",
+            "from": "Checking",
+            "to": "Credit Card",
+            "amount": 450,
+            "note": "Pay off credit card"
+        },
+        {
+            "date": "2025-12-15",
+            "from": "Checking",
+            "to": "Cash",
+            "amount": 100,
+            "note": "Cash withdrawal"
+        }
+    ],
+    "exportedAt": "2025-12-24T09:00:00.000Z",
+    "version": "1.0"
+}

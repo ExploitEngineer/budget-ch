@@ -61,6 +61,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
                     resolvedTheme === "dark" ? "pe-10" : "pe-0",
                   )}
                   priority
+                  sizes="100vw"
                 />
               </div>
             </>
@@ -72,6 +73,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
                 fill
                 className="m-0 object-cover p-0"
                 priority
+                sizes="30px"
               />
             </div>
           )}
@@ -80,8 +82,8 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
 
       <SidebarContent className="dark:bg-blue-background">
         {open && (
-          <div className="mx-auto flex gap-4 items-center">
-            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">{user.name}</p>
+          <div className="mx-auto flex flex-col gap-1 w-full overflow-hidden px-2">
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.name}</p>
             <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
           </div>
         )}

@@ -73,13 +73,13 @@ export default function CreateSavingGoalDialog() {
       }
       const res = await getFinancialAccountsAPI(hubId);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch accounts");
+        throw new Error(res.message || t("messages.error.create"));
       }
       return res.data ?? [];
     },
     enabled: open && !!hubId, // Only fetch when dialog is open and hubId exists
   });
-  
+
   // Transform domain accounts to UI rows
   const accounts: AccountRow[] | undefined = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
 
@@ -105,19 +105,19 @@ export default function CreateSavingGoalDialog() {
     }) => {
       const result = await createSavingGoal(data);
       if (!result.success) {
-        throw new Error(result.message || "Failed to create saving goal");
+        throw new Error(result.message || t("messages.error.create"));
       }
       return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId) });
       queryClient.invalidateQueries({ queryKey: savingGoalKeys.summary(hubId) });
-      toast.success("Saving goal created successfully!");
+      toast.success(t("messages.created"));
       form.reset();
       setOpen(false);
     },
     onError: (error: Error) => {
-      toast.error(error.message || "Failed to create saving goal");
+      toast.error(error.message || t("messages.error.create"));
     },
   });
 
@@ -280,7 +280,7 @@ export default function CreateSavingGoalDialog() {
                           <SelectValue
                             placeholder={
                               accountsLoading
-                                ? "Loading accounts..."
+                                ? t("loading-accounts")
                                 : t("labels.account.title")
                             }
                           />
@@ -288,7 +288,7 @@ export default function CreateSavingGoalDialog() {
                         <SelectContent>
                           {accountsLoading ? (
                             <SelectItem value="loading" disabled>
-                              Loading accounts...
+                              {t("loading-accounts")}
                             </SelectItem>
                           ) : accounts && accounts.length > 0 ? (
                             accounts.map((account) => (
@@ -298,7 +298,7 @@ export default function CreateSavingGoalDialog() {
                             ))
                           ) : (
                             <SelectItem value="no-accounts" disabled>
-                              No accounts available
+                              {t("no-accounts")}
                             </SelectItem>
                           )}
                         </SelectContent>

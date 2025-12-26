@@ -5,21 +5,24 @@ import { validateHubAccess } from "@/lib/api-helpers";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const hubId = searchParams.get("hub");
-  
+
   if (!hubId) {
     return apiError({ message: "Hub ID is required", status: 400 });
   }
-  
+
   const access = await validateHubAccess(hubId);
   if (!access.success) {
     return apiError({ message: access.message ?? "Access denied", status: 403 });
   }
-  
-  const categories = await getDetailedCategories();
-  
+
+  const from = searchParams.get("from") ?? undefined;
+  const to = searchParams.get("to") ?? undefined;
+
+  const categories = await getDetailedCategories(hubId, from, to);
+
   if (!categories.success) {
     return apiError({ message: categories.message ?? "Failed to fetch detailed categories", status: 500 });
   }
-  
+
   return apiSuccess({ data: categories.data, status: 200 });
 }

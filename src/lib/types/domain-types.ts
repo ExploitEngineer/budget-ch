@@ -74,6 +74,8 @@ export interface BudgetWithCategory {
   categoryName: string | null;
   carriedOverAmount?: number;
   isInstance?: boolean;
+  month?: number;
+  year?: number;
 }
 
 /**

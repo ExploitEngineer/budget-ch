@@ -22,11 +22,21 @@ function makeQueryClient() {
 let browserQueryClient: QueryClient | undefined = undefined;
 
 export function getQueryClient() {
-  if(isServer) {
+  if (isServer) {
     return makeQueryClient();
-  }else {
-    if(!browserQueryClient) browserQueryClient = makeQueryClient();
+  } else {
+    if (!browserQueryClient) browserQueryClient = makeQueryClient();
     return browserQueryClient;
+  }
+}
+
+/**
+ * Clear all cached queries - call on logout to prevent stale data
+ * when switching accounts
+ */
+export function clearQueryCache() {
+  if (browserQueryClient) {
+    browserQueryClient.clear();
   }
 }
 

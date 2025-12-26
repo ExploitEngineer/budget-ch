@@ -16,6 +16,7 @@ import {
   DialogTrigger,
   DialogContent,
   DialogClose,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import {
@@ -86,6 +87,7 @@ export default function CreateTransactionDialog({
       endDate?: Date | null;
       recurringStatus?: "active" | "inactive";
       hubIdArg?: string;
+      createdAt?: Date;
     }) => {
       const result = await createTransaction({
         categoryName: data.category?.trim() || "",
@@ -101,6 +103,7 @@ export default function CreateTransactionDialog({
         endDate: data.endDate,
         recurringStatus: data.recurringStatus,
         hubIdArg: data.hubIdArg,
+        createdAt: data.createdAt,
       });
       if (!result.success) {
         throw new Error(result.message || "Failed to create transaction");
@@ -115,7 +118,7 @@ export default function CreateTransactionDialog({
       });
       // Invalidate account queries since balance changes
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
-      toast.success("Transaction created successfully!");
+      toast.success(t("messages.created"));
     },
     onError: (error: Error) => {
       // Only show error if it's not already handled by the service
@@ -126,7 +129,7 @@ export default function CreateTransactionDialog({
       ) {
         toast.error(
           error.message ||
-          "Something went wrong while creating the transaction.",
+          commonT("error"),
         );
       } else {
         toast.error(error.message);
@@ -154,8 +157,9 @@ export default function CreateTransactionDialog({
 
 
   const t = useTranslations(
-    "main-dashboard.transactions-page.transaction-edit-dialog",
+    "main-dashboard.transactions-page",
   );
+  const commonT = useTranslations("common");
 
   const form = useForm<TransactionDialogValues>({
     resolver: zodResolver(TransactionDialogSchema) as any,
@@ -208,6 +212,7 @@ export default function CreateTransactionDialog({
           ? values.recurringStatus
           : undefined,
         hubIdArg: hubId || undefined,
+        createdAt: values.date,
       });
 
       form.reset();
@@ -241,7 +246,7 @@ export default function CreateTransactionDialog({
           >
             <Plus className="h-5 w-5" />
             <span className="hidden text-sm sm:block">
-              {variant === "gradient" ? t("title-2") : text}
+              {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
             </span>
           </Button>
         </DialogTrigger>
@@ -255,15 +260,18 @@ export default function CreateTransactionDialog({
           <div className="flex-1 overflow-auto">
             <div className="flex items-center justify-between pb-3">
               <DialogTitle className="text-lg font-semibold">
-                {t("title-2")}
+                {t("transaction-edit-dialog.title-2")}
               </DialogTitle>
+              <DialogDescription className="sr-only">
+                Form to create a new transaction
+              </DialogDescription>
               <DialogClose asChild>
                 <Button
                   type="button"
                   className="cursor-pointer border"
                   variant="ghost"
                 >
-                  {t("dialog.close")}
+                  {t("transaction-edit-dialog.dialog.close")}
                 </Button>
               </DialogClose>
             </div>
@@ -283,7 +291,7 @@ export default function CreateTransactionDialog({
                     name="date"
                     render={({ field }) => (
                       <FormItem className="flex flex-col w-full">
-                        <FormLabel>{t("dialog.labels.date")}</FormLabel>
+                        <FormLabel>{t("transaction-edit-dialog.dialog.labels.date")}</FormLabel>
                         <FormControl>
                           <Popover>
                             <PopoverTrigger asChild>
@@ -294,7 +302,7 @@ export default function CreateTransactionDialog({
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
                                   ? format(field.value, "dd/MM/yyyy")
-                                  : t("dialog.placeholders.date")}
+                                  : t("transaction-edit-dialog.dialog.placeholders.date")}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -316,7 +324,7 @@ export default function CreateTransactionDialog({
                     name="accountId"
                     render={({ field }) => (
                       <FormItem className="flex flex-col w-full">
-                        <FormLabel>{t("dialog.labels.account")}</FormLabel>
+                        <FormLabel>{t("transaction-edit-dialog.dialog.labels.account")}</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={(value) => {
@@ -336,8 +344,8 @@ export default function CreateTransactionDialog({
                               <SelectValue
                                 placeholder={
                                   accountsLoading
-                                    ? "Loading accounts..."
-                                    : t("dialog.placeholders.account")
+                                    ? t("labels.loading-accounts")
+                                    : t("transaction-edit-dialog.dialog.placeholders.account")
                                 }
                               />
                             </SelectTrigger>
@@ -358,7 +366,7 @@ export default function CreateTransactionDialog({
                                 ))
                               ) : (
                                 <SelectItem value="no-accounts" disabled>
-                                  No accounts available
+                                  {t("labels.no-accounts")}
                                 </SelectItem>
                               )}
                             </SelectContent>
@@ -377,7 +385,7 @@ export default function CreateTransactionDialog({
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormLabel>
-                          {t("dialog.labels.transactionType.title")}
+                          {t("transaction-edit-dialog.dialog.labels.transactionType.title")}
                         </FormLabel>
                         <FormControl>
                           <Select
@@ -387,24 +395,24 @@ export default function CreateTransactionDialog({
                             <SelectTrigger className="w-full flex-1">
                               <SelectValue
                                 placeholder={t(
-                                  "dialog.labels.transactionType.options.income",
+                                  "transaction-edit-dialog.dialog.labels.transactionType.options.income",
                                 )}
                               />
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="income">
                                 {t(
-                                  "dialog.labels.transactionType.options.income",
+                                  "transaction-edit-dialog.dialog.labels.transactionType.options.income",
                                 )}
                               </SelectItem>
                               <SelectItem value="expense">
                                 {t(
-                                  "dialog.labels.transactionType.options.expense",
+                                  "transaction-edit-dialog.dialog.labels.transactionType.options.expense",
                                 )}
                               </SelectItem>
                               <SelectItem value="transfer">
                                 {t(
-                                  "dialog.labels.transactionType.options.transfer",
+                                  "transaction-edit-dialog.dialog.labels.transactionType.options.transfer",
                                 )}
                               </SelectItem>
                             </SelectContent>
@@ -421,12 +429,12 @@ export default function CreateTransactionDialog({
                     name="recipient"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>{t("dialog.labels.recipient")}</FormLabel>
+                        <FormLabel>{t("transaction-edit-dialog.dialog.labels.recipient")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             value={field.value ?? ""}
-                            placeholder={t("dialog.placeholders.recipient")}
+                            placeholder={t("transaction-edit-dialog.dialog.placeholders.recipient")}
                           />
                         </FormControl>
                         <FormMessage />
@@ -443,7 +451,7 @@ export default function CreateTransactionDialog({
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
                         <FormLabel>
-                          {t("dialog.labels.destinationAccount")}
+                          {t("transaction-edit-dialog.dialog.labels.destinationAccount")}
                         </FormLabel>
                         <FormControl>
                           <Select
@@ -466,7 +474,7 @@ export default function CreateTransactionDialog({
                                   accountsLoading
                                     ? "Loading accounts..."
                                     : t(
-                                      "dialog.placeholders.destinationAccount",
+                                      "transaction-edit-dialog.dialog.placeholders.destinationAccount",
                                     )
                                 }
                               />
@@ -513,8 +521,8 @@ export default function CreateTransactionDialog({
                       name="category"
                       hubId={hubId}
                       allowCreate={true}
-                      label={t("dialog.labels.category")}
-                      placeholder="Select or add a category"
+                      label={t("transaction-edit-dialog.dialog.labels.category")}
+                      placeholder={t("transaction-edit-dialog.dialog.placeholders.category-selector")}
                       enabled={open && !!hubId}
                       onCategoryAdded={handleCategoryAdded}
                     />
@@ -525,7 +533,7 @@ export default function CreateTransactionDialog({
                     name="amount"
                     render={({ field }) => (
                       <FormItem className="flex flex-1 flex-col">
-                        <FormLabel>{t("dialog.labels.amount")}</FormLabel>
+                        <FormLabel>{t("transaction-edit-dialog.dialog.labels.amount")}</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -546,11 +554,11 @@ export default function CreateTransactionDialog({
                   name="note"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>{t("dialog.labels.note")}</FormLabel>
+                      <FormLabel>{t("transaction-edit-dialog.dialog.labels.note")}</FormLabel>
                       <FormControl>
                         <Textarea
                           {...field}
-                          placeholder={t("dialog.placeholders.note")}
+                          placeholder={t("transaction-edit-dialog.dialog.placeholders.note")}
                         />
                       </FormControl>
                       <FormMessage />
@@ -573,7 +581,7 @@ export default function CreateTransactionDialog({
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel className="cursor-pointer">
-                            {t("dialog.labels.recurring")}
+                            {t("transaction-edit-dialog.dialog.labels.recurring")}
                           </FormLabel>
                         </div>
                       </FormItem>
@@ -588,7 +596,7 @@ export default function CreateTransactionDialog({
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
                             <FormLabel>
-                              {t("dialog.labels.frequencyDays")}
+                              {t("transaction-edit-dialog.dialog.labels.frequencyDays")}
                             </FormLabel>
                             <FormControl>
                               <Input
@@ -612,7 +620,7 @@ export default function CreateTransactionDialog({
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
                             <FormLabel>
-                              {t("dialog.labels.startDate")}
+                              {t("transaction-edit-dialog.dialog.labels.startDate")}
                             </FormLabel>
                             <FormControl>
                               <Popover>
@@ -624,7 +632,7 @@ export default function CreateTransactionDialog({
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
                                       ? format(field.value, "dd/MM/yyyy")
-                                      : t("dialog.placeholders.startDate")}
+                                      : t("transaction-edit-dialog.dialog.placeholders.startDate")}
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent>
@@ -646,7 +654,7 @@ export default function CreateTransactionDialog({
                         name="endDate"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.endDate")}</FormLabel>
+                            <FormLabel>{t("transaction-edit-dialog.dialog.labels.endDate")}</FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -657,7 +665,7 @@ export default function CreateTransactionDialog({
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
                                       ? format(field.value, "dd/MM/yyyy")
-                                      : t("dialog.placeholders.endDate")}
+                                      : t("transaction-edit-dialog.dialog.placeholders.endDate")}
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent>
@@ -680,7 +688,7 @@ export default function CreateTransactionDialog({
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
                             <FormLabel>
-                              {t("dialog.labels.recurringStatus")}
+                              {t("transaction-edit-dialog.dialog.labels.recurringStatus")}
                             </FormLabel>
                             <FormControl>
                               <Select
@@ -692,10 +700,10 @@ export default function CreateTransactionDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="active">
-                                    {t("dialog.options.active")}
+                                    {t("transaction-edit-dialog.dialog.options.active")}
                                   </SelectItem>
                                   <SelectItem value="inactive">
-                                    {t("dialog.options.inactive")}
+                                    {t("transaction-edit-dialog.dialog.options.inactive")}
                                   </SelectItem>
                                 </SelectContent>
                               </Select>
@@ -711,7 +719,7 @@ export default function CreateTransactionDialog({
                 {/* Split Rows Section */}
                 {/* 
                 <div className="flex flex-col gap-3 pt-2">
-                  <FormLabel>{t("dialog.labels.splitSum")}</FormLabel>
+                  <FormLabel>{t("transaction-edit-dialog.dialog.labels.splitSum")}</FormLabel>
 
                   {fields.map((item, index) => (
                     <div
@@ -731,7 +739,7 @@ export default function CreateTransactionDialog({
                                 <SelectTrigger className="w-full">
                                   <SelectValue
                                     placeholder={t(
-                                      "dialog.placeholders.category",
+                                      "transaction-edit-dialog.dialog.placeholders.category",
                                     )}
                                   />
                                 </SelectTrigger>
@@ -808,11 +816,11 @@ export default function CreateTransactionDialog({
                       }
                     >
                       <Plus className="h-4 w-4" />
-                      {t("dialog.badges.row")}
+                      {t("transaction-edit-dialog.dialog.badges.row")}
                     </Badge>
 
                     <Badge variant="secondary">
-                      {t("dialog.badges.splitTotal")}
+                      {t("transaction-edit-dialog.dialog.badges.splitTotal")}
                     </Badge>
                   </div>
                 </div> 
@@ -826,7 +834,7 @@ export default function CreateTransactionDialog({
                     type="button"
                     onClick={() => setOpen(false)}
                   >
-                    {t("dialog.buttons.cancel")}
+                    {t("transaction-edit-dialog.dialog.buttons.cancel")}
                   </Button>
                   <Button
                     type="submit"
@@ -836,7 +844,7 @@ export default function CreateTransactionDialog({
                     {createTransactionMutation.isPending ? (
                       <Spinner />
                     ) : (
-                      t("dialog.buttons.save")
+                      t("transaction-edit-dialog.dialog.buttons.save")
                     )}
                   </Button>
                 </div>

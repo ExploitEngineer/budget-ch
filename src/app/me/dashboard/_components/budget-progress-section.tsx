@@ -20,12 +20,14 @@ import { toast } from "sonner";
 import { ErrorState } from "@/components/ui/error-state";
 import type { QuickTask } from "@/db/schema";
 import type { DashboardSavingsGoalsCards } from "@/lib/types/dashboard-types";
+import { useSessionReady } from "@/hooks/use-session-ready";
 
 export function BudgetProgressSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const { isSessionReady } = useSessionReady();
 
   const [newTask, setNewTask] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -49,7 +51,7 @@ export function BudgetProgressSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   // Top categories query
@@ -69,7 +71,7 @@ export function BudgetProgressSection() {
       }
       return res.data ?? [];
     },
-    enabled: !!hubId,
+    enabled: !!hubId && isSessionReady,
   });
 
   // Create task mutation
@@ -84,7 +86,7 @@ export function BudgetProgressSection() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) });
-      toast.success("Task created");
+      toast.success(t("todos.created"));
       setNewTask("");
     },
     onError: (error: Error) => {
@@ -120,7 +122,7 @@ export function BudgetProgressSection() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) });
-      toast.success("Task deleted");
+      toast.success(t("todos.deleted"));
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to delete task");
@@ -268,7 +270,7 @@ export function BudgetProgressSection() {
                         className={`text-sm ${task.checked ? "line-through opacity-70" : ""
                           }`}
                         onDoubleClick={() => startEditing(task.id, task.name)}
-                        title="Double click to edit"
+                        title={t("todos.double-click")}
                       >
                         {task.name}
                       </h3>

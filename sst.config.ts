@@ -22,6 +22,7 @@ export default $config({
       schedule: "cron(0 9 * * ? *)",
       function: {
         handler: "src/functions/scheduled-notifications.handler",
+        copyFiles: [{ from: "messages", to: "messages" }],
         nodejs: {
           install: ["pg", "nodemailer"],
           esbuild: {
@@ -42,6 +43,7 @@ export default $config({
       schedule: "rate(1 hour)",
       function: {
         handler: "src/functions/budget-alerts.handler",
+        copyFiles: [{ from: "messages", to: "messages" }],
         nodejs: {
           install: ["pg", "nodemailer"],
           esbuild: {

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useQuery } from "@tanstack/react-query";
-import { getAccountTransfers, getFinancialAccounts, getRecentTransactions, getBudgets, getSavingGoals } from "@/lib/api";
+import { getAccountTransfers, getFinancialAccounts, getTransactions, getBudgets, getSavingGoals } from "@/lib/api";
 import {
   accountKeys,
   transactionKeys,
@@ -30,7 +30,7 @@ export function Export() {
 
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
-  
+
   const { data: domainBudgets } = useQuery<BudgetWithCategory[]>({
     queryKey: budgetKeys.list(hubId),
     queryFn: async () => {
@@ -48,7 +48,7 @@ export function Export() {
 
   // Convert domain budgets to UI rows for export
   const budgets = domainBudgets ? mapBudgetsToRows(domainBudgets) : undefined;
-  
+
   const { data: domainAccounts } = useQuery<FinancialAccount[]>({
     queryKey: accountKeys.list(hubId),
     queryFn: async () => {
@@ -63,25 +63,25 @@ export function Export() {
     },
     enabled: !!hubId,
   });
-  
+
   // Convert domain accounts to UI rows for export
   const accounts = domainAccounts ? mapAccountsToRows(domainAccounts) : undefined;
-  
+
   const { data: domainTransactions } = useQuery<TransactionWithDetails[]>({
-    queryKey: transactionKeys.recent(hubId),
+    queryKey: transactionKeys.list(hubId),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getRecentTransactions(hubId);
+      const res = await getTransactions(hubId);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch recent transactions");
+        throw new Error(res.message || "Failed to fetch transactions");
       }
       return res.data ?? [];
     },
     enabled: !!hubId,
   });
-  
+
   // Convert domain transactions to UI rows for export
   const transactions = domainTransactions ? mapTransactionsToRows(domainTransactions) : undefined;
 
@@ -99,16 +99,17 @@ export function Export() {
     },
     enabled: !!hubId,
   });
-  
+
   const { data: transfers } = useQuery<TransferData[]>({
-    queryKey: transferKeys.list(),
+    queryKey: transferKeys.list(hubId),
     queryFn: async () => {
-      const res = await getAccountTransfers();
+      const res = await getAccountTransfers(hubId!);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch transfers");
       }
       return res.data ?? [];
     },
+    enabled: !!hubId,
   });
   const {
     exportTransactions,
@@ -214,7 +215,7 @@ export function Export() {
                   key={btn.title}
                   onClick={btn.onClick}
                   variant="outline"
-                  className="!bg-dark-blue-background dark:border-border-blue text-foreground cursor-pointer"
+                  className="!bg-dark-blue-background dark:border-border-blue text-foreground cursor-pointer h-auto min-h-10 py-2 text-center whitespace-normal text-xs"
                 >
                   {btn.title}
                 </Button>
@@ -240,7 +241,7 @@ export function Export() {
                     transfers: transfers ?? [],
                   })
                 }
-                className="btn-gradient dark:text-foreground w-[38%] cursor-pointer hover:text-white"
+                className="btn-gradient dark:text-foreground w-auto cursor-pointer hover:text-white"
               >
                 {t("export-json-card.button")}
               </Button>
@@ -258,7 +259,7 @@ export function Export() {
                   key={btn.title}
                   onClick={btn.onClick}
                   variant="outline"
-                  className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl cursor-pointer border-dashed"
+                  className="!bg-dark-blue-background shadow-dark-blue-background dark:border-border-blue text-foreground shadow-4xl cursor-pointer border-dashed h-auto min-h-10 py-2 text-center whitespace-normal text-xs"
                 >
                   {btn.title}
                 </Button>

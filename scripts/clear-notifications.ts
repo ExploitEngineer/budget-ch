@@ -1,3 +1,4 @@
+import "dotenv/config";
 import db from "../src/db/db";
 import { notifications } from "../src/db/schema";
 import { sql } from "drizzle-orm";

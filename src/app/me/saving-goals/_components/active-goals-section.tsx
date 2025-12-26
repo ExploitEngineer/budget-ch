@@ -21,6 +21,7 @@ export function ActiveGoalsSection() {
   const t = useTranslations(
     "main-dashboard.saving-goals-page.active-goals-section",
   );
+  const tc = useTranslations("common");
 
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -41,7 +42,7 @@ export function ActiveGoalsSection() {
       }
       const res = await getSavingGoals(hubId);
       if (!res.success) {
-        throw new Error(res.message || "Failed to fetch saving goals");
+        throw new Error(res.message || t("error-loading"));
       }
       return res.data ?? [];
     },
@@ -89,11 +90,14 @@ export function ActiveGoalsSection() {
               variant="outline"
               className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
             >
-              {activeGoalsData.length} Goals • Auto Allocation: CHF{" "}
-              {(domainGoals ?? [])
-                .filter(g => g.autoAllocationEnabled)
-                .reduce((sum, g) => sum + (g.monthlyAllocation ?? 0), 0)
-                .toLocaleString()}
+              {t("badge-pattern", {
+                count: activeGoalsData.length,
+                currency: tc("currency"),
+                amount: (domainGoals ?? [])
+                  .filter(g => g.autoAllocationEnabled)
+                  .reduce((sum, g) => sum + (g.monthlyAllocation ?? 0), 0)
+                  .toLocaleString()
+              })}
             </Badge>
           </div>
 
@@ -132,10 +136,10 @@ export function ActiveGoalsSection() {
         <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-1 lg:grid-cols-3">
           {goalsError ? (
             <p className="text-muted-foreground p-4 text-sm">
-              {goalsError.message || "Failed to load saving goals"}
+              {goalsError instanceof Error ? goalsError.message : t("error-loading")}
             </p>
           ) : goalsLoading ? (
-            <p className="text-muted-foreground p-4 text-sm">{t("loading")}</p>
+            <p className="text-muted-foreground p-4 text-sm">{tc("loading")}</p>
           ) : activeGoalsData.length === 0 ? (
             <p className="text-muted-foreground p-4 text-sm">{t("no-goals")}</p>
           ) : (
@@ -157,6 +161,7 @@ export function ActiveGoalsSection() {
                   minimumFractionDigits: 2,
                 },
               );
+              const currency = tc("currency");
 
               return (
                 <Card
@@ -182,21 +187,21 @@ export function ActiveGoalsSection() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <h3>{t("cards.tax-reserves.content.goal")}</h3>
-                        <p>CHF {goalAmountCHF}</p>
+                        <p>{currency} {goalAmountCHF}</p>
                       </div>
                       <div>
                         <h3>{t("cards.tax-reserves.content.saved")}</h3>
-                        <p>CHF {savedCHF}</p>
+                        <p>{currency} {savedCHF}</p>
                       </div>
                       <div>
                         <h3>{t("cards.tax-reserves.content.remaining")}</h3>
-                        <p>CHF {remainingCHF}</p>
+                        <p>{currency} {remainingCHF}</p>
                       </div>
                       <div>
                         <h3>
                           {t("cards.tax-reserves.content.monthly-allocated")}
                         </h3>
-                        <p>CHF {monthlyCHF}</p>
+                        <p>{currency} {monthlyCHF}</p>
                       </div>
                     </div>
 
@@ -217,7 +222,7 @@ export function ActiveGoalsSection() {
                         variant="outline"
                         className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                       >
-                        {t("cards.tax-reserves.content.auto")}: CHF{" "}
+                        {t("cards.tax-reserves.content.auto")}: {currency}{" "}
                         {goal.monthlyAllocation?.toLocaleString("de-CH", {
                           minimumFractionDigits: 2,
                         }) ?? "0.00"}
@@ -227,25 +232,18 @@ export function ActiveGoalsSection() {
                         variant="outline"
                         className="bg-badge-background dark:border-border-blue rounded-full px-3 py-2"
                       >
-                        {t("cards.tax-reserves.content.remaining")}: CHF{" "}
+                        {t("cards.tax-reserves.content.remaining")}: {currency}{" "}
                         {goal.remaining?.toLocaleString("de-CH", {
                           minimumFractionDigits: 2,
                         }) ?? "0.00"}
                       </Badge>
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <AllocateForm
-                          amountSaved={goal.amountSaved || 0}
-                          goalId={goal.id}
-                        />
-                      </div>
-
-                      <p className="text-sm">
-                        {t("cards.tax-reserves.content.new-balance")}:{" "}
-                        <span className="font-bold">CHF {savedCHF ?? "—"}</span>
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <AllocateForm
+                        amountSaved={goal.amountSaved || 0}
+                        goalId={goal.id}
+                      />
                     </div>
                   </CardContent>
                 </Card>

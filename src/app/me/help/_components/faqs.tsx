@@ -12,9 +12,11 @@ import { useTranslations } from "next-intl";
 
 interface FAQsProps {
   FAQs: FAQS[];
+  expandedItems?: string[];
+  onExpandedChange?: (value: string[]) => void;
 }
 
-export function FAQs({ FAQs }: FAQsProps) {
+export function FAQs({ FAQs, expandedItems = [], onExpandedChange }: FAQsProps) {
   const t = useTranslations("main-dashboard.help-page.faqs-section");
 
   return (
@@ -31,10 +33,10 @@ export function FAQs({ FAQs }: FAQsProps) {
         <Separator className="dark:bg-border-blue" />
         <CardContent>
           <Accordion
-            type="single"
-            collapsible
+            type="multiple"
+            value={expandedItems}
+            onValueChange={onExpandedChange}
             className="dark:border-border-blue !bg-dark-blue-background w-full rounded-lg border p-2 px-4"
-            defaultValue="item-1"
           >
             {FAQs.map((faq, idx: number) => (
               <AccordionItem

@@ -1,4 +1,35 @@
 {
+    "common": {
+        "loading": "Loading...",
+        "updating": "Updating...",
+        "update": "Update",
+        "add": "Add",
+        "error": "Something went wrong. Please try again.",
+        "retry": "Retry",
+        "currency": "CHF",
+        "percent": "{value}%",
+        "validations": {
+            "required": "Required",
+            "name-required": "Name is required",
+            "amount-required": "Amount is required",
+            "date-required": "Date is required",
+            "min-1-day": "Must be at least 1 day"
+        },
+        "months": {
+            "0": "January",
+            "1": "February",
+            "2": "March",
+            "3": "April",
+            "4": "May",
+            "5": "June",
+            "6": "July",
+            "7": "August",
+            "8": "September",
+            "9": "October",
+            "10": "November",
+            "11": "December"
+        }
+    },
     "two-factor": {
         "title": "Two-Factor Authentication",
         "description": "Please enter your verification code to continue",
@@ -31,13 +62,39 @@
             "backup-code-success": "Backup code accepted. Redirecting..."
         }
     },
-    "common": {
-        "loading": "Loading...",
-        "updating": "Updating...",
-        "update": "Update",
-        "add": "Add",
-        "error": "Something went wrong. Please try again.",
-        "retry": "Retry"
+    "public-pages": {
+        "accept-invitation": {
+            "pending": "Processing your invitation...",
+            "success": {
+                "title": "Invitation Accepted!",
+                "toast": "Invitation accepted!",
+                "redirecting": "Redirecting to your dashboard in {countdown} {countdown, plural, =1 {second} other {seconds}}...",
+                "button": "Go Now"
+            },
+            "error": {
+                "title": "Invalid or Expired Invitation",
+                "description": "The invitation link is not valid or has already expired.",
+                "set-hub-failed": "Invitation accepted but failed to set active hub"
+            }
+        },
+        "goodbye": {
+            "title": "Account Deleted Successfully",
+            "description": "Your account has been deleted. We're sorry to see you go! You can always come back and create a new account anytime.",
+            "button": "Return to Homepage"
+        },
+        "email-verified": {
+            "success": {
+                "title": "Email Verified Successfully!",
+                "description": "Your email has been verified. You can now access your dashboard and start using all features.",
+                "button": "Go to Sign In"
+            },
+            "error": {
+                "title": "Verification Failed",
+                "invalid-link": "The verification link is invalid or expired.",
+                "generic": "Something went wrong while verifying your email.",
+                "button": "Try Signing In Again"
+            }
+        }
     },
     "greeting": {
         "cta": "Dashboard"
@@ -86,6 +143,51 @@
             },
             "tip": "Tip: Check Spam/Promotions. Search subject “BudgetHub – Verify your email”.",
             "content": "After you click the link, we’ll sign you in automatically."
+        }
+    },
+    "emails": {
+        "auth": {
+            "reset-password": {
+                "subject": "Reset Your Password",
+                "title": "Reset Your Password",
+                "hi": "Hi {name},",
+                "request": "We received a request to reset your password. Click the button below to choose a new one.",
+                "button": "Reset Password",
+                "fallback": "If the button doesn’t work, copy and paste this link into your browser:",
+                "expire": "This password reset link will expire in 24 hours.",
+                "ignore": "If you didn’t request a password reset, you can safely ignore this email.",
+                "footer": "© 2024 BudgetHub. All rights reserved."
+            },
+            "verify-email": {
+                "subject": "Verify your email address",
+                "title": "Verify Your Email Address",
+                "hi": "Hi there!",
+                "thanks": "Thank you, {name}, for signing up! To complete your registration, please verify your email by clicking the button below.",
+                "button": "Verify Email Address",
+                "fallback": "If the button doesn’t work, copy and paste this link into your browser:",
+                "expire": "This verification link will expire in 24 hours.",
+                "ignore": "If you didn’t create an account, you can ignore this email.",
+                "footer": "© 2025 BudgetHub. All rights reserved."
+            },
+            "otp": {
+                "subject": "Your Verification Code",
+                "title": "Your Verification Code",
+                "hi": "Hi {name},",
+                "code-is": "Your verification code is:",
+                "expire": "This code will expire in 5 minutes.",
+                "ignore": "If you didn't request this code, you can safely ignore this email.",
+                "footer": "© 2025 BudgetHub. All rights reserved."
+            }
+        },
+        "invitation": {
+            "subject": "You're invited to join a Hub!",
+            "title": "You're invited to join a Hub!",
+            "hello": "Hello,",
+            "invited": "You have been invited to join a hub with the role: <strong>{role}</strong>.",
+            "button": "Accept Invitation",
+            "fallback": "Or copy and paste this link into your browser:",
+            "expire": "This invitation expires in 7 days.",
+            "ignore": "If you didn't expect this invitation, you can safely ignore this email."
         }
     },
     "main-dashboard": {
@@ -161,6 +263,14 @@
                         "placeholder": "Optional"
                     }
                 },
+                "placeholders": {
+                    "category-name": "e.g. groceries, bills..."
+                },
+                "messages": {
+                    "category-added": "Category \"{name}\" added",
+                    "category-exists": "Category \"{name}\" already exists",
+                    "id-required": "Hub ID is required"
+                },
                 "no-categories-yet": "No categories yet",
                 "buttons": {
                     "save": "Save as template",
@@ -214,13 +324,19 @@
                         "delete": "Delete",
                         "save": "Save",
                         "saving": "Saving..."
+                    },
+                    "messages": {
+                        "success": "Recurring transaction updated successfully!",
+                        "error": "Failed to update recurring transaction",
+                        "load-error": "Failed to load template"
                     }
                 }
             },
             "cards": {
                 "card-1": {
                     "title": "Total Budget (Month)",
-                    "badge": "Fixed + Variable • incl. CC & SERAFE"
+                    "badge": "Fixed + Variable • incl. CC & SERAFE",
+                    "simple-badge": "Monthly Budget"
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
@@ -257,6 +373,7 @@
                 "title": "Quick Tasks",
                 "placeholder": "Add Task…",
                 "no-tasks": "No tasks yet...",
+                "double-click": "Double click to edit",
                 "created": "Task created successfully!",
                 "updated": "Task updated successfully!",
                 "deleted": "Task deleted successfully!"
@@ -303,7 +420,11 @@
                 },
                 "card-3": {
                     "title": "3 new transactions since yesterday"
-                }
+                },
+                "budget-exceeded": "{category} budget exceeded",
+                "budget-at-percent": "{category} budget at {percent}%",
+                "no-warnings": "No warnings. Your budget is healthy!",
+                "currency": "CHF"
             },
             "recent-transactions-table": {
                 "button": "Show all",
@@ -347,6 +468,15 @@
         "transactions-page": {
             "loading": "loading...",
             "no-transactions": "No transactions yet",
+            "messages": {
+                "created": "Transaction created successfully!",
+                "updated": "Transaction updated successfully!",
+                "deleted": "Transaction deleted successfully!",
+                "all-deleted": "All transactions deleted!",
+                "error": {
+                    "delete-all": "Something went wrong while deleting all transactions."
+                }
+            },
             "transaction-edit-dialog": {
                 "title-1": "Edit",
                 "title-2": "New Transaction",
@@ -384,11 +514,13 @@
                         "account": "Choose an account",
                         "recipient": "Enter recipient",
                         "category": "Choose a category",
+                        "category-selector": "Select or add a category",
                         "note": "Enter your note",
                         "note-optional": "Note (optional)",
                         "destinationAccount": "Choose destination account",
                         "startDate": "Select start date",
-                        "endDate": "No end date"
+                        "endDate": "No end date",
+                        "pick-date": "Pick a date"
                     },
                     "options": {
                         "checking": "Checking",
@@ -443,7 +575,9 @@
                 "search": {
                     "title": "Search",
                     "placeholder": "e.g., Coop, Rent, Credit Card…"
-                }
+                },
+                "loading-accounts": "Loading accounts...",
+                "no-accounts": "No accounts available"
             },
             "checkboxes": {
                 "recipient": "With Recipient",
@@ -526,7 +660,9 @@
                 "pagination": {
                     "previous": "Previous",
                     "next": "Next"
-                }
+                },
+                "no-results": "No results.",
+                "rows-selected": "{selected} of {total} row(s) selected."
             }
         },
         "budgets-page": {
@@ -557,7 +693,18 @@
                     },
                     "delete-btn": "Delete",
                     "cancel": "Cancel",
-                    "save": "Save"
+                    "save": "Save",
+                    "create-budget": "Create Budget",
+                    "messages": {
+                        "created": "Budget created successfully!",
+                        "updated": "Budget updated successfully!",
+                        "deleted": "Budget deleted successfully!",
+                        "error": {
+                            "create": "Failed to create budget",
+                            "update": "Failed to update budget",
+                            "delete": "Failed to delete budget"
+                        }
+                    }
                 }
             },
             "cards": {
@@ -588,6 +735,11 @@
                 "title": "All categories",
                 "total-budget": "Total Budget: ",
                 "rest-budget": "Rest: ",
+                "loading": "Loading...",
+                "no-budgets": "No Budgets Found",
+                "set-budget": "Set Budget",
+                "edit": "Edit",
+                "error-loading": "Failed to load budgets",
                 "buttons": {
                     "export": "Export CSV",
                     "reset": "Reset"
@@ -599,7 +751,9 @@
                     "spent": "SPENT",
                     "rest": "REST",
                     "progress": "PROGRESS",
-                    "action": "ACTION"
+                    "action": "ACTION",
+                    "month": "MONTH",
+                    "year": "YEAR"
                 },
                 "data": {
                     "category": {
@@ -615,6 +769,7 @@
                 "toggle-groups": {
                     "month": "Month",
                     "week": "Week",
+                    "warn-50": "Warn at 50%",
                     "warn-80": "Warn at 80%",
                     "warn-90": "Warn at 90%",
                     "warn-100": "Warn at 100%"
@@ -628,10 +783,14 @@
                 "no-warnings": "Your budget is looking healthy! No warnings.",
                 "settings": {
                     "title": "Settings (Month)",
-                    "button": "+ Budget",
+                    "button": "Budget",
                     "checkboxes": {
                         "carry": "Carry over surplus/deficit to next month",
                         "e-mail": "Email warnings at 80% / 100%"
+                    },
+                    "messages": {
+                        "updated": "Settings updated successfully",
+                        "error": "Failed to update settings"
                     }
                 }
             }
@@ -667,7 +826,19 @@
                         },
                         "monthly-allocation": "Monthly Allocation (CHF)"
                     },
-                    "save": "Save"
+                    "save": "Save",
+                    "loading-accounts": "Loading accounts...",
+                    "no-accounts": "No accounts available",
+                    "messages": {
+                        "created": "Saving goal created successfully!",
+                        "updated": "Saving goal updated successfully!",
+                        "deleted": "Saving goal deleted successfully!",
+                        "error": {
+                            "create": "Failed to create saving goal",
+                            "update": "Failed to update saving goal",
+                            "delete": "Failed to delete saving goal"
+                        }
+                    }
                 }
             },
             "cards": {
@@ -679,23 +850,35 @@
                 "card-2": {
                     "title": "Saved So Far",
                     "content": "CHF 8’610.00",
-                    "badge": "48% Achieved"
+                    "badge": "48% Achieved",
+                    "badge-pattern": "{percent}% Achieved"
                 },
                 "card-3": {
                     "title": "Remaining to Save",
                     "content": "CHF 9’390.00",
-                    "badge": "Monthly car: CHF 700.00"
+                    "badge": "Monthly car: CHF 700.00",
+                    "badge-pattern": "Monthly Allocations: {currency} {amount}"
                 },
                 "card-4": {
                     "title": "Number of Goals",
                     "content": "3",
-                    "badge": "No Urgent Due Items"
+                    "badge": "No Urgent Due Items",
+                    "badge-overdue": "⚠️ {count} Overdue",
+                    "badge-none": "No Urgent Due Items"
                 }
             },
             "active-goals-section": {
                 "title": "Active Goals",
                 "badge": "3 Goals • Auto Allocation: CHF 700.00",
+                "badge-pattern": "{count} Goals • Auto Allocation: {currency} {amount}",
+                "error-loading": "Failed to load saving goals",
                 "no-goals": "No saving goals found.",
+                "messages": {
+                    "updated": "Saving goal updated successfully!",
+                    "error": {
+                        "update": "Failed to update saving goal"
+                    }
+                },
                 "loading": "loading...",
                 "buttons": {
                     "due": "Due",
@@ -726,7 +909,8 @@
                             "button": "Allocation",
                             "new-balance": "New Balance",
                             "placeholder": "Amount",
-                            "updating": "Updating..."
+                            "updating": "Updating...",
+                            "funded": "Funded"
                         }
                     }
                 }
@@ -734,7 +918,13 @@
             "warning-section": {
                 "title": "Notes & Warnings",
                 "button": "Hide All",
-                "badge": "No Notes"
+                "show-all": "Show All",
+                "hide-all": "Hide All",
+                "loading": "Loading...",
+                "due": "Due: ",
+                "more-overdue": "...and {count} more overdue goals",
+                "badge": "No Notes",
+                "funded": "Funded"
             },
             "settings-section": {
                 "title": "Settings",
@@ -742,6 +932,16 @@
                 "checkboxes": {
                     "monthly": "Monthly Auto-Allocation Active",
                     "goals": "Show Overfunded Goals"
+                },
+                "export-btn": "Export CSV",
+                "messages": {
+                    "no-export": "No goals to export",
+                    "exported": "Savings goals exported to CSV",
+                    "enabling-auto": "Enabling auto-allocation...",
+                    "disabling-auto": "Disabling auto-allocation...",
+                    "auto-enabled": "Auto-allocation enabled for all goals",
+                    "auto-disabled": "Auto-allocation disabled",
+                    "error": "Failed to update settings"
                 }
             }
         },
@@ -779,7 +979,12 @@
                         }
                     },
                     "save": "Save",
-                    "delete": "Delete"
+                    "delete": "Delete",
+                    "messages": {
+                        "created": "Account created successfully!",
+                        "updated": "Account updated successfully!",
+                        "deleted": "Account deleted successfully!"
+                    }
                 },
                 "dialog-box": {
                     "title": "Transfer between accounts",
@@ -831,7 +1036,7 @@
                 "card-3": {
                     "title": "Savings Balance",
                     "content": "CHF 13’200.00",
-                    "badge": "including Pillar 3a"
+                    "badge": "{percent}% of Total Assets"
                 },
                 "card-4": {
                     "title": "Credit Cards",
@@ -841,8 +1046,10 @@
             },
             "data-table": {
                 "loading": "Loading...",
-                "title": "All categories",
-                "badge": "5 Konten • Liquid CHF 2’620.00",
+                "title": "All Accounts",
+                "no-accounts": "No Accounts Yet",
+                "error-loading": "Failed to load accounts",
+                "badge": "{count, plural, one {1 Account} other {# Accounts}} • Liquid CHF {amount}",
                 "buttons": {
                     "export": "Export CSV",
                     "reset": "Reset"
@@ -870,6 +1077,8 @@
                 "title": "Latest transfers",
                 "button": "Export CSV",
                 "no-transfers": "No transfers yet",
+                "loading": "Loading Data...",
+                "error-loading": "Failed to load transfers",
                 "data-table": {
                     "headings": {
                         "date": "DATE",
@@ -885,6 +1094,18 @@
             "loading": "loading...",
             "no-reports": "No monthly reports yet",
             "no-categories-yet": "No categories yet",
+            "export": {
+                "summary-title": "Financial Summary",
+                "income": "Total Income",
+                "expenses": "Total Expenses",
+                "balance": "Balance",
+                "savings-rate": "Savings Rate",
+                "categories-title": "Expenses by Categories",
+                "category": "Category",
+                "amount": "Amount",
+                "trend-title": "Trend Analysis",
+                "no-data": "No data available"
+            },
             "sidebar-header": {
                 "filter-dialog": {
                     "button": "Filter",
@@ -932,6 +1153,9 @@
             "analysis-table-data": {
                 "title": "Analysis",
                 "badge-last-month": "Last month: ",
+                "badge-this-quarter": "This quarter: ",
+                "badge-this-year": "This year: ",
+                "badge-period": "Selected period: ",
                 "badge-income": "Income • ",
                 "badge-expense": "Expenses ",
                 "toggle-groups": {
@@ -951,18 +1175,22 @@
                     }
                 }
             },
-            "income-exp": {
-                "title": "Income vs. Expenses (last 9 months)",
-                "data-table": {
-                    "headings": {
-                        "month": "MONTH",
-                        "income": "INCOME",
-                        "expenses": "Expenses",
-                        "balance": "Balance"
-                    }
-                }
-            },
             "detailed-table": {
+                "income-exp": {
+                    "title": "Income vs. Expenses (last 9 months)",
+                    "title-quarter": "Income vs. Expenses (by Quarter)",
+                    "title-year": "Income vs. Expenses (by Year)",
+                    "data-table": {
+                        "headings": {
+                            "month": "MONTH",
+                            "quarter": "QUARTER",
+                            "year": "YEAR",
+                            "income": "INCOME",
+                            "expenses": "Expenses",
+                            "balance": "Balance"
+                        }
+                    }
+                },
                 "title": "Detailed table",
                 "loading": "loading...",
                 "buttons": {
@@ -1029,7 +1257,50 @@
                     "replace-existing": "Replace Existing"
                 },
                 "input": "Drop file here or click",
-                "supported-files": "Supported: .csv, .json. Separator ‘;’ or ‘,’ will be recognized."
+                "supported-files": "Supported: .csv, .json. Separator ‘;’ or ‘,’ will be recognized.",
+                "validation-results": "Validation Results",
+                "valid-rows": "{count} valid rows.",
+                "invalid-rows": "{count} invalid rows (check dates/amounts).",
+                "potential-duplicates": "{count} potential duplicates detected",
+                "new-categories-info": "{count} new categories will be created.",
+                "categories-found": "{count} categories found in file.",
+                "new-accounts-found": "{count} new accounts found in file.",
+                "missing-accounts-title": "Missing Account Mappings",
+                "missing-accounts-desc": "The accounts below were found in your file but are missing in your dashboard. Map them to existing accounts to continue.",
+                "select-existing": "Select existing account",
+                "create-missing-button": "Create all missing accounts",
+                "new-accounts-auto-info": "All {count} missing accounts will be created automatically.",
+                "skip-duplicates-label": "Skip potential duplicates",
+                "duplicates-ignored-info": "Detected duplicates will be ignored.",
+                "replace-confirmation": {
+                    "title": "Are you sure?",
+                    "desc": "This will delete all existing {type} for this hub before importing. This action cannot be undone.",
+                    "confirm": "Yes, replace all",
+                    "cancel": "Cancel"
+                },
+                "full-json-validation": {
+                    "title": "Full Export Summary",
+                    "total": "Total: {count} items will be imported",
+                    "exported-at": "Exported"
+                },
+                "cancel": "Cancel",
+                "errors": {
+                    "invalid-json": "Invalid JSON file",
+                    "parse-csv": "Error parsing CSV",
+                    "unsupported-file": "Unsupported file type. Please use .csv or .json",
+                    "validation-failed": "Validation failed",
+                    "select-file-first": "Please select a file first",
+                    "hub-not-found": "Hub ID not found"
+                },
+                "messages": {
+                    "import-success": "Successfully imported {count} items!"
+                },
+                "validating": "Validating data...",
+                "preview": "Preview:",
+                "more-rows": "... and {count} more rows",
+                "imported-as": "Imported as: {type}",
+                "importing": "Importing...",
+                "start-import": "Start Import"
             }
         },
         "settings-page": {
@@ -1061,6 +1332,11 @@
                 "address": {
                     "title": "Address (optional)",
                     "placeholder": "Street & Number, ZIP Code, City"
+                },
+                "messages": {
+                    "update-success": "Profile and household settings updated successfully",
+                    "update-error": "Failed to update settings",
+                    "unexpected-error": "An unexpected error occurred"
                 }
             },
             "plans-upgrade-section": {
@@ -1110,7 +1386,8 @@
                     },
                     "errors": {
                         "no-price": "That plan is temporarily unavailable.",
-                        "portal-failed": "Unable to open the Stripe portal right now."
+                        "portal-failed": "Unable to open the Stripe portal right now.",
+                        "checkout-failed": "Failed to create checkout session"
                     },
                     "current-plan-badge": "Current plan",
                     "manage-plan-button": "Manage plan",
@@ -1196,6 +1473,12 @@
                         "action": "ACTION"
                     },
                     "content": "No Invitations or Members Yet."
+                },
+                "messages": {
+                    "load-error": "Failed to load invitations & members",
+                    "invitation-sent": "Invitation sent",
+                    "send-error": "Failed to send invitation",
+                    "send-unexpected-error": "Error sending invitation"
                 }
             },
             "appearance-section": {
@@ -1390,6 +1673,16 @@
                             "delete-account": "Delete Account"
                         }
                     }
+                },
+                "delete-dialog": {
+                    "title": "Confirm Account Deletion",
+                    "description": "Are you sure you want to delete your account? This action is permanent and cannot be undone.",
+                    "cancel": "Cancel",
+                    "confirm": "Delete Account"
+                },
+                "messages": {
+                    "delete-error": "Error deleting user",
+                    "unexpected-error": "Unexpected error occurred"
                 }
             },
             "billing-details-section": {
@@ -1426,7 +1719,12 @@
                 "support": {
                     "title": "Support",
                     "placeholder": "Question or Feedback …",
-                    "button": "Send to Support"
+                    "button": "Send to Support",
+                    "sending": "Sending...",
+                    "success": "Your message has been sent successfully!",
+                    "error": "Failed to send message. Please try again.",
+                    "error-empty": "Please enter a message",
+                    "error-too-short": "Message is too short (minimum 10 characters)"
                 }
             }
         },
@@ -1473,14 +1771,19 @@
             "contact-support-section": {
                 "title": "Contact & Support",
                 "subject": {
-                    "title": "Suject",
+                    "title": "Subject",
                     "placeholder": "Short description"
                 },
                 "message": {
                     "title": "Message",
                     "placeholder": "How can we help? Please be as specific as possible."
                 },
-                "button": "Send ticket"
+                "button": "Send ticket",
+                "sending": "Sending...",
+                "success": "Your ticket has been sent successfully!",
+                "error": "Failed to send ticket. Please try again.",
+                "error-empty": "Please enter a message",
+                "error-too-short": "Message is too short (minimum 10 characters)"
             },
             "keyboard-shortcuts-section": {
                 "title": "Keyboard Shortcuts",
@@ -1509,6 +1812,28 @@
         "loading": "Loading notifications...",
         "noNotifications": "No notifications",
         "markAllAsRead": "Mark all as read",
+        "types": {
+            "budget-threshold-80": {
+                "title": "Budget Threshold Reached",
+                "message": "Your budget for \"{categoryName}\" has reached 80% of the allocated amount."
+            },
+            "budget-threshold-100": {
+                "title": "Budget Exceeded",
+                "message": "Your budget for \"{categoryName}\" has been exceeded."
+            },
+            "subscription-expiring-3-days": {
+                "title": "Subscription Expiring Soon",
+                "message": "Your subscription will expire in 3 days. Please renew to continue using all features."
+            },
+            "subscription-expiring-1-day": {
+                "title": "Subscription Expiring Tomorrow",
+                "message": "Your subscription will expire tomorrow. Please renew immediately to avoid service interruption."
+            },
+            "subscription-expired": {
+                "title": "Subscription Expired",
+                "message": "Your subscription has expired. Please renew to restore access to all features."
+            }
+        },
         "browser": {
             "prompt": {
                 "title": "Enable Browser Notifications",
