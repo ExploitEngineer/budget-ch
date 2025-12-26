@@ -322,19 +322,23 @@ export default function SidebarHeader({
         </div>
       </div>
 
-      <div className="flex w-full justify-center px-4 sm:hidden">
-        <div className="bg-blue-background flex w-full items-center justify-between gap-2 rounded-lg border">
-          <Button variant="ghost" size="icon" onClick={goToPrevMonth}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <span className="text-center text-xs font-medium whitespace-nowrap sm:text-sm">
-            {commonT(`months.${date.getMonth()}`)} {date.getFullYear()}
-          </span>
-          <Button variant="ghost" size="icon" onClick={goToNextMonth}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+      {/* Mobile month selector - commented out as it's not connected to actual budget filtering
+      {route === "budgets" && (
+        <div className="flex w-full justify-center px-4 sm:hidden">
+          <div className="bg-blue-background flex w-full items-center justify-between gap-2 rounded-lg border">
+            <Button variant="ghost" size="icon" onClick={goToPrevMonth}>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-center text-xs font-medium whitespace-nowrap sm:text-sm">
+              {commonT(`months.${date.getMonth()}`)} {date.getFullYear()}
+            </span>
+            <Button variant="ghost" size="icon" onClick={goToNextMonth}>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-      </div>
+      )}
+      */}
     </header>
   );
 }

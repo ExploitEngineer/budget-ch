@@ -75,7 +75,7 @@ export default function TransactionsClient() {
         <DataTable
           transactions={(transactions ?? []) as Transaction[]}
           filters={filters}
-          loading={transactionLoading}
+          loading={transactionLoading || !hubId || transactions === undefined}
           error={transactionError?.message ?? null}
         />
       </div>
