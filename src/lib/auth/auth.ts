@@ -65,7 +65,7 @@ export const auth = betterAuth({
 
             // Otherwise, onboarding failed - prevent sign-in
             throw new APIError("INTERNAL_SERVER_ERROR", {
-              message:
+              message: result.message ||
                 "Failed to setup your account. Please try signing in again.",
             });
           }
