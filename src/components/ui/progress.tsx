@@ -28,18 +28,18 @@ function Progress({
         data-slot="progress-indicator"
         className={cn(
           "h-full w-full flex-1 transition-all",
-          // If markerColor is explicitly set (not "standard"), use it
+          // If markerColor is explicitly set (not "standard"), use gradient version
           markerColor === "green"
-            ? "bg-green-500"
+            ? "progress-gradient-green"
             : markerColor === "orange"
-              ? "bg-orange-500"
+              ? "progress-gradient-orange"
               : markerColor === "red"
-                ? "bg-red-500"
-                // Otherwise, use default budget-style logic
+                ? "progress-gradient-red"
+                // Otherwise, use default budget-style logic with gradients
                 : value && value >= 100
-                  ? "bg-red-600"
+                  ? "progress-gradient-danger"
                   : value && value >= warningThreshold
-                    ? "bg-[#F59E0B]"
+                    ? "progress-gradient-warning"
                     : "progress-gradient",
         )}
         style={{ transform: `translateX(-${100 - (value || 0)}%)` }}

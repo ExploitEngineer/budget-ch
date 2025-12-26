@@ -153,13 +153,15 @@ export function BudgetDataTable() {
       });
     }
 
-    // Apply warning filter
-    if (warnFilter === "warn-80") {
-      return processedBudgets.filter((b) => b.progress >= 80 && b.progress < 90);
+    // Apply warning filter - filters by assigned warning percentage, not progress
+    if (warnFilter === "warn-50") {
+      return processedBudgets.filter((b) => b.warningThreshold === 50);
+    } else if (warnFilter === "warn-80") {
+      return processedBudgets.filter((b) => b.warningThreshold === 80);
     } else if (warnFilter === "warn-90") {
-      return processedBudgets.filter((b) => b.progress >= 90 && b.progress < 100);
+      return processedBudgets.filter((b) => b.warningThreshold === 90);
     } else if (warnFilter === "warn-100") {
-      return processedBudgets.filter((b) => b.progress >= 100);
+      return processedBudgets.filter((b) => b.warningThreshold === 100);
     }
 
     return processedBudgets;
@@ -291,37 +293,42 @@ export function BudgetDataTable() {
           <Separator className="bg-border-blue mt-2" />
         </CardContent>
 
-        <CardFooter className="flex flex-wrap items-center justify-between gap-2">
+        <CardFooter className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <ToggleGroup
-            className="dark:border-border-blue bg-dark-blue-background border"
+            className="dark:border-border-blue bg-dark-blue-background border w-full sm:w-auto"
             type="single"
             value={periodFilter}
             onValueChange={(val) => val && setPeriodFilter(val as "month" | "week")}
           >
-            <ToggleGroupItem value="month" aria-label="toggle-month">
+            <ToggleGroupItem value="month" aria-label="toggle-month" className="flex-1 sm:flex-none text-xs sm:text-sm">
               {t("data-table.toggle-groups.month")}
             </ToggleGroupItem>
-            <ToggleGroupItem value="week" aria-label="toggle-week">
+            <ToggleGroupItem value="week" aria-label="toggle-week" className="flex-1 sm:flex-none text-xs sm:text-sm">
               {t("data-table.toggle-groups.week")}
             </ToggleGroupItem>
           </ToggleGroup>
 
-          <ToggleGroup
-            className="dark:border-border-blue bg-dark-blue-background border"
-            type="single"
-            value={warnFilter ?? ""}
-            onValueChange={(val) => setWarnFilter(val || null)}
-          >
-            <ToggleGroupItem value="warn-80" aria-label="toggle-warn-80">
-              {t("data-table.toggle-groups.warn-80")}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="warn-90" aria-label="toggle-warn-90">
-              {t("data-table.toggle-groups.warn-90")}
-            </ToggleGroupItem>
-            <ToggleGroupItem value="warn-100" aria-label="toggle-warn-100">
-              {t("data-table.toggle-groups.warn-100")}
-            </ToggleGroupItem>
-          </ToggleGroup>
+          <div className="w-full overflow-x-auto sm:w-auto sm:overflow-visible">
+            <ToggleGroup
+              className="dark:border-border-blue bg-dark-blue-background border min-w-max"
+              type="single"
+              value={warnFilter ?? ""}
+              onValueChange={(val) => setWarnFilter(val || null)}
+            >
+              <ToggleGroupItem value="warn-50" aria-label="toggle-warn-50" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-50")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="warn-80" aria-label="toggle-warn-80" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-80")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="warn-90" aria-label="toggle-warn-90" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-90")}
+              </ToggleGroupItem>
+              <ToggleGroupItem value="warn-100" aria-label="toggle-warn-100" className="text-xs sm:text-sm whitespace-nowrap">
+                {t("data-table.toggle-groups.warn-100")}
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
         </CardFooter>
       </Card>
     </section>

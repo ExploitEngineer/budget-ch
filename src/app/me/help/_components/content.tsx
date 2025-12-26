@@ -8,9 +8,10 @@ export function Content() {
     t("faq"),
     t("contact-support"),
     t("keyboard-shortcuts"),
-    t("troubleshooting"),
-    t("privacy"),
-    t("release-notes"),
+    // Hidden for now
+    // t("troubleshooting"),
+    // t("privacy"),
+    // t("release-notes"),
   ];
 
   return (

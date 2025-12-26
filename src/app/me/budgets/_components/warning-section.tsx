@@ -63,24 +63,17 @@ export function WarningSection() {
               const percent = allocated > 0 ? (totalSpent / allocated) * 100 : 0;
               const isOver = totalSpent >= allocated;
               return (
-                <Badge
+                <div
                   key={w.id}
                   className={cn(
-                    "rounded-full px-3 py-2 text-white border-none shadow-sm",
-                    isOver
-                      ? "bg-red-600"
-                      : w.markerColor === "green"
-                        ? "bg-green-500"
-                        : w.markerColor === "orange"
-                          ? "bg-orange-500"
-                          : w.markerColor === "red"
-                            ? "bg-red-500"
-                            : "bg-[#F59E0B]"
+                    "flex items-center gap-2 rounded-full border px-4 py-2",
+                    isOver ? "border-[#9A4249]" : "border-[#9A6F42]",
                   )}
-                  variant="outline"
                 >
-                  {w.categoryName}: {percent.toFixed(0)}% ({commonT("currency")} {totalSpent})
-                </Badge>
+                  <p className="text-sm">
+                    {w.categoryName}: {percent.toFixed(0)}% ({commonT("currency")} {totalSpent})
+                  </p>
+                </div>
               );
             })
           ) : (

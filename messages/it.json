@@ -146,6 +146,51 @@
             "content": "Dopo aver cliccato sul link, verrai connesso automaticamente."
         }
     },
+    "emails": {
+        "auth": {
+            "reset-password": {
+                "subject": "Reimposta la tua password",
+                "title": "Reimposta la tua password",
+                "hi": "Ciao {name},",
+                "request": "Abbiamo ricevuto una richiesta di reimpostazione della tua password. Clicca sul pulsante qui sotto per sceglierne una nuova.",
+                "button": "Reimposta password",
+                "fallback": "Se il pulsante non funziona, copia e incolla questo link nel tuo browser:",
+                "expire": "Questo link di reimpostazione della password scadrà tra 24 ore.",
+                "ignore": "Se non hai richiesto la reimpostazione della password, puoi ignorare tranquillamente questa e-mail.",
+                "footer": "© 2024 BudgetHub. Tutti i diritti riservati."
+            },
+            "verify-email": {
+                "subject": "Verifica il tuo indirizzo e-mail",
+                "title": "Verifica il tuo indirizzo e-mail",
+                "hi": "Ciao!",
+                "thanks": "Grazie, {name}, per esserti registrato! Per completare la registrazione, verifica la tua e-mail cliccando sul pulsante qui sotto.",
+                "button": "Verifica indirizzo e-mail",
+                "fallback": "Se il pulsante non funziona, copia e incolla questo link nel tuo browser:",
+                "expire": "Questo link di verifica scadrà tra 24 ore.",
+                "ignore": "Se non hai creato un account, puoi ignorare questa e-mail.",
+                "footer": "© 2025 BudgetHub. Tutti i diritti riservati."
+            },
+            "otp": {
+                "subject": "Il tuo codice di verifica",
+                "title": "Il tuo codice di verifica",
+                "hi": "Ciao {name},",
+                "code-is": "Il tuo codice di verifica è:",
+                "expire": "Questo codice scadrà tra 5 minuti.",
+                "ignore": "Se non hai richiesto questo codice, puoi ignorare tranquillamente questa e-mail.",
+                "footer": "© 2025 BudgetHub. Tutti i diritti riservati."
+            }
+        },
+        "invitation": {
+            "subject": "Sei stato invitato a unirti a un Hub!",
+            "title": "Sei stato invitato a unirti a un Hub!",
+            "hello": "Ciao,",
+            "invited": "Sei stato invitato a unirti a un hub con il ruolo: <strong>{role}</strong>.",
+            "button": "Accetta invito",
+            "fallback": "Oppure copia e incolla questo link nel tuo browser:",
+            "expire": "Questo invito scade tra 7 giorni.",
+            "ignore": "Se non ti aspettavi questo invito, puoi ignorare tranquillamente questa e-mail."
+        }
+    },
     "main-dashboard": {
         "export": "Esporta",
         "export-json": "Esporta JSON",
@@ -291,7 +336,8 @@
             "cards": {
                 "card-1": {
                     "title": "Budget totale (Mese)",
-                    "badge": "Fisso + Variabile • incl. CC & SERAFE"
+                    "badge": "Fisso + Variabile • incl. CC & SERAFE",
+                    "simple-badge": "Budget Mensile"
                 },
                 "card-2": {
                     "title": "Spese (Attuali)",
@@ -674,13 +720,15 @@
                 },
                 "card-3": {
                     "title": "Disponibile",
+                    "title-over": "Fuori budget",
                     "content": "CHF 985.00",
-                    "badge": "+34% disponibile"
+                    "badge": "disponibile",
+                    "badge-over": "Spesa in eccesso"
                 },
                 "card-4": {
                     "title": "Numero di categorie",
                     "content": "8",
-                    "badge": "Avvisi: 2"
+                    "badge": "Avvisi"
                 }
             },
             "data-table": {
@@ -721,6 +769,7 @@
                 "toggle-groups": {
                     "month": "Mese",
                     "week": "Settimana",
+                    "warn-50": "Avvisa al 50%",
                     "warn-80": "Avvisa al 80%",
                     "warn-90": "Avvisa al 90%",
                     "warn-100": "Avvisa al 100%"
@@ -735,7 +784,7 @@
                 },
                 "settings": {
                     "title": "Impostazioni (Mese)",
-                    "button": "+ Budget",
+                    "button": "Budget",
                     "checkboxes": {
                         "carry": "Riporta avanzo/deficit al mese successivo",
                         "e-mail": "Invia avvisi via email al 80% / 100%"
@@ -809,7 +858,7 @@
                     "title": "Rimanente da risparmiare",
                     "content": "CHF 9’390.00",
                     "badge": "Obiettivo mensile: CHF 700.00",
-                    "badge-pattern": "Mensile per: {currency} {amount}"
+                    "badge-pattern": "Allocazioni Mensili: {currency} {amount}"
                 },
                 "card-4": {
                     "title": "Numero di obiettivi",
@@ -825,6 +874,12 @@
                 "badge-pattern": "{count} obiettivi • Assegnazione automatica: {currency} {amount}",
                 "error-loading": "Caricamento obiettivi di risparmio fallito",
                 "no-goals": "Nessun obiettivo di risparmio trovato.",
+                "messages": {
+                    "updated": "Obiettivo di risparmio aggiornato con successo!",
+                    "error": {
+                        "update": "Aggiornamento obiettivo di risparmio fallito"
+                    }
+                },
                 "loading": "Caricamento...",
                 "buttons": {
                     "due": "Scadenza",
@@ -869,7 +924,8 @@
                 "loading": "Caricamento...",
                 "due": "Scadenza: ",
                 "more-overdue": "...e altri {count} obiettivi in ritardo",
-                "badge": "Nessuna nota"
+                "badge": "Nessuna nota",
+                "funded": "Finanziato"
             },
             "settings-section": {
                 "title": "Impostazioni",
@@ -1123,9 +1179,13 @@
             "detailed-table": {
                 "income-exp": {
                     "title": "Entrate vs Spese (ultimi 9 mesi)",
+                    "title-quarter": "Entrate vs Spese (per Trimestre)",
+                    "title-year": "Entrate vs Spese (per Anno)",
                     "data-table": {
                         "headings": {
                             "month": "MESE",
+                            "quarter": "TRIMESTRE",
+                            "year": "ANNO",
                             "income": "ENTRATE",
                             "expenses": "Spese",
                             "balance": "Saldo"
@@ -1660,7 +1720,12 @@
                 "support": {
                     "title": "Supporto",
                     "placeholder": "Domanda o feedback …",
-                    "button": "Invia al supporto"
+                    "button": "Invia al supporto",
+                    "sending": "Invio in corso...",
+                    "success": "Il tuo messaggio è stato inviato con successo!",
+                    "error": "Invio fallito. Si prega di riprovare.",
+                    "error-empty": "Inserisci un messaggio",
+                    "error-too-short": "Il messaggio è troppo corto (minimo 10 caratteri)"
                 }
             }
         },
@@ -1714,7 +1779,12 @@
                     "title": "Messaggio",
                     "placeholder": "Come possiamo aiutarti? Sii il più specifico possibile."
                 },
-                "button": "Invia ticket"
+                "button": "Invia ticket",
+                "sending": "Invio in corso...",
+                "success": "Il tuo ticket è stato inviato con successo!",
+                "error": "Invio fallito. Si prega di riprovare.",
+                "error-empty": "Inserisci un messaggio",
+                "error-too-short": "Il messaggio è troppo corto (minimo 10 caratteri)"
             },
             "keyboard-shortcuts-section": {
                 "title": "Scorciatoie da tastiera",
@@ -1748,7 +1818,7 @@
                 "title": "Soglia budget raggiunta",
                 "message": "Il tuo budget per \"{categoryName}\" ha raggiunto l'80% dell'importo assegnato."
             },
-            "budget-exceeded": {
+            "budget-threshold-100": {
                 "title": "Budget superato",
                 "message": "Il tuo budget per \"{categoryName}\" è stato superato."
             },

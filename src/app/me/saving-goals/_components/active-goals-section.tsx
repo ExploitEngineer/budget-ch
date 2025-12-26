@@ -239,18 +239,11 @@ export function ActiveGoalsSection() {
                       </Badge>
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-3">
-                        <AllocateForm
-                          amountSaved={goal.amountSaved || 0}
-                          goalId={goal.id}
-                        />
-                      </div>
-
-                      <p className="text-sm">
-                        {t("cards.tax-reserves.content.new-balance")}:{" "}
-                        <span className="font-bold">{currency} {savedCHF ?? "—"}</span>
-                      </p>
+                    <div className="flex items-center gap-3">
+                      <AllocateForm
+                        amountSaved={goal.amountSaved || 0}
+                        goalId={goal.id}
+                      />
                     </div>
                   </CardContent>
                 </Card>

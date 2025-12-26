@@ -306,7 +306,8 @@ export function DataTable({
         // Color based on transaction type:
         // expense & transfer = red (deduct)
         // income = green (add)
-        const colorClass = type === "income" ? "text-green-600" : "text-red-600";
+        // Using cleaner, less harsh color variants
+        const colorClass = type === "income" ? "text-[#48A8A0]" : "text-[#D07270]";
 
         return (
           <span className={`font-semibold ${colorClass}`}>

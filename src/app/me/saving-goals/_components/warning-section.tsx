@@ -89,7 +89,7 @@ export function WarningSection() {
                       ).toFixed(1)}
                       %
                     </div>
-                    <div className="text-xs opacity-80">{t("active-goals-section.cards.tax-reserves.content.funded")}</div>
+                    <div className="text-xs opacity-80">{t("funded")}</div>
                   </div>
                 </div>
               ))}

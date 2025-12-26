@@ -10,6 +10,10 @@ import {
 import { headers } from "next/headers";
 import { getContext } from "@/lib/auth/actions";
 import { mailer } from "@/lib/mailer";
+import { getMailTranslations } from "@/lib/mail-translations";
+import db from "@/db/db";
+import { users } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import type { AccessRole } from "@/db/queries";
 
 interface SendInvitationParams {
@@ -36,8 +40,14 @@ export async function sendHubInvitation({
 
     if (!userId) return { success: false, message: "Not authenticated" };
 
-    const user = await getUserByEmailDB(email);
-    if (!user?.id) return { success: false, message: "User not found" };
+    const recipientUser = await getUserByEmailDB(email);
+    const inviterUser = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: { language: true },
+    });
+
+    const locale = recipientUser?.language || inviterUser?.language || "en";
+    const t = await getMailTranslations(locale);
 
     const existingMembers = await getHubMembers(hubId);
     const isAlreadyMember = existingMembers.data?.some(
@@ -76,12 +86,12 @@ export async function sendHubInvitation({
     await mailer.sendMail({
       from: `"BudgetHub" <${process.env.MAIL_USER}>`,
       to: email,
-      subject: "You're invited to join a Hub!",
+      subject: t("emails.invitation.subject"),
       html: `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-      <h2 style="color: #235FE3;">You're invited to join a Hub!</h2>
-      <p>Hello,</p>
-      <p>You have been invited to join a hub with the role: <strong>${role}</strong>.</p>
+      <h2 style="color: #235FE3;">${t("emails.invitation.title")}</h2>
+      <p>${t("emails.invitation.hello")}</p>
+      <p>${t("emails.invitation.invited", { role })}</p>
       <p style="margin: 20px 0;">
         <a href="${link}" style="
           display: inline-block;
@@ -91,15 +101,15 @@ export async function sendHubInvitation({
           text-decoration: none;
           border-radius: 5px;
         ">
-          Accept Invitation
+          ${t("emails.invitation.button")}
         </a>
       </p>
-      <p>Or copy and paste this link into your browser: <br/>
+      <p>${t("emails.invitation.fallback")} <br/>
          <span style="word-break: break-all; color: #666;">${link}</span>
       </p>
-      <p style="color: #999; font-size: 12px;">This invitation expires in 7 days.</p>
+      <p style="color: #999; font-size: 12px;">${t("emails.invitation.expire")}</p>
       <hr />
-      <p style="font-size: 12px; color: #999;">If you didn't expect this invitation, you can safely ignore this email.</p>
+      <p style="font-size: 12px; color: #999;">${t("emails.invitation.ignore")}</p>
     </div>
   `,
     });

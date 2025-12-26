@@ -8,7 +8,7 @@ import { Notifications } from "./_components/notifications";
 import { Security } from "./_components/security";
 import { DataPrivacy } from "./_components/data-privacy";
 // import { BillingDetails } from "./_components/billing-details";
-import { AboutSection } from "./_components/about";
+// import { AboutSection } from "./_components/about";
 import { loadStripePrices } from "@/lib/stripe";
 import { getContext } from "@/lib/auth/actions";
 import { headers } from "next/headers";
@@ -24,13 +24,13 @@ export default async function Settings() {
     subscription === null
       ? null
       : {
-          plan: subscription.subscriptionPlan,
-          status: subscription.status,
-          currentPeriodStart: subscription.currentPeriodStart.toISOString(),
-          currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
-          cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
-          cancelAt: subscription.cancelAt ? new Date(subscription.cancelAt).toISOString() : null,
-        };
+        plan: subscription.subscriptionPlan,
+        status: subscription.status,
+        currentPeriodStart: subscription.currentPeriodStart.toISOString(),
+        currentPeriodEnd: subscription.currentPeriodEnd.toISOString(),
+        cancelAtPeriodEnd: subscription.cancelAtPeriodEnd,
+        cancelAt: subscription.cancelAt ? new Date(subscription.cancelAt).toISOString() : null,
+      };
 
   return (
     <section>
@@ -54,7 +54,7 @@ export default async function Settings() {
         <Security />
         <DataPrivacy />
         {/* <BillingDetails /> */}
-        <AboutSection />
+        {/* <AboutSection /> */}
       </div>
     </section>
   );

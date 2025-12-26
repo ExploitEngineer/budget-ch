@@ -274,12 +274,14 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
   }
 
   const headers = [
-    t("cards.tax-reserves.content.goal"),
-    t("cards.tax-reserves.content.rest"),
-    t("cards.tax-reserves.content.saved"),
-    t("cards.tax-reserves.content.monthly-allocated"),
-    "Account",
-    "Due Date",
+    t("sidebar-header.dialog.labels.name.title"),  // Name
+    t("active-goals-section.cards.tax-reserves.content.goal"),  // Goal Amount
+    t("active-goals-section.cards.tax-reserves.content.saved"),  // Saved
+    t("active-goals-section.cards.tax-reserves.content.rest"),  // Remaining
+    t("active-goals-section.cards.tax-reserves.content.monthly-allocated"),  // Allocated
+    "Progress",
+    t("active-goals-section.cards.tax-reserves.content.account.title"),  // Account
+    t("active-goals-section.cards.tax-reserves.content.due"),  // Due
     "Status",
   ];
 

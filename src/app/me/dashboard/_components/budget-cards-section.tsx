@@ -67,7 +67,7 @@ export function BudgetCardsSection() {
     {
       title: t("cards.card-1.title"),
       content: `${commonT("currency")} ${(totalAllocated).toLocaleString()}`,
-      badge: t("cards.card-1.badge"),
+      badge: t("cards.card-1.simple-badge"),
     },
     {
       title: t("cards.card-2.title"),

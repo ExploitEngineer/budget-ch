@@ -440,7 +440,7 @@ export default function EditTransactionDialog({
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
                                   ? format(field.value, "dd/MM/yyyy")
-                                  : t("dialog.placeholders.date")}
+                                  : t("transaction-edit-dialog.dialog.placeholders.date")}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent>
@@ -462,7 +462,7 @@ export default function EditTransactionDialog({
                     name="accountId"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>{t("dialog.labels.account")}</FormLabel>
+                        <FormLabel>{t("transaction-edit-dialog.dialog.labels.account")}</FormLabel>
                         <FormControl>
                           <Select
                             onValueChange={(value) => {
@@ -522,7 +522,7 @@ export default function EditTransactionDialog({
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormLabel>
-                          {t("dialog.labels.transactionType.title")}
+                          {t("transaction-edit-dialog.dialog.labels.transactionType.title")}
                         </FormLabel>
                         <FormControl>
                           <Select
@@ -566,12 +566,12 @@ export default function EditTransactionDialog({
                     name="recipient"
                     render={({ field }) => (
                       <FormItem className="w-full">
-                        <FormLabel>{t("dialog.labels.recipient")}</FormLabel>
+                        <FormLabel>{t("transaction-edit-dialog.dialog.labels.recipient")}</FormLabel>
                         <FormControl>
                           <Input
                             {...field}
                             value={field.value ?? ""}
-                            placeholder={t("dialog.placeholders.recipient")}
+                            placeholder={t("transaction-edit-dialog.dialog.placeholders.recipient")}
                           />
                         </FormControl>
                         <FormMessage />
@@ -588,7 +588,7 @@ export default function EditTransactionDialog({
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormLabel>
-                          {t("dialog.labels.destinationAccount")}
+                          {t("transaction-edit-dialog.dialog.labels.destinationAccount")}
                         </FormLabel>
                         <FormControl>
                           <Select
@@ -611,7 +611,7 @@ export default function EditTransactionDialog({
                                   accountsLoading
                                     ? "Loading accounts..."
                                     : t(
-                                      "dialog.placeholders.destinationAccount",
+                                      "transaction-edit-dialog.dialog.placeholders.destinationAccount",
                                     )
                                 }
                               />
@@ -719,7 +719,7 @@ export default function EditTransactionDialog({
                         </FormControl>
                         <div className="space-y-1 leading-none">
                           <FormLabel className="cursor-pointer">
-                            {t("dialog.labels.recurring")}
+                            {t("transaction-edit-dialog.dialog.labels.recurring")}
                           </FormLabel>
                         </div>
                       </FormItem>
@@ -733,7 +733,7 @@ export default function EditTransactionDialog({
                         name="frequencyDays"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.frequencyDays")}</FormLabel>
+                            <FormLabel>{t("transaction-edit-dialog.dialog.labels.frequencyDays")}</FormLabel>
                             <FormControl>
                               <Input
                                 type="number"
@@ -753,7 +753,7 @@ export default function EditTransactionDialog({
                         name="startDate"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.startDate")}</FormLabel>
+                            <FormLabel>{t("transaction-edit-dialog.dialog.labels.startDate")}</FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -764,7 +764,7 @@ export default function EditTransactionDialog({
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
                                       ? format(field.value, "dd/MM/yyyy")
-                                      : t("dialog.placeholders.startDate")}
+                                      : t("transaction-edit-dialog.dialog.placeholders.startDate")}
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent>
@@ -786,7 +786,7 @@ export default function EditTransactionDialog({
                         name="endDate"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.endDate")}</FormLabel>
+                            <FormLabel>{t("transaction-edit-dialog.dialog.labels.endDate")}</FormLabel>
                             <FormControl>
                               <Popover>
                                 <PopoverTrigger asChild>
@@ -797,7 +797,7 @@ export default function EditTransactionDialog({
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
                                       ? format(field.value, "dd/MM/yyyy")
-                                      : t("dialog.placeholders.endDate")}
+                                      : t("transaction-edit-dialog.dialog.placeholders.endDate")}
                                   </Button>
                                 </PopoverTrigger>
                                 <PopoverContent>

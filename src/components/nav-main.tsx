@@ -35,6 +35,7 @@ import {
 } from "@/lib/services/features-permission";
 import { toast } from "sonner";
 import { getUrlWithHubFromCookie } from "@/hooks/use-hub-sync";
+import { clearQueryCache } from "@/components/providers/query-provider";
 
 interface Items {
   title: string;
@@ -62,10 +63,31 @@ export function NavMain() {
   const handleLogout = async (): Promise<void> => {
     setIsLoading(true);
     try {
+      // Clear any localStorage caches related to the app
+      if (typeof window !== "undefined") {
+        // Clear hub-related caches
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && (key.startsWith("hub_") || key.startsWith("cache_") || key.startsWith("user_"))) {
+            keysToRemove.push(key);
+          }
+        }
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+      }
+
+      // Clear React Query cache to prevent stale data with wrong hub ID
+      clearQueryCache();
+
+      // Sign out - server-side hook will clear the httpOnly activeHubId cookie
       await authClient.signOut();
-      router.push("/signin");
+
+      // Use hard refresh instead of soft navigation to completely clear all client state
+      window.location.href = "/signin";
     } catch (err) {
       console.error("Error logging out", err);
+      // Still try to redirect even on error
+      window.location.href = "/signin";
     } finally {
       setIsLoading(false);
     }

@@ -145,6 +145,51 @@
             "content": "After you click the link, we’ll sign you in automatically."
         }
     },
+    "emails": {
+        "auth": {
+            "reset-password": {
+                "subject": "Reset Your Password",
+                "title": "Reset Your Password",
+                "hi": "Hi {name},",
+                "request": "We received a request to reset your password. Click the button below to choose a new one.",
+                "button": "Reset Password",
+                "fallback": "If the button doesn’t work, copy and paste this link into your browser:",
+                "expire": "This password reset link will expire in 24 hours.",
+                "ignore": "If you didn’t request a password reset, you can safely ignore this email.",
+                "footer": "© 2024 BudgetHub. All rights reserved."
+            },
+            "verify-email": {
+                "subject": "Verify your email address",
+                "title": "Verify Your Email Address",
+                "hi": "Hi there!",
+                "thanks": "Thank you, {name}, for signing up! To complete your registration, please verify your email by clicking the button below.",
+                "button": "Verify Email Address",
+                "fallback": "If the button doesn’t work, copy and paste this link into your browser:",
+                "expire": "This verification link will expire in 24 hours.",
+                "ignore": "If you didn’t create an account, you can ignore this email.",
+                "footer": "© 2025 BudgetHub. All rights reserved."
+            },
+            "otp": {
+                "subject": "Your Verification Code",
+                "title": "Your Verification Code",
+                "hi": "Hi {name},",
+                "code-is": "Your verification code is:",
+                "expire": "This code will expire in 5 minutes.",
+                "ignore": "If you didn't request this code, you can safely ignore this email.",
+                "footer": "© 2025 BudgetHub. All rights reserved."
+            }
+        },
+        "invitation": {
+            "subject": "You're invited to join a Hub!",
+            "title": "You're invited to join a Hub!",
+            "hello": "Hello,",
+            "invited": "You have been invited to join a hub with the role: <strong>{role}</strong>.",
+            "button": "Accept Invitation",
+            "fallback": "Or copy and paste this link into your browser:",
+            "expire": "This invitation expires in 7 days.",
+            "ignore": "If you didn't expect this invitation, you can safely ignore this email."
+        }
+    },
     "main-dashboard": {
         "export": "Export",
         "export-json": "Export JSON",
@@ -290,7 +335,8 @@
             "cards": {
                 "card-1": {
                     "title": "Total Budget (Month)",
-                    "badge": "Fixed + Variable • incl. CC & SERAFE"
+                    "badge": "Fixed + Variable • incl. CC & SERAFE",
+                    "simple-badge": "Monthly Budget"
                 },
                 "card-2": {
                     "title": "Expenses (Actual)",
@@ -723,6 +769,7 @@
                 "toggle-groups": {
                     "month": "Month",
                     "week": "Week",
+                    "warn-50": "Warn at 50%",
                     "warn-80": "Warn at 80%",
                     "warn-90": "Warn at 90%",
                     "warn-100": "Warn at 100%"
@@ -736,7 +783,7 @@
                 "no-warnings": "Your budget is looking healthy! No warnings.",
                 "settings": {
                     "title": "Settings (Month)",
-                    "button": "+ Budget",
+                    "button": "Budget",
                     "checkboxes": {
                         "carry": "Carry over surplus/deficit to next month",
                         "e-mail": "Email warnings at 80% / 100%"
@@ -810,7 +857,7 @@
                     "title": "Remaining to Save",
                     "content": "CHF 9’390.00",
                     "badge": "Monthly car: CHF 700.00",
-                    "badge-pattern": "Monthly per: {currency} {amount}"
+                    "badge-pattern": "Monthly Allocations: {currency} {amount}"
                 },
                 "card-4": {
                     "title": "Number of Goals",
@@ -826,6 +873,12 @@
                 "badge-pattern": "{count} Goals • Auto Allocation: {currency} {amount}",
                 "error-loading": "Failed to load saving goals",
                 "no-goals": "No saving goals found.",
+                "messages": {
+                    "updated": "Saving goal updated successfully!",
+                    "error": {
+                        "update": "Failed to update saving goal"
+                    }
+                },
                 "loading": "loading...",
                 "buttons": {
                     "due": "Due",
@@ -870,7 +923,8 @@
                 "loading": "Loading...",
                 "due": "Due: ",
                 "more-overdue": "...and {count} more overdue goals",
-                "badge": "No Notes"
+                "badge": "No Notes",
+                "funded": "Funded"
             },
             "settings-section": {
                 "title": "Settings",
@@ -1665,7 +1719,12 @@
                 "support": {
                     "title": "Support",
                     "placeholder": "Question or Feedback …",
-                    "button": "Send to Support"
+                    "button": "Send to Support",
+                    "sending": "Sending...",
+                    "success": "Your message has been sent successfully!",
+                    "error": "Failed to send message. Please try again.",
+                    "error-empty": "Please enter a message",
+                    "error-too-short": "Message is too short (minimum 10 characters)"
                 }
             }
         },
@@ -1712,14 +1771,19 @@
             "contact-support-section": {
                 "title": "Contact & Support",
                 "subject": {
-                    "title": "Suject",
+                    "title": "Subject",
                     "placeholder": "Short description"
                 },
                 "message": {
                     "title": "Message",
                     "placeholder": "How can we help? Please be as specific as possible."
                 },
-                "button": "Send ticket"
+                "button": "Send ticket",
+                "sending": "Sending...",
+                "success": "Your ticket has been sent successfully!",
+                "error": "Failed to send ticket. Please try again.",
+                "error-empty": "Please enter a message",
+                "error-too-short": "Message is too short (minimum 10 characters)"
             },
             "keyboard-shortcuts-section": {
                 "title": "Keyboard Shortcuts",
@@ -1753,7 +1817,7 @@
                 "title": "Budget Threshold Reached",
                 "message": "Your budget for \"{categoryName}\" has reached 80% of the allocated amount."
             },
-            "budget-exceeded": {
+            "budget-threshold-100": {
                 "title": "Budget Exceeded",
                 "message": "Your budget for \"{categoryName}\" has been exceeded."
             },

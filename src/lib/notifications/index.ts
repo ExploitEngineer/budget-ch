@@ -44,6 +44,10 @@ export async function sendNotification(
         hubId: input.hubId,
         userId: input.userId ?? null,
         ...config,
+        metadata: {
+          ...input.metadata,
+          typeKey: input.typeKey,
+        },
       };
     } else {
       notificationData = input;

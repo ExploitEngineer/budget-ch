@@ -141,9 +141,13 @@ export function BudgetCardsSection() {
             <Badge
               variant="outline"
               className={cn(
-                "bg-badge-background rounded-full px-2 py-1 whitespace-pre-wrap",
+                "rounded-full px-2 py-1 whitespace-pre-wrap",
+                // Default background for cards without special styling
+                !(idx === 3 && warningCount && warningCount > 0) && "bg-badge-background",
                 idx === 1 && "border-[#996E41]",
                 idx === 2 && "border-[#308BA4]",
+                // Card-4: Style warnings badge like Dashboard's Notes & Warnings section - border only, no background
+                idx === 3 && warningCount && warningCount > 0 && "border-[#9A6F42] bg-transparent",
               )}
             >
               <p className="w-full text-xs">{card.badge}</p>

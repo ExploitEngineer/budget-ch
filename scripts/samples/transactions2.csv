@@ -1,0 +1,18 @@
+Date,Category,Account,Amount,Type,Recipient,Note
+26/12/2025,test-budget-threshold-category,-,81,expense,—,TEstttttttttttttt
+21/12/2025,—,-,10,expense,—,Deposit
+20/12/2025,Health,-,15,expense,Pharmacy,Medicine
+18/12/2025,Household,-,120,expense,IKEA,New cushions
+17/12/2025,—,-,45,expense,—,Expense reimbursement
+15/12/2025,Transport,-,8.5,expense,SBB,Train ticket
+14/12/2025,—,-,300,expense,—,Unexpected bill
+12/12/2025,Groceries,-,32.4,expense,Migros,Quick snack
+11/12/2025,—,-,50,expense,—,Safety net
+10/12/2025,Restaurant,-,65,expense,Pizza Palace,Dinner with friends
+08/12/2025,—,-,350,expense,—,Repayment
+06/12/2025,—,-,100,expense,—,Travel fund
+05/12/2025,Rent,-,1200,expense,Apartment Management,Monthly rent
+04/12/2025,—,-,200,expense,—,Atm withdrawal
+03/12/2025,—,-,500,expense,—,Monthly savings
+02/12/2025,Salary,-,5000,expense,Employer,Monthly paycheck
+01/12/2025,Groceries,-,45.5,expense,Coop,Weekly groceries

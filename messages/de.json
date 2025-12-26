@@ -145,6 +145,51 @@
             "content": "Nachdem du auf den Link geklickt hast, melden wir dich automatisch an."
         }
     },
+    "emails": {
+        "auth": {
+            "reset-password": {
+                "subject": "Setze dein Passwort zurück",
+                "title": "Setze dein Passwort zurück",
+                "hi": "Hallo {name},",
+                "request": "Wir haben eine Anfrage zum Zurücksetzen deines Passworts erhalten. Klicke auf die Schaltfläche unten, um ein neues zu wählen.",
+                "button": "Passwort zurücksetzen",
+                "fallback": "Wenn die Schaltfläche nicht funktioniert, kopiere diesen Link und füge ihn in deinen Browser ein:",
+                "expire": "Dieser Link zum Zurücksetzen des Passworts läuft in 24 Stunden ab.",
+                "ignore": "Wenn du kein Zurücksetzen des Passworts angefordert hast, kannst du diese E-Mail ignorieren.",
+                "footer": "© 2024 BudgetHub. Alle Rechte vorbehalten."
+            },
+            "verify-email": {
+                "subject": "Bestätige deine E-Mail-Adresse",
+                "title": "Bestätige deine E-Mail-Adresse",
+                "hi": "Hallo!",
+                "thanks": "Vielen Dank, {name}, für deine Anmeldung! Um deine Registrierung abzuschließen, bestätige bitte deine E-Mail, indem du auf die Schaltfläche unten klickst.",
+                "button": "E-Mail-Adresse bestätigen",
+                "fallback": "Wenn die Schaltfläche nicht funktioniert, kopiere diesen Link und füge ihn in deinen Browser ein:",
+                "expire": "Dieser Bestätigungslink läuft in 24 Stunden ab.",
+                "ignore": "Wenn du kein Konto erstellt hast, kannst du diese E-Mail ignorieren.",
+                "footer": "© 2025 BudgetHub. Alle Rechte vorbehalten."
+            },
+            "otp": {
+                "subject": "Dein Bestätigungscode",
+                "title": "Dein Bestätigungscode",
+                "hi": "Hallo {name},",
+                "code-is": "Dein Bestätigungscode lautet:",
+                "expire": "Dieser Code läuft in 5 Minuten ab.",
+                "ignore": "Wenn du diesen Code nicht angefordert hast, kannst du diese E-Mail ignorieren.",
+                "footer": "© 2025 BudgetHub. Alle Rechte vorbehalten."
+            }
+        },
+        "invitation": {
+            "subject": "Du wurdest eingeladen, einem Hub beizutreten!",
+            "title": "Du wurdest eingeladen, einem Hub beizutreten!",
+            "hello": "Hallo,",
+            "invited": "Du wurdest eingeladen, einem Hub beizutreten mit der Rolle: <strong>{role}</strong>.",
+            "button": "Einladung annehmen",
+            "fallback": "Oder kopiere diesen Link und füge ihn in deinen Browser ein:",
+            "expire": "Diese Einladung läuft in 7 Tagen ab.",
+            "ignore": "Wenn du diese Einladung nicht erwartet hast, kannst du diese E-Mail ignorieren."
+        }
+    },
     "main-dashboard": {
         "export": "Exportieren",
         "export-json": "JSON exportieren",
@@ -290,7 +335,8 @@
             "cards": {
                 "card-1": {
                     "title": "Gesamtbudget (Monat)",
-                    "badge": "Fix + Variabel • inkl. KK & SERAFE"
+                    "badge": "Fix + Variabel • inkl. KK & SERAFE",
+                    "simple-badge": "Monatsbudget"
                 },
                 "card-2": {
                     "title": "Ausgaben (Aktuell)",
@@ -675,13 +721,13 @@
                     "title": "Verfügbar",
                     "title-over": "Über Budget",
                     "content": "CHF 985.00",
-                    "badge": "+34% verfügbar",
+                    "badge": "verfügbar",
                     "badge-over": "Überzogen"
                 },
                 "card-4": {
                     "title": "Anzahl Kategorien",
                     "content": "8",
-                    "badge": "Warnungen: 2"
+                    "badge": "Warnungen"
                 }
             },
             "data-table": {
@@ -722,6 +768,7 @@
                 "toggle-groups": {
                     "month": "Monat",
                     "week": "Woche",
+                    "warn-50": "Warnung bei 50%",
                     "warn-80": "Warnung bei 80%",
                     "warn-90": "Warnung bei 90%",
                     "warn-100": "Warnung bei 100%"
@@ -734,9 +781,11 @@
                     "restaurant": "Budget Restaurant & Café bei 82%",
                     "health": "Budget Gesundheit bei 96%"
                 },
+                "loading": "Warnungen werden überprüft...",
+                "no-warnings": "Dein Budget sieht gut aus! Keine Warnungen.",
                 "settings": {
                     "title": "Einstellungen (Monat)",
-                    "button": "+ Budget",
+                    "button": "Budget",
                     "checkboxes": {
                         "carry": "Überschuss/Defizit in den nächsten Monat übertragen",
                         "e-mail": "Warnungen per E-Mail bei 80% / 100%"
@@ -810,7 +859,7 @@
                     "title": "Noch zu sparen",
                     "content": "CHF 9’390.00",
                     "badge": "Monatliches Ziel: CHF 700.00",
-                    "badge-pattern": "Monatlich pro: {currency} {amount}"
+                    "badge-pattern": "Monatliche Zuweisungen: {currency} {amount}"
                 },
                 "card-4": {
                     "title": "Anzahl Ziele",
@@ -826,6 +875,12 @@
                 "badge-pattern": "{count} Ziele • Automatische Zuweisung: {currency} {amount}",
                 "error-loading": "Sparziele konnten nicht geladen werden",
                 "no-goals": "Keine Sparziele gefunden.",
+                "messages": {
+                    "updated": "Sparziel erfolgreich aktualisiert!",
+                    "error": {
+                        "update": "Fehler beim Aktualisieren des Sparziels"
+                    }
+                },
                 "loading": "Wird geladen...",
                 "buttons": {
                     "due": "Fällig",
@@ -870,7 +925,8 @@
                 "loading": "Wird geladen...",
                 "due": "Fällig: ",
                 "more-overdue": "...und {count} weitere überfällige Ziele",
-                "badge": "Keine Notizen"
+                "badge": "Keine Notizen",
+                "funded": "Finanziert"
             },
             "settings-section": {
                 "title": "Einstellungen",
@@ -1053,6 +1109,28 @@
                 "no-data": "Keine Daten verfügbar"
             },
             "sidebar-header": {
+                "filter-dialog": {
+                    "button": "Filter",
+                    "dialog-box": {
+                        "title": "Filter",
+                        "button": "Schließen",
+                        "labels": {
+                            "from": "Von",
+                            "fromPlaceholder": "TT/MM/JJJJ",
+                            "to": "Bis",
+                            "toPlaceholder": "TT/MM/JJJJ",
+                            "text": {
+                                "title": "Text enthält",
+                                "placeholder": "z. B. Coop, Miete "
+                            }
+                        },
+                        "buttons": {
+                            "apply": "Anwenden"
+                        }
+                    }
+                }
+            },
+            "cards": {
                 "card-1": {
                     "title": "Einkommen",
                     "content": "CHF 5’800.00",
@@ -1643,7 +1721,12 @@
                 "support": {
                     "title": "Support",
                     "placeholder": "Frage oder Feedback …",
-                    "button": "An Support senden"
+                    "button": "An Support senden",
+                    "sending": "Wird gesendet...",
+                    "success": "Ihre Nachricht wurde erfolgreich gesendet!",
+                    "error": "Senden fehlgeschlagen. Bitte versuchen Sie es erneut.",
+                    "error-empty": "Bitte geben Sie eine Nachricht ein",
+                    "error-too-short": "Nachricht ist zu kurz (mind. 10 Zeichen)"
                 }
             }
         },
@@ -1697,7 +1780,12 @@
                     "title": "Nachricht",
                     "placeholder": "Wie können wir helfen? Bitte so genau wie möglich sein."
                 },
-                "button": "Ticket senden"
+                "button": "Ticket senden",
+                "sending": "Wird gesendet...",
+                "success": "Ihr Ticket wurde erfolgreich gesendet!",
+                "error": "Senden fehlgeschlagen. Bitte versuchen Sie es erneut.",
+                "error-empty": "Bitte geben Sie eine Nachricht ein",
+                "error-too-short": "Nachricht ist zu kurz (mind. 10 Zeichen)"
             },
             "keyboard-shortcuts-section": {
                 "title": "Tastenkürzel",
@@ -1731,7 +1819,7 @@
                 "title": "Budgetgrenze erreicht",
                 "message": "Ihr Budget für \"{categoryName}\" hat 80% des zugewiesenen Betrags erreicht."
             },
-            "budget-exceeded": {
+            "budget-threshold-100": {
                 "title": "Budget überschritten",
                 "message": "Ihr Budget für \"{categoryName}\" wurde überschritten."
             },

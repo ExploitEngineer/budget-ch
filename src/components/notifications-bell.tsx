@@ -86,20 +86,22 @@ export function NotificationsBell() {
 
   // Map stored English titles to translation keys
   const getTranslatedContent = (notification: { title: string; message: string; metadata?: unknown }) => {
-    // Map English titles to translation type keys
+    // Get typeKey from metadata if available
+    const metadata = notification.metadata as { categoryName?: string; typeKey?: string } | null;
+
+    // Fallback mapping for older notifications or those without typeKey in metadata
     const titleToTypeKey: Record<string, string> = {
       "Budget Threshold Reached": "budget-threshold-80",
-      "Budget Exceeded": "budget-exceeded",
+      "Budget Exceeded": "budget-threshold-100",
       "Subscription Expiring Soon": "subscription-expiring-3-days",
       "Subscription Expiring Tomorrow": "subscription-expiring-1-day",
       "Subscription Expired": "subscription-expired",
     };
 
-    const typeKey = titleToTypeKey[notification.title];
+    const typeKey = metadata?.typeKey?.toLowerCase().replace(/_/g, "-") || titleToTypeKey[notification.title];
 
     if (typeKey) {
       // Get category name from metadata if available
-      const metadata = notification.metadata as { categoryName?: string } | null;
       const categoryName = metadata?.categoryName || "category";
 
       return {

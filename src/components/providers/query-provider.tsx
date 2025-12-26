@@ -30,6 +30,16 @@ export function getQueryClient() {
   }
 }
 
+/**
+ * Clear all cached queries - call on logout to prevent stale data
+ * when switching accounts
+ */
+export function clearQueryCache() {
+  if (browserQueryClient) {
+    browserQueryClient.clear();
+  }
+}
+
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 

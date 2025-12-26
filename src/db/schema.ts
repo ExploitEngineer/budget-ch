@@ -130,6 +130,7 @@ export const users = pgTable("users", {
   image: text("image"),
   stripeCustomerId: text("stripe_customer_id"),
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
+  language: text("language").default("en").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

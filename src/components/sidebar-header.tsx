@@ -296,6 +296,7 @@ export default function SidebarHeader({
 
           {route === "help" && (
             <div className="flex items-center gap-2">
+              {/* Hidden for now
               <Button
                 variant="outline"
                 className="dark:border-border-blue !bg-dark-blue-background flex items-center gap-2"
@@ -303,7 +304,16 @@ export default function SidebarHeader({
                 <Download />
                 <span className="hidden sm:block">{t("diagnose")}</span>
               </Button>
-              <Button className="btn-gradient flex items-center gap-2 dark:text-white">
+              */}
+              <Button
+                className="btn-gradient flex items-center gap-2 dark:text-white"
+                onClick={() => {
+                  const element = document.getElementById("contact-support-form");
+                  if (element) {
+                    element.scrollIntoView({ behavior: "smooth" });
+                  }
+                }}
+              >
                 <MessageSquare />
                 <span className="hidden sm:block">{t("support")}</span>
               </Button>

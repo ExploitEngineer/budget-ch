@@ -305,6 +305,7 @@ export async function getUserByEmailDB(email: string) {
         name: true,
         email: true,
         stripeCustomerId: true,
+        language: true,
       },
     });
     return user;
@@ -3330,6 +3331,23 @@ export async function markTemplateFailureDB(
     return {
       success: false,
       message: err.message || "Failed to mark template failure",
+    };
+  }
+}
+
+export async function updateUserLanguageDB(userId: string, language: string) {
+  try {
+    await db
+      .update(users)
+      .set({ language })
+      .where(eq(users.id, userId));
+
+    return { success: true, message: "User language updated successfully" };
+  } catch (err: any) {
+    console.error("Error updating user language:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to update user language",
     };
   }
 }

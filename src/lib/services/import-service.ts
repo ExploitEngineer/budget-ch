@@ -156,7 +156,9 @@ export async function importTransactions(
             const dateValues = data.map(d => Date.parse(normalizeItem(d).date || normalizeItem(d).datum || normalizeItem(d).data)).filter(d => !isNaN(d));
             if (dateValues.length > 0) {
                 const firstDate = new Date(Math.min(...dateValues));
+                firstDate.setHours(0, 0, 0, 0); // Start of day
                 const lastDate = new Date(Math.max(...dateValues));
+                lastDate.setHours(23, 59, 59, 999); // End of day
 
                 existingTransactions = await tx.query.transactions.findMany({
                     where: (t: any) => and(
@@ -180,12 +182,14 @@ export async function importTransactions(
                 const parsedDate = normalizeDate(item.date || item.datum || item.data);
                 const itemDate = parsedDate ? parsedDate.toISOString().split('T')[0] : '';
                 const itemSource = (item.recipient || item.source || item.quelle || item.empfänger || item.destinatario || item.bénéficiaire || "").trim().toLowerCase();
+                const itemNote = (item.note || item.notiz || item.nota || item.remarque || "").trim().toLowerCase();
 
                 const isDuplicate = existingTransactions.some(et => {
                     const etAmount = et.amount;
                     const etDate = et.createdAt.toISOString().split('T')[0];
                     const etSource = (et.source || "").trim().toLowerCase();
-                    return etAmount === itemAmount && etDate === itemDate && etSource === itemSource;
+                    const etNote = (et.note || "").trim().toLowerCase();
+                    return etAmount === itemAmount && etDate === itemDate && etSource === itemSource && etNote === itemNote;
                 });
 
                 if (isDuplicate) {
@@ -740,7 +744,9 @@ export async function validateTransactionsAction(
     const dateValues = data.map(d => Date.parse(normalizeItem(d).date || normalizeItem(d).datum || normalizeItem(d).data)).filter(d => !isNaN(d));
     if (dateValues.length > 0) {
         const firstDate = new Date(Math.min(...dateValues));
+        firstDate.setHours(0, 0, 0, 0); // Start of day
         const lastDate = new Date(Math.max(...dateValues));
+        lastDate.setHours(23, 59, 59, 999); // End of day
 
         const existingTransactions = await db.query.transactions.findMany({
             where: (t) => and(
@@ -750,23 +756,55 @@ export async function validateTransactionsAction(
             ),
         });
 
+        console.log("[VALIDATION] Checking duplicates - existing transactions found:", existingTransactions.length);
+
+        // Debug: log first existing transaction
+        if (existingTransactions.length > 0) {
+            const firstEt = existingTransactions[0];
+            console.log("[VALIDATION] First existing transaction:", {
+                amount: firstEt.amount,
+                amountType: typeof firstEt.amount,
+                date: firstEt.createdAt.toISOString().split('T')[0],
+                source: (firstEt.source || "").trim().toLowerCase(),
+                note: (firstEt.note || "").trim().toLowerCase(),
+            });
+        }
+
         for (let rawItem of data) {
             const item = normalizeItem(rawItem);
             const itemAmount = Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0);
             const itemDate = new Date(item.date || item.datum || item.data).toISOString().split('T')[0];
             const itemSource = (item.recipient || item.source || item.quelle || item.empfänger || item.destinatario || item.bénéficiaire || "").trim().toLowerCase();
+            const itemNote = (item.note || item.notiz || item.nota || item.remarque || "").trim().toLowerCase();
+
+            // Debug: log first CSV item
+            if (rawItem === data[0]) {
+                console.log("[VALIDATION] First CSV item:", {
+                    amount: itemAmount,
+                    amountType: typeof itemAmount,
+                    date: itemDate,
+                    source: itemSource,
+                    note: itemNote,
+                });
+            }
 
             const isDuplicate = existingTransactions.some(et => {
                 const etAmount = et.amount;
                 const etDate = et.createdAt.toISOString().split('T')[0];
                 const etSource = (et.source || "").trim().toLowerCase();
-                return etAmount === itemAmount && etDate === itemDate && etSource === itemSource;
+                const etNote = (et.note || "").trim().toLowerCase();
+                const matches = etAmount === itemAmount && etDate === itemDate && etSource === itemSource && etNote === itemNote;
+                if (matches) {
+                    console.log("[VALIDATION] Duplicate found:", { itemAmount, itemDate, itemSource, itemNote });
+                }
+                return matches;
             });
 
             if (isDuplicate) report.potentialDuplicates++;
         }
     }
 
+    console.log("[VALIDATION] Final report - potentialDuplicates:", report.potentialDuplicates);
     return report;
 }
 

@@ -1,20 +1,25 @@
+"use client";
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useTranslations } from "next-intl";
-import { cn } from "@/lib/utils";
 
-export function QuickAccess() {
+interface QuickAccessProps {
+  onOpenAll?: () => void;
+  onCloseAll?: () => void;
+}
+
+export function QuickAccess({ onOpenAll, onCloseAll }: QuickAccessProps) {
   const t = useTranslations("main-dashboard.help-page");
 
-  const Buttons: string[] = [
-    t("buttons.tour"),
-    t("buttons.faqs"),
-    t("buttons.close-all"),
-    t("buttons.attach"),
-    t("buttons.contact-support"),
-  ];
+  const handleScrollToContactForm = () => {
+    const element = document.getElementById("contact-support-form");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
 
   return (
     <section>
@@ -30,19 +35,43 @@ export function QuickAccess() {
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="flex flex-wrap items-center gap-2">
-          {Buttons.map((button, idx: number) => (
-            <Button
-              variant="outline"
-              key={button}
-              className={cn(
-                idx === Buttons.length - 1
-                  ? "btn-gradient"
-                  : "!bg-dark-blue-background dark:border-border-blue",
-              )}
-            >
-              {button}
-            </Button>
-          ))}
+          {/* Hidden for now
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+          >
+            {t("buttons.tour")}
+          </Button>
+          */}
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+            onClick={onOpenAll}
+          >
+            {t("buttons.faqs")}
+          </Button>
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+            onClick={onCloseAll}
+          >
+            {t("buttons.close-all")}
+          </Button>
+          {/* Hidden for now
+          <Button
+            variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+          >
+            {t("buttons.attach")}
+          </Button>
+          */}
+          <Button
+            variant="outline"
+            className="btn-gradient"
+            onClick={handleScrollToContactForm}
+          >
+            {t("buttons.contact-support")}
+          </Button>
         </CardContent>
       </Card>
     </section>

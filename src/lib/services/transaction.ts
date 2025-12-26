@@ -288,24 +288,28 @@ export async function createTransaction({
             const allocatedAmount = Number(budget.allocatedAmount ?? 0);
 
             if (allocatedAmount > 0) {
-              const percentage = totalSpent / allocatedAmount;
+              const currentPercentage = totalSpent / allocatedAmount;
+              // Calculate PREVIOUS percentage (before this transaction)
+              const previousSpent = totalSpent - amount;
+              const previousPercentage = previousSpent / allocatedAmount;
 
-              // Check if we've already sent a notification for this threshold recently (within last 24 hours)
-              const oneDayAgo = subHours(new Date(), 24);
-              const recentNotificationsResult = await db
+              // Get current month boundaries for duplicate checking
+              const now = new Date();
+              const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+              // Check existing notifications for this budget this month
+              const monthlyNotificationsResult = await db
                 .select()
                 .from(notifications)
                 .where(
                   and(
                     eq(notifications.hubId, hubId),
-                    eq(notifications.type, percentage >= 1 ? "error" : "warning"),
-                    gte(notifications.createdAt, oneDayAgo),
+                    gte(notifications.createdAt, startOfMonth),
                   ),
-                )
-                .limit(1);
+                );
 
-              // Check if any recent notification has matching budgetId in metadata
-              const hasRecentNotification = recentNotificationsResult.some((n) => {
+              // Find the most recent notification for this budget to check if it was "reset"
+              const budgetNotifications = monthlyNotificationsResult.filter((n) => {
                 if (!n.metadata) return false;
                 try {
                   const metadata =
@@ -318,35 +322,88 @@ export async function createTransaction({
                 }
               });
 
-              // Only send notification if threshold crossed and no recent notification exists
-              if (!hasRecentNotification) {
-                if (percentage >= 1) {
-                  // Budget exceeded (100%) - hub-wide notification, emails sent to all hub members
-                  await sendNotification({
-                    typeKey: BUDGET_THRESHOLD_100,
-                    hubId,
-                    userId: null, // Hub-wide notification, visible to all members
-                    metadata: {
-                      budgetId: budget.id,
-                      categoryName: budget.categoryName,
-                      spentAmount: totalSpent,
-                      allocatedAmount: allocatedAmount,
-                    },
-                  });
-                } else if (percentage >= 0.8) {
-                  // Budget reached 80% threshold - hub-wide notification, emails sent to all hub members
-                  await sendNotification({
-                    typeKey: BUDGET_THRESHOLD_80,
-                    hubId,
-                    userId: null, // Hub-wide notification, visible to all members
-                    metadata: {
-                      budgetId: budget.id,
-                      categoryName: budget.categoryName,
-                      spentAmount: totalSpent,
-                      allocatedAmount: allocatedAmount,
-                    },
-                  });
+              // Check if we've already sent 80% or 100% notification this month
+              const has80Notification = budgetNotifications.some((n) => {
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.thresholdType === "80";
+                } catch {
+                  return false;
                 }
+              });
+
+              const has100Notification = budgetNotifications.some((n) => {
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.thresholdType === "100";
+                } catch {
+                  return false;
+                }
+              });
+
+              // Check if budget was reset (dropped below 60% after a notification)
+              // We look for a "reset" marker in notifications or check if previous was below 60%
+              const wasReset = budgetNotifications.some((n) => {
+                try {
+                  const metadata =
+                    typeof n.metadata === "string"
+                      ? JSON.parse(n.metadata)
+                      : n.metadata;
+                  return metadata.thresholdType === "reset";
+                } catch {
+                  return false;
+                }
+              });
+
+              // Only send notification if:
+              // 1. We're actually CROSSING the threshold (previous < threshold, current >= threshold)
+              // 2. AND no notification for this threshold exists this month (or was reset)
+
+              const shouldSend100 =
+                currentPercentage >= 1 &&
+                previousPercentage < 1 &&
+                (!has100Notification || wasReset);
+
+              const shouldSend80 =
+                currentPercentage >= 0.8 &&
+                currentPercentage < 1 &&
+                previousPercentage < 0.8 &&
+                (!has80Notification || wasReset);
+
+              if (shouldSend100) {
+                // Budget exceeded (100%) - hub-wide notification, emails sent to all hub members
+                await sendNotification({
+                  typeKey: BUDGET_THRESHOLD_100,
+                  hubId,
+                  userId: null, // Hub-wide notification, visible to all members
+                  metadata: {
+                    budgetId: budget.id,
+                    categoryName: budget.categoryName,
+                    spentAmount: totalSpent,
+                    allocatedAmount: allocatedAmount,
+                    thresholdType: "100",
+                  },
+                });
+              } else if (shouldSend80) {
+                // Budget reached 80% threshold - hub-wide notification, emails sent to all hub members
+                await sendNotification({
+                  typeKey: BUDGET_THRESHOLD_80,
+                  hubId,
+                  userId: null, // Hub-wide notification, visible to all members
+                  metadata: {
+                    budgetId: budget.id,
+                    categoryName: budget.categoryName,
+                    spentAmount: totalSpent,
+                    allocatedAmount: allocatedAmount,
+                    thresholdType: "80",
+                  },
+                });
               }
             }
           }
@@ -900,6 +957,95 @@ export async function deleteTransaction(
         success: false,
         message: res.message || "Failed to delete transaction.",
       };
+    }
+
+    // Check if deleting this expense caused any budget to drop below 60%
+    // If so, create a "reset" marker so that future threshold crossings will trigger new emails
+    if (existingTx && existingTx.type === "expense" && existingTx.transactionCategoryId) {
+      try {
+        const budgetsResult = await getBudgetsDB(hubId);
+        if (budgetsResult.success && budgetsResult.data) {
+          const categoryBudgets = budgetsResult.data.filter(
+            (b) => b.transactionCategoryId === existingTx.transactionCategoryId,
+          );
+
+          for (const budget of categoryBudgets) {
+            // Calculate NEW total spent (after deletion)
+            const spentResult = await db
+              .select({
+                totalSpent: sql<number>`COALESCE(SUM(${transactions.amount}), 0)`,
+              })
+              .from(transactions)
+              .where(
+                and(
+                  eq(transactions.hubId, hubId),
+                  eq(transactions.transactionCategoryId, existingTx.transactionCategoryId),
+                  eq(transactions.type, "expense"),
+                ),
+              );
+
+            const totalSpent = Number(spentResult[0]?.totalSpent ?? 0);
+            const allocatedAmount = Number(budget.allocatedAmount ?? 0);
+
+            if (allocatedAmount > 0) {
+              const currentPercentage = totalSpent / allocatedAmount;
+              // Calculate what percentage was BEFORE deletion
+              const previousSpent = totalSpent + Number(existingTx.amount);
+              const previousPercentage = previousSpent / allocatedAmount;
+
+              // If we dropped below 60% from 80%+, create a reset marker
+              if (currentPercentage < 0.6 && previousPercentage >= 0.8) {
+                const now = new Date();
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+                // Check if there's already a reset marker this month
+                const existingResetResult = await db
+                  .select()
+                  .from(notifications)
+                  .where(
+                    and(
+                      eq(notifications.hubId, hubId),
+                      gte(notifications.createdAt, startOfMonth),
+                    ),
+                  );
+
+                const hasResetMarker = existingResetResult.some((n) => {
+                  try {
+                    const metadata =
+                      typeof n.metadata === "string"
+                        ? JSON.parse(n.metadata)
+                        : n.metadata;
+                    return metadata?.budgetId === budget.id && metadata?.thresholdType === "reset";
+                  } catch {
+                    return false;
+                  }
+                });
+
+                if (!hasResetMarker) {
+                  // Create an internal "reset" marker notification (channel: "web" so no email is sent)
+                  await sendNotification({
+                    hubId,
+                    userId: null,
+                    type: "info",
+                    title: "Budget Reset",
+                    message: `${budget.categoryName} budget has dropped below 60%`,
+                    channel: "web",
+                    metadata: {
+                      budgetId: budget.id,
+                      categoryName: budget.categoryName,
+                      thresholdType: "reset",
+                      currentPercentage: Math.round(currentPercentage * 100),
+                    },
+                  });
+                }
+              }
+            }
+          }
+        }
+      } catch (err) {
+        // Don't fail deletion if reset marker creation fails
+        console.error("Error creating budget reset marker:", err);
+      }
     }
 
     revalidatePath("/me/transactions");
