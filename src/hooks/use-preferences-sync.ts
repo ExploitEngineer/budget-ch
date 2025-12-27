@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { useLocale } from "next-intl";
 import { setLanguage } from "@/app/actions";
@@ -14,13 +14,17 @@ import { getLocalUserPreferences } from "@/lib/services/locat-store";
 export function usePreferencesSync() {
   const { setTheme, theme } = useTheme();
   const currentLocale = useLocale();
+  const hasSyncedRef = useRef(false);
 
   useEffect(() => {
     // Wait for theme to be mounted before applying preferences
-    if (theme === undefined) return;
+    if (theme === undefined || hasSyncedRef.current) return;
 
     const preferences = getLocalUserPreferences(false);
-    if (!preferences) return;
+    if (!preferences) {
+      hasSyncedRef.current = true;
+      return;
+    }
 
     // Apply theme if different from current
     // Map "auto" to "system" for next-themes
@@ -38,6 +42,8 @@ export function usePreferencesSync() {
       formData.append("pathname", window.location.pathname);
       setLanguage(formData);
     }
+
+    hasSyncedRef.current = true;
   }, [theme, setTheme, currentLocale]); // Run when theme is mounted
 
   return { preferences: getLocalUserPreferences(false) as UserPreferencesValues | null };

@@ -153,7 +153,11 @@ export async function importTransactions(
 
         let existingTransactions: any[] = [];
         if (skipDuplicates && data.length > 0) {
-            const dateValues = data.map(d => Date.parse(normalizeItem(d).date || normalizeItem(d).datum || normalizeItem(d).data)).filter(d => !isNaN(d));
+            const dateValues = data.map(d => {
+                const item = normalizeItem(d);
+                const date = normalizeDate(item.date || item.datum || item.data);
+                return date ? date.getTime() : NaN;
+            }).filter(d => !isNaN(d));
             if (dateValues.length > 0) {
                 const firstDate = new Date(Math.min(...dateValues));
                 firstDate.setHours(0, 0, 0, 0); // Start of day
@@ -270,8 +274,8 @@ export async function importBudgets(
 
             const month = Number(item.month || item.monat || item.mese || item.mois || defaultMonth);
             const year = Number(item.year || item.jahr || item.anno || item.année || defaultYear);
-            const amount = Number(item.allocated || item.allocatedamount || item.budget || item.importo || item.montant || item["budget(chf)"] || 0);
-            const spentAmount = Number(item.spent || item.spentamount || item.ist || item.effettivo || item.réel || item.actual || item["effettivo(chf)"] || item["réel(chf)"] || item["ist(chf)"] || 0);
+            const amount = Number(item.allocated || item.allocatedamount || item.budget || item.importo || item.montant || item["budget(chf)"] || item["budget(chf)"] || item["importo(chf)"] || item["montant(chf)"] || 0);
+            const spentAmount = Number(item.spent || item.spentamount || item.ist || item.effettivo || item.réel || item.actual || item["effettivo(chf)"] || item["réel(chf)"] || item["ist(chf)"] || item["spent(chf)"] || 0);
             const warningPercentage = Number(item.warningpercentage || item.warning || item.avviso || item.alerte || item["warningat(%)"] || item["alerteà(%)"] || item["warnungbei(%)"] || item["avvisoa(%)"] || 80);
             const markerColor = (item.markercolor || item.color || item.indicatore || item.marqueur || item["colormarker"] || item["farbmarker"] || item["indicatorecolore"] || item["marqueurdecouleur"] || "").trim();
 
@@ -355,7 +359,7 @@ export async function importTransfers(
             const amount = Math.abs(Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0));
             const note = item.note || item.notiz || item.nota || item.remarque || null;
 
-            if (!fromAccountName || !toAccountName || isNaN(amount)) continue;
+            if (!fromAccountName || !toAccountName || isNaN(amount) || !date) continue;
 
             // Get From Account
             let fromAccountId = null;
@@ -412,10 +416,10 @@ export async function importAccounts(
             const accountName = (item.name || item.accountname || item.konto || item.conto || item.compte || "").trim();
             if (!accountName) continue;
 
-            const initialBalance = Number(item.balance || item.initialbalance || item["initialbalance(chf)"] || item.kontostand || item.saldo || item["startingbalance(chf)"] || item["startsaldo(chf)"] || item["saldoiniziale(chf)"] || item["soldeinitial(chf)"] || 0);
+            const initialBalance = Number(item.balance || item.initialbalance || item["initialbalance(chf)"] || item.kontostand || item.saldo || item["startingbalance(chf)"] || item["startsaldo(chf)"] || item["saldoiniziale(chf)"] || item["soldeinitial(chf)"] || item["initial(chf)"] || 0);
             const accountType = (item.type || item.typ || item.tipo || "checking") as any;
-            const iban = item.iban || item["iban/note"] || null;
-            const note = item.note || item.notiz || item.nota || item.remarque || item["iban/note"] || null;
+            const iban = item.iban || item["iban/note"] || item["iban/notiz"] || item["iban/nota"] || item["iban/remarque"] || null;
+            const note = item.note || item.notiz || item.nota || item.remarque || item["iban/note"] || item["iban/notiz"] || item["iban/nota"] || item["iban/remarque"] || null;
 
             if (mode === "append") {
                 const existing = await tx.query.financialAccounts.findFirst({
@@ -468,7 +472,7 @@ export async function importSavingGoals(
 
         for (let item of data) {
             item = normalizeItem(item);
-            const goalName = (item.name || item.goal || item.ziel || item.obiettivo || item.nom || "").trim();
+            const goalName = (item.name || item.nom || item.nome || item.label || item.titel || "").trim();
             if (!goalName) continue;
 
             const accountName = (item.account || item.konto || item.conto || item.compte || "").trim();
@@ -481,10 +485,10 @@ export async function importSavingGoals(
                 }
             }
 
-            const goalAmount = Number(item.goalamount || item.target || item.targetamount || item.betrag || item.importo || item.montant || item["targetamount(chf)"] || item["zielbetrag(chf)"] || item["importoobiettivo(chf)"] || item["montantcible(chf)"] || 0);
-            const amountSaved = Number(item.amountsaved || item.saved || item.gespart || item.risparmiato || item.épargné || item["alreadysaved(chf)"] || item["bereitsgespart(chf)"] || item["giàrisparmiato(chf)"] || item["déjàéconomisé(chf)"] || 0);
-            const monthlyAllocation = Number(item.monthlyallocation || item.monthlyallocated || item.rate || item.assegnazione || item.allocation || item["monthlyallocation(chf)"] || item["monatlichezuweisung(chf)"] || item["assegnazionemensile(chf)"] || item["allocationmensuelle(chf)"] || 0);
-            const dueDateStr = item.duedate || item.due_date || item.datum || item.data || item.échéance;
+            const goalAmount = Number(item.goalamount || item.goal || item.target || item.targetamount || item.betrag || item.importo || item.montant || item.ziel || item.obiettivo || item["targetamount(chf)"] || item["zielbetrag(chf)"] || item["importoobiettivo(chf)"] || item["montantcible(chf)"] || item["goal(chf)"] || item["target(chf)"] || 0);
+            const amountSaved = Number(item.amountsaved || item.saved || item.gespart || item.risparmiato || item.épargné || item["alreadysaved(chf)"] || item["bereitsgespart(chf)"] || item["giàrisparmiato(chf)"] || item["déjàéconomisé(chf)"] || item["saved(chf)"] || 0);
+            const monthlyAllocation = Number(item.monthlyallocation || item.monthlyallocated || item.rate || item.assegnazione || item.allocation || item["monthlyallocation(chf)"] || item["monatlichezuweisung(chf)"] || item["assegnazionemensile(chf)"] || item["allocationmensuelle(chf)"] || item["monthly(chf)"] || 0);
+            const dueDateStr = item.duedate || item.due_date || item.datum || item.data || item.échéance || item.due;
             const dueDate = normalizeDate(dueDateStr);
 
             if (mode === "append") {
@@ -741,7 +745,12 @@ export async function validateTransactionsAction(
     report.allCategories = Array.from(allCategoriesSet);
 
     // 3. Potential Duplicate Check
-    const dateValues = data.map(d => Date.parse(normalizeItem(d).date || normalizeItem(d).datum || normalizeItem(d).data)).filter(d => !isNaN(d));
+    const dateValues = data.map(d => {
+        const item = normalizeItem(d);
+        const date = normalizeDate(item.date || item.datum || item.data);
+        return date ? date.getTime() : NaN;
+    }).filter(d => !isNaN(d));
+
     if (dateValues.length > 0) {
         const firstDate = new Date(Math.min(...dateValues));
         firstDate.setHours(0, 0, 0, 0); // Start of day
@@ -756,55 +765,29 @@ export async function validateTransactionsAction(
             ),
         });
 
-        console.log("[VALIDATION] Checking duplicates - existing transactions found:", existingTransactions.length);
-
-        // Debug: log first existing transaction
-        if (existingTransactions.length > 0) {
-            const firstEt = existingTransactions[0];
-            console.log("[VALIDATION] First existing transaction:", {
-                amount: firstEt.amount,
-                amountType: typeof firstEt.amount,
-                date: firstEt.createdAt.toISOString().split('T')[0],
-                source: (firstEt.source || "").trim().toLowerCase(),
-                note: (firstEt.note || "").trim().toLowerCase(),
-            });
-        }
-
         for (let rawItem of data) {
             const item = normalizeItem(rawItem);
             const itemAmount = Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0);
-            const itemDate = new Date(item.date || item.datum || item.data).toISOString().split('T')[0];
+
+            const parsedDate = normalizeDate(item.date || item.datum || item.data);
+            const itemDate = parsedDate ? parsedDate.toISOString().split('T')[0] : '';
+            if (!itemDate) continue; // Skip if date is invalid
+
             const itemSource = (item.recipient || item.source || item.quelle || item.empfänger || item.destinatario || item.bénéficiaire || "").trim().toLowerCase();
             const itemNote = (item.note || item.notiz || item.nota || item.remarque || "").trim().toLowerCase();
-
-            // Debug: log first CSV item
-            if (rawItem === data[0]) {
-                console.log("[VALIDATION] First CSV item:", {
-                    amount: itemAmount,
-                    amountType: typeof itemAmount,
-                    date: itemDate,
-                    source: itemSource,
-                    note: itemNote,
-                });
-            }
 
             const isDuplicate = existingTransactions.some(et => {
                 const etAmount = et.amount;
                 const etDate = et.createdAt.toISOString().split('T')[0];
                 const etSource = (et.source || "").trim().toLowerCase();
                 const etNote = (et.note || "").trim().toLowerCase();
-                const matches = etAmount === itemAmount && etDate === itemDate && etSource === itemSource && etNote === itemNote;
-                if (matches) {
-                    console.log("[VALIDATION] Duplicate found:", { itemAmount, itemDate, itemSource, itemNote });
-                }
-                return matches;
+                return etAmount === itemAmount && etDate === itemDate && etSource === itemSource && etNote === itemNote;
             });
 
             if (isDuplicate) report.potentialDuplicates++;
         }
     }
 
-    console.log("[VALIDATION] Final report - potentialDuplicates:", report.potentialDuplicates);
     return report;
 }
 
@@ -849,7 +832,7 @@ export async function validateBudgetsAction(
         const item = normalizeItem(rawItem);
 
         const categoryName = ((item.category || item.kategorie || item.kategorien || item.categoria || item.catégorie || item.catégories || item.group || item.genre || "") as string).trim();
-        const amountStr = item.allocated || item.allocatedamount || item.budget || item.importo || item.montant || item["budget(chf)"];
+        const amountStr = item.allocated || item.allocatedamount || item.budget || item.importo || item.montant || item["budget(chf)"] || item["importo(chf)"] || item["montant(chf)"];
 
         if (!categoryName || categoryName === "—" || isNaN(Number(amountStr))) {
             report.invalidRows++;
@@ -913,8 +896,10 @@ export async function validateSavingGoalsAction(
     for (let rawItem of data) {
         const item = normalizeItem(rawItem);
 
-        const goalName = (item.name || item.goal || item.ziel || item.obiettivo || item.nom || "").trim();
-        const goalAmount = item.goalamount || item.target || item.targetamount || item.betrag || item.importo || item.montant || item["targetamount(chf)"] || item["zielbetrag(chf)"];
+        const goalName = (item.name || item.nom || item.nome || item.label || item.titel || "").trim();
+        const goalAmount = item.goalamount || item.goal || item.target || item.targetamount || item.betrag || item.importo || item.montant || item.ziel || item.obiettivo || item["targetamount(chf)"] || item["zielbetrag(chf)"] || item["goal(chf)"] || item["target(chf)"];
+        const dueDateStr = item.duedate || item.due_date || item.datum || item.data || item.échéance || item.due;
+        const dueDate = normalizeDate(dueDateStr);
 
         if (!goalName || isNaN(Number(goalAmount))) {
             report.invalidRows++;
@@ -968,11 +953,12 @@ export async function validateTransfersAction(
         const item = normalizeItem(rawItem);
 
         const dateStr = item.date || item.datum || item.data;
+        const parsedDate = normalizeDate(dateStr);
         const fromAccount = (item.from || item.von || item.da || item.de || "").trim();
         const toAccount = (item.to || item.an || item.a || item.à || "").trim();
         const amount = item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"];
 
-        if (!dateStr || isNaN(Date.parse(dateStr)) || !fromAccount || !toAccount || isNaN(Number(amount))) {
+        if (!dateStr || !parsedDate || !fromAccount || !toAccount || isNaN(Number(amount))) {
             report.invalidRows++;
             continue;
         }
@@ -1017,7 +1003,7 @@ export async function validateAccountsAction(
         const item = normalizeItem(rawItem);
 
         const accountName = (item.name || item.accountname || item.konto || item.conto || item.compte || "").trim();
-        const balance = item.balance || item.initialbalance || item["initialbalance(chf)"] || item.kontostand || item.saldo || item["startingbalance(chf)"];
+        const balance = item.balance || item.initialbalance || item["initialbalance(chf)"] || item.kontostand || item.saldo || item["startingbalance(chf)"] || item["startsaldo(chf)"] || item["saldoiniziale(chf)"] || item["soldeinitial(chf)"] || item["initial(chf)"];
 
         if (!accountName || (balance !== undefined && isNaN(Number(balance)))) {
             report.invalidRows++;

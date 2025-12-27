@@ -108,14 +108,16 @@ export const exportBudgetsToCSV = ({
   const data = budgets.map((budget) => {
     const allocatedValue = budget.allocated ?? 0;
     const istValue = budget.ist ?? 0;
+    const currentDate = new Date();
+    const month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
 
     return {
       [headers[0]]: budget.category,
       [headers[1]]: allocatedValue.toFixed(2),
       [headers[2]]: istValue.toFixed(2), // IST column
-      [headers[3]]: budget.spent.toFixed(2), // Spent column
-      [headers[4]]: budget.remaining.toFixed(2),
-      [headers[5]]: `${budget.progress.toFixed(1)}%`,
+      [headers[3]]: month, // Month column
+      [headers[4]]: year, // Year column
     };
   });
 
@@ -151,8 +153,8 @@ export const exportLatestTransfersToCSV = ({
   tableHeadings,
   transfers,
 }: LatestTranfersExportArgs) => {
-  if (!transfers || transfers.length === 0) {
-    console.warn("No transfers to export.");
+  if (!transfers || !Array.isArray(transfers) || transfers.length === 0) {
+    console.warn("No transfers to export or invalid data format.");
     return;
   }
 
@@ -277,45 +279,25 @@ export const exportSavingGoalsToCSV = ({ goals, t }: SavingGoalsExportArgs) => {
   }
 
   const headers = [
-    t("sidebar-header.dialog.labels.name.title"),  // Name
-    t("active-goals-section.cards.tax-reserves.content.goal"),  // Goal Amount
-    t("active-goals-section.cards.tax-reserves.content.saved"),  // Saved
-    t("active-goals-section.cards.tax-reserves.content.rest"),  // Remaining
-    t("active-goals-section.cards.tax-reserves.content.monthly-allocated"),  // Allocated
-    "Progress",
-    t("active-goals-section.cards.tax-reserves.content.account.title"),  // Account
-    t("active-goals-section.cards.tax-reserves.content.due"),  // Due
-    "Status",
+    t("sidebar-header.dialog.labels.name.title"),           // Name
+    t("sidebar-header.dialog.labels.goal-amount"),         // Target Amount (CHF)
+    t("sidebar-header.dialog.labels.saved-amount"),        // Already Saved (CHF)
+    t("sidebar-header.dialog.labels.monthly-allocation"),  // Monthly Allocation (CHF)
+    t("sidebar-header.dialog.labels.account.title"),       // Account
+    t("sidebar-header.dialog.labels.due-date.title"),      // Due Date
   ];
 
   const data = goals.map((goal) => {
-    const remaining = Math.max(0, (goal.goalAmount ?? 0) - (goal.amountSaved ?? 0));
     const goalAmount = Number(goal.goalAmount ?? 0);
     const amountSaved = Number(goal.amountSaved ?? 0);
-    // Allow progress > 100%
-    const progress = goalAmount > 0
-      ? (amountSaved / goalAmount) * 100
-      : 0;
-
-    let status = "Not Started";
-    if (amountSaved >= goalAmount) status = "Achieved";
-    else if (amountSaved > 0) status = "In Progress";
-
-    // Add overdue check if needed, but simple status requested for now
-    if (goal.dueDate && new Date(goal.dueDate) < new Date() && amountSaved < goalAmount) {
-      status = "Overdue";
-    }
 
     return {
       [headers[0]]: goal.name,
       [headers[1]]: goalAmount.toFixed(2),
       [headers[2]]: amountSaved.toFixed(2),
-      [headers[3]]: remaining.toFixed(2),
-      [headers[4]]: (goal.monthlyAllocation ?? 0).toFixed(2),
-      [headers[5]]: `${progress.toFixed(1)}%`,
-      [headers[6]]: goal.financialAccountId || "-",
-      [headers[7]]: goal.dueDate ? new Date(goal.dueDate).toLocaleDateString() : "N/A",
-      [headers[8]]: status,
+      [headers[3]]: (goal.monthlyAllocation ?? 0).toFixed(2),
+      [headers[4]]: goal.financialAccountId || "-",
+      [headers[5]]: goal.dueDate ? new Date(goal.dueDate).toLocaleDateString() : "-",
     };
   });
 

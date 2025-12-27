@@ -4,6 +4,7 @@ import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon, SunMoon } from "lucide-react";
+import { setLocalUserPreferences } from "@/lib/services/locat-store";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,7 +15,9 @@ import {
 export function ModeToggle() {
   const { setTheme, theme } = useTheme();
   const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const newTheme = theme === "dark" ? "light" : "dark";
+    setTheme(newTheme);
+    setLocalUserPreferences({ theme: newTheme });
   };
 
   const t = useTranslations("authpages");
@@ -58,15 +61,15 @@ export function ThemeToggleDropdown() {
         side="top"
         align="start"
       >
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem onClick={() => { setTheme("light"); setLocalUserPreferences({ theme: "light" }); }}>
           <Sun className="mr-2 h-4 w-4" />
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem onClick={() => { setTheme("dark"); setLocalUserPreferences({ theme: "dark" }); }}>
           <Moon className="mr-2 h-4 w-4" />
           Dark
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>
+        <DropdownMenuItem onClick={() => { setTheme("system"); setLocalUserPreferences({ theme: "auto" }); }}>
           <SunMoon className="mr-2 h-4 w-4" />
           Auto
         </DropdownMenuItem>

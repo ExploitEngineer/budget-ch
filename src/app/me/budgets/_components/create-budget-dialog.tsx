@@ -25,15 +25,21 @@ import {
   DialogContent,
   DialogClose,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Plus, Info } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
   BudgetDialogSchema,
   BudgetDialogValues,
 } from "@/lib/validations/budget-dialog-validations";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { useState } from "react";
 import { Spinner } from "@/components/ui/spinner";
+import { useState, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createBudget } from "@/lib/services/budget";
 import { budgetKeys } from "@/lib/query-keys";
@@ -57,7 +63,20 @@ export default function CreateBudgetDialog({
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+  const monthStr = searchParams.get("month");
+  const yearStr = searchParams.get("year");
   const [open, setOpen] = useState<boolean>(false);
+
+  const mainT = useTranslations("main-dashboard.budgets-page");
+
+  const isFutureMonth = useMemo(() => {
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    const m = monthStr ? parseInt(monthStr) : currentMonth;
+    const y = yearStr ? parseInt(yearStr) : currentYear;
+    return y > currentYear || (y === currentYear && m > currentMonth);
+  }, [monthStr, yearStr]);
 
   const createBudgetMutation = useMutation({
     mutationFn: async (data: {
@@ -126,7 +145,7 @@ export default function CreateBudgetDialog({
         }
       }}
     >
-      <DialogTrigger className="cursor-pointer" asChild>
+      {isFutureMonth ? (
         <Button
           className={
             variant === "gradient"
@@ -134,13 +153,30 @@ export default function CreateBudgetDialog({
               : "bg-dark-blue-background! dark:border-border-blue flex cursor-pointer items-center gap-2"
           }
           variant={variant === "gradient" ? "default" : "outline"}
+          onClick={() => toast.warning(mainT("data-table.future-month-no-edit"))}
         >
           <Plus className="h-5 w-5" />
           <span className="hidden text-sm sm:block">
             {variant === "gradient" ? t("title") : text}
           </span>
         </Button>
-      </DialogTrigger>
+      ) : (
+        <DialogTrigger className="cursor-pointer" asChild>
+          <Button
+            className={
+              variant === "gradient"
+                ? "btn-gradient flex items-center gap-2 dark:text-white"
+                : "bg-dark-blue-background! dark:border-border-blue flex cursor-pointer items-center gap-2"
+            }
+            variant={variant === "gradient" ? "default" : "outline"}
+          >
+            <Plus className="h-5 w-5" />
+            <span className="hidden text-sm sm:block">
+              {variant === "gradient" ? t("title") : text}
+            </span>
+          </Button>
+        </DialogTrigger>
+      )}
 
       <DialogContent className="max-w-2xl [&>button]:hidden">
         <div className="flex items-center justify-between border-b pb-3">
@@ -198,7 +234,19 @@ export default function CreateBudgetDialog({
                 name="istChf"
                 render={({ field }) => (
                   <FormItem className="flex flex-1 flex-col">
-                    <FormLabel>{t("labels.1-chf")}</FormLabel>
+                    <div className="flex items-center gap-1">
+                      <FormLabel>{t("labels.1-chf")}</FormLabel>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Info className="text-muted-foreground h-3.5 w-3.5 cursor-help" />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>{t("labels.ist-help")}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <FormControl>
                       <Input
                         type="number"

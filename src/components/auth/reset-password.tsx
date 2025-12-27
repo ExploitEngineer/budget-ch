@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  userResetPasswordSchema,
+  getUserResetPasswordSchema,
   UserResetPasswordValues,
 } from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
@@ -31,21 +31,21 @@ export default function ResetPassword() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const t = useTranslations("authpages");
+
   const form = useForm<UserResetPasswordValues>({
-    resolver: zodResolver(userResetPasswordSchema),
+    resolver: zodResolver(getUserResetPasswordSchema(t)),
     defaultValues: {
       password: "",
       confirmPassword: "",
     },
   });
 
-  const t = useTranslations("authpages");
-
   const token = searchParams.get("token") as string;
 
   useEffect((): void => {
     if (!token) {
-      toast.error("Invalid or missing token");
+      toast.error(t("messages.invalid-token"));
       router.push("/forgot-password");
     }
   }, [token]);
@@ -55,7 +55,7 @@ export default function ResetPassword() {
       setIsLoading(true);
 
       if (values.password !== values.confirmPassword) {
-        toast.error("Password do not match");
+        toast.error(t("messages.passwords-not-match"));
         setIsLoading(false);
         return;
       }
@@ -68,13 +68,13 @@ export default function ResetPassword() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Password reset successfully");
+        toast.success(t("messages.password-reset-success"));
         form.reset();
         router.push("/signin");
       }
     } catch (err) {
       console.error("Reset password failed:", err);
-      toast.error("Something went wrong");
+      toast.error(t("messages.error-generic"));
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +98,7 @@ export default function ResetPassword() {
                   <Input
                     type="password"
                     className="dark:border-border-blue dark:!bg-dark-blue-background bg-[#F6F8FF]"
-                    placeholder="********"
+                    placeholder={t("placeholders.password")}
                     {...field}
                   />
                 </FormControl>
@@ -118,7 +118,7 @@ export default function ResetPassword() {
                   <Input
                     type="password"
                     className="dark:border-border-blue dark:!bg-dark-blue-background bg-[#F6F8FF]"
-                    placeholder="********"
+                    placeholder={t("placeholders.password")}
                     {...field}
                   />
                 </FormControl>

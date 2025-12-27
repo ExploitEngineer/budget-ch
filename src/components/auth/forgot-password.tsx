@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  userForgotPasswordSchema,
+  getUserForgotPasswordSchema,
   UserForgotPasswordValues,
 } from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
@@ -27,14 +27,14 @@ import { Spinner } from "../ui/spinner";
 export default function ForgotPassword() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  const t = useTranslations("authpages");
+
   const form = useForm<UserForgotPasswordValues>({
-    resolver: zodResolver(userForgotPasswordSchema),
+    resolver: zodResolver(getUserForgotPasswordSchema(t)),
     defaultValues: {
       email: "",
     },
   });
-
-  const t = useTranslations("authpages");
 
   async function onSubmit(values: UserForgotPasswordValues) {
     try {
@@ -48,12 +48,12 @@ export default function ForgotPassword() {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Password reset email sent");
+        toast.success(t("messages.password-reset-sent"));
         form.reset();
       }
     } catch (err) {
       console.error("Reset password failed:", err);
-      toast.error("Something went wrong");
+      toast.error(t("messages.error-generic"));
     } finally {
       setIsLoading(false);
     }

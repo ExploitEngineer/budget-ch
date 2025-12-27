@@ -33,11 +33,27 @@ import {
   getNotificationPermission,
 } from "@/hooks/use-browser-notifications";
 
-export function Notifications() {
+import { toast } from "sonner";
+import {
+  updateUserNotificationsEnabled,
+  updateUserReportFrequency,
+} from "@/lib/services/user";
+import { Loader2 } from "lucide-react";
+
+export function Notifications({
+  notificationsEnabled: initialEnabled,
+  reportFrequency: initialFrequency,
+}: {
+  notificationsEnabled: boolean;
+  reportFrequency: string;
+}) {
+  const [globalEnabled, setGlobalEnabled] = useState(initialEnabled);
+  const [isUpdating, setIsUpdating] = useState(false);
+
   const form = useForm<MainFormValues>({
     resolver: zodResolver(mainFormSchema) as any,
     defaultValues: {
-      select: "",
+      account: initialFrequency || "off",
     },
   });
   const t = useTranslations(
@@ -61,6 +77,23 @@ export function Notifications() {
       setPermissionStatus(getNotificationPermission());
     }
   }, []);
+
+  const handleGlobalToggle = async (checked: boolean) => {
+    setIsUpdating(true);
+    try {
+      const res = await updateUserNotificationsEnabled(checked);
+      if (res.success) {
+        setGlobalEnabled(checked);
+        toast.success(res.message);
+      } else {
+        toast.error(res.message);
+      }
+    } catch (err) {
+      toast.error("An error occurred");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
   const handleBrowserNotificationToggle = async (checked: boolean) => {
     if (checked) {
@@ -101,14 +134,30 @@ export function Notifications() {
     t("labels.push-browser.badges.new-transaction"),
     t("labels.push-browser.badges.savings"),
   ];
+
   return (
     <section>
-      <Card className="bg-blue-background dark:border-border-blue">
-        <CardHeader>
+      <Card className="bg-blue-background dark:border-border-blue relative">
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
+          <div className="flex items-center gap-2">
+            {isUpdating && <Loader2 className="h-4 w-4 animate-spin opacity-50" />}
+            <Checkbox
+              id="global-notifications"
+              checked={globalEnabled}
+              onCheckedChange={handleGlobalToggle}
+              disabled={isUpdating}
+            />
+            <label
+              htmlFor="global-notifications"
+              className="text-sm cursor-pointer font-medium"
+            >
+              {t("master-toggle")}
+            </label>
+          </div>
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
-        <CardContent>
+        <CardContent className={!globalEnabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}>
           <div className="mb-5 grid grid-cols-2 gap-5">
             <div>
               <h3 className="mb-3 text-sm opacity-80">
@@ -137,19 +186,22 @@ export function Notifications() {
                       id="browser-notifications"
                       checked={browserNotificationsEnabled}
                       onCheckedChange={handleBrowserNotificationToggle}
-                      disabled={permissionStatus === "denied"}
+                      disabled={permissionStatus === "denied" || !globalEnabled}
                     />
                     <label
                       htmlFor="browser-notifications"
                       className="text-sm cursor-pointer"
                     >
-                      {browserNotificationsEnabled
-                        ? browserT("settings.enabled")
-                        : browserT("settings.disabled")}
+                      {browserT("settings.deviceEnable")}
                     </label>
                   </div>
                 )}
               </div>
+              {isSupported && (
+                <p className="text-xs text-muted-foreground mb-3 italic">
+                  {browserT("settings.deviceDescription")}
+                </p>
+              )}
               {isSupported && permissionStatus === "denied" && (
                 <p className="text-xs text-muted-foreground mb-2">
                   {browserT("settings.permissionDenied")}
@@ -184,8 +236,29 @@ export function Notifications() {
                     {t("labels.monthly-report.title")}
                   </FormLabel>
                   <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger className="dark:border-border-blue !dark:bg-dark-blue-background w-full cursor-pointer">
+                    <Select
+                      value={field.value}
+                      onValueChange={async (value) => {
+                        field.onChange(value);
+                        setIsUpdating(true);
+                        try {
+                          const res = await updateUserReportFrequency(value);
+                          if (res.success) {
+                            toast.success(t("toasts.success"));
+                          } else {
+                            toast.error(t("toasts.error"));
+                          }
+                        } catch (err) {
+                          toast.error("An error occurred");
+                        } finally {
+                          setIsUpdating(false);
+                        }
+                      }}
+                    >
+                      <SelectTrigger
+                        disabled={!globalEnabled}
+                        className="dark:border-border-blue !dark:bg-dark-blue-background w-full cursor-pointer"
+                      >
                         <SelectValue
                           placeholder={t("labels.monthly-report.options.off")}
                         />

@@ -114,7 +114,8 @@
         },
         "placeholders": {
             "name": "Il tuo nome",
-            "email": "tuo@example.com"
+            "email": "tuo@example.com",
+            "password": "********"
         },
         "checkboxes": {
             "password": "Mostra password",
@@ -133,16 +134,36 @@
         "dark-mode": "Modalità scura",
         "remember-pass": "Ricordare la password?",
         "light-mode": "Modalità chiara",
+        "messages": {
+            "success-signin": "Accesso effettuato con successo!",
+            "error-signin": "Impossibile accedere: {message}",
+            "error-google": "Errore durante l'accesso con Google",
+            "verify-email-needed": "Verifica la tua e-mail prima di accedere. Controlla la tua casella di posta per il link di verifica.",
+            "verification-email-sent": "E-mail di verifica inviata! Controlla la tua casella di posta.",
+            "success-signup": "Account creato! Controlla la tua e-mail per il link di verifica.",
+            "error-signup": "Impossibile registrarsi: {message}",
+            "error-generic": "Qualcosa è andato storto",
+            "password-reset-sent": "E-mail di reimpostazione della password inviata",
+            "invalid-token": "Token non valido o mancante",
+            "passwords-not-match": "Le password non corrispondono",
+            "password-reset-success": "Password reimpostata con successo"
+        },
+        "validations": {
+            "name-min": "Il nome deve contenere almeno 2 caratteri.",
+            "email-invalid": "Indirizzo e-mail non valido.",
+            "password-min": "La password deve contenere almeno 8 caratteri.",
+            "accept-terms": "Devi accettare i termini e l'informativa sulla privacy."
+        },
         "verify-email": {
             "title": "Verifica la tua e-mail",
             "sub-heading": "Abbiamo inviato un link di verifica a:",
             "buttons": {
                 "resend": "Invia di nuovo",
-                "reset": "Reimposta",
                 "change-email": "Cambia e-mail",
-                "signin": "Torna al login"
+                "signin": "Torna al login",
+                "reset": "Reimposta password"
             },
-            "tip": "Suggerimento: controlla le cartelle Spam/Promozioni. Cerca l’oggetto «BudgetHub – Verify your email».",
+            "tip": "Suggerimento: controlla le cartelle Spam/Promocioni. Cerca l’oggetto «BudgetHub – Verify your email».",
             "content": "Dopo aver cliccato sul link, verrai connesso automaticamente."
         }
     },
@@ -345,7 +366,9 @@
                 },
                 "card-3": {
                     "title": "Disponibile",
-                    "badge": "margine"
+                    "title-over": "Fuori budget",
+                    "badge": "margine",
+                    "badge-over": "Sforato"
                 },
                 "card-4": {
                     "title": "Previsione fino al",
@@ -680,6 +703,7 @@
                         },
                         "budget-chf": "Budget (CHF)",
                         "1-chf": "Effettivo (CHF)",
+                        "ist-help": "Valore base (escluso riporto)",
                         "warning": "Avviso a (%)",
                         "color-marker": {
                             "title": "Indicatore colore",
@@ -735,6 +759,7 @@
                 "title": "Tutte le categorie",
                 "total-budget": "Budget totale: ",
                 "rest-budget": "Resto: ",
+                "future-month-no-edit": "I mesi futuri non possono essere modificati. Vai al mese corrente per apportare modifiche al tuo modello di budget.",
                 "loading": "Caricamento...",
                 "no-budgets": "Nessun budget trovato",
                 "set-budget": "Imposta budget",
@@ -782,6 +807,8 @@
                     "restaurant": "Budget Ristorante & Caffè al 82%",
                     "health": "Budget Salute al 96%"
                 },
+                "loading": "Controllo avvisi...",
+                "no-warnings": "Il tuo budget è in salute! Nessun avviso.",
                 "settings": {
                     "title": "Impostazioni (Mese)",
                     "button": "Budget",
@@ -813,7 +840,7 @@
                         "goal-amount": "Importo obiettivo (CHF)",
                         "saved-amount": "Già risparmiato (CHF)",
                         "due-date": {
-                            "title": "Data di scadenza",
+                            "title": "Data",
                             "placeholder": "gg/mm/aaaa"
                         },
                         "account": {
@@ -1542,6 +1569,7 @@
             },
             "notifications-section": {
                 "title": "Notifiche",
+                "master-toggle": "Notifiche attivate",
                 "labels": {
                     "email-alerts": {
                         "title": "Avvisi e-mail",
@@ -1564,6 +1592,10 @@
                             "off": "Disattivato",
                             "monthly": "Mensile",
                             "quarterly": "Trimestrale"
+                        },
+                        "toasts": {
+                            "success": "Preferenza di rapporto aggiornata con successo",
+                            "error": "Errore durante l'aggiornamento della preferenza di rapporto"
                         }
                     }
                 }
@@ -1833,6 +1865,37 @@
             "subscription-expired": {
                 "title": "Abbonamento scaduto",
                 "message": "Il tuo abbonamento è scaduto. Rinnova per ripristinare l'accesso a tutte le funzionalità."
+            },
+            "recurring-payment-success": {
+                "title": "Pagamento ricorrente elaborato",
+                "message": "Il tuo pagamento ricorrente \"{templateName}\" ({amount}) è stato elaborato con successo il {date}."
+            },
+            "recurring-payment-failed": {
+                "title": "Pagamento ricorrente fallito",
+                "message": "Il tuo pagamento ricorrente \"{templateName}\" ({amount}) è fallito il {date}. Motivo: {reason}"
+            },
+            "recurring-payment-summary": {
+                "title": "Riepilogo pagamenti ricorrenti",
+                "message": "Elaborati {successCount} riusciti, {failedCount} falliti, {skippedCount} pagamenti ricorrenti saltati.",
+                "success": "Elaborati con successo ({count})",
+                "failed": "Falliti ({count})",
+                "skipped": "Non ancora dovuti ({count})",
+                "nextDue": "Prossimo: {date}"
+            },
+            "monthly-report": {
+                "title": "Rapporto mensile delle spese",
+                "labels": {
+                    "totalIncome": "Reddito totale",
+                    "totalExpense": "Spese totali",
+                    "spending": "Spese",
+                    "savingRate": "Tasso di risparmio",
+                    "introText": "Ecco il riepilogo delle tue spese per",
+                    "viewDashboard": "Visualizza dashboard",
+                    "footerText": "Inviato da Budget Hub. Hai ricevuto questa email perché hai attivato i rapporti automatizzati nelle tue impostazioni."
+                }
+            },
+            "quarterly-report": {
+                "title": "Rapporto trimestrale delle spese"
             }
         },
         "browser": {
@@ -1845,8 +1908,20 @@
             "settings": {
                 "enabled": "Abilitato",
                 "disabled": "Disabilitato",
+                "deviceEnable": "Attiva le notifiche push su questo dispositivo",
+                "deviceDescription": "Ricevi avvisi pop-up in questo browser quando sei su altre schede.",
                 "permissionDenied": "Le notifiche del browser sono bloccate. Abilitalle nelle impostazioni del browser.",
                 "notSupported": "Le notifiche del browser non sono supportate in questo browser."
+            }
+        },
+        "errors": {
+            "transaction": {
+                "insufficient-funds": "Fondi insufficienti nel conto selezionato",
+                "insufficient-funds-source": "Fondi insufficienti nel conto di origine",
+                "account-not-found": "Conto non trovato o non hai accesso",
+                "destination-account-not-found": "Conto di destinazione non trovato o non hai accesso",
+                "same-account-transfer": "Impossibile trasferire allo stesso conto",
+                "unknown-error": "Si è verificato un errore imprevisto"
             }
         }
     }

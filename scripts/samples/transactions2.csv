@@ -1,4 +1,6 @@
 Date,Category,Account,Amount,Type,Recipient,Note
+27/12/2025,test-budget-threshold-category,-,500,expense,—,-
+27/12/2025,Transport,-,200,expense,Test Edit,-
 26/12/2025,test-budget-threshold-category,-,81,expense,—,TEstttttttttttttt
 21/12/2025,—,-,10,expense,—,Deposit
 20/12/2025,Health,-,15,expense,Pharmacy,Medicine
@@ -15,4 +17,7 @@ Date,Category,Account,Amount,Type,Recipient,Note
 04/12/2025,—,-,200,expense,—,Atm withdrawal
 03/12/2025,—,-,500,expense,—,Monthly savings
 02/12/2025,Salary,-,5000,expense,Employer,Monthly paycheck
+01/12/2025,Groceries,-,45.5,expense,Coop,Weekly groceries
+01/12/2025,Groceries,-,45.5,expense,Coop,Weekly groceries
+01/12/2025,Groceries,-,45.5,expense,Coop,Weekly groceries
 01/12/2025,Groceries,-,45.5,expense,Coop,Weekly groceries

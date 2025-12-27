@@ -179,7 +179,7 @@ export const useExportCSV = () => {
     exportCategories: ({ categories }: Omit<CategoriesExportArgs, "t">) =>
       exportCategoriesToCSV({ categories, t: categoriesT }),
     exportSavingGoals: ({ goals }: Omit<SavingGoalsExportArgs, "t">) =>
-      exportSavingGoalsToCSV({ goals, t: useTranslations("main-dashboard.saving-goals-page.active-goals-section") }),
+      exportSavingGoalsToCSV({ goals, t: savingGoalsT }),
     exportMonthlyReports: ({
       monthlyReports,
     }: Omit<MonthlyReportExportArgs, "tableHeadings">) =>

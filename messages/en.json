@@ -97,6 +97,7 @@
         }
     },
     "greeting": {
+        "title": "How are you?",
         "cta": "Dashboard"
     },
     "intro": "Hi {name}, You have {count, plural, =0 {no followers yet} =1 {one follower} other {# followers}}.",
@@ -113,7 +114,8 @@
         },
         "placeholders": {
             "name": "Your name",
-            "email": "your@example.com"
+            "email": "your@example.com",
+            "password": "********"
         },
         "checkboxes": {
             "password": "Show password",
@@ -132,6 +134,26 @@
         "no-account-yet": "No account yet?",
         "dark-mode": "Dark mode",
         "light-mode": "Light mode",
+        "messages": {
+            "success-signin": "Signed in successfully!",
+            "error-signin": "Could not sign in: {message}",
+            "error-google": "Error signing in with Google",
+            "verify-email-needed": "Please verify your email before signing in. Check your inbox for the verification link.",
+            "verification-email-sent": "Verification email sent! Please check your inbox and verify your email.",
+            "success-signup": "Account created! Please check your email for the verification link.",
+            "error-signup": "Could not signup: {message}",
+            "error-generic": "Something went wrong",
+            "password-reset-sent": "Password reset email sent",
+            "invalid-token": "Invalid or missing token",
+            "passwords-not-match": "Passwords do not match",
+            "password-reset-success": "Password reset successfully"
+        },
+        "validations": {
+            "name-min": "Name must be at least 2 characters.",
+            "email-invalid": "Invalid email address.",
+            "password-min": "Password must be at least 8 characters.",
+            "accept-terms": "You must accept the terms and privacy policy."
+        },
         "verify-email": {
             "title": "Verify your email",
             "sub-heading": "We sent a verification link to:",
@@ -427,6 +449,7 @@
                 "currency": "CHF"
             },
             "recent-transactions-table": {
+                "title": "Recent Transactions",
                 "button": "Show all",
                 "table-headings": {
                     "date": "Date",
@@ -680,6 +703,7 @@
                         },
                         "budget-chf": "Budget (CHF)",
                         "1-chf": "IST (CHF)",
+                        "ist-help": "Base value (excludes carry-over)",
                         "warning": "Warning at (%)",
                         "color-marker": {
                             "title": "Color Marker",
@@ -735,6 +759,7 @@
                 "title": "All categories",
                 "total-budget": "Total Budget: ",
                 "rest-budget": "Rest: ",
+                "future-month-no-edit": "Future months cannot be edited. Please go to the current month to make changes to your budget template.",
                 "loading": "Loading...",
                 "no-budgets": "No Budgets Found",
                 "set-budget": "Set Budget",
@@ -778,7 +803,10 @@
             "warning-section": {
                 "title": "Notes & Warnings",
                 "button": "Hide all",
-                "badges": {},
+                "badges": {
+                    "restaurant": "Budget Restaurant & Café at 82%",
+                    "health": "Budget Health at 96%"
+                },
                 "loading": "Checking for warnings...",
                 "no-warnings": "Your budget is looking healthy! No warnings.",
                 "settings": {
@@ -1541,6 +1569,7 @@
             },
             "notifications-section": {
                 "title": "Notifications",
+                "master-toggle": "Notifications Enabled",
                 "labels": {
                     "email-alerts": {
                         "title": "E-Mail Alerts",
@@ -1563,6 +1592,10 @@
                             "off": "Off",
                             "monthly": "Monthly",
                             "quarterly": "Quarterly"
+                        },
+                        "toasts": {
+                            "success": "Report preference updated successfully",
+                            "error": "Failed to update report preference"
                         }
                     }
                 }
@@ -1832,6 +1865,37 @@
             "subscription-expired": {
                 "title": "Subscription Expired",
                 "message": "Your subscription has expired. Please renew to restore access to all features."
+            },
+            "recurring-payment-success": {
+                "title": "Recurring Payment Processed",
+                "message": "Your recurring payment \"{templateName}\" ({amount}) was successfully processed on {date}."
+            },
+            "recurring-payment-failed": {
+                "title": "Recurring Payment Failed",
+                "message": "Your recurring payment \"{templateName}\" ({amount}) failed on {date}. Reason: {reason}"
+            },
+            "recurring-payment-summary": {
+                "title": "Recurring Payments Summary",
+                "message": "Processed {successCount} successful, {failedCount} failed, {skippedCount} skipped recurring payments.",
+                "success": "Successfully Processed ({count})",
+                "failed": "Failed ({count})",
+                "skipped": "Not Due Yet ({count})",
+                "nextDue": "Next: {date}"
+            },
+            "monthly-report": {
+                "title": "Monthly Spending Report",
+                "labels": {
+                    "totalIncome": "Total Income",
+                    "totalExpense": "Total Expenses",
+                    "spending": "Spending",
+                    "savingRate": "Saving Rate",
+                    "introText": "Here is your spending summary for",
+                    "viewDashboard": "View Dashboard",
+                    "footerText": "Sent by Budget Hub. You received this because you enabled automated reports in your settings."
+                }
+            },
+            "quarterly-report": {
+                "title": "Quarterly Spending Report"
             }
         },
         "browser": {
@@ -1844,8 +1908,20 @@
             "settings": {
                 "enabled": "Enabled",
                 "disabled": "Disabled",
+                "deviceEnable": "Enable push notifications on this device",
+                "deviceDescription": "Receive pop-up alerts in this browser when you are on other tabs.",
                 "permissionDenied": "Browser notifications are blocked. Please enable them in your browser settings.",
                 "notSupported": "Browser notifications are not supported in this browser."
+            }
+        },
+        "errors": {
+            "transaction": {
+                "insufficient-funds": "Insufficient funds in selected account",
+                "insufficient-funds-source": "Insufficient funds in source account",
+                "account-not-found": "Account not found or you don't have access to it",
+                "destination-account-not-found": "Destination account not found or you don't have access to it",
+                "same-account-transfer": "Cannot transfer to the same account",
+                "unknown-error": "An unexpected error occurred"
             }
         }
     }

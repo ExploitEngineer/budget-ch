@@ -100,17 +100,18 @@ export function Export() {
     enabled: !!hubId,
   });
 
-  const { data: transfers } = useQuery<TransferData[]>({
+  const { data: transfersData } = useQuery<{ data: TransferData[]; message?: string }>({
     queryKey: transferKeys.list(hubId),
     queryFn: async () => {
       const res = await getAccountTransfers(hubId!);
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch transfers");
       }
-      return res.data ?? [];
+      return { data: res.data ?? [], message: res.message };
     },
     enabled: !!hubId,
   });
+  const transfers = transfersData?.data;
   const {
     exportTransactions,
     exportBudgets,

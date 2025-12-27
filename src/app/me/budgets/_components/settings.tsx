@@ -17,6 +17,7 @@ export function Settings() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
+
   const t = useTranslations(
     "main-dashboard.budgets-page.warning-section.settings",
   );

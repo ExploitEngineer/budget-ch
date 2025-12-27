@@ -8,6 +8,8 @@ import {
   getUserSettingsDB,
   upsertUserSettingsDB,
   updateUser,
+  updateUserNotificationsEnabledDB,
+  updateUserReportFrequencyDB,
 } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
@@ -144,6 +146,56 @@ export async function updateProfileHousehold(data: {
     return {
       success: false,
       message: `Failed to update profile and household: ${err.message}`,
+    };
+  }
+}
+
+// UPDATE user notifications enabled
+export async function updateUserNotificationsEnabled(enabled: boolean) {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    const res = await updateUserNotificationsEnabledDB(userId, enabled);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Error updating notification preference",
+      };
+    }
+
+    return { success: true, message: "Notification preference updated successfully" };
+  } catch (err: any) {
+    console.error("Error updating user notifications enabled: ", err);
+    return {
+      success: false,
+      message: `Failed to update notification preference: ${err.message}`,
+    };
+  }
+}
+
+// UPDATE user report frequency
+export async function updateUserReportFrequency(frequency: string) {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    const res = await updateUserReportFrequencyDB(userId, frequency);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Error updating report preference",
+      };
+    }
+
+    return { success: true, message: "Report preference updated successfully" };
+  } catch (err: any) {
+    console.error("Error updating user report frequency: ", err);
+    return {
+      success: false,
+      message: `Failed to update report preference: ${err.message}`,
     };
   }
 }

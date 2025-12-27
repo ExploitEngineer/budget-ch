@@ -322,6 +322,8 @@ export async function getUserEmailDB(userId: string) {
       where: eq(users.id, userId),
       columns: {
         email: true,
+        notificationsEnabled: true,
+        reportFrequency: true,
       },
     });
 
@@ -822,6 +824,24 @@ export async function updateTransactionDB({
       success: false,
       message: err.message || "Failed to update transaction",
     };
+  }
+}
+
+// UPDATE User Notifications Enabled
+export async function updateUserNotificationsEnabledDB(
+  userId: string,
+  enabled: boolean,
+) {
+  try {
+    await db
+      .update(users)
+      .set({ notificationsEnabled: enabled })
+      .where(eq(users.id, userId));
+
+    return { success: true, message: "Notification preference updated" };
+  } catch (err: any) {
+    console.error("DB Error: updateUserNotificationsEnabledDB:", err);
+    return { success: false, message: err.message };
   }
 }
 
@@ -2719,6 +2739,7 @@ export async function getHubMembersDB(hubId: string) {
         role: hubMembers.accessRole,
         isOwner: hubMembers.isOwner,
         joinedAt: hubMembers.joinedAt,
+        notificationsEnabled: users.notificationsEnabled,
       })
       .from(hubMembers)
       .innerJoin(users, eq(hubMembers.userId, users.id))
@@ -3238,11 +3259,16 @@ export async function getActiveRecurringTemplatesDB() {
         lastGeneratedDate: recurringTransactionTemplates.lastGeneratedDate,
         consecutiveFailures: recurringTransactionTemplates.consecutiveFailures,
         categoryName: transactionCategories.name,
+        userLanguage: users.language,
       })
       .from(recurringTransactionTemplates)
       .leftJoin(
         transactionCategories,
         eq(recurringTransactionTemplates.transactionCategoryId, transactionCategories.id)
+      )
+      .leftJoin(
+        users,
+        eq(recurringTransactionTemplates.userId, users.id)
       )
       .where(
         and(
@@ -3349,5 +3375,70 @@ export async function updateUserLanguageDB(userId: string, language: string) {
       success: false,
       message: err.message || "Failed to update user language",
     };
+  }
+}
+
+export async function updateUserReportFrequencyDB(
+  userId: string,
+  frequency: string,
+) {
+  try {
+    await db
+      .update(users)
+      .set({ reportFrequency: frequency, updatedAt: new Date() })
+      .where(eq(users.id, userId));
+    return {
+      success: true,
+      message: "User report frequency updated successfully",
+    };
+  } catch (err: any) {
+    console.error("Error updating user report frequency:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+export async function getUsersForReportsDB(frequency: string) {
+  try {
+    const usersList = await db.query.users.findMany({
+      where: eq(users.reportFrequency, frequency),
+      columns: {
+        id: true,
+        email: true,
+        name: true,
+        language: true,
+        notificationsEnabled: true,
+      },
+    });
+
+    return {
+      success: true,
+      data: usersList,
+    };
+  } catch (err: any) {
+    console.error("Error fetching users for reports:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+export async function getUserHubsDB(userId: string) {
+  try {
+    const userHubs = await db
+      .select({
+        id: hubs.id,
+        name: hubs.name,
+        role: hubMembers.accessRole,
+        isOwner: hubMembers.isOwner,
+      })
+      .from(hubMembers)
+      .innerJoin(hubs, eq(hubMembers.hubId, hubs.id))
+      .where(eq(hubMembers.userId, userId));
+
+    return {
+      success: true,
+      data: userHubs,
+    };
+  } catch (err: any) {
+    console.error("Error fetching user hubs:", err);
+    return { success: false, message: err.message };
   }
 }

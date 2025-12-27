@@ -296,11 +296,19 @@ export async function getBudgets(
     }
 
     const now = new Date();
-    const targetMonth = month || now.getMonth() + 1;
-    const targetYear = year || now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    const targetMonth = month || currentMonth;
+    const targetYear = year || currentYear;
 
-    // Ensure instances exist (snapshot/carry-over)
-    await ensureBudgetInstances(hubId, targetMonth, targetYear);
+    // Check if this is a future month
+    const isFutureMonth = targetYear > currentYear ||
+      (targetYear === currentYear && targetMonth > currentMonth);
+
+    // Ensure instances exist for non-future months
+    if (!isFutureMonth) {
+      await ensureBudgetInstances(hubId, targetMonth, targetYear);
+    }
 
     const res = await getBudgetsByMonthDB(hubId, targetMonth, targetYear);
 
@@ -311,24 +319,60 @@ export async function getBudgets(
       };
     }
 
+    // For future months, calculate simulated IST values if carry-over is enabled
+    let dynamicIST: Map<string, number> | null = null;
+
+    if (isFutureMonth) {
+      const settingsRes = await getHubSettingsDB(hubId);
+      const carryOverEnabled = settingsRes.data?.budgetCarryOver ?? false;
+
+      if (carryOverEnabled) {
+        dynamicIST = await calculateFutureIST(
+          hubId,
+          currentMonth,
+          currentYear,
+          targetMonth,
+          targetYear
+        );
+      }
+    }
+
     // Normalize DB output (ensure numbers are properly typed)
-    const budgets: BudgetWithCategory[] = res.data.map((b) => ({
-      id: b.id,
-      hubId: b.hubId,
-      userId: b.userId,
-      transactionCategoryId: b.transactionCategoryId,
-      allocatedAmount:
-        b.allocatedAmount !== null ? Number(b.allocatedAmount) : null,
-      spentAmount: b.spentAmount !== null ? Number(b.spentAmount) : null, // IST - stored initial spent amount
-      calculatedSpentAmount: Number(b.calculatedSpentAmount ?? 0), // Calculated from transactions
-      warningPercentage: b.warningPercentage,
-      markerColor: b.markerColor,
-      createdAt: b.createdAt,
-      updatedAt: b.updatedAt,
-      categoryName: b.categoryName,
-      carriedOverAmount: b.carriedOverAmount ? Number(b.carriedOverAmount) : 0,
-      isInstance: b.isInstance,
-    }));
+    const budgets: BudgetWithCategory[] = res.data.map((b) => {
+      // Base IST is always the template's spentAmount (user-set value)
+      const spentAmount = b.spentAmount !== null ? Number(b.spentAmount) : null;
+
+      // Carry-over amount: for future months with carry-over ON, use dynamic calculation
+      // Otherwise use database value (which is 0 for future months without instances)
+      let carriedOverAmount = b.carriedOverAmount ? Number(b.carriedOverAmount) : 0;
+
+      if (isFutureMonth && dynamicIST && b.id) {
+        // For future months with carry-over enabled:
+        // dynamicIST contains the simulated IST value (which is baseIST - cumulative carryOver)
+        // We need to extract the carry-over: carryOver = baseIST - simulatedIST
+        const baseIST = spentAmount ?? 0;
+        const simulatedIST = dynamicIST.get(b.id) ?? 0;
+        carriedOverAmount = baseIST - simulatedIST;
+      }
+
+      return {
+        id: b.id,
+        hubId: b.hubId,
+        userId: b.userId,
+        transactionCategoryId: b.transactionCategoryId,
+        allocatedAmount:
+          b.allocatedAmount !== null ? Number(b.allocatedAmount) : null,
+        spentAmount,
+        calculatedSpentAmount: Number(b.calculatedSpentAmount ?? 0), // Calculated from transactions
+        warningPercentage: b.warningPercentage,
+        markerColor: b.markerColor,
+        createdAt: b.createdAt,
+        updatedAt: b.updatedAt,
+        categoryName: b.categoryName,
+        carriedOverAmount,
+        isInstance: b.isInstance,
+      };
+    });
 
     return {
       success: true,
@@ -342,6 +386,93 @@ export async function getBudgets(
       message: err.message || "Unexpected server error.",
     };
   }
+}
+
+/**
+ * Calculate simulated IST values for future months by chaining from current month
+ * Returns a Map of budgetId -> IST value for the target month
+ * Formula: nextIST = prevIST - prevREST, where REST = BUDGET - prevIST
+ */
+async function calculateFutureIST(
+  hubId: string,
+  startMonth: number,
+  startYear: number,
+  targetMonth: number,
+  targetYear: number,
+): Promise<Map<string, number>> {
+  const istMap = new Map<string, number>();
+
+  // Start from current month and chain forward
+  let m = startMonth;
+  let y = startYear;
+
+  // Get current month's data as the starting point
+  const currentMonthRes = await getBudgetsByMonthDB(hubId, m, y);
+  if (!currentMonthRes.success || !currentMonthRes.data) {
+    return istMap;
+  }
+
+  // Initialize IST for first future month based on current month's REST
+  // Current month IST = spentAmount - carriedOver (from adapter formula)
+  // Current month REST = BUDGET - IST - SPENT = allocated + carried - (spentAmount + calcSpent)
+  // First future month IST = current IST - current REST
+  for (const budget of currentMonthRes.data) {
+    if (!budget.id) continue;
+
+    const allocated = Number(budget.allocatedAmount ?? 0);
+    const carried = Number(budget.carriedOverAmount ?? 0);
+    const spentAmount = Number(budget.spentAmount ?? 0);
+    const calcSpent = Number(budget.calculatedSpentAmount ?? 0);
+
+    // Current month's REST = BUDGET + CARRIED - IST_BASE - SPENT
+    const currentREST = allocated + carried - spentAmount - calcSpent;
+
+    // First future month IST = baseIST - currentREST
+    // (In future months, spentAmount is the base template IST)
+    const firstFutureIST = spentAmount - currentREST;
+
+    istMap.set(budget.id, firstFutureIST);
+  }
+
+  // Chain forward month by month
+  // For future months: nextIST = prevIST - prevREST, where REST = BUDGET - prevIST
+  while (true) {
+    // Move to next month
+    if (m === 12) {
+      m = 1;
+      y++;
+    } else {
+      m++;
+    }
+
+    // Stop when we reach target month
+    if (m === targetMonth && y === targetYear) {
+      break;
+    }
+
+    // For intermediate future months, calculate IST chain
+    const intermediateRes = await getBudgetsByMonthDB(hubId, m, y);
+    if (intermediateRes.success && intermediateRes.data) {
+      for (const budget of intermediateRes.data) {
+        if (!budget.id) continue;
+
+        const prevIST = istMap.get(budget.id) ?? 0;
+        const allocated = Number(budget.allocatedAmount ?? 0);
+        const baseIST = Number(budget.spentAmount ?? 0);
+
+        // prevCarried = baseIST - prevIST
+        const prevCarried = baseIST - prevIST;
+        // REST for this intermediate month = BUDGET + CARRIED - baseIST
+        const monthREST = allocated + prevCarried - baseIST;
+
+        // Next month's IST = baseIST - currentREST
+        const nextIST = baseIST - monthREST;
+        istMap.set(budget.id, nextIST);
+      }
+    }
+  }
+
+  return istMap;
 }
 
 // GET Top Categories
@@ -486,6 +617,16 @@ export async function ensureBudgetInstances(
   year: number,
 ) {
   try {
+    // Don't create instances for future months - they should use template values
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    const isFutureMonth = year > currentYear || (year === currentYear && month > currentMonth);
+
+    if (isFutureMonth) {
+      return; // Skip instance creation for future months
+    }
+
     const exists = await checkBudgetInstancesExistDB(hubId, month, year);
     if (exists) return;
 
