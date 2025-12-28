@@ -1,40 +1,42 @@
 import { z } from "zod";
 
-export const userSignUpSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." }),
-  acceptTerms: z.boolean().refine((val) => val === true, {
-    message: "You must accept the terms and privacy policy.",
-  }),
-});
+export const getUserSignUpSchema = (t: any) =>
+  z.object({
+    name: z.string().min(2, { message: t("validations.name-min") }),
+    email: z.string().email({ message: t("validations.email-invalid") }),
+    password: z.string().min(8, { message: t("validations.password-min") }),
+    acceptTerms: z.boolean().refine((val) => val === true, {
+      message: t("validations.accept-terms"),
+    }),
+  });
 
-export type UserSignUpValues = z.infer<typeof userSignUpSchema>;
+export type UserSignUpValues = z.infer<ReturnType<typeof getUserSignUpSchema>>;
 
-export const userSignInSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." }),
-});
+export const getUserSignInSchema = (t: any) =>
+  z.object({
+    email: z.string().email({ message: t("validations.email-invalid") }),
+    password: z.string().min(8, { message: t("validations.password-min") }),
+  });
 
-export type UserSignInValues = z.infer<typeof userSignInSchema>;
+export type UserSignInValues = z.infer<ReturnType<typeof getUserSignInSchema>>;
 
-export const userForgotPasswordSchema = z.object({
-  email: z.string().email({ message: "Invalid email address." }),
-});
+export const getUserForgotPasswordSchema = (t: any) =>
+  z.object({
+    email: z.string().email({ message: t("validations.email-invalid") }),
+  });
 
-export type UserForgotPasswordValues = z.infer<typeof userForgotPasswordSchema>;
+export type UserForgotPasswordValues = z.infer<
+  ReturnType<typeof getUserForgotPasswordSchema>
+>;
 
-export const userResetPasswordSchema = z.object({
-  password: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." }),
-  confirmPassword: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters." }),
-});
+export const getUserResetPasswordSchema = (t: any) =>
+  z.object({
+    password: z.string().min(8, { message: t("validations.password-min") }),
+    confirmPassword: z
+      .string()
+      .min(8, { message: t("validations.password-min") }),
+  });
 
-export type UserResetPasswordValues = z.infer<typeof userResetPasswordSchema>;
+export type UserResetPasswordValues = z.infer<
+  ReturnType<typeof getUserResetPasswordSchema>
+>;

@@ -87,7 +87,7 @@ export function NotificationsBell() {
   // Map stored English titles to translation keys
   const getTranslatedContent = (notification: { title: string; message: string; metadata?: unknown }) => {
     // Get typeKey from metadata if available
-    const metadata = notification.metadata as { categoryName?: string; typeKey?: string } | null;
+    const metadata = notification.metadata as Record<string, any> | null;
 
     // Fallback mapping for older notifications or those without typeKey in metadata
     const titleToTypeKey: Record<string, string> = {
@@ -96,17 +96,19 @@ export function NotificationsBell() {
       "Subscription Expiring Soon": "subscription-expiring-3-days",
       "Subscription Expiring Tomorrow": "subscription-expiring-1-day",
       "Subscription Expired": "subscription-expired",
+      "Recurring Payments Summary": "recurring-payment-summary",
+      "Recurring Payment Failed": "recurring-payment-failed",
+      "Recurring Payment Processed": "recurring-payment-success",
     };
 
-    const typeKey = metadata?.typeKey?.toLowerCase().replace(/_/g, "-") || titleToTypeKey[notification.title];
+    const typeKey =
+      metadata?.typeKey?.toLowerCase().replace(/_/g, "-") ||
+      titleToTypeKey[notification.title];
 
     if (typeKey) {
-      // Get category name from metadata if available
-      const categoryName = metadata?.categoryName || "category";
-
       return {
         title: t(`types.${typeKey}.title`),
-        message: t(`types.${typeKey}.message`, { categoryName }),
+        message: t(`types.${typeKey}.message`, metadata || {}),
       };
     }
 

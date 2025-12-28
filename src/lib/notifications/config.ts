@@ -19,6 +19,25 @@ interface SubscriptionMetadata {
   [key: string]: unknown;
 }
 
+interface RecurringPaymentMetadata {
+  templateName?: string;
+  amount?: number;
+  date?: string;
+  reason?: string;
+  [key: string]: unknown;
+}
+
+interface RecurringPaymentSummaryMetadata {
+  hubName?: string;
+  successCount?: number;
+  failedCount?: number;
+  skippedCount?: number;
+  successItems?: Array<{ name: string; amount: number }>;
+  failedItems?: Array<{ name: string; amount: number; reason: string }>;
+  skippedItems?: Array<{ name: string; nextDue: string }>;
+  [key: string]: unknown;
+}
+
 const notificationConfigs: Record<
   NotificationTypeKey,
   NotificationConfigFactory
@@ -73,6 +92,41 @@ const notificationConfigs: Record<
       type: "error",
       title: "Subscription Expired",
       message: `Your subscription has expired. Please renew to restore access to all features.`,
+      channel: "both",
+      metadata,
+    };
+  },
+
+  RECURRING_PAYMENT_SUCCESS: (metadata?: NotificationMetadata) => {
+    const paymentMeta = metadata as RecurringPaymentMetadata | undefined;
+    const amount = paymentMeta?.amount ? new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(paymentMeta.amount) : '';
+    return {
+      type: "success",
+      title: "Recurring Payment Processed",
+      message: `Your recurring payment "${paymentMeta?.templateName || "payment"}" (${amount}) was successfully processed on ${paymentMeta?.date || "today"}.`,
+      channel: "both",
+      metadata,
+    };
+  },
+
+  RECURRING_PAYMENT_FAILED: (metadata?: NotificationMetadata) => {
+    const paymentMeta = metadata as RecurringPaymentMetadata | undefined;
+    const amount = paymentMeta?.amount ? new Intl.NumberFormat('de-CH', { style: 'currency', currency: 'CHF' }).format(paymentMeta.amount) : '';
+    return {
+      type: "error",
+      title: "Recurring Payment Failed",
+      message: `Your recurring payment "${paymentMeta?.templateName || "payment"}" (${amount}) failed on ${paymentMeta?.date || "today"}. Reason: ${paymentMeta?.reason || "Unknown error"}.`,
+      channel: "both",
+      metadata,
+    };
+  },
+
+  RECURRING_PAYMENT_SUMMARY: (metadata?: NotificationMetadata) => {
+    const summaryMeta = metadata as RecurringPaymentSummaryMetadata | undefined;
+    return {
+      type: "info",
+      title: "Recurring Payments Summary",
+      message: `Processed ${summaryMeta?.successCount || 0} successful, ${summaryMeta?.failedCount || 0} failed, ${summaryMeta?.skippedCount || 0} skipped recurring payments.`,
       channel: "both",
       metadata,
     };

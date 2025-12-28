@@ -30,6 +30,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getBudgets, getBudgetsAmounts } from "@/lib/api";
 import { budgetKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import type { BudgetRow } from "@/lib/types/ui-types";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import { mapBudgetsToRows } from "../budget-adapters";

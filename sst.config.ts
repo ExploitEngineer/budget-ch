@@ -15,7 +15,7 @@ export default $config({
     };
   },
   async run() {
-    // const web = new sst.aws.Nextjs("MyWeb");
+    const web = new sst.aws.Nextjs("MyWeb");
 
     // Subscription Expiry Check (Daily at 9 AM UTC)
     new sst.aws.Cron("SubscriptionNotifications", {
@@ -94,26 +94,71 @@ export default $config({
       } as any,
     });
 
-    // Recurring Transaction Generation (Daily at 02:00 UTC)
-    // Runs daily to generate transactions from active recurring templates
+    // Recurring Transaction Generation (Hourly)
+    // Runs every hour at the top of the hour to check for due recurring transactions
     new sst.aws.Cron("RecurringTransactionGeneration", {
-      schedule: "cron(0 2 * * ? *)",
+      schedule: "cron(0 * * * ? *)",
       function: {
         handler: "src/functions/recurring-transactions-generator.handler",
         nodejs: {
-          install: ["pg"],
+          install: ["pg", "nodemailer"],
           esbuild: {
-            external: ["pg"],
+            external: ["pg", "nodemailer"],
           },
         },
         environment: {
           DATABASE_URL: process.env.DATABASE_URL!,
+          SMTP_HOST: process.env.SMTP_HOST!,
+          MAIL_USER: process.env.MAIL_USER!,
+          MAIL_PASS: process.env.MAIL_PASS!,
+        },
+      } as any,
+    });
+
+    // Monthly Reports (1st of each month at 03:00 UTC)
+    new sst.aws.Cron("MonthlyReport", {
+      schedule: "cron(0 3 1 * ? *)",
+      function: {
+        handler: "src/functions/reports.monthlyHandler",
+        nodejs: {
+          install: ["pg", "nodemailer"],
+          esbuild: {
+            external: ["pg", "nodemailer"],
+          },
+        },
+        environment: {
+          DATABASE_URL: process.env.DATABASE_URL!,
+          SMTP_HOST: process.env.SMTP_HOST!,
+          MAIL_USER: process.env.MAIL_USER!,
+          MAIL_PASS: process.env.MAIL_PASS!,
+          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL!,
+        },
+      } as any,
+    });
+
+    // Quarterly Reports (1st of Jan, Apr, Jul, Oct at 04:00 UTC)
+    new sst.aws.Cron("QuarterlyReport", {
+      schedule: "cron(0 4 1 1,4,7,10 ? *)",
+      function: {
+        handler: "src/functions/reports.quarterlyHandler",
+        nodejs: {
+          install: ["pg", "nodemailer"],
+          esbuild: {
+            external: ["pg", "nodemailer"],
+          },
+        },
+        environment: {
+          DATABASE_URL: process.env.DATABASE_URL!,
+          SMTP_HOST: process.env.SMTP_HOST!,
+          MAIL_USER: process.env.MAIL_USER!,
+          MAIL_PASS: process.env.MAIL_PASS!,
+          NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL!,
         },
       } as any,
     });
 
     return {
-      // web,
+      web,
     };
   },
 });

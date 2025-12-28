@@ -18,7 +18,7 @@ import { useTheme } from "next-themes";
 
 export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & { user: { email: string; name: string } }) {
   const [mounted, setMounted] = useState<boolean>(false);
-  const { resolvedTheme } = useTheme();
+  const { } = useTheme();
   const { open } = useSidebar();
 
   useEffect(() => {
@@ -49,17 +49,18 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
             <>
               <div className="relative me-9 h-[45px] w-full">
                 <Image
-                  src={
-                    resolvedTheme === "dark"
-                      ? "/assets/images/dark-logo.png"
-                      : "/assets/images/logo.png"
-                  }
+                  src="/assets/images/logo.png"
                   alt="company logo"
                   fill
-                  className={cn(
-                    "m-0 object-cover p-0",
-                    resolvedTheme === "dark" ? "pe-10" : "pe-0",
-                  )}
+                  className="m-0 object-cover p-0 dark:hidden pe-0"
+                  priority
+                  sizes="100vw"
+                />
+                <Image
+                  src="/assets/images/dark-logo.png"
+                  alt="company logo"
+                  fill
+                  className="m-0 object-cover p-0 hidden dark:block pe-10"
                   priority
                   sizes="100vw"
                 />

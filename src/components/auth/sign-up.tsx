@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  userSignUpSchema,
+  getUserSignUpSchema,
   UserSignUpValues,
 } from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
@@ -34,8 +34,10 @@ export default function SignUp() {
   const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const t = useTranslations("authpages");
+
   const form = useForm<UserSignUpValues>({
-    resolver: zodResolver(userSignUpSchema),
+    resolver: zodResolver(getUserSignUpSchema(t)),
     defaultValues: {
       name: "",
       email: "",
@@ -43,8 +45,6 @@ export default function SignUp() {
       acceptTerms: false,
     },
   });
-
-  const t = useTranslations("authpages");
 
   async function onSubmit(values: UserSignUpValues): Promise<void> {
     setIsSigningUp(true);
@@ -58,18 +58,16 @@ export default function SignUp() {
       });
 
       if (error) {
-        toast.error(`Could not signup ${error.message}`);
+        toast.error(t("messages.error-signup", { message: error.message || "Unknown error" }));
         return;
       }
 
       form.reset();
-      toast.success(
-        "Account created! Please check your email for the verification link.",
-      );
+      toast.success(t("messages.success-signup"));
       router.push("/signin");
     } catch (err) {
       console.error(err);
-      toast.error("Something went wrong during signup");
+      toast.error(t("messages.error-generic"));
     } finally {
       setIsSigningUp(false);
     }
@@ -80,7 +78,7 @@ export default function SignUp() {
     try {
       const result = await signInWithGoogle();
       if (result.status === "error") {
-        toast.error("Error signing up with Google");
+        toast.error(t("messages.error-google"));
       }
     } catch (err) {
       console.error(err);
@@ -144,7 +142,7 @@ export default function SignUp() {
                 <FormControl className="rounded-lg px-4 py-5">
                   <Input
                     type={showPassword ? "text" : "password"}
-                    placeholder="********"
+                    placeholder={t("placeholders.password")}
                     className="dark:border-border-blue dark:!bg-dark-blue-background bg-[#F6F8FF]"
                     {...field}
                   />

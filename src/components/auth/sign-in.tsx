@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  userSignInSchema,
+  getUserSignInSchema,
   UserSignInValues,
 } from "@/lib/validations/auth-validations";
 import { Button } from "@/components/ui/button";
@@ -33,15 +33,15 @@ export default function SignIn() {
   const [isSigningIn, setIsSigningIn] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const t = useTranslations("authpages");
+
   const form = useForm<UserSignInValues>({
-    resolver: zodResolver(userSignInSchema),
+    resolver: zodResolver(getUserSignInSchema(t)),
     defaultValues: {
       email: "",
       password: "",
     },
   });
-
-  const t = useTranslations("authpages");
 
   async function onSubmit(values: UserSignInValues): Promise<void> {
     setIsSigningIn(true);
@@ -63,22 +63,18 @@ export default function SignIn() {
 
           if (resendError) {
             // If resend fails (e.g., rate limit), just show the check inbox message
-            toast.error(
-              `Please verify your email before signing in. Check your inbox for the verification link.`,
-            );
+            toast.error(t("messages.verify-email-needed"));
           } else {
-            toast.success(
-              `Verification email sent! Please check your inbox and verify your email.`,
-            );
+            toast.success(t("messages.verification-email-sent"));
           }
           form.reset();
           return;
         } else {
-          toast.error(`Could not sign in: ${error.message}`);
+          toast.error(t("messages.error-signin", { message: error.message || "Unknown error" }));
         }
       }
       if (data) {
-        toast.success(`Signed in successfully!`);
+        toast.success(t("messages.success-signin"));
         form.reset();
         redirect("/me/dashboard");
       }
@@ -94,7 +90,7 @@ export default function SignIn() {
     try {
       const result = await signInWithGoogle();
       if (result.status === "error") {
-        toast.error("Error signing in with Google");
+        toast.error(t("messages.error-google"));
       }
     } catch (err) {
       console.error(err);
@@ -140,7 +136,7 @@ export default function SignIn() {
                   <Input
                     type={showPassword ? "text" : "password"}
                     className="dark:border-border-blue dark:!bg-dark-blue-background bg-[#F6F8FF]"
-                    placeholder="********"
+                    placeholder={t("placeholders.password")}
                     {...field}
                   />
                 </FormControl>

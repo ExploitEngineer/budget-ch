@@ -39,6 +39,7 @@
         "error": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
         "retry": "Wiederholen",
         "currency": "CHF",
+        "percent": "{value}%",
         "validations": {
             "required": "Erforderlich",
             "name-required": "Name ist erforderlich",
@@ -113,7 +114,8 @@
         },
         "placeholders": {
             "name": "Dein Name",
-            "email": "deine@example.com"
+            "email": "deine@example.com",
+            "password": "********"
         },
         "checkboxes": {
             "password": "Passwort anzeigen",
@@ -132,14 +134,34 @@
         "remember-pass": "Passwort merken?",
         "dark-mode": "Dunkelmodus",
         "light-mode": "Hellmodus",
+        "messages": {
+            "success-signin": "Erfolgreich angemeldet!",
+            "error-signin": "Anmeldung fehlgeschlagen: {message}",
+            "error-google": "Fehler bei der Anmeldung mit Google",
+            "verify-email-needed": "Bitte bestätigen Sie Ihre E-Mail-Adresse vor der Anmeldung. Überprüfen Sie Ihren Posteingang auf den Bestätigungslink.",
+            "verification-email-sent": "Bestätigungs-E-Mail gesendet! Bitte überprüfen Sie Ihren Posteingang.",
+            "success-signup": "Konto erstellt! Bitte überprüfen Sie Ihre E-Mail auf den Bestätigungslink.",
+            "error-signup": "Registrierung fehlgeschlagen: {message}",
+            "error-generic": "Etwas ist schief gelaufen",
+            "password-reset-sent": "E-Mail zum Zurücksetzen des Passworts gesendet",
+            "invalid-token": "Ungültiger oder fehlender Token",
+            "passwords-not-match": "Passwörter stimmen nicht überein",
+            "password-reset-success": "Passwort erfolgreich zurückgesetzt"
+        },
+        "validations": {
+            "name-min": "Der Name muss mindestens 2 Zeichen lang sein.",
+            "email-invalid": "Ungültige E-Mail-Adresse.",
+            "password-min": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+            "accept-terms": "Sie müssen den Bedingungen und der Datenschutzrichtlinie zustimmen."
+        },
         "verify-email": {
             "title": "Bestätige deine E-Mail-Adresse",
             "sub-heading": "Wir haben einen Bestätigungslink gesendet an:",
             "buttons": {
                 "resend": "Erneut senden",
                 "change-email": "E-Mail ändern",
-                "reset": "Zurücksetzen",
-                "signin": "Zurück zur Anmeldung"
+                "signin": "Torna al login",
+                "reset": "Passwort zurücksetzen"
             },
             "tip": "Tipp: Überprüfe Spam-/Werbeordner. Suche nach dem Betreff „BudgetHub – Verify your email“.",
             "content": "Nachdem du auf den Link geklickt hast, melden wir dich automatisch an."
@@ -344,7 +366,9 @@
                 },
                 "card-3": {
                     "title": "Verfügbar",
-                    "badge": "Puffer"
+                    "title-over": "Über Budget",
+                    "badge": "Puffer",
+                    "badge-over": "Überzogen"
                 },
                 "card-4": {
                     "title": "Prognose bis",
@@ -679,6 +703,7 @@
                         },
                         "budget-chf": "Budget (CHF)",
                         "1-chf": "IST (CHF)",
+                        "ist-help": "Basiswert (ohne Übertrag)",
                         "warning": "Warnung bei (%)",
                         "color-marker": {
                             "title": "Farbmarker",
@@ -734,6 +759,7 @@
                 "title": "Alle Kategorien",
                 "total-budget": "Gesamtbudget: ",
                 "rest-budget": "Verbleibend: ",
+                "future-month-no-edit": "Zukünftige Monate können nicht bearbeitet werden. Bitte gehen Sie zum aktuellen Monat, um Änderungen an Ihrer Budgetvorlage vorzunehmen.",
                 "loading": "Wird geladen...",
                 "no-budgets": "Keine Budgets gefunden",
                 "set-budget": "Budget festlegen",
@@ -814,7 +840,7 @@
                         "goal-amount": "Zielbetrag (CHF)",
                         "saved-amount": "Bereits gespart (CHF)",
                         "due-date": {
-                            "title": "Fälligkeitsdatum",
+                            "title": "Datum",
                             "placeholder": "TT/MM/JJJJ"
                         },
                         "account": {
@@ -1543,6 +1569,7 @@
             },
             "notifications-section": {
                 "title": "Benachrichtigungen",
+                "master-toggle": "Benachrichtigungen aktiviert",
                 "labels": {
                     "email-alerts": {
                         "title": "E-Mail Benachrichtigungen",
@@ -1565,6 +1592,10 @@
                             "off": "Aus",
                             "monthly": "Monatlich",
                             "quarterly": "Quartalsweise"
+                        },
+                        "toasts": {
+                            "success": "Berichtseinstellungen erfolgreich aktualisiert",
+                            "error": "Fehler beim Aktualisieren der Berichtseinstellungen"
                         }
                     }
                 }
@@ -1834,6 +1865,37 @@
             "subscription-expired": {
                 "title": "Abonnement abgelaufen",
                 "message": "Ihr Abonnement ist abgelaufen. Bitte erneuern Sie es, um den Zugang zu allen Funktionen wiederherzustellen."
+            },
+            "recurring-payment-success": {
+                "title": "Wiederkehrende Zahlung verarbeitet",
+                "message": "Ihre wiederkehrende Zahlung \"{templateName}\" ({amount}) wurde am {date} erfolgreich verarbeitet."
+            },
+            "recurring-payment-failed": {
+                "title": "Wiederkehrende Zahlung fehlgeschlagen",
+                "message": "Ihre wiederkehrende Zahlung \"{templateName}\" ({amount}) ist am {date} fehlgeschlagen. Grund: {reason}"
+            },
+            "recurring-payment-summary": {
+                "title": "Zusammenfassung wiederkehrender Zahlungen",
+                "message": "{successCount} erfolgreich, {failedCount} fehlgeschlagen, {skippedCount} übersprungene wiederkehrende Zahlungen verarbeitet.",
+                "success": "Erfolgreich verarbeitet ({count})",
+                "failed": "Fehlgeschlagen ({count})",
+                "skipped": "Noch nicht fällig ({count})",
+                "nextDue": "Nächste: {date}"
+            },
+            "monthly-report": {
+                "title": "Monatlicher Ausgabenbericht",
+                "labels": {
+                    "totalIncome": "Gesamteinnahmen",
+                    "totalExpense": "Gesamtausgaben",
+                    "spending": "Ausgaben",
+                    "savingRate": "Sparrate",
+                    "introText": "Hier ist Ihre Ausgabenübersicht für",
+                    "viewDashboard": "Dashboard anzeigen",
+                    "footerText": "Gesendet von Budget Hub. Sie erhalten diese E-Mail, da Sie automatisierte Berichte in Ihren Einstellungen aktiviert haben."
+                }
+            },
+            "quarterly-report": {
+                "title": "Quartals-Ausgabenbericht"
             }
         },
         "browser": {
@@ -1846,8 +1908,20 @@
             "settings": {
                 "enabled": "Aktiviert",
                 "disabled": "Deaktiviert",
+                "deviceEnable": "Push-Benachrichtigungen auf diesem Gerät aktivieren",
+                "deviceDescription": "Erhalten Sie Pop-up-Benachrichtigungen in diesem Browser, wenn Sie sich in anderen Tabs befinden.",
                 "permissionDenied": "Browser-Benachrichtigungen sind blockiert. Bitte aktivieren Sie sie in Ihren Browser-Einstellungen.",
                 "notSupported": "Browser-Benachrichtigungen werden in diesem Browser nicht unterstützt."
+            }
+        },
+        "errors": {
+            "transaction": {
+                "insufficient-funds": "Unzureichendes Guthaben auf dem ausgewählten Konto",
+                "insufficient-funds-source": "Unzureichendes Guthaben auf dem Quellkonto",
+                "account-not-found": "Konto nicht gefunden oder Sie haben keinen Zugriff darauf",
+                "destination-account-not-found": "Zielkonto nicht gefunden oder Sie haben keinen Zugriff darauf",
+                "same-account-transfer": "Überweisung auf dasselbe Konto nicht möglich",
+                "unknown-error": "Ein unerwarteter Fehler ist aufgetreten"
             }
         }
     }

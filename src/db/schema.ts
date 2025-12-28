@@ -131,6 +131,8 @@ export const users = pgTable("users", {
   stripeCustomerId: text("stripe_customer_id"),
   twoFactorEnabled: boolean("two_factor_enabled").default(false).notNull(),
   language: text("language").default("en").notNull(),
+  notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
+  reportFrequency: text("report_frequency").default("off").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

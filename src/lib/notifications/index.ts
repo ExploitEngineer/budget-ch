@@ -86,7 +86,8 @@ export async function sendNotification(
         if (hubMembersResult.success && hubMembersResult.data) {
           // Send emails to all hub members sequentially and await them
           for (const member of hubMembersResult.data) {
-            if (member.email) {
+            // Check global notification preference
+            if (member.email && (member as any).notificationsEnabled !== false) {
               try {
                 await sendNotificationEmail(notification, member.email);
               } catch (err) {
@@ -103,7 +104,11 @@ export async function sendNotification(
         // User-specific notification: send email to the specified user
         if (notificationData.userId) {
           const emailResult = await getUserEmailDB(notificationData.userId);
-          if (emailResult.success && emailResult.data?.email) {
+          if (
+            emailResult.success &&
+            emailResult.data?.email &&
+            (emailResult.data as any).notificationsEnabled !== false
+          ) {
             try {
               await sendNotificationEmail(notification, emailResult.data.email);
             } catch (err) {

@@ -37,9 +37,10 @@ import db from "@/db/db";
 import { requireAdminRole } from "@/lib/auth/permissions";
 import { addDays, format, isBefore, isAfter, startOfDay, isSameDay, subHours } from "date-fns";
 import { sendNotification } from "@/lib/notifications";
-import { BUDGET_THRESHOLD_80, BUDGET_THRESHOLD_100 } from "@/lib/notifications/types";
+import { BUDGET_THRESHOLD_80, BUDGET_THRESHOLD_100, RECURRING_PAYMENT_SUCCESS, RECURRING_PAYMENT_FAILED, RECURRING_PAYMENT_SUMMARY } from "@/lib/notifications/types";
 import { transactions, notifications } from "@/db/schema";
 import { eq, and, sql, gte } from "drizzle-orm";
+import { getMailTranslations } from "@/lib/mail-translations";
 
 // CREATE Transaction
 export async function createTransaction({
@@ -1280,7 +1281,17 @@ export async function deleteAllTransactionsAndCategories() {
   }
 }
 
-// GENERATE Recurring Transactions
+// Interface for hub-level summary
+interface HubSummary {
+  hubId: string;
+  hubName: string;
+  userLanguage: string;
+  success: Array<{ name: string; amount: number }>;
+  failed: Array<{ name: string; amount: number; reason: string }>;
+  skipped: Array<{ name: string; nextDue: string }>;
+}
+
+// GENERATE Recurring Transactions - Hub-Batched Version
 export async function generateRecurringTransactions() {
   try {
     const templatesResult = await getActiveRecurringTemplatesDB();
@@ -1303,17 +1314,45 @@ export async function generateRecurringTransactions() {
 
     const today = startOfDay(new Date());
 
+    // Group templates by hubId for batched notifications
+    const hubSummaries: Record<string, HubSummary> = {};
+
     for (const template of templates) {
+      // Initialize hub summary if not exists
+      if (!hubSummaries[template.hubId]) {
+        hubSummaries[template.hubId] = {
+          hubId: template.hubId,
+          hubName: "", // We don't have hub name from template, will use generic
+          userLanguage: template.userLanguage || "en",
+          success: [],
+          failed: [],
+          skipped: [],
+        };
+      }
+
+      const hubSummary = hubSummaries[template.hubId];
+
       try {
         // Check if template is due for generation
         const isDue = isTemplateDue(template, today);
 
         if (!isDue) {
           results.skipped++;
+
+          // Calculate next due date for skipped items
+          const lastGenerated = template.lastGeneratedDate
+            ? startOfDay(new Date(template.lastGeneratedDate))
+            : startOfDay(new Date(template.startDate));
+          const nextDue = addDays(lastGenerated, template.frequencyDays);
+
+          hubSummary.skipped.push({
+            name: template.source || template.categoryName || "Unnamed",
+            nextDue: format(nextDue, "d.M.yyyy"),
+          });
           continue;
         }
 
-        // Use existing createTransaction service - handles ALL balance logic!
+        // Process the transaction
         const result = await createTransaction({
           categoryName: template.categoryName || "",
           amount: template.amount,
@@ -1323,33 +1362,19 @@ export async function generateRecurringTransactions() {
           accountId: template.financialAccountId,
           destinationAccountId: template.destinationAccountId,
           hubIdArg: template.hubId,
-          userIdArg: template.userId || undefined, // Bypass auth checks for system operation
-          // Pass template ID for linking
+          userIdArg: template.userId || undefined,
           recurringTemplateId: template.id,
         });
 
         if (result.success) {
-          // Mark template as successfully generated
           await updateTemplateLastGeneratedDB(template.id);
           results.success++;
 
-          // Send in-app notification to user (no email)
-          if (template.userId) {
-            await sendNotification({
-              userId: template.userId,
-              hubId: template.hubId,
-              type: "success",
-              title: "Recurring Transaction Created",
-              message: `Your recurring transaction "${template.source || template.categoryName}" (${new Intl.NumberFormat("de-CH", { style: "currency", currency: "CHF" }).format(template.amount)}) was automatically created.`,
-              channel: "web", // In-app only, no email
-              metadata: {
-                templateId: template.id,
-                transactionAmount: template.amount,
-              },
-            });
-          }
+          hubSummary.success.push({
+            name: template.source || template.categoryName || "Recurring Payment",
+            amount: template.amount,
+          });
         } else {
-          // Handle failure - mark template and send notification
           await markTemplateFailureDB(template.id, result.message || "Unknown error");
           results.failed++;
           results.errors.push({
@@ -1357,21 +1382,31 @@ export async function generateRecurringTransactions() {
             error: result.message || "Unknown error",
           });
 
-          // Send in-app notification to user (no email)
-          if (template.userId) {
-            await sendNotification({
-              userId: template.userId,
-              hubId: template.hubId,
-              type: "warning",
-              title: "Recurring Transaction Failed",
-              message: `Your recurring transaction "${template.source || template.categoryName}" failed: ${result.message}`,
-              channel: "web", // In-app only, no email
-              metadata: {
-                templateId: template.id,
-                reason: result.message,
-              },
-            });
+          // Translate error message to user's language
+          const userLang = template.userLanguage || "en";
+          const t = await getMailTranslations(userLang);
+          let translatedError = result.message || "Unknown error";
+          const errorMessage = result.message?.toLowerCase() || "";
+
+          if (errorMessage.includes("insufficient funds in selected account")) {
+            translatedError = t("notifications.errors.transaction.insufficient-funds");
+          } else if (errorMessage.includes("insufficient funds in source account")) {
+            translatedError = t("notifications.errors.transaction.insufficient-funds-source");
+          } else if (errorMessage.includes("account not found") || errorMessage.includes("don't have access")) {
+            translatedError = t("notifications.errors.transaction.account-not-found");
+          } else if (errorMessage.includes("destination account not found")) {
+            translatedError = t("notifications.errors.transaction.destination-account-not-found");
+          } else if (errorMessage.includes("cannot transfer to the same account")) {
+            translatedError = t("notifications.errors.transaction.same-account-transfer");
+          } else {
+            translatedError = t("notifications.errors.transaction.unknown-error");
           }
+
+          hubSummary.failed.push({
+            name: template.source || template.categoryName || "Recurring Payment",
+            amount: template.amount,
+            reason: translatedError,
+          });
         }
       } catch (error: any) {
         results.failed++;
@@ -1380,11 +1415,39 @@ export async function generateRecurringTransactions() {
           error: error.message || "Unexpected error",
         });
 
-        // Mark failure in database
-        await markTemplateFailureDB(
-          template.id,
-          error.message || "Unexpected error"
-        );
+        await markTemplateFailureDB(template.id, error.message || "Unexpected error");
+
+        // Add to hub summary with translated error
+        const userLang = template.userLanguage || "en";
+        const t = await getMailTranslations(userLang);
+        hubSummary.failed.push({
+          name: template.source || template.categoryName || "Recurring Payment",
+          amount: template.amount,
+          reason: t("notifications.errors.transaction.unknown-error"),
+        });
+      }
+    }
+
+    // Send ONE consolidated summary email per hub
+    for (const hubId in hubSummaries) {
+      const summary = hubSummaries[hubId];
+
+      // Only send if there's activity (success or failed transactions processed)
+      if (summary.success.length > 0 || summary.failed.length > 0) {
+        await sendNotification({
+          typeKey: RECURRING_PAYMENT_SUMMARY,
+          hubId: summary.hubId,
+          userId: null, // Hub-wide notification
+          metadata: {
+            hubName: summary.hubName || "Your Hub",
+            successCount: summary.success.length,
+            failedCount: summary.failed.length,
+            skippedCount: summary.skipped.length,
+            successItems: summary.success,
+            failedItems: summary.failed,
+            skippedItems: summary.skipped,
+          },
+        });
       }
     }
 

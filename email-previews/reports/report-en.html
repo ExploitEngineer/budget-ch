@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Spending Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #161b22;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #30363d;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 1px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background-color: #0d1117;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #30363d;
+        }
+
+        .label {
+            font-size: 12px;
+            color: #8b949e;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #58a6ff;
+        }
+
+        .value.income {
+            color: #3fb950;
+        }
+
+        .value.expense {
+            color: #f85149;
+        }
+
+        .hub-section {
+            margin-top: 30px;
+            border-top: 1px solid #30363d;
+            padding-top: 20px;
+        }
+
+        .hub-title {
+            font-size: 18px;
+            color: #f0f6fc;
+            margin-bottom: 15px;
+        }
+
+        .budget-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .progress-container {
+            height: 8px;
+            background-color: #30363d;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+            color: #8b949e;
+            background-color: #0d1117;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #238636;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Budget Tracker Report</h1>
+        </div>
+        <div class="content">
+            <p>Hello Demo User,</p>
+            <p>Here is your spending summary for <strong>December 2025</strong>.</p>
+
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="label">Total Income</div>
+                    <div class="value income">CHF 12,500.00</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">Total Expenses</div>
+                    <div class="value expense">CHF 8,240.50</div>
+                </div>
+            </div>
+
+            
+            <div class="hub-section">
+                <div class="hub-title">Personal Finances</div>
+                <div class="budget-info">
+                    <span>Spending: <strong>CHF 4,500.00</strong></span>
+                    <span>Saving Rate: <strong>15.5%</strong></span>
+                </div>
+            </div>
+        
+            <div class="hub-section">
+                <div class="hub-title">Shared Household</div>
+                <div class="budget-info">
+                    <span>Spending: <strong>CHF 3,740.50</strong></span>
+                    <span>Saving Rate: <strong>8.2%</strong></span>
+                </div>
+            </div>
+        
+
+            <div style="text-align: center;">
+                <a href="https://app.budgethub.ch/signin" class="button">View Dashboard</a>
+            </div>
+        </div>
+        <div class="footer">
+            Sent by Budget Hub. You received this because you enabled automated reports in your settings.
+        </div>
+    </div>
+</body>
+
+</html>

@@ -10,21 +10,25 @@ export default function AuthLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { resolvedTheme } = useTheme();
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F6F8FF] px-4 dark:[background:var(--fancy-gradient)]">
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">
         <div className="flex items-center gap-2">
           <Image
-            src={
-              resolvedTheme === "dark"
-                ? "/assets/images/dark-logo.png"
-                : "/assets/images/logo.png"
-            }
+            src="/assets/images/logo.png"
             width={150}
             height={150}
             alt="company logo"
             priority
+            className="dark:hidden"
+          />
+          <Image
+            src="/assets/images/dark-logo.png"
+            width={150}
+            height={150}
+            alt="company logo"
+            priority
+            className="hidden dark:block"
           />
         </div>
 

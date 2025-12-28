@@ -115,7 +115,7 @@ export function HubDisplay() {
                 onSelect={async (): Promise<void> => {
                   setSelectedHub(hub);
                   setOpen(false);
-                  
+
                   // Update cookie via server action
                   try {
                     // Update URL with hub param

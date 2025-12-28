@@ -50,7 +50,10 @@ export default async function Settings() {
         />
         <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />
-        <Notifications />
+        <Notifications
+          notificationsEnabled={user.notificationsEnabled}
+          reportFrequency={user.reportFrequency}
+        />
         <Security />
         <DataPrivacy />
         {/* <BillingDetails /> */}

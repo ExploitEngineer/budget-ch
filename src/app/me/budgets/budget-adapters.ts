@@ -21,11 +21,14 @@ export function mapBudgetToBudgetRow(budget: BudgetWithCategory): BudgetRow {
   const baseAllocated = budget.allocatedAmount !== null ? Number(budget.allocatedAmount) : null;
   const carriedOver = budget.carriedOverAmount ? Number(budget.carriedOverAmount) : 0;
 
-  // Effective allocated = base + carry over
-  // Only apply carry over if base allocated is set (budgeted)
-  const allocated = baseAllocated !== null ? baseAllocated + carriedOver : null;
+  // Budget column shows only the base allocated amount (no carry-over)
+  const allocated = baseAllocated;
 
-  const ist = budget.spentAmount !== null ? Number(budget.spentAmount) : 0; // Initial stored spent amount
+  // IST = initial stored spent - carriedOver
+  // Positive carry-over (surplus) reduces IST, negative (deficit) increases it
+  const baseIst = budget.spentAmount !== null ? Number(budget.spentAmount) : 0;
+  const ist = baseIst - carriedOver;
+
   const spent = Number(budget.calculatedSpentAmount ?? 0); // Calculated from transactions
 
   const totalSpent = ist + spent;
