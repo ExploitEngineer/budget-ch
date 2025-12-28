@@ -82,12 +82,12 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
       </SidebarHeader>
 
       <SidebarContent className="dark:bg-blue-background">
-        {open && (
+        {/*open && (
           <div className="mx-auto flex flex-col gap-1 w-full overflow-hidden px-2">
             <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{user.name}</p>
             <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
           </div>
-        )}
+        )*/}
         <NavMain />
       </SidebarContent>
 

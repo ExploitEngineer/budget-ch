@@ -35,6 +35,7 @@ import {
 } from "@/lib/services/features-permission";
 import { toast } from "sonner";
 import { clearQueryCache } from "@/components/providers/query-provider";
+import LinkLoadingIndicator from "./link-loading-indicator";
 
 interface Items {
   title: string;
@@ -78,11 +79,16 @@ export function NavMain() {
         const keysToRemove: string[] = [];
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
-          if (key && (key.startsWith("hub_") || key.startsWith("cache_") || key.startsWith("user_"))) {
+          if (
+            key &&
+            (key.startsWith("hub_") ||
+              key.startsWith("cache_") ||
+              key.startsWith("user_"))
+          ) {
             keysToRemove.push(key);
           }
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
+        keysToRemove.forEach((key) => localStorage.removeItem(key));
       }
 
       // Clear React Query cache to prevent stale data with wrong hub ID
@@ -195,11 +201,7 @@ export function NavMain() {
             <div key={item.title}>
               <Link
                 href={
-                  isRestricted
-                    ? "#"
-                    : item.url
-                      ? getUrlWithHub(item.url)
-                      : ""
+                  isRestricted ? "#" : item.url ? getUrlWithHub(item.url) : ""
                 }
                 onClick={(e) => handleNavigation(e, item, isRestricted)}
               >
@@ -211,11 +213,13 @@ export function NavMain() {
                         ? "flex !cursor-pointer items-center gap-2 rounded-xl border border-transparent px-3 py-5 ring-0 transition-all duration-300 hover:border-blue-600 focus:ring-0 hover:focus:ring-0 dark:hover:border-[#2B365C] hover:dark:bg-[#141B2C]"
                         : "",
                       pathname === item.url &&
-                      "border-blue-600 bg-gray-100 dark:border-[#2B365C] dark:bg-[#141A2C]",
+                        "border-blue-600 bg-gray-100 dark:border-[#2B365C] dark:bg-[#141A2C]",
                     )}
                     tooltip={item.title}
                   >
-                    {item.icon && <item.icon />}
+                    <LinkLoadingIndicator>
+                      {item.icon && <item.icon />}
+                    </LinkLoadingIndicator>
                     <span>
                       {item.onClick && isLoading ? <Spinner /> : item.title}
                     </span>
@@ -224,8 +228,8 @@ export function NavMain() {
               </Link>
               {(item.title === t("sidebar.links.reports") ||
                 item.title === t("sidebar.links.help")) && (
-                  <Separator className="dark:bg-[#1A2441]" />
-                )}
+                <Separator className="dark:bg-[#1A2441]" />
+              )}
             </div>
           );
         })}
