@@ -130,7 +130,7 @@ export function NavMain() {
       icon: CircleDotDashed,
     },
     {
-      title: t("sidebar.links.content"),
+      title: t("sidebar.links.accounts"),
       url: "/me/accounts",
       icon: UserRound,
     },
