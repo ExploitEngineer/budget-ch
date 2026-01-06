@@ -54,7 +54,7 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
         // image: "https://example.com/image.png",
-        // callbackURL: "/signin",
+        // callbackURL: "/login",
       });
 
       if (error) {
@@ -64,7 +64,7 @@ export default function SignUp() {
 
       form.reset();
       toast.success(t("messages.success-signup"));
-      router.push("/signin");
+      router.push("/login");
     } catch (err) {
       console.error(err);
       toast.error(t("messages.error-generic"));
@@ -247,7 +247,7 @@ export default function SignUp() {
             <span>{t("already")} </span>
             <Link
               className="text-sm text-[#235FE3] transition-all duration-300 hover:underline dark:text-[#6371FF]"
-              href="/signin"
+              href="/login"
             >
               {t("signin")}
             </Link>

@@ -46,7 +46,7 @@ function generatePreview() {
             totalExpense: "CHF 8,240.50",
             viewDashboardLabel: getTranslation(messages, "notifications.types.monthly-report.labels.viewDashboard"),
             footerText: getTranslation(messages, "notifications.types.monthly-report.labels.footerText"),
-            appUrl: "https://app.budgethub.ch/signin",
+            appUrl: "https://app.budgethub.ch/login",
             hubs: [
                 {
                     name: "Personal Finances",

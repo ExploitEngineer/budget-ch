@@ -98,11 +98,11 @@ export function NavMain() {
       await authClient.signOut();
 
       // Use hard refresh instead of soft navigation to completely clear all client state
-      window.location.href = "/signin";
+      window.location.href = "/login";
     } catch (err) {
       console.error("Error logging out", err);
       // Still try to redirect even on error
-      window.location.href = "/signin";
+      window.location.href = "/login";
     } finally {
       setIsLoading(false);
     }

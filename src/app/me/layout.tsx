@@ -17,7 +17,7 @@ export default async function DashboardLayout({
   });
 
   if (!session) {
-    redirect("/signin");
+    redirect("/login");
   }
 
   // Note: Hub ID is managed via cookie (source of truth)

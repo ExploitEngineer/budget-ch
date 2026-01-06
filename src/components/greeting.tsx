@@ -16,7 +16,7 @@ export default function Greeting() {
       <Link href="/signup">
         <Button className="cursor-pointer">Signup</Button>
       </Link>
-      <Link href="/signin">
+      <Link href="/login">
         <Button className="cursor-pointer">Signin</Button>
       </Link>
       <Link href="/forgot-password">
