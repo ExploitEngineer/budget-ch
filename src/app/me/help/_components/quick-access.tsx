@@ -67,6 +67,19 @@ export function QuickAccess({ onOpenAll, onCloseAll }: QuickAccessProps) {
           */}
           <Button
             variant="outline"
+            className="!bg-dark-blue-background dark:border-border-blue"
+            asChild
+          >
+            <a
+              href="https://budgethub.com/guide"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {t("buttons.guide")}
+            </a>
+          </Button>
+          <Button
+            variant="outline"
             className="btn-gradient"
             onClick={handleScrollToContactForm}
           >

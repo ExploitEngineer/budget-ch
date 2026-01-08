@@ -1802,7 +1802,8 @@
                 "faqs": "Ouvrir toutes les FAQ",
                 "close-all": "Tout fermer",
                 "attach": "Joindre le diagnostic",
-                "contact-support": "Contacter le support"
+                "contact-support": "Contacter le support",
+                "guide": "Guide Budgethub"
             },
             "faqs-section": {
                 "title": "FAQ",

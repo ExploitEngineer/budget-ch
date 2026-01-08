@@ -1802,7 +1802,8 @@
                 "faqs": "Open All FAQs",
                 "close-all": "Close All",
                 "attach": "Attach Diagnostics",
-                "contact-support": "Contact Support"
+                "contact-support": "Contact Support",
+                "guide": "Budgethub Guide"
             },
             "faqs-section": {
                 "title": "FAQ",

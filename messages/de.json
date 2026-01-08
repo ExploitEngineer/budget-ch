@@ -1802,7 +1802,8 @@
                 "faqs": "Alle FAQs öffnen",
                 "close-all": "Alles schließen",
                 "attach": "Diagnose anhängen",
-                "contact-support": "Support kontaktieren"
+                "contact-support": "Support kontaktieren",
+                "guide": "Budgethub Leitfaden"
             },
             "faqs-section": {
                 "title": "FAQ",
