@@ -100,6 +100,10 @@
             "already-member": {
                 "title": "Bereits Mitglied",
                 "description": "Sie sind bereits Mitglied dieses Hubs. Sie können über Ihr Dashboard darauf zugreifen."
+            },
+            "cancelled": {
+                "title": "Einladung abgebrochen",
+                "description": "Diese Einladung wurde vom Hub-Eigentümer abgebrochen. Bitte fordern Sie eine neue Einladung an."
             }
         },
         "goodbye": {
@@ -1490,7 +1494,8 @@
                     "cancel": "Abbrechen",
                     "send": "Einladung senden",
                     "sending": "Senden...",
-                    "upgrade": "Upgrade für Einladung"
+                    "upgrade": "Upgrade für Einladung",
+                    "cancel-invitation": "Abbrechen"
                 },
                 "members-table": {
                     "title": "Hub-Mitglieder",
@@ -1511,7 +1516,8 @@
                         "email": "E-Mail",
                         "role": "Rolle",
                         "status": "Status",
-                        "expires": "Läuft ab"
+                        "expires": "Läuft ab",
+                        "actions": "Aktionen"
                     },
                     "statuses": {
                         "accepted": "Akzeptiert",
@@ -1531,7 +1537,9 @@
                     "load-error": "Fehler beim Laden von Einladungen & Mitgliedern",
                     "invitation-sent": "Einladung gesendet",
                     "send-error": "Fehler beim Senden der Einladung",
-                    "send-unexpected-error": "Fehler beim Senden der Einladung"
+                    "send-unexpected-error": "Fehler beim Senden der Einladung",
+                    "invitation-cancelled": "Einladung abgebrochen",
+                    "cancel-error": "Fehler beim Abbrechen der Einladung"
                 }
             },
             "appearance-section": {

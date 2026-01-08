@@ -242,6 +242,7 @@ export const hubInvitations = pgTable("hub_invitations", {
   role: accessRole().notNull().default("member"),
   token: text("token").notNull(),
   accepted: boolean("accepted").default(false).notNull(),
+  cancelled: boolean("cancelled").default(false).notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

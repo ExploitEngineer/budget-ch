@@ -14,6 +14,7 @@ import {
   UserX,
   Users,
   AlertCircle,
+  Ban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
@@ -28,7 +29,8 @@ type StatusType =
   | "expired"
   | "already-accepted"
   | "email-mismatch"
-  | "already-member";
+  | "already-member"
+  | "cancelled";
 
 // Map server error messages to status types
 function getStatusFromMessage(message: string): StatusType {
@@ -41,6 +43,8 @@ function getStatusFromMessage(message: string): StatusType {
       return "expired";
     case "Invitation already accepted":
       return "already-accepted";
+    case "Invitation cancelled":
+      return "cancelled";
     case "You cannot accept this invitation (email does not match)":
       return "email-mismatch";
     case "You are already a member of this hub":
@@ -217,6 +221,19 @@ export default function AcceptInvitationPage() {
             <Button asChild variant="outline" className="mt-2">
               <Link href="/me/dashboard">{t("success.button")}</Link>
             </Button>
+          </div>
+        );
+
+      case "cancelled":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <Ban className="h-12 w-12 text-red-500" />
+            <h2 className="text-lg font-semibold text-red-600">
+              {t("cancelled.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("cancelled.description")}
+            </p>
           </div>
         );
 

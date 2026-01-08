@@ -2595,7 +2595,7 @@ export async function getHubsByUserDB(
   }
 }
 
-// CREATE Invitation
+// CREATE Invitation (replaces existing pending invitation for same email)
 export async function createHubInvitationDB({
   hubId,
   email,
@@ -2604,6 +2604,18 @@ export async function createHubInvitationDB({
   expiresAt,
 }: HubInvitationProps) {
   try {
+    // Delete any existing pending (not accepted, not cancelled) invitations for this email in this hub
+    await db
+      .delete(hubInvitations)
+      .where(
+        and(
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.email, email),
+          eq(hubInvitations.accepted, false),
+          eq(hubInvitations.cancelled, false)
+        )
+      );
+
     const inserted = await db
       .insert(hubInvitations)
       .values({
@@ -2621,7 +2633,7 @@ export async function createHubInvitationDB({
   }
 }
 
-// GET INVITATIONS by HUB
+// GET INVITATIONS by HUB (excludes cancelled invitations)
 export async function getHubInvitationsByHubDB(hubId: string) {
   try {
     const rows = await db
@@ -2630,15 +2642,46 @@ export async function getHubInvitationsByHubDB(hubId: string) {
         email: hubInvitations.email,
         role: hubInvitations.role,
         accepted: hubInvitations.accepted,
+        cancelled: hubInvitations.cancelled,
         expiresAt: hubInvitations.expiresAt,
         createdAt: hubInvitations.createdAt,
       })
       .from(hubInvitations)
-      .where(eq(hubInvitations.hubId, hubId));
+      .where(
+        and(
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.cancelled, false)
+        )
+      );
 
     return { success: true, data: rows };
   } catch (err: any) {
     return { success: false, message: err.message, data: [] };
+  }
+}
+
+// CANCEL Invitation
+export async function cancelHubInvitationDB(invitationId: string, hubId: string) {
+  try {
+    const result = await db
+      .update(hubInvitations)
+      .set({ cancelled: true })
+      .where(
+        and(
+          eq(hubInvitations.id, invitationId),
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.accepted, false)
+        )
+      )
+      .returning();
+
+    if (result.length === 0) {
+      return { success: false, message: "Invitation not found or already accepted" };
+    }
+
+    return { success: true, message: "Invitation cancelled" };
+  } catch (err: any) {
+    return { success: false, message: err.message };
   }
 }
 
@@ -2667,6 +2710,9 @@ export async function acceptInvitationDB(token: string, userId: string) {
     });
 
     if (!invite) return { success: false, message: "Invitation not found" };
+
+    if (invite.cancelled)
+      return { success: false, message: "Invitation cancelled" };
 
     if (invite.accepted)
       return { success: false, message: "Invitation already accepted" };

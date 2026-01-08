@@ -28,6 +28,7 @@ import {
   sendHubInvitation,
   getHubInvitations,
   getHubMembers,
+  cancelHubInvitation,
 } from "@/lib/services/hub-invitation";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -138,6 +139,27 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
     [t],
   );
 
+  const handleCancelInvitation = async (invitationId: string): Promise<void> => {
+    startTransition(async (): Promise<void> => {
+      try {
+        const result = await cancelHubInvitation(invitationId, hubId);
+        if (result.success) {
+          toast.success(t("messages.invitation-cancelled"));
+          // Refresh invitations list
+          const invRes = await getHubInvitations(hubId);
+          if (invRes.success && Array.isArray(invRes.data)) {
+            setInvitations(invRes.data);
+          }
+        } else {
+          toast.error(result.message || t("messages.cancel-error"));
+        }
+      } catch (e) {
+        console.error(e);
+        toast.error(t("messages.cancel-error"));
+      }
+    });
+  };
+
   const invitationColumns = useMemo<ColumnDef<Invitation>[]>(
     () => [
       {
@@ -167,8 +189,29 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
         header: () => t("invitations-table.table-headings.expires"),
         cell: (info) => formatDate(info.row.original.expiresAt),
       },
+      {
+        id: "actions",
+        header: () => t("invitations-table.table-headings.actions"),
+        cell: (info) => {
+          // Only show cancel button for pending (not accepted) invitations
+          if (info.row.original.accepted) {
+            return null;
+          }
+          return (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => handleCancelInvitation(info.row.original.id)}
+              disabled={isPending}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+            >
+              {t("buttons.cancel-invitation")}
+            </Button>
+          );
+        },
+      },
     ],
-    [t],
+    [t, isPending, hubId],
   );
 
   const membersTable = useReactTable({

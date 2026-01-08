@@ -4,6 +4,7 @@ import {
   createHubInvitationDB,
   getHubInvitationsByHubDB,
   acceptInvitationDB,
+  cancelHubInvitationDB,
   getHubMembersDB,
   getUserByEmailDB,
 } from "@/db/queries";
@@ -167,4 +168,23 @@ export async function getHubMembers(hubId: string) {
     return { success: false, message: "Not authenticated", data: [] };
 
   return await getHubMembersDB(hubId);
+}
+
+// CANCEL Invitation
+export async function cancelHubInvitation(invitationId: string, hubId: string) {
+  try {
+    const hdrs = await headers();
+
+    // Check authentication
+    try {
+      await getContext(hdrs, false);
+    } catch {
+      return { success: false, message: "Not authenticated" };
+    }
+
+    const res = await cancelHubInvitationDB(invitationId, hubId);
+    return res;
+  } catch (err: any) {
+    return { success: false, message: err.message || "Error cancelling invitation" };
+  }
 }

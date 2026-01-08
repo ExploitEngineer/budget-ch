@@ -100,6 +100,10 @@
             "already-member": {
                 "title": "Già membro",
                 "description": "Sei già membro di questo hub. Puoi accedervi dalla tua dashboard."
+            },
+            "cancelled": {
+                "title": "Invito annullato",
+                "description": "Questo invito è stato annullato dal proprietario dell'hub. Richiedi un nuovo invito."
             }
         },
         "goodbye": {
@@ -1490,7 +1494,8 @@
                     "cancel": "Annulla",
                     "send": "Invia invito",
                     "sending": "Invio...",
-                    "upgrade": "Effettua l'upgrade per invitare"
+                    "upgrade": "Effettua l'upgrade per invitare",
+                    "cancel-invitation": "Annulla"
                 },
                 "members-table": {
                     "title": "Membri dell'hub",
@@ -1511,7 +1516,8 @@
                         "email": "Email",
                         "role": "Ruolo",
                         "status": "Stato",
-                        "expires": "Scade il"
+                        "expires": "Scade il",
+                        "actions": "Azioni"
                     },
                     "statuses": {
                         "accepted": "Accettato",
@@ -1531,7 +1537,9 @@
                     "load-error": "Impossibile caricare inviti e membri",
                     "invitation-sent": "Invito inviato",
                     "send-error": "Impossibile inviare l'invito",
-                    "send-unexpected-error": "Errore durante l'invio dell'invito"
+                    "send-unexpected-error": "Errore durante l'invio dell'invito",
+                    "invitation-cancelled": "Invito annullato",
+                    "cancel-error": "Impossibile annullare l'invito"
                 }
             },
             "appearance-section": {

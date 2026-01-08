@@ -100,6 +100,10 @@
             "already-member": {
                 "title": "Already a Member",
                 "description": "You are already a member of this hub. You can access it from your dashboard."
+            },
+            "cancelled": {
+                "title": "Invitation Cancelled",
+                "description": "This invitation has been cancelled by the hub owner. Please request a new invitation."
             }
         },
         "goodbye": {
@@ -1490,7 +1494,8 @@
                     "cancel": "Cancel",
                     "send": "Send Invitation",
                     "sending": "Sending...",
-                    "upgrade": "Upgrade to Invite"
+                    "upgrade": "Upgrade to Invite",
+                    "cancel-invitation": "Cancel"
                 },
                 "members-table": {
                     "title": "Hub Members",
@@ -1511,7 +1516,8 @@
                         "email": "Email",
                         "role": "Role",
                         "status": "Status",
-                        "expires": "Expires"
+                        "expires": "Expires",
+                        "actions": "Actions"
                     },
                     "statuses": {
                         "accepted": "Accepted",
@@ -1531,7 +1537,9 @@
                     "load-error": "Failed to load invitations & members",
                     "invitation-sent": "Invitation sent",
                     "send-error": "Failed to send invitation",
-                    "send-unexpected-error": "Error sending invitation"
+                    "send-unexpected-error": "Error sending invitation",
+                    "invitation-cancelled": "Invitation cancelled",
+                    "cancel-error": "Failed to cancel invitation"
                 }
             },
             "appearance-section": {
