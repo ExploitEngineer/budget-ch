@@ -6,12 +6,49 @@ import { acceptHubInvitation } from "@/lib/services/hub-invitation";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, XCircle, LogIn } from "lucide-react";
+import {
+  CheckCircle,
+  XCircle,
+  LogIn,
+  Clock,
+  UserX,
+  Users,
+  AlertCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
-type StatusType = "pending" | "accepted" | "error" | "not-authenticated";
+type StatusType =
+  | "pending"
+  | "accepted"
+  | "error"
+  | "not-authenticated"
+  | "not-found"
+  | "expired"
+  | "already-accepted"
+  | "email-mismatch"
+  | "already-member";
+
+// Map server error messages to status types
+function getStatusFromMessage(message: string): StatusType {
+  switch (message) {
+    case "Not authenticated":
+      return "not-authenticated";
+    case "Invitation not found":
+      return "not-found";
+    case "Invitation expired":
+      return "expired";
+    case "Invitation already accepted":
+      return "already-accepted";
+    case "You cannot accept this invitation (email does not match)":
+      return "email-mismatch";
+    case "You are already a member of this hub":
+      return "already-member";
+    default:
+      return "error";
+  }
+}
 
 export default function AcceptInvitationPage() {
   const router = useRouter();
@@ -24,7 +61,7 @@ export default function AcceptInvitationPage() {
 
   useEffect((): void => {
     if (!token) {
-      setStatus("error");
+      setStatus("not-found");
       return;
     }
 
@@ -41,20 +78,15 @@ export default function AcceptInvitationPage() {
           const dashboardUrl = `/me/dashboard?hub=${res.data.hubId}`;
           setTimeout(() => {
             router.push(dashboardUrl);
-          }, 2000)
+          }, 2000);
         } catch (err) {
           console.error("Failed to set hub cookie:", err);
           toast.error(t("error.set-hub-failed"));
           setStatus("error");
         }
       } else {
-        // Check if the error is due to not being authenticated
-        if (res.message === "Not authenticated") {
-          setStatus("not-authenticated");
-        } else {
-          toast.error(res.message);
-          setStatus("error");
-        }
+        const errorStatus = getStatusFromMessage(res.message || "");
+        setStatus(errorStatus);
       }
     };
 
@@ -114,16 +146,89 @@ export default function AcceptInvitationPage() {
           </div>
         );
 
+      case "not-found":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <AlertCircle className="h-12 w-12 text-orange-500" />
+            <h2 className="text-lg font-semibold text-orange-600">
+              {t("not-found.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("not-found.description")}
+            </p>
+          </div>
+        );
+
+      case "expired":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <Clock className="h-12 w-12 text-orange-500" />
+            <h2 className="text-lg font-semibold text-orange-600">
+              {t("expired.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("expired.description")}
+            </p>
+          </div>
+        );
+
+      case "already-accepted":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <CheckCircle className="h-12 w-12 text-blue-500" />
+            <h2 className="text-lg font-semibold text-blue-600">
+              {t("already-accepted.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("already-accepted.description")}
+            </p>
+            <Button asChild variant="outline" className="mt-2">
+              <Link href="/me/dashboard">{t("success.button")}</Link>
+            </Button>
+          </div>
+        );
+
+      case "email-mismatch":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <UserX className="h-12 w-12 text-red-500" />
+            <h2 className="text-lg font-semibold text-red-600">
+              {t("email-mismatch.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("email-mismatch.description")}
+            </p>
+            <Button asChild className="mt-2">
+              <Link href="/login">{t("not-authenticated.button")}</Link>
+            </Button>
+          </div>
+        );
+
+      case "already-member":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <Users className="h-12 w-12 text-blue-500" />
+            <h2 className="text-lg font-semibold text-blue-600">
+              {t("already-member.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("already-member.description")}
+            </p>
+            <Button asChild variant="outline" className="mt-2">
+              <Link href="/me/dashboard">{t("success.button")}</Link>
+            </Button>
+          </div>
+        );
+
       case "error":
+      default:
         return (
           <div className="flex flex-col items-center gap-4">
             <XCircle className="h-12 w-12 text-red-500" />
             <h2 className="text-lg font-semibold text-red-600">
               {t("error.title")}
             </h2>
-            <p className="text-gray-600">
-              {t("error.description")}
-            </p>
+            <p className="text-center text-gray-600">{t("error.description")}</p>
           </div>
         );
     }

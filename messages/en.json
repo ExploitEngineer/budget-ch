@@ -72,14 +72,34 @@
                 "button": "Go Now"
             },
             "error": {
-                "title": "Invalid or Expired Invitation",
-                "description": "The invitation link is not valid or has already expired.",
+                "title": "Something Went Wrong",
+                "description": "An unexpected error occurred while processing your invitation.",
                 "set-hub-failed": "Invitation accepted but failed to set active hub"
             },
             "not-authenticated": {
                 "title": "Login Required",
                 "description": "Please log in to accept this invitation. After logging in, open the invitation link again.",
                 "button": "Go to Login"
+            },
+            "not-found": {
+                "title": "Invitation Not Found",
+                "description": "This invitation link is invalid. Please check the link or request a new invitation."
+            },
+            "expired": {
+                "title": "Invitation Expired",
+                "description": "This invitation has expired. Please request a new invitation from the hub owner."
+            },
+            "already-accepted": {
+                "title": "Invitation Already Used",
+                "description": "This invitation has already been accepted. You can access the hub from your dashboard."
+            },
+            "email-mismatch": {
+                "title": "Wrong Account",
+                "description": "This invitation was sent to a different email address. Please log in with the correct account to accept this invitation."
+            },
+            "already-member": {
+                "title": "Already a Member",
+                "description": "You are already a member of this hub. You can access it from your dashboard."
             }
         },
         "goodbye": {

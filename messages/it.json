@@ -72,14 +72,34 @@
                 "button": "Vai ora"
             },
             "error": {
-                "title": "Invito non valido o scaduto",
-                "description": "Il link dell'invito non è valido o è già scaduto.",
+                "title": "Qualcosa è andato storto",
+                "description": "Si è verificato un errore imprevisto durante l'elaborazione del tuo invito.",
                 "set-hub-failed": "Invito accettato ma impossibile impostare l'hub attivo"
             },
             "not-authenticated": {
                 "title": "Accesso richiesto",
                 "description": "Effettua l'accesso per accettare questo invito. Dopo aver effettuato l'accesso, apri nuovamente il link dell'invito.",
                 "button": "Vai all'accesso"
+            },
+            "not-found": {
+                "title": "Invito non trovato",
+                "description": "Questo link di invito non è valido. Verifica il link o richiedi un nuovo invito."
+            },
+            "expired": {
+                "title": "Invito scaduto",
+                "description": "Questo invito è scaduto. Richiedi un nuovo invito al proprietario dell'hub."
+            },
+            "already-accepted": {
+                "title": "Invito già utilizzato",
+                "description": "Questo invito è già stato accettato. Puoi accedere all'hub dalla tua dashboard."
+            },
+            "email-mismatch": {
+                "title": "Account sbagliato",
+                "description": "Questo invito è stato inviato a un altro indirizzo email. Effettua l'accesso con l'account corretto per accettare questo invito."
+            },
+            "already-member": {
+                "title": "Già membro",
+                "description": "Sei già membro di questo hub. Puoi accedervi dalla tua dashboard."
             }
         },
         "goodbye": {

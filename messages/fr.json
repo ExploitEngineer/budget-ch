@@ -72,14 +72,34 @@
                 "button": "Y aller maintenant"
             },
             "error": {
-                "title": "Invitation invalide ou expirée",
-                "description": "Le lien d'invitation n'est pas valide ou a déjà expiré.",
+                "title": "Une erreur s'est produite",
+                "description": "Une erreur inattendue s'est produite lors du traitement de votre invitation.",
                 "set-hub-failed": "Invitation acceptée mais impossible de définir le hub actif"
             },
             "not-authenticated": {
                 "title": "Connexion requise",
                 "description": "Veuillez vous connecter pour accepter cette invitation. Après vous être connecté, ouvrez à nouveau le lien d'invitation.",
                 "button": "Aller à la connexion"
+            },
+            "not-found": {
+                "title": "Invitation introuvable",
+                "description": "Ce lien d'invitation n'est pas valide. Veuillez vérifier le lien ou demander une nouvelle invitation."
+            },
+            "expired": {
+                "title": "Invitation expirée",
+                "description": "Cette invitation a expiré. Veuillez demander une nouvelle invitation au propriétaire du hub."
+            },
+            "already-accepted": {
+                "title": "Invitation déjà utilisée",
+                "description": "Cette invitation a déjà été acceptée. Vous pouvez accéder au hub depuis votre tableau de bord."
+            },
+            "email-mismatch": {
+                "title": "Mauvais compte",
+                "description": "Cette invitation a été envoyée à une autre adresse e-mail. Veuillez vous connecter avec le bon compte pour accepter cette invitation."
+            },
+            "already-member": {
+                "title": "Déjà membre",
+                "description": "Vous êtes déjà membre de ce hub. Vous pouvez y accéder depuis votre tableau de bord."
             }
         },
         "goodbye": {

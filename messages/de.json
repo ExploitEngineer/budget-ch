@@ -72,14 +72,34 @@
                 "button": "Jetzt los"
             },
             "error": {
-                "title": "Ungültige oder abgelaufene Einladung",
-                "description": "Der Einladungslink ist ungültig oder bereits abgelaufen.",
+                "title": "Etwas ist schiefgelaufen",
+                "description": "Bei der Verarbeitung Ihrer Einladung ist ein unerwarteter Fehler aufgetreten.",
                 "set-hub-failed": "Einladung angenommen, aber Hub konnte nicht aktiviert werden"
             },
             "not-authenticated": {
                 "title": "Anmeldung erforderlich",
                 "description": "Bitte melden Sie sich an, um diese Einladung anzunehmen. Öffnen Sie nach der Anmeldung den Einladungslink erneut.",
                 "button": "Zur Anmeldung"
+            },
+            "not-found": {
+                "title": "Einladung nicht gefunden",
+                "description": "Dieser Einladungslink ist ungültig. Bitte überprüfen Sie den Link oder fordern Sie eine neue Einladung an."
+            },
+            "expired": {
+                "title": "Einladung abgelaufen",
+                "description": "Diese Einladung ist abgelaufen. Bitte fordern Sie eine neue Einladung vom Hub-Eigentümer an."
+            },
+            "already-accepted": {
+                "title": "Einladung bereits verwendet",
+                "description": "Diese Einladung wurde bereits angenommen. Sie können über Ihr Dashboard auf den Hub zugreifen."
+            },
+            "email-mismatch": {
+                "title": "Falsches Konto",
+                "description": "Diese Einladung wurde an eine andere E-Mail-Adresse gesendet. Bitte melden Sie sich mit dem richtigen Konto an, um diese Einladung anzunehmen."
+            },
+            "already-member": {
+                "title": "Bereits Mitglied",
+                "description": "Sie sind bereits Mitglied dieses Hubs. Sie können über Ihr Dashboard darauf zugreifen."
             }
         },
         "goodbye": {

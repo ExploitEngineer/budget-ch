@@ -135,20 +135,26 @@ export async function getHubInvitations(hubId: string) {
 export async function acceptHubInvitation(token: string) {
   try {
     const hdrs = await headers();
-    const { userId } = await getContext(hdrs, false);
 
-    if (!userId) return { success: false, message: "Not authenticated" };
+    // Check authentication - getContext throws if not authenticated
+    let userId: string;
+    try {
+      const context = await getContext(hdrs, false);
+      userId = context.userId;
+    } catch {
+      return { success: false, message: "Not authenticated" };
+    }
 
     const res = await acceptInvitationDB(token, userId);
     if (!res.success) return res;
 
     return {
       success: true,
-      message: "Invitation Accecpted Successfully",
+      message: "Invitation Accepted Successfully",
       data: { hubId: res.data?.hubId },
     };
   } catch (err: any) {
-    return { success: false, message: "Error accepting invitation" };
+    return { success: false, message: err.message || "Error accepting invitation" };
   }
 }
 
