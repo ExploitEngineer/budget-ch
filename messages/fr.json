@@ -75,6 +75,11 @@
                 "title": "Invitation invalide ou expirée",
                 "description": "Le lien d'invitation n'est pas valide ou a déjà expiré.",
                 "set-hub-failed": "Invitation acceptée mais impossible de définir le hub actif"
+            },
+            "not-authenticated": {
+                "title": "Connexion requise",
+                "description": "Veuillez vous connecter pour accepter cette invitation. Après vous être connecté, ouvrez à nouveau le lien d'invitation.",
+                "button": "Aller à la connexion"
             }
         },
         "goodbye": {

@@ -6,11 +6,12 @@ import { acceptHubInvitation } from "@/lib/services/hub-invitation";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
-import { CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
-type StatusType = "pending" | "accepted" | "error";
+type StatusType = "pending" | "accepted" | "error" | "not-authenticated";
 
 export default function AcceptInvitationPage() {
   const router = useRouter();
@@ -47,8 +48,13 @@ export default function AcceptInvitationPage() {
           setStatus("error");
         }
       } else {
-        toast.error(res.message);
-        setStatus("error");
+        // Check if the error is due to not being authenticated
+        if (res.message === "Not authenticated") {
+          setStatus("not-authenticated");
+        } else {
+          toast.error(res.message);
+          setStatus("error");
+        }
       }
     };
 
@@ -88,6 +94,22 @@ export default function AcceptInvitationPage() {
               className="mt-2"
             >
               {t("success.button")}
+            </Button>
+          </div>
+        );
+
+      case "not-authenticated":
+        return (
+          <div className="flex flex-col items-center gap-4">
+            <LogIn className="h-12 w-12 text-blue-500" />
+            <h2 className="text-lg font-semibold text-blue-600">
+              {t("not-authenticated.title")}
+            </h2>
+            <p className="text-center text-gray-600">
+              {t("not-authenticated.description")}
+            </p>
+            <Button asChild className="mt-2">
+              <Link href="/login">{t("not-authenticated.button")}</Link>
             </Button>
           </div>
         );

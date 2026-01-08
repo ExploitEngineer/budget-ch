@@ -75,6 +75,11 @@
                 "title": "Ungültige oder abgelaufene Einladung",
                 "description": "Der Einladungslink ist ungültig oder bereits abgelaufen.",
                 "set-hub-failed": "Einladung angenommen, aber Hub konnte nicht aktiviert werden"
+            },
+            "not-authenticated": {
+                "title": "Anmeldung erforderlich",
+                "description": "Bitte melden Sie sich an, um diese Einladung anzunehmen. Öffnen Sie nach der Anmeldung den Einladungslink erneut.",
+                "button": "Zur Anmeldung"
             }
         },
         "goodbye": {

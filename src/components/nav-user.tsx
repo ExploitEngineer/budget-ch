@@ -41,14 +41,14 @@ export function NavUser() {
       <SidebarMenuItem className="flex w-full items-center gap-4">
         {open ? (
           <div className="flex w-full flex-col justify-center gap-2">
-            <div className="flex w-full items-center gap-3">
+            <div className="flex w-full items-center gap-3 px-1">
               {/* <LangSwitcherDefault />
               <ThemeToggleDropdown /> */}
               <div className="flex cursor-pointer items-center rounded-full border bg-gray-100 py-1 px-2 text-xs dark:bg-transparent">
                 Plan: <span className="ml-1 font-medium">{plan}</span>
               </div>
             </div>
-            <div className="dark:border-border-blue border-b p-4">
+            <div className="dark:border-border-blue border-b py-4 px-1">
               <div className="mb-2 text-xs font-semibold text-gray-500">
                 Current Hub
               </div>

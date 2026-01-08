@@ -75,6 +75,11 @@
                 "title": "Invito non valido o scaduto",
                 "description": "Il link dell'invito non è valido o è già scaduto.",
                 "set-hub-failed": "Invito accettato ma impossibile impostare l'hub attivo"
+            },
+            "not-authenticated": {
+                "title": "Accesso richiesto",
+                "description": "Effettua l'accesso per accettare questo invito. Dopo aver effettuato l'accesso, apri nuovamente il link dell'invito.",
+                "button": "Vai all'accesso"
             }
         },
         "goodbye": {

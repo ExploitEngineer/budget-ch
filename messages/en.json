@@ -75,6 +75,11 @@
                 "title": "Invalid or Expired Invitation",
                 "description": "The invitation link is not valid or has already expired.",
                 "set-hub-failed": "Invitation accepted but failed to set active hub"
+            },
+            "not-authenticated": {
+                "title": "Login Required",
+                "description": "Please log in to accept this invitation. After logging in, open the invitation link again.",
+                "button": "Go to Login"
             }
         },
         "goodbye": {
