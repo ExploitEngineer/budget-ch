@@ -819,7 +819,7 @@ export default function EditTransactionDialog({
                         name="recurringStatus"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.recurringStatus")}</FormLabel>
+                            <FormLabel>{t("transaction-edit-dialog.dialog.labels.recurringStatus")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -830,10 +830,10 @@ export default function EditTransactionDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="active">
-                                    {t("dialog.options.active")}
+                                    {t("transaction-edit-dialog.dialog.options.active")}
                                   </SelectItem>
                                   <SelectItem value="inactive">
-                                    {t("dialog.options.inactive")}
+                                    {t("transaction-edit-dialog.dialog.options.inactive")}
                                   </SelectItem>
                                 </SelectContent>
                               </Select>

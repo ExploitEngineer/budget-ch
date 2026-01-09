@@ -14,6 +14,7 @@ import {
   regenerateBackupCodes,
   getTwoFactorStatus,
 } from "@/lib/services/security";
+import { exportFullUserData } from "@/lib/services/export-service";
 
 export async function createStripePortalSession() {
   const hdrs = await headers();
@@ -71,3 +72,6 @@ export async function getTwoFactorStatusAction() {
   return await getTwoFactorStatus();
 }
 
+export async function exportFullUserDataAction() {
+  return await exportFullUserData();
+}

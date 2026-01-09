@@ -28,6 +28,8 @@ import type {
 } from "@/lib/utils/export-csv";
 import { exportAllDataToJSON } from "@/lib/utils/export-json";
 import Papa from "papaparse";
+import { exportFullUserDataAction } from "@/app/me/settings/actions";
+import { toast } from "sonner";
 
 export const useExportCSV = () => {
   const transactionT = useTranslations("main-dashboard.transactions-page");
@@ -200,6 +202,30 @@ export const useExportCSV = () => {
 
     // (JSON) export
     exportAllDataJSON: (data: Record<string, any>) => exportAllDataToJSON(data),
+
+    // GDPR Full Export
+    exportGDPRDataJSON: async () => {
+      try {
+        const result = await exportFullUserDataAction();
+        if (result.success && result.data) {
+          const json = JSON.stringify(result.data, null, 2);
+          const blob = new Blob([json], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `gdpr-full-export-${new Date().toISOString().split("T")[0]}.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          toast.success("GDPR full data export started");
+        } else {
+          toast.error(result.message || "Failed to export GDPR data");
+        }
+      } catch (err: any) {
+        toast.error("Failed to export GDPR data");
+        console.error(err);
+      }
+    },
 
     // All csv templates export
     exportALLCSVTemplates,

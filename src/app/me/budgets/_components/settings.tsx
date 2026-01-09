@@ -51,7 +51,6 @@ export function Settings() {
       <Card className="bg-blue-background dark:border-border-blue">
         <CardHeader className="flex items-center justify-between">
           <CardTitle>{t("title")}</CardTitle>
-          <CreateBudgetDialog variant="outline" text={t("button")} />
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className="flex flex-wrap items-center gap-2">

@@ -55,7 +55,7 @@ export default async function Settings() {
           reportFrequency={user.reportFrequency}
         />
         <Security />
-        <DataPrivacy />
+        {/* <DataPrivacy /> */}
         {/* <BillingDetails /> */}
         {/* <AboutSection /> */}
       </div>

@@ -123,7 +123,7 @@ export function Export() {
     exportAccountTemplate,
     exportTransferTemplate,
     exportSavingGoalTemplate,
-    exportAllDataJSON,
+    exportGDPRDataJSON,
   } = useExportCSV();
 
   const buttons = [
@@ -233,15 +233,7 @@ export function Export() {
               <p>{t("export-json-card.content")}</p>
               <Button
                 variant="outline"
-                onClick={() =>
-                  exportAllDataJSON({
-                    transactions,
-                    budgets,
-                    accounts,
-                    goals,
-                    transfers: transfers ?? [],
-                  })
-                }
+                onClick={() => exportGDPRDataJSON()}
                 className="btn-gradient dark:text-foreground w-auto cursor-pointer hover:text-white"
               >
                 {t("export-json-card.button")}

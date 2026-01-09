@@ -184,7 +184,7 @@ export default function SignUp() {
                       terms: (chunks) => (
                         <a
                           className="text-[#235FE3] underline dark:text-[#6371FF]"
-                          href="/terms"
+                          href="https://www.budgethub.ch/nutzungsbedingungen/"
                           target="_blank"
                           rel="noopener"
                         >
@@ -194,7 +194,7 @@ export default function SignUp() {
                       privacy: (chunks) => (
                         <a
                           className="text-[#235FE3] underline dark:text-[#6371FF]"
-                          href="/privacy"
+                          href="https://www.budgethub.ch/datenschutzerklarung/"
                           target="_blank"
                           rel="noopener"
                         >

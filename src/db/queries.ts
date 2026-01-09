@@ -521,15 +521,6 @@ export async function createFinancialAccountDB({
   note,
 }: financialAccountArgs) {
   try {
-    const existing = await db.query.financialAccounts.findFirst({
-      where: (a) => and(eq(a.hubId, hubId), eq(a.type, type)),
-      columns: { id: true },
-    });
-
-    if (existing) {
-      throw new Error(`An account of type ${type} already exists in this hub.`);
-    }
-
     const [account] = await db
       .insert(financialAccounts)
       .values({

@@ -1,6 +1,6 @@
 "use server";
 
-import { mailer } from "@/lib/mailer";
+import { mailer, supportMailer } from "@/lib/mailer";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
 
@@ -30,10 +30,10 @@ export async function sendSupportEmail(
             ? `[BudgetHub Support] ${subject.trim()}`
             : `[BudgetHub Support] Feedback from ${userName}`;
 
-        // Send email to support
-        await mailer.sendMail({
-            from: `"BudgetHub Support" <${process.env.MAIL_USER!}>`,
-            to: process.env.MAIL_USER!, // Send to support email (same as sender for now)
+        // Send email using support credentials
+        await supportMailer.sendMail({
+            from: `"BudgetHub Support System" <${process.env.MAIL_SUPPORT_USER || process.env.MAIL_USER!}>`,
+            to: process.env.MAIL_SUPPORT_USER!, // Send to the main application contact email
             replyTo: userEmail,
             subject: emailSubject,
             html: `
