@@ -1,5 +1,3 @@
-"use server";
-
 import db from "@/db/db";
 import {
   users,
@@ -17,9 +15,122 @@ import {
   quickTasks,
   notifications,
 } from "@/db/schema";
-import { eq, or, inArray } from "drizzle-orm";
+import { eq, or, inArray, and } from "drizzle-orm";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
+import { format } from "date-fns";
+
+export async function exportHubData(hubIdArg?: string) {
+  try {
+    const hdrs = await headers();
+    const { userId, hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!userId || !hubId) {
+      return { success: false, message: "Authentication or Hub ID missing" };
+    }
+
+    // Verify membership
+    const membership = await db.query.hubMembers.findFirst({
+      where: and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)),
+    });
+
+    if (!membership) {
+      return { success: false, message: "Access denied" };
+    }
+
+    // Fetch Hub Data
+    const hubAccounts = await db.query.financialAccounts.findMany({
+      where: eq(financialAccounts.hubId, hubId),
+    });
+
+    const hubCategories = await db.query.transactionCategories.findMany({
+      where: eq(transactionCategories.hubId, hubId),
+    });
+
+    const hubBudgets = await db.query.budgets.findMany({
+      where: eq(budgets.hubId, hubId),
+    });
+
+    const budgetIds = hubBudgets.map((b) => b.id);
+    const hubBudgetInstances = budgetIds.length > 0
+      ? await db.query.budgetInstances.findMany({
+          where: inArray(budgetInstances.budgetId, budgetIds),
+        })
+      : [];
+
+    const hubTransactions = await db.query.transactions.findMany({
+      where: eq(transactions.hubId, hubId),
+    });
+
+    const hubSavingGoals = await db.query.savingGoals.findMany({
+      where: eq(savingGoals.hubId, hubId),
+    });
+
+    // Create lookup maps for names
+    const accountMap = new Map(hubAccounts.map(a => [a.id, a.name]));
+    const categoryMap = new Map(hubCategories.map(c => [c.id, c.name]));
+
+    // Format data for export (Standardized Format)
+    const exportData = {
+      accounts: hubAccounts.map(a => ({
+        name: a.name,
+        type: a.type,
+        balance: a.initialBalance,
+        iban: a.iban,
+        note: a.note,
+      })),
+      budgets: hubBudgetInstances.map(bi => {
+        const budget = hubBudgets.find(b => b.id === bi.budgetId);
+        return {
+          category: categoryMap.get(budget?.transactionCategoryId || "") || "Uncategorized",
+          allocated: bi.allocatedAmount,
+          month: bi.month,
+          year: bi.year,
+          warning: budget?.warningPercentage || 80,
+          color: budget?.markerColor || "standard",
+        };
+      }),
+      transactions: hubTransactions.filter(t => t.type !== 'transfer').map(t => ({
+        date: format(t.createdAt, "yyyy-MM-dd"),
+        category: categoryMap.get(t.transactionCategoryId || "") || "Uncategorized",
+        account: accountMap.get(t.financialAccountId || "") || "Unknown",
+        amount: t.amount,
+        type: t.type,
+        source: t.source,
+        note: t.note,
+      })),
+      transfers: hubTransactions.filter(t => t.type === 'transfer').map(t => ({
+        date: format(t.createdAt, "yyyy-MM-dd"),
+        from: accountMap.get(t.financialAccountId || "") || "Unknown",
+        to: accountMap.get(t.destinationAccountId || "") || "Unknown",
+        amount: Math.abs(t.amount),
+        note: t.note,
+      })),
+      "saving-goals": hubSavingGoals.map(sg => ({
+        name: sg.name,
+        goal: sg.goalAmount,
+        saved: sg.amountSaved,
+        monthlyAllocation: sg.monthlyAllocation,
+        account: accountMap.get(sg.financialAccountId || "") || null,
+        dueDate: sg.dueDate ? format(sg.dueDate, "yyyy-MM-dd") : null,
+      })),
+    };
+
+    return {
+      success: true,
+      data: {
+        version: "1.2",
+        exportedAt: new Date().toISOString(),
+        hubId,
+        data: exportData,
+      }
+    };
+  } catch (err: any) {
+    console.error("Error exporting hub data:", err);
+    return { success: false, message: `Failed to export data: ${err.message}` };
+  }
+}
 
 export async function exportFullUserData() {
   try {

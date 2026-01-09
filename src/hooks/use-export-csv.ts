@@ -28,10 +28,13 @@ import type {
 } from "@/lib/utils/export-csv";
 import { exportAllDataToJSON } from "@/lib/utils/export-json";
 import Papa from "papaparse";
-import { exportFullUserDataAction } from "@/app/me/settings/actions";
+import { exportFullUserDataAction, exportHubDataAction } from "@/app/me/settings/actions";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 export const useExportCSV = () => {
+  const searchParams = useSearchParams();
+  const currentHubId = searchParams.get("hub");
   const transactionT = useTranslations("main-dashboard.transactions-page");
   const categoriesT = useTranslations(
     "main-dashboard.report-page.detailed-table",
@@ -223,6 +226,36 @@ export const useExportCSV = () => {
         }
       } catch (err: any) {
         toast.error("Failed to export GDPR data");
+        console.error(err);
+      }
+    },
+
+    // Hub JSON Export
+    exportHubDataJSON: async (hubId?: string) => {
+      try {
+        const targetHubId = hubId || currentHubId;
+        if (!targetHubId) {
+          toast.error("No hub selected for export");
+          return;
+        }
+
+        const result = await exportHubDataAction(targetHubId);
+        if (result.success && result.data) {
+          const json = JSON.stringify(result.data, null, 2);
+          const blob = new Blob([json], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = `hub-export-${targetHubId}-${new Date().toISOString().split("T")[0]}.json`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          toast.success("Hub data export completed");
+        } else {
+          toast.error(result.message || "Failed to export hub data");
+        }
+      } catch (err: any) {
+        toast.error("Failed to export hub data");
         console.error(err);
       }
     },

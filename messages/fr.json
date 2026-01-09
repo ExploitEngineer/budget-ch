@@ -1288,9 +1288,10 @@
                     }
                 },
                 "export-json-card": {
-                    "title": "Export complet (JSON)",
-                    "content": "Exporte toutes les données de localStorage dans un fichier JSON.",
-                    "button": "Exporter tout"
+                    "title": "Export JSON",
+                    "content": "Exportez vos données dans un format JSON standardisé. L'exportation Hub est compatible avec l'importateur, tandis que l'exportation complète inclut toutes vos données de profil et de hub.",
+                    "button-full": "Exportation RGPD complète",
+                    "button-hub": "Exportation Hub (recommandée)"
                 },
                 "csv-template-card": {
                     "title": "Modèles CSV"

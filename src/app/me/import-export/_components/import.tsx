@@ -15,7 +15,7 @@ import { useTranslations } from "next-intl";
 import Papa from "papaparse";
 import { Button } from "@/components/ui/button";
 import { importDataAction, validateTransactionsAction, validateBudgetsAction, validateSavingGoalsAction, validateAccountsAction, validateTransfersAction, validateFullJsonAction } from "@/lib/services/import-service";
-import type { ImportType, ImportMode, ValidationReport, FullJsonValidationReport } from "@/lib/services/import-service";
+import type { ImportType, ImportMode, ValidationReport, FullJsonValidationReport } from "@/lib/services/import-export-types";
 import { toast } from "sonner";
 import { Loader2, AlertCircle, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
 import { useSearchParams } from "next/navigation";

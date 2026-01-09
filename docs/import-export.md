@@ -88,32 +88,50 @@ Transfers between accounts can be imported.
     - **Note**: `Note`, `Notiz`, `Nota`, `Remarque`
 - **Behavior**: Source and destination accounts are required. If an account is missing, it will be created if "Auto-create accounts" is checked.
 
-### 8. Full Hub Migration (JSON)
-A complete export/import format for migrating entire Hub data. The JSON structure is:
+### 8. Standardized Hub Migration (JSON)
+A complete export/import format for migrating entire Hub data. This format is standardized and ensures consistent field mapping regardless of language.
+
+The JSON structure is:
 
 ```json
 {
-  "accounts": [{ "name": "...", "type": "...", "balance": 0, "iban": "...", "note": "..." }],
-  "budgets": [{ "category": "...", "allocated": 0, "ist": 0, "month": 12, "year": 2025, "warning": 80, "color": "standard" }],
-  "transactions": [{ "date": "YYYY-MM-DD", "category": "...", "account": "...", "amount": 0, "type": "expense", "source": "...", "note": "..." }],
-  "saving-goals": [{ "name": "...", "goal": 0, "saved": 0, "monthlyAllocation": 0, "account": "...", "dueDate": "YYYY-MM-DD" }],
-  "transfers": [{ "date": "YYYY-MM-DD", "from": "...", "to": "...", "amount": 0, "note": "..." }],
+  "version": "1.2",
   "exportedAt": "2025-12-24T09:00:00.000Z",
-  "version": "1.0"
+  "hubId": "hub_id_here",
+  "data": {
+    "accounts": [{ "name": "...", "type": "...", "balance": 0, "iban": "...", "note": "..." }],
+    "budgets": [{ "category": "...", "allocated": 0, "month": 12, "year": 2025, "warning": 80, "color": "standard" }],
+    "transactions": [{ "date": "YYYY-MM-DD", "category": "...", "account": "...", "amount": 0, "type": "expense", "source": "...", "note": "..." }],
+    "saving-goals": [{ "name": "...", "goal": 0, "saved": 0, "monthlyAllocation": 0, "account": "...", "dueDate": "YYYY-MM-DD" }],
+    "transfers": [{ "date": "YYYY-MM-DD", "from": "...", "to": "...", "amount": 0, "note": "..." }]
+  }
 }
 ```
 
+The importer is flexible and can handle both the `data` wrapper or flat structures for backwards compatibility.
+
 **Import Order**: Accounts → Budgets → Transactions → Saving Goals → Transfers
 
-### 9. Implementation Details
-- **Service**: `src/lib/services/import-service.ts`
+### 9. Key Mapping and Robustness
+The import service uses a `KEY_MAPPINGS` system to robustly handle different header names (e.g., `Category` vs `Kategorie`). This ensures that:
+1.  **JSON Exports** using standardized keys are always prioritized.
+2.  **CSV Exports** from different languages are correctly mapped to database fields.
+3.  **Manual Edits** to files with variations in casing or spacing are normalized.
+
+### 10. Implementation Details
+- **Services**: 
+    - `src/lib/services/import-service.ts`: Handles validation and database insertion.
+    - `src/lib/services/export-service.ts`: Handles data extraction and formatting.
 - **Actions**:
-    - `validateTransactionsAction`: Generates the pre-flight report.
+    - `validateTransactionsAction`: Generates the pre-flight report for individual files.
     - `validateFullJsonAction`: Validates full JSON export structure.
     - `importDataAction`: Performs the actual database mutation.
-- **Database**: Uses Drizzle ORM and Postgres. Auto-creation of accounts and categories happens within a transaction to ensure atomicity.
+    - `exportHubDataAction`: Generates standardized Hub JSON.
+- **Database**: Uses Drizzle ORM. Auto-creation of accounts and categories happens within a database transaction to ensure atomicity.
 
 ## Export Process
-- **CSV Export**: available for all major data types.
-- **JSON Full Export**: Exports the entire Hub data into a single JSON file that can be re-imported without modification.
+- **Quick Export (CSV)**: Available for all major data types individually. Uses current locale headers.
+- **Hub Export (JSON)**: Exports the current Hub data into a standardized JSON file that can be re-imported seamlessly into any hub. (Recommended for backups/migration)
+- **Full GDPR Export (JSON)**: Exports everything related to your user account, including profile, settings, subscriptions, and all hubs you belong to. Note: This format is primarily for data portability and is not directly importable as a single unit.
+- **CSV Templates**: Blank templates with correct headers for manual data entry.
 

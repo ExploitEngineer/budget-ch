@@ -10,7 +10,7 @@ import {
   getSubscriptionByUserId,
 } from "@/db/queries";
 import { UserType } from "@/db/schema";
-import { getDefaultHubId } from "@/lib/services/hub";
+import { getDefaultHubId } from "@/lib/services/hub-logic";
 
 export async function getContext(headersObj: Headers, requireAccount = false) {
   const session = await auth.api.getSession({ headers: headersObj });
