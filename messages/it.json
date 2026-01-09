@@ -218,7 +218,7 @@
                 "fallback": "Se il pulsante non funziona, copia e incolla questo link nel tuo browser:",
                 "expire": "Questo link di verifica scadrà tra 24 ore.",
                 "ignore": "Se non hai creato un account, puoi ignorare questa e-mail.",
-                "footer": "© 2025 BudgetHub. Tutti i diritti riservati."
+                "footer": "© 2026 BudgetHub. Tutti i diritti riservati."
             },
             "otp": {
                 "subject": "Il tuo codice di verifica",
@@ -227,7 +227,7 @@
                 "code-is": "Il tuo codice di verifica è:",
                 "expire": "Questo codice scadrà tra 5 minuti.",
                 "ignore": "Se non hai richiesto questo codice, puoi ignorare tranquillamente questa e-mail.",
-                "footer": "© 2025 BudgetHub. Tutti i diritti riservati."
+                "footer": "© 2026 BudgetHub. Tutti i diritti riservati."
             }
         },
         "invitation": {
@@ -356,7 +356,7 @@
                         "has-end-date": "Seleziona per impostare una data di fine per questa transazione ricorrente"
                     },
                     "placeholders": {
-                        "date": "25/09/2025",
+                        "date": "25/09/2026",
                         "account": "Scegli un conto",
                         "name": "Inserisci nome",
                         "start-date": "Seleziona data di inizio",
@@ -562,7 +562,7 @@
                         "recurringStatus": "Stato"
                     },
                     "placeholders": {
-                        "date": "21/09/2025",
+                        "date": "21/09/2026",
                         "account": "Scegli un conto",
                         "recipient": "Inserisci destinatario",
                         "category": "Scegli una categoria",

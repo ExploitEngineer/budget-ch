@@ -218,7 +218,7 @@
                 "fallback": "If the button doesn’t work, copy and paste this link into your browser:",
                 "expire": "This verification link will expire in 24 hours.",
                 "ignore": "If you didn’t create an account, you can ignore this email.",
-                "footer": "© 2025 BudgetHub. All rights reserved."
+                "footer": "© 2026 BudgetHub. All rights reserved."
             },
             "otp": {
                 "subject": "Your Verification Code",
@@ -227,7 +227,7 @@
                 "code-is": "Your verification code is:",
                 "expire": "This code will expire in 5 minutes.",
                 "ignore": "If you didn't request this code, you can safely ignore this email.",
-                "footer": "© 2025 BudgetHub. All rights reserved."
+                "footer": "© 2026 BudgetHub. All rights reserved."
             }
         },
         "invitation": {
@@ -356,7 +356,7 @@
                         "has-end-date": "Check to set an end date for this recurring transaction"
                     },
                     "placeholders": {
-                        "date": "09/25/2025",
+                        "date": "09/25/2026",
                         "account": "Choose an account",
                         "name": "Enter name",
                         "start-date": "Select start date",
@@ -562,7 +562,7 @@
                         "recurringStatus": "Status"
                     },
                     "placeholders": {
-                        "date": "09/21/2025",
+                        "date": "09/21/2026",
                         "account": "Choose an account",
                         "recipient": "Enter recipient",
                         "category": "Choose a category",

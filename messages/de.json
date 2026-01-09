@@ -218,7 +218,7 @@
                 "fallback": "Wenn die Schaltfläche nicht funktioniert, kopiere diesen Link und füge ihn in deinen Browser ein:",
                 "expire": "Dieser Bestätigungslink läuft in 24 Stunden ab.",
                 "ignore": "Wenn du kein Konto erstellt hast, kannst du diese E-Mail ignorieren.",
-                "footer": "© 2025 BudgetHub. Alle Rechte vorbehalten."
+                "footer": "© 2026 BudgetHub. Alle Rechte vorbehalten."
             },
             "otp": {
                 "subject": "Dein Bestätigungscode",
@@ -227,7 +227,7 @@
                 "code-is": "Dein Bestätigungscode lautet:",
                 "expire": "Dieser Code läuft in 5 Minuten ab.",
                 "ignore": "Wenn du diesen Code nicht angefordert hast, kannst du diese E-Mail ignorieren.",
-                "footer": "© 2025 BudgetHub. Alle Rechte vorbehalten."
+                "footer": "© 2026 BudgetHub. Alle Rechte vorbehalten."
             }
         },
         "invitation": {
@@ -356,7 +356,7 @@
                         "has-end-date": "Aktivieren, um ein Enddatum für diese wiederkehrende Transaktion festzulegen"
                     },
                     "placeholders": {
-                        "date": "25.09.2025",
+                        "date": "25.09.2026",
                         "account": "Konto auswählen",
                         "name": "Name eingeben",
                         "start-date": "Startdatum auswählen",
@@ -562,7 +562,7 @@
                         "recurringStatus": "Status"
                     },
                     "placeholders": {
-                        "date": "21.09.2025",
+                        "date": "21.09.2026",
                         "account": "Konto auswählen",
                         "recipient": "Empfänger eingeben",
                         "category": "Kategorie auswählen",
