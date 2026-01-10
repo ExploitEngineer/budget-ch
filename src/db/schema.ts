@@ -14,7 +14,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
 
-export const accessRole = pgEnum("access_role", ["admin", "member"]);
+export const accessRole = pgEnum("access_role", ["admin", "member"]); // For hub members
+export const userRole = pgEnum("user_role", ["user", "root_admin"]); // For users
 
 export const transactionType = pgEnum("transaction_type", [
   "income",
@@ -133,6 +134,7 @@ export const users = pgTable("users", {
   language: text("language").default("en").notNull(),
   notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
   reportFrequency: text("report_frequency").default("off").notNull(),
+  role: userRole().default("user").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
