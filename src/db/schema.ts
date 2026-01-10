@@ -11,8 +11,10 @@ import {
   integer,
   index,
   jsonb,
+  bigint,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
+
 
 export const accessRole = pgEnum("access_role", ["admin", "member"]);
 
@@ -493,6 +495,13 @@ export const notifications = pgTable(
     index("notifications_createdAt_idx").on(table.createdAt),
   ],
 );
+
+export const rateLimits = pgTable("rate_limits", {
+  id: text("id").primaryKey(),
+  key: text("key"),
+  count: integer("count"),
+  lastRequest: bigint("last_request", { mode: "number" }),
+});
 
 // Schema-derived types for all key tables
 export type Budget = InferSelectModel<typeof budgets>;

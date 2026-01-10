@@ -11,6 +11,12 @@ import { getMailTranslations } from "@/lib/mail-translations";
 
 
 export const auth = betterAuth({
+  rateLimit: {
+    enabled: true,
+    window: 10,
+    max: 100,
+    storage: "database",
+},
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,
@@ -20,6 +26,7 @@ export const auth = betterAuth({
       accounts: schema.accounts,
       verifications: schema.verifications,
       twoFactors: schema.twoFactor,
+      rateLimits: schema.rateLimits,
     },
   }),
   appName: "Budget-ch",
