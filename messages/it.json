@@ -1,4 +1,17 @@
 {
+    "auth-error": {
+        "banned": {
+            "title": "Account sospeso",
+            "description": "Il tuo account e stato sospeso e non puoi accedere al momento.",
+            "contact": "Se ritieni che questo sia un errore, contatta il nostro team di supporto."
+        },
+        "generic": {
+            "title": "Errore di autenticazione",
+            "description": "Si e verificato un problema durante l'elaborazione della richiesta. Riprova."
+        },
+        "error-code": "Codice errore",
+        "back-home": "Torna alla home"
+    },
     "common": {
         "loading": "Caricamento...",
         "updating": "Aggiornamento...",

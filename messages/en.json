@@ -30,6 +30,19 @@
             "11": "December"
         }
     },
+    "auth-error": {
+        "banned": {
+            "title": "Account Suspended",
+            "description": "Your account has been suspended and you cannot sign in at this time.",
+            "contact": "If you believe this is an error, please contact our support team for assistance."
+        },
+        "generic": {
+            "title": "Authentication Error",
+            "description": "We encountered an issue while processing your request. Please try again."
+        },
+        "error-code": "Error code",
+        "back-home": "Return to Homepage"
+    },
     "two-factor": {
         "title": "Two-Factor Authentication",
         "description": "Please enter your verification code to continue",

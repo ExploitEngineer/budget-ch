@@ -1,4 +1,17 @@
 {
+    "auth-error": {
+        "banned": {
+            "title": "Konto gesperrt",
+            "description": "Ihr Konto wurde gesperrt und Sie können sich derzeit nicht anmelden.",
+            "contact": "Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an unser Support-Team."
+        },
+        "generic": {
+            "title": "Authentifizierungsfehler",
+            "description": "Bei der Verarbeitung Ihrer Anfrage ist ein Problem aufgetreten. Bitte versuchen Sie es erneut."
+        },
+        "error-code": "Fehlercode",
+        "back-home": "Zur Startseite"
+    },
     "two-factor": {
         "title": "Zwei-Faktor-Authentifizierung",
         "description": "Bitte geben Sie Ihren Bestätigungscode ein, um fortzufahren",

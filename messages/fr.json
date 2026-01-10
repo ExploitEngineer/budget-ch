@@ -1,4 +1,17 @@
 {
+    "auth-error": {
+        "banned": {
+            "title": "Compte suspendu",
+            "description": "Votre compte a ete suspendu et vous ne pouvez pas vous connecter pour le moment.",
+            "contact": "Si vous pensez qu'il s'agit d'une erreur, veuillez contacter notre equipe d'assistance."
+        },
+        "generic": {
+            "title": "Erreur d'authentification",
+            "description": "Nous avons rencontre un probleme lors du traitement de votre demande. Veuillez reessayer."
+        },
+        "error-code": "Code d'erreur",
+        "back-home": "Retour a l'accueil"
+    },
     "common": {
         "loading": "Chargement...",
         "updating": "Mise à jour...",
