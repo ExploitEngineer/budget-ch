@@ -65,8 +65,9 @@ export default function AdminOverviewPage() {
     }).format(value);
   };
 
-  const calculateChange = (current: number, previous: number) => {
-    if (previous === 0) return 0;
+  const calculateChange = (current: number, previous: number): number | null => {
+    // Return null if we don't have previous data to compare
+    if (previous === 0) return null;
     return ((current - previous) / previous) * 100;
   };
 
@@ -88,7 +89,7 @@ export default function AdminOverviewPage() {
 
   const mrrChange = stats
     ? calculateChange(stats.mrr, stats.mrrPreviousMonth)
-    : 0;
+    : null;
 
   return (
     <div className="p-6 space-y-6">
@@ -113,16 +114,22 @@ export default function AdminOverviewPage() {
               {formatCurrency(stats?.mrr || 0)}
             </div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
-              {mrrChange >= 0 ? (
-                <TrendingUp className="h-3 w-3 text-green-500" />
+              {mrrChange !== null ? (
+                <>
+                  {mrrChange >= 0 ? (
+                    <TrendingUp className="h-3 w-3 text-green-500" />
+                  ) : (
+                    <TrendingDown className="h-3 w-3 text-red-500" />
+                  )}
+                  <span className={mrrChange >= 0 ? "text-green-500" : "text-red-500"}>
+                    {mrrChange >= 0 ? "+" : ""}
+                    {mrrChange.toFixed(1)}%
+                  </span>
+                  <span>{t("overview.kpi.vs-last-month")}</span>
+                </>
               ) : (
-                <TrendingDown className="h-3 w-3 text-red-500" />
+                <span>{t("overview.kpi.no-comparison-data")}</span>
               )}
-              <span className={mrrChange >= 0 ? "text-green-500" : "text-red-500"}>
-                {mrrChange >= 0 ? "+" : ""}
-                {mrrChange.toFixed(1)}%
-              </span>
-              <span>{t("overview.kpi.vs-last-month")}</span>
             </div>
           </CardContent>
         </Card>

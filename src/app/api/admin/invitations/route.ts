@@ -27,8 +27,8 @@ export async function POST(request: Request) {
       return apiError({ message: "Email is required", status: 400 });
     }
 
-    if (!role || !["user", "root_admin"].includes(role)) {
-      return apiError({ message: "Valid role is required (user or root_admin)", status: 400 });
+    if (!role || !["user", "admin"].includes(role)) {
+      return apiError({ message: "Valid role is required (user or admin)", status: 400 });
     }
 
     const result = await createAdminInvitation({

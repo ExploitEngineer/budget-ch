@@ -5,8 +5,6 @@ import { requireRootAdmin } from "./admin-auth";
 import {
   getAllUsersWithFiltersDB,
   getUserWithSubscriptionDB,
-  lockUserDB,
-  unlockUserDB,
   anonymizeUserDB,
   deleteUserPermanentlyDB,
   createAuditLogDB,
@@ -15,6 +13,7 @@ import {
   type UserWithSubscription,
 } from "@/db/admin-queries";
 import { exportFullUserDataById } from "./admin-export";
+import { auth } from "@/lib/auth/auth";
 
 // ============================================
 // GET USERS
@@ -35,20 +34,34 @@ export async function getUser(userId: string): Promise<UserWithSubscription | nu
 }
 
 // ============================================
-// LOCK USER
+// BAN USER (using Better Auth admin plugin)
 // ============================================
 
 export async function lockUser(userId: string) {
   const hdrs = await headers();
   const { userId: adminId } = await requireRootAdmin(hdrs);
 
-  // Prevent admin from locking themselves
+  // Prevent admin from banning themselves
   if (userId === adminId) {
-    return { success: false, message: "Cannot lock your own account" };
+    return { success: false, message: "Cannot ban your own account" };
   }
 
   try {
-    const user = await lockUserDB(userId);
+    // Get user info before banning for audit log
+    const userBefore = await getUserWithSubscriptionDB(userId);
+    if (!userBefore) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Use Better Auth's banUser API
+    await auth.api.banUser({
+      body: {
+        userId,
+        banReason: "Banned by admin",
+      },
+      headers: hdrs,
+    });
+
     const reference = generateReferenceId();
 
     await createAuditLogDB({
@@ -56,18 +69,20 @@ export async function lockUser(userId: string) {
       affectedUserId: userId,
       adminId,
       reference,
-      metadata: { email: user.email },
+      metadata: { email: userBefore.email },
     });
 
-    return { success: true, message: "User locked successfully", data: user };
+    // Return updated user
+    const updatedUser = await getUserWithSubscriptionDB(userId);
+    return { success: true, message: "User banned successfully", data: updatedUser };
   } catch (err) {
-    console.error("Error locking user:", err);
-    return { success: false, message: `Failed to lock user: ${(err as Error).message}` };
+    console.error("Error banning user:", err);
+    return { success: false, message: `Failed to ban user: ${(err as Error).message}` };
   }
 }
 
 // ============================================
-// UNLOCK USER
+// UNBAN USER (using Better Auth admin plugin)
 // ============================================
 
 export async function unlockUser(userId: string) {
@@ -75,7 +90,20 @@ export async function unlockUser(userId: string) {
   const { userId: adminId } = await requireRootAdmin(hdrs);
 
   try {
-    const user = await unlockUserDB(userId);
+    // Get user info before unbanning for audit log
+    const userBefore = await getUserWithSubscriptionDB(userId);
+    if (!userBefore) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Use Better Auth's unbanUser API
+    await auth.api.unbanUser({
+      body: {
+        userId,
+      },
+      headers: hdrs,
+    });
+
     const reference = generateReferenceId();
 
     await createAuditLogDB({
@@ -83,13 +111,15 @@ export async function unlockUser(userId: string) {
       affectedUserId: userId,
       adminId,
       reference,
-      metadata: { email: user.email },
+      metadata: { email: userBefore.email },
     });
 
-    return { success: true, message: "User unlocked successfully", data: user };
+    // Return updated user
+    const updatedUser = await getUserWithSubscriptionDB(userId);
+    return { success: true, message: "User unbanned successfully", data: updatedUser };
   } catch (err) {
-    console.error("Error unlocking user:", err);
-    return { success: false, message: `Failed to unlock user: ${(err as Error).message}` };
+    console.error("Error unbanning user:", err);
+    return { success: false, message: `Failed to unban user: ${(err as Error).message}` };
   }
 }
 

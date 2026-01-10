@@ -1978,6 +1978,7 @@
             "kpi": {
                 "mrr": "Monatlich wiederkehrender Umsatz",
                 "vs-last-month": "vs. Vormonat",
+                "no-comparison-data": "Nicht genügend Daten für Vergleich",
                 "active-subscriptions": "Aktive Abonnements",
                 "individual": "Einzelperson",
                 "family": "Familie",

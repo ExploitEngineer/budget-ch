@@ -23,7 +23,7 @@ import type { AdminInvitation } from "@/db/schema";
 
 export interface CreateInvitationParams {
   email: string;
-  role: "user" | "root_admin";
+  role: "user" | "admin";
   subscriptionPlan?: "individual" | "family" | null;
   subscriptionMonths?: number | null;
 }
@@ -102,7 +102,7 @@ export async function createAdminInvitation(params: CreateInvitationParams) {
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
           <h2 style="color: #235FE3;">BudgetHub Admin Invitation</h2>
           <p>Hello,</p>
-          <p>A BudgetHub administrator has invited you to join the platform${role === "root_admin" ? " as an administrator" : ""}.</p>
+          <p>A BudgetHub administrator has invited you to join the platform${role === "admin" ? " as an administrator" : ""}.</p>
           ${subscriptionInfo}
           <p style="margin: 20px 0;">
             <a href="${link}" style="
@@ -234,8 +234,8 @@ export async function acceptAdminInvitation(
     await markInvitationAcceptedDB(invitation.id);
 
     // Update user role if needed
-    if (invitation.role === "root_admin") {
-      await updateUser(user.id, { role: "root_admin" });
+    if (invitation.role === "admin") {
+      await updateUser(user.id, { role: "admin" });
     }
 
     // Grant subscription if specified
@@ -318,7 +318,7 @@ export async function getInvitationByToken(
   message?: string;
   data?: {
     email: string;
-    role: "user" | "root_admin";
+    role: "user" | "admin";
     hasSubscription: boolean;
     subscriptionPlan?: string | null;
     subscriptionMonths?: number | null;

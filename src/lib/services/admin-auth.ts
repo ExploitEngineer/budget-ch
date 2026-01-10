@@ -9,8 +9,8 @@ export interface RootAdminContext {
 }
 
 /**
- * Validates that the current session belongs to a root_admin user.
- * Throws an error if not authenticated or not a root admin.
+ * Validates that the current session belongs to a admin user.
+ * Throws an error if not authenticated or not a admin.
  */
 export async function requireRootAdmin(
   headers: Headers,
@@ -23,11 +23,11 @@ export async function requireRootAdmin(
 
   const user = session.user as UserType;
 
-  if (user.role !== "root_admin") {
+  if (user.role !== "admin") {
     throw new Error("Access denied: Root admin privileges required");
   }
 
-  if (user.isLocked) {
+  if (user.banned) {
     throw new Error("Access denied: Account is locked");
   }
 
@@ -57,7 +57,7 @@ export async function isRootAdmin(
  */
 export async function getUserRole(
   headers: Headers,
-): Promise<"user" | "root_admin" | null> {
+): Promise<"user" | "admin" | null> {
   const session = await auth.api.getSession({ headers });
 
   if (!session?.user) {

@@ -55,7 +55,7 @@ export function UserActionsMenu({ user, onRefresh }: UserActionsMenuProps) {
   const handleToggleLock = async () => {
     setIsToggleLock(true);
     try {
-      const endpoint = user.isLocked
+      const endpoint = user.banned
         ? `/api/admin/users/${user.id}/unlock`
         : `/api/admin/users/${user.id}/lock`;
 
@@ -67,7 +67,7 @@ export function UserActionsMenu({ user, onRefresh }: UserActionsMenuProps) {
       }
 
       toast.success(
-        user.isLocked
+        user.banned
           ? t("users.actions.unlock-success")
           : t("users.actions.lock-success")
       );
@@ -94,7 +94,7 @@ export function UserActionsMenu({ user, onRefresh }: UserActionsMenuProps) {
             {isExporting ? t("users.actions.exporting") : t("users.actions.export")}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={handleToggleLock} disabled={isToggleLock}>
-            {user.isLocked ? (
+            {user.banned ? (
               <>
                 <Unlock className="h-4 w-4 mr-2" />
                 {t("users.actions.unlock")}

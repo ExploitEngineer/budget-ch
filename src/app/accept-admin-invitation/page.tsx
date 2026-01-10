@@ -38,7 +38,7 @@ type StatusType =
 
 interface InvitationInfo {
   email: string;
-  role: "user" | "root_admin";
+  role: "user" | "admin";
   hasSubscription: boolean;
   subscriptionPlan?: string | null;
   subscriptionMonths?: number | null;
@@ -138,8 +138,8 @@ export default function AcceptAdminInvitationPage() {
 
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-sm text-muted-foreground">{t("pending.role")}</p>
-                  <Badge variant={invitationInfo.role === "root_admin" ? "default" : "secondary"}>
-                    {invitationInfo.role === "root_admin"
+                  <Badge variant={invitationInfo.role === "admin" ? "default" : "secondary"}>
+                    {invitationInfo.role === "admin"
                       ? t("pending.role-admin")
                       : t("pending.role-user")}
                   </Badge>

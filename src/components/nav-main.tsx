@@ -50,7 +50,7 @@ export function NavMain() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-  const [isRootAdmin, setIsRootAdmin] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const router = useRouter();
   const t = useTranslations("main-dashboard");
@@ -71,11 +71,11 @@ export function NavMain() {
       setHasAccess(res.canAccess);
     });
 
-    // Check if user is root_admin
+    // Check if user is admin
     authClient.getSession().then((session) => {
       if (session?.data?.user) {
         const user = session.data.user as { role?: string };
-        setIsRootAdmin(user.role === "root_admin");
+        setIsAdmin(user.role === "admin");
       }
     });
   }, []);
@@ -164,8 +164,8 @@ export function NavMain() {
       url: "/me/help",
       icon: CircleQuestionMark,
     },
-    // Admin Dashboard link - only for root_admin users
-    ...(isRootAdmin
+    // Admin Dashboard link - only for admin users
+    ...(isAdmin
       ? [
           {
             title: t("sidebar.links.admin"),

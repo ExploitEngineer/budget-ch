@@ -1978,6 +1978,7 @@
             "kpi": {
                 "mrr": "Revenu mensuel récurrent",
                 "vs-last-month": "vs mois dernier",
+                "no-comparison-data": "Données insuffisantes pour la comparaison",
                 "active-subscriptions": "Abonnements actifs",
                 "individual": "Individuel",
                 "family": "Famille",

@@ -28,6 +28,7 @@ import type {
   AdminInvitation,
   AdminAuditLog,
   AdminActionType,
+  userRoles,
 } from "./schema";
 import { eq, desc, sql, inArray, and, or, ilike, count } from "drizzle-orm";
 
@@ -142,43 +143,6 @@ export async function getUserWithSubscriptionDB(
   }
 }
 
-export async function lockUserDB(userId: string): Promise<UserType> {
-  try {
-    const [updatedUser] = await db
-      .update(users)
-      .set({ isLocked: true })
-      .where(eq(users.id, userId))
-      .returning();
-
-    if (!updatedUser) {
-      throw new Error("User not found");
-    }
-
-    return updatedUser;
-  } catch (err) {
-    console.error("Error locking user:", err);
-    throw err;
-  }
-}
-
-export async function unlockUserDB(userId: string): Promise<UserType> {
-  try {
-    const [updatedUser] = await db
-      .update(users)
-      .set({ isLocked: false })
-      .where(eq(users.id, userId))
-      .returning();
-
-    if (!updatedUser) {
-      throw new Error("User not found");
-    }
-
-    return updatedUser;
-  } catch (err) {
-    console.error("Error unlocking user:", err);
-    throw err;
-  }
-}
 
 export async function anonymizeUserDB(userId: string): Promise<void> {
   try {
@@ -210,7 +174,8 @@ export async function anonymizeUserDB(userId: string): Promise<void> {
           language: "en",
           notificationsEnabled: false,
           reportFrequency: "off",
-          isLocked: true,
+          banned: true,
+          banReason: "Account anonymized",
         })
         .where(eq(users.id, userId));
 
@@ -299,7 +264,7 @@ export async function deleteUserPermanentlyDB(userId: string): Promise<void> {
 
 export interface CreateAdminInvitationInput {
   email: string;
-  role: "user" | "root_admin";
+  role: (typeof userRoles)[number];
   subscriptionPlan?: string | null;
   subscriptionMonths?: number | null;
   token: string;
@@ -603,18 +568,15 @@ export async function getKPIStatsDB(): Promise<KPIStats> {
       .from(users);
     const totalUsers = totalUsersResult?.count ?? 0;
 
-    // Blocked users
+    // Blocked users (using Better Auth's banned field)
     const [blockedUsersResult] = await db
       .select({ count: count() })
       .from(users)
-      .where(eq(users.isLocked, true));
+      .where(eq(users.banned, true));
     const blockedUsers = blockedUsersResult?.count ?? 0;
 
-    // Active users (users who have logged in - have sessions)
-    const [activeUsersResult] = await db
-      .select({ count: sql<number>`count(distinct ${sessions.userId})` })
-      .from(sessions);
-    const activeUsers = activeUsersResult?.count ?? 0;
+    // Active users = total users minus blocked users
+    const activeUsers = totalUsers - blockedUsers;
 
     // Total subscriptions
     const [totalSubscriptionsResult] = await db
@@ -659,8 +621,9 @@ export async function getKPIStatsDB(): Promise<KPIStats> {
     const familyMrr = familyCount * 14.9;
     const mrr = individualMrr + familyMrr;
 
-    // Previous MRR (would need historical data - placeholder for now)
-    const previousMrr = mrr * 0.95; // Placeholder: assume 5% growth
+    // Previous MRR - set to 0 to indicate no historical data available
+    // This will be handled in the frontend to show "Not enough data" instead of NaN
+    const previousMrr = 0;
 
     return {
       totalUsers,
@@ -673,7 +636,7 @@ export async function getKPIStatsDB(): Promise<KPIStats> {
         family: familyCount,
       },
       mrr: Math.round(mrr * 100) / 100,
-      previousMrr: Math.round(previousMrr * 100) / 100,
+      previousMrr,
     };
   } catch (err) {
     console.error("Error fetching KPI stats:", err);

@@ -1981,6 +1981,7 @@
             "kpi": {
                 "mrr": "Monthly Recurring Revenue",
                 "vs-last-month": "vs last month",
+                "no-comparison-data": "Not enough data for comparison",
                 "active-subscriptions": "Active Subscriptions",
                 "individual": "Individual",
                 "family": "Family",

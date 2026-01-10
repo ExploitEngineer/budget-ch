@@ -35,7 +35,7 @@ export function UsersTable({
   const t = useTranslations("admin");
 
   const getStatusBadge = (user: AdminUser) => {
-    if (user.isLocked) {
+    if (user.banned) {
       return (
         <Badge variant="destructive" className="text-xs">
           {t("users.table.status.locked")}
@@ -124,7 +124,7 @@ export function UsersTable({
                       <span className="text-xs text-muted-foreground">
                         {user.email}
                       </span>
-                      {user.role === "root_admin" && (
+                      {user.role === "admin" && (
                         <Badge variant="outline" className="text-xs w-fit mt-1">
                           Admin
                         </Badge>

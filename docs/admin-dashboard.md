@@ -1,12 +1,12 @@
 # Admin Dashboard
 
-The Admin Dashboard provides BudgetHub platform administrators (`root_admin` users) with comprehensive user management, audit logging, and compliance oversight capabilities.
+The Admin Dashboard provides BudgetHub platform administrators (`admin` users) with comprehensive user management, audit logging, and compliance oversight capabilities.
 
 ## Access Control
 
-- Only users with `role: "root_admin"` can access the admin dashboard
+- Only users with `role: "admin"` can access the admin dashboard
 - The admin layout (`/src/app/admin/layout.tsx`) performs server-side authentication checks
-- Locked users are redirected to the main dashboard even if they have admin privileges
+- Banned users are redirected to the main dashboard even if they have admin privileges
 - A conditional "Admin Dashboard" link appears in the main navigation sidebar for root admins
 
 ## Architecture Overview
@@ -15,9 +15,11 @@ The Admin Dashboard provides BudgetHub platform administrators (`root_admin` use
 
 The admin dashboard relies on three main database constructs added to `src/db/schema.ts`:
 
-1. **`users.isLocked`**: Boolean column to block user access
-2. **`adminInvitations`**: Table for admin-initiated user invitations with optional subscription grants
-3. **`adminAuditLogs`**: Table tracking all administrative actions with references and metadata
+1. **`users.banned`**: Boolean column to block user access (using Better Auth admin plugin)
+2. **`users.banReason`**: Text column for the reason a user was banned
+3. **`users.banExpires`**: Timestamp for when the ban expires (optional)
+4. **`adminInvitations`**: Table for admin-initiated user invitations with optional subscription grants
+5. **`adminAuditLogs`**: Table tracking all administrative actions with references and metadata
 
 ### API Routes
 
@@ -28,8 +30,8 @@ All routes are protected by `requireRootAdmin()` middleware from `src/lib/servic
 | `/api/admin/kpis` | GET | Dashboard KPIs (MRR, subscriptions, users) |
 | `/api/admin/users` | GET | Paginated user list with search |
 | `/api/admin/users/[userId]` | GET, DELETE | Get user details / Delete permanently |
-| `/api/admin/users/[userId]/lock` | POST | Lock user account |
-| `/api/admin/users/[userId]/unlock` | POST | Unlock user account |
+| `/api/admin/users/[userId]/lock` | POST | Ban user account (using Better Auth admin plugin) |
+| `/api/admin/users/[userId]/unlock` | POST | Unban user account (using Better Auth admin plugin) |
 | `/api/admin/users/[userId]/anonymize` | POST | GDPR-compliant anonymization |
 | `/api/admin/users/[userId]/export` | GET | Export user data (GDPR) |
 | `/api/admin/invitations` | GET, POST | List/create admin invitations |
@@ -41,7 +43,7 @@ All routes are protected by `requireRootAdmin()` middleware from `src/lib/servic
 Located in `src/lib/services/`:
 
 - **`admin-auth.ts`**: Authentication helpers (`requireRootAdmin`, `isRootAdmin`, `getUserRole`)
-- **`admin-user.ts`**: User management operations (lock, unlock, anonymize, delete, export)
+- **`admin-user.ts`**: User management operations (ban/unban via Better Auth, anonymize, delete, export)
 - **`admin-invitation.ts`**: Invitation creation, acceptance, and listing
 - **`admin-subscription-grant.ts`**: Grant Stripe subscriptions without payment
 - **`admin-audit.ts`**: Audit log retrieval and CSV export
@@ -63,7 +65,7 @@ Also shows hardcoded system status information (region, encryption, logs, storag
 User management interface with:
 - Search by email or user ID
 - Paginated user table showing ID, name, email, status, plan, registration date
-- User actions dropdown: Export (GDPR), Lock/Unlock, Delete
+- User actions dropdown: Export (GDPR), Ban/Unban, Delete
 
 **Invite Dialog**: Send invitations with:
 - Email address
@@ -179,12 +181,12 @@ src/
 
 1. **Access Control**:
    - Log in as a regular user and verify `/admin` redirects to `/me/dashboard`
-   - Log in as `root_admin` and verify admin dashboard is accessible
+   - Log in as `admin` and verify admin dashboard is accessible
    - Verify "Admin Dashboard" link appears in sidebar only for admins
 
 2. **User Management**:
    - Search for users by email and ID
-   - Lock/unlock a user and verify they can/cannot log in
+   - Ban/unban a user and verify they can/cannot log in
    - Export user data and verify JSON structure
    - Anonymize a user and verify PII is replaced
    - Delete a user and verify cascade deletion

@@ -31,16 +31,6 @@ export const auth = betterAuth({
         required: false,
         input: false,
       },
-      role: {
-        type: "string",
-        required: false,
-        input: false,
-      },
-      isLocked: {
-        type: "boolean",
-        required: false,
-        input: false,
-      },
     },
     deleteUser: {
       enabled: true,

@@ -15,7 +15,7 @@ import {
 import { InferSelectModel } from "drizzle-orm";
 
 export const accessRole = pgEnum("access_role", ["admin", "member"]); // For hub members
-export const userRole = pgEnum("user_role", ["user", "root_admin"]); // For users
+export const userRoles = ["user", "admin"] as const;
 
 export const transactionType = pgEnum("transaction_type", [
   "income",
@@ -135,7 +135,7 @@ export const users = pgTable("users", {
   language: text("language").default("en").notNull(),
   notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
   reportFrequency: text("report_frequency").default("off").notNull(),
-  role: text("role", { enum: ["user", "admin"] }).default("user").notNull(),
+  role: text("role", { enum: userRoles }).default("user").notNull(),
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
   banExpires: timestamp("ban_expires"),
@@ -538,7 +538,7 @@ export type AdminActionType = (typeof adminActionTypeEnum.enumValues)[number];
 export const adminInvitations = pgTable("admin_invitations", {
   id: uuid("id").notNull().primaryKey().defaultRandom(),
   email: text("email").notNull(),
-  role: userRole().notNull().default("user"),
+  role: text("role", { enum: userRoles }).notNull().default("user"),
   subscriptionPlan: text("subscription_plan"), // "individual" | "family" | null
   subscriptionMonths: integer("subscription_months"), // 1-24 months
   token: text("token").notNull().unique(),

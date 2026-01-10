@@ -14,8 +14,8 @@ export interface AdminUser {
   id: string;
   name: string;
   email: string;
-  role: "user" | "root_admin";
-  isLocked: boolean;
+  role: "user" | "admin";
+  banned: boolean;
   emailVerified: boolean;
   createdAt: string;
   subscription: {

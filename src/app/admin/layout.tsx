@@ -22,13 +22,13 @@ export default async function AdminLayout({
 
   console.log("[AdminLayout] User:", user);
 
-  // Check if user is root_admin
-  if (user.role !== "root_admin") {
+  // Check if user is admin
+  if (user.role !== "admin") {
     redirect("/me/dashboard");
   }
 
-  // Check if user is locked
-  if (user.isLocked) {
+  // Check if user is banned
+  if (user.banned) {
     redirect("/me/dashboard");
   }
 

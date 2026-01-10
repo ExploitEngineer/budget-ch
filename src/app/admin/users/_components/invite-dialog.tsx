@@ -35,7 +35,7 @@ export function InviteDialog({
   onSuccess,
 }: InviteDialogProps) {
   const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"user" | "root_admin">("user");
+  const [role, setRole] = useState<"user" | "admin">("user");
   const [includeSubscription, setIncludeSubscription] = useState(false);
   const [subscriptionPlan, setSubscriptionPlan] = useState<
     "individual" | "family"
@@ -116,7 +116,7 @@ export function InviteDialog({
             <Label htmlFor="role">{t("users.invite-dialog.role")}</Label>
             <Select
               value={role}
-              onValueChange={(value: "user" | "root_admin") => setRole(value)}
+              onValueChange={(value: "user" | "admin") => setRole(value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -125,7 +125,7 @@ export function InviteDialog({
                 <SelectItem value="user">
                   {t("users.invite-dialog.role-user")}
                 </SelectItem>
-                <SelectItem value="root_admin">
+                <SelectItem value="admin">
                   {t("users.invite-dialog.role-admin")}
                 </SelectItem>
               </SelectContent>
