@@ -1827,14 +1827,10 @@
                 }
             },
             "content-section": {
-                "title": "Contenu",
-                "faq": "FAQ",
-                "contact-support": "Contact & Support",
-                "keyboard-shortcuts": "Raccourcis clavier",
-                "troubleshooting": "Dépannage",
-                "privacy": "Confidentialité",
-                "release-notes": "Notes de version",
-                "help": "Besoin d'aide individuelle ? Créez un ticket – vous recevrez une réponse par e-mail."
+                "title": "À propos de Budgethub",
+                "imprint": "Mentions légales",
+                "data-privacy": "Protection des données",
+                "term-of-use": "Conditions d'utilisation"
             },
             "contact-support-section": {
                 "title": "Contact & Support",
