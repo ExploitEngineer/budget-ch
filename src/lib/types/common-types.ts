@@ -22,3 +22,19 @@ export interface CardsContent {
  */
 export type TwoFactorStatus = "enabled" | "pending" | "disabled";
 
+/**
+ * KPI stats for the admin dashboard
+ */
+export interface KPIStats {
+  totalUsers: number;
+  activeUsers: number;
+  blockedUsers: number;
+  totalSubscriptions: number;
+  activeSubscriptions: number;
+  subscriptionsByPlan: {
+    individual: number;
+    family: number;
+  };
+  mrr: number;
+  previousMrr: number;
+}

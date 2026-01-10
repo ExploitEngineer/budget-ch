@@ -19,17 +19,17 @@ import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
 
 interface KPIStats {
-  mrr: number;
-  mrrPreviousMonth: number;
-  activeSubscriptions: {
-    total: number;
+  totalUsers: number;
+  activeUsers: number;
+  blockedUsers: number;
+  totalSubscriptions: number;
+  activeSubscriptions: number;
+  subscriptionsByPlan: {
     individual: number;
     family: number;
   };
-  activeUsers: {
-    total: number;
-    blocked: number;
-  };
+  mrr: number;
+  previousMrr: number;
 }
 
 export default function AdminOverviewPage() {
@@ -47,6 +47,7 @@ export default function AdminOverviewPage() {
         }
         const data = await res.json();
         setStats(data.data);
+        console.log("Stats:", data.data);
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -87,9 +88,7 @@ export default function AdminOverviewPage() {
     );
   }
 
-  const mrrChange = stats
-    ? calculateChange(stats.mrr, stats.mrrPreviousMonth)
-    : null;
+  const mrrChange = stats ? calculateChange(stats.mrr, stats.previousMrr) : null;
 
   return (
     <div className="p-6 space-y-6">
@@ -121,7 +120,9 @@ export default function AdminOverviewPage() {
                   ) : (
                     <TrendingDown className="h-3 w-3 text-red-500" />
                   )}
-                  <span className={mrrChange >= 0 ? "text-green-500" : "text-red-500"}>
+                  <span
+                    className={mrrChange >= 0 ? "text-green-500" : "text-red-500"}
+                  >
                     {mrrChange >= 0 ? "+" : ""}
                     {mrrChange.toFixed(1)}%
                   </span>
@@ -144,14 +145,19 @@ export default function AdminOverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {stats?.activeSubscriptions.total || 0}
+              {stats?.activeSubscriptions || 0}
             </div>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-              <Badge variant="secondary" className="text-xs">
-                {stats?.activeSubscriptions.individual || 0} {t("overview.kpi.individual")}
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-1">
+              <Badge variant="outline" className="text-xs">
+                {stats?.totalSubscriptions || 0} {t("overview.kpi.total")}
               </Badge>
               <Badge variant="secondary" className="text-xs">
-                {stats?.activeSubscriptions.family || 0} {t("overview.kpi.family")}
+                {stats?.subscriptionsByPlan.individual || 0}{" "}
+                {t("overview.kpi.individual")}
+              </Badge>
+              <Badge variant="secondary" className="text-xs">
+                {stats?.subscriptionsByPlan.family || 0}{" "}
+                {t("overview.kpi.family")}
               </Badge>
             </div>
           </CardContent>
@@ -166,12 +172,10 @@ export default function AdminOverviewPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {stats?.activeUsers.total || 0}
-            </div>
+            <div className="text-2xl font-bold">{stats?.activeUsers || 0}</div>
             <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
               <Badge variant="outline" className="text-xs">
-                {stats?.activeUsers.blocked || 0} {t("overview.kpi.blocked")}
+                {stats?.blockedUsers || 0} {t("overview.kpi.blocked")}
               </Badge>
             </div>
           </CardContent>
