@@ -127,8 +127,8 @@ export function AdminSidebar({
       >
         <div className="relative m-0 flex h-auto w-full items-center justify-start p-0 pt-1">
           {open ? (
-            <div className="flex flex-col gap-1">
-              <div className="relative h-[45px] w-full me-9">
+            <>
+              <div className="relative me-9 h-[45px] w-full">
                 <Image
                   src="/assets/images/logo.png"
                   alt="company logo"
@@ -146,10 +146,7 @@ export function AdminSidebar({
                   sizes="100vw"
                 />
               </div>
-              <span className="text-xs text-muted-foreground font-medium px-1">
-                {t("sidebar.subtitle")}
-              </span>
-            </div>
+            </>
           ) : (
             <div className="relative h-[30px] w-[30px]">
               <Image
