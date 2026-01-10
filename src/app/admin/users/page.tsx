@@ -89,17 +89,17 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">{t("users.title")}</h1>
-        <p className="text-muted-foreground">{t("users.description")}</p>
+        <p className="text-muted-foreground text-sm sm:text-base">{t("users.description")}</p>
       </div>
 
       {/* Search and Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <form onSubmit={handleSearch} className="flex gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:flex-none">
+      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <form onSubmit={handleSearch} className="flex gap-2 w-full lg:w-auto">
+          <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={t("users.search-placeholder")}
@@ -113,7 +113,7 @@ export default function AdminUsersPage() {
           </Button>
         </form>
 
-        <Button onClick={() => setInviteDialogOpen(true)}>
+        <Button onClick={() => setInviteDialogOpen(true)} className="w-full lg:w-auto">
           <UserPlus className="h-4 w-4 mr-2" />
           {t("users.invite")}
         </Button>

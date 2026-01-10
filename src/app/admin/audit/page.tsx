@@ -212,21 +212,21 @@ export default function AdminAuditPage() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-bold">{t("audit.title")}</h1>
-        <p className="text-muted-foreground">{t("audit.description")}</p>
+        <p className="text-muted-foreground text-sm sm:text-base">{t("audit.description")}</p>
       </div>
 
       {/* Filters and Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
           <form
             onSubmit={handleSearch}
             className="flex gap-2 w-full sm:w-auto"
           >
-            <div className="relative flex-1 sm:flex-none">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t("audit.search-placeholder")}
@@ -261,7 +261,7 @@ export default function AdminAuditPage() {
           </Select>
         </div>
 
-        <Button onClick={handleExport} disabled={isExporting} variant="outline">
+        <Button onClick={handleExport} disabled={isExporting} variant="outline" className="w-full lg:w-auto">
           <Download className="h-4 w-4 mr-2" />
           {isExporting ? t("audit.exporting") : t("audit.export-csv")}
         </Button>
@@ -279,15 +279,15 @@ export default function AdminAuditPage() {
             {t("audit.showing", { count: logs.length, total })}
           </div>
 
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t("audit.columns.time")}</TableHead>
-                  <TableHead>{t("audit.columns.action")}</TableHead>
-                  <TableHead>{t("audit.columns.affected")}</TableHead>
-                  <TableHead>{t("audit.columns.trigger")}</TableHead>
-                  <TableHead>{t("audit.columns.ref")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("audit.columns.time")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("audit.columns.action")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("audit.columns.affected")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("audit.columns.trigger")}</TableHead>
+                  <TableHead className="whitespace-nowrap">{t("audit.columns.ref")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -303,12 +303,12 @@ export default function AdminAuditPage() {
                 ) : (
                   logs.map((log) => (
                     <TableRow key={log.id}>
-                      <TableCell className="text-sm">
+                      <TableCell className="text-sm whitespace-nowrap">
                         {formatDate(log.createdAt)}
                       </TableCell>
-                      <TableCell>{getActionBadge(log.action)}</TableCell>
-                      <TableCell>{getAffectedDisplay(log)}</TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">{getActionBadge(log.action)}</TableCell>
+                      <TableCell className="whitespace-nowrap">{getAffectedDisplay(log)}</TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {log.admin ? (
                           <div className="flex flex-col">
                             <span className="font-medium text-sm">
@@ -324,7 +324,7 @@ export default function AdminAuditPage() {
                           </span>
                         )}
                       </TableCell>
-                      <TableCell className="font-mono text-xs">
+                      <TableCell className="font-mono text-xs whitespace-nowrap">
                         {log.reference || "—"}
                       </TableCell>
                     </TableRow>
@@ -336,28 +336,32 @@ export default function AdminAuditPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(page - 1)}
-                disabled={page === 1}
-              >
-                <ChevronLeft className="h-4 w-4" />
-                {t("audit.previous")}
-              </Button>
-              <span className="text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-muted-foreground order-2 sm:order-1">
                 {t("audit.page", { page, totalPages })}
-              </span>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setPage(page + 1)}
-                disabled={page === totalPages}
-              >
-                {t("audit.next")}
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              </div>
+              <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 1}
+                  className="flex-1 sm:flex-none"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  {t("audit.previous")}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page + 1)}
+                  disabled={page === totalPages}
+                  className="flex-1 sm:flex-none"
+                >
+                  {t("audit.next")}
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
             </div>
           )}
         </div>

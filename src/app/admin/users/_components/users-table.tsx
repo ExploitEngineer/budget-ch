@@ -93,16 +93,16 @@ export function UsersTable({
       </div>
 
       {/* Table */}
-      <div className="rounded-md border">
+      <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">{t("users.table.columns.id")}</TableHead>
-              <TableHead>{t("users.table.columns.user")}</TableHead>
-              <TableHead>{t("users.table.columns.status")}</TableHead>
-              <TableHead>{t("users.table.columns.plan")}</TableHead>
-              <TableHead>{t("users.table.columns.registered")}</TableHead>
-              <TableHead className="text-right">{t("users.table.columns.actions")}</TableHead>
+              <TableHead className="w-[100px] whitespace-nowrap">{t("users.table.columns.id")}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("users.table.columns.user")}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("users.table.columns.status")}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("users.table.columns.plan")}</TableHead>
+              <TableHead className="whitespace-nowrap">{t("users.table.columns.registered")}</TableHead>
+              <TableHead className="text-right whitespace-nowrap">{t("users.table.columns.actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -115,10 +115,10 @@ export function UsersTable({
             ) : (
               users.map((user) => (
                 <TableRow key={user.id}>
-                  <TableCell className="font-mono text-xs">
+                  <TableCell className="font-mono text-xs whitespace-nowrap">
                     {truncateId(user.id)}
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     <div className="flex flex-col">
                       <span className="font-medium">{user.name}</span>
                       <span className="text-xs text-muted-foreground">
@@ -131,12 +131,12 @@ export function UsersTable({
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>{getStatusBadge(user)}</TableCell>
-                  <TableCell>{getPlanBadge(user)}</TableCell>
-                  <TableCell className="text-sm">
+                  <TableCell className="whitespace-nowrap">{getStatusBadge(user)}</TableCell>
+                  <TableCell className="whitespace-nowrap">{getPlanBadge(user)}</TableCell>
+                  <TableCell className="text-sm whitespace-nowrap">
                     {formatDate(user.createdAt)}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right whitespace-nowrap">
                     <UserActionsMenu user={user} onRefresh={onRefresh} />
                   </TableCell>
                 </TableRow>
@@ -148,28 +148,32 @@ export function UsersTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page - 1)}
-            disabled={page === 1}
-          >
-            <ChevronLeft className="h-4 w-4" />
-            {t("users.table.previous")}
-          </Button>
-          <span className="text-sm text-muted-foreground">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-muted-foreground order-2 sm:order-1">
             {t("users.table.page", { page, totalPages })}
-          </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onPageChange(page + 1)}
-            disabled={page === totalPages}
-          >
-            {t("users.table.next")}
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          </div>
+          <div className="flex items-center gap-2 order-1 sm:order-2 w-full sm:w-auto justify-between sm:justify-end">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page === 1}
+              className="flex-1 sm:flex-none"
+            >
+              <ChevronLeft className="h-4 w-4 mr-1" />
+              {t("users.table.previous")}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page === totalPages}
+              className="flex-1 sm:flex-none"
+            >
+              {t("users.table.next")}
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
         </div>
       )}
     </div>
