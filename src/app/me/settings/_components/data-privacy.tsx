@@ -158,7 +158,7 @@ export function DataPrivacy() {
           <div className="flex flex-col gap-2">
             <h3 className="text-sm">{t("labels.data-export.title")}</h3>
             <div className="flex flex-wrap items-center gap-2">
-              <Button
+              {/* <Button
                 variant="outline"
                 onClick={(): void =>
                   exportAllDataJSON({
@@ -172,7 +172,7 @@ export function DataPrivacy() {
                 className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
               >
                 {t("labels.data-export.buttons.json")}
-              </Button>
+              </Button> */}
 
               {/* Delete Account Dialog Trigger */}
               <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
