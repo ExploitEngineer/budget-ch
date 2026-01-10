@@ -37,7 +37,7 @@ export function BillingDetails() {
   });
 
   const onSubmit = (values: BillingDetailsValues) => {
-    console.log("Billing details:", values);
+    // console.log("Billing details:", values);
   };
 
   return (

@@ -124,6 +124,7 @@ const transactionFilterFn: FilterFn<Transaction> = (
 
   // Recurring filter (only show recurring transactions when checked)
   if (filterValue.isRecurring) {
+    /*
     console.log('🔍 RECURRING FILTER CHECK:', {
       isRecurringFilterActive: filterValue.isRecurring,
       txId: tx.id,
@@ -132,6 +133,7 @@ const transactionFilterFn: FilterFn<Transaction> = (
       txIsRecurring: tx.isRecurring,
       willShow: !!tx.recurringTemplateId
     });
+    */
     if (!tx.recurringTemplateId) return false;
   }
 

@@ -48,7 +48,7 @@ export function ReportCardsSection({
     enabled: !!hubId,
   });
 
-  console.log("DEBUG: ReportCardsSection - Summary Data:", summary);
+  // console.log("DEBUG: ReportCardsSection - Summary Data:", summary);
 
   const income = summary?.income ?? 0;
   const expense = summary?.expense ?? 0;

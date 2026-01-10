@@ -2377,8 +2377,8 @@ export async function getReportSummaryDB(
       .from(transactions)
       .where(and(...filters));
 
-    console.log("DEBUG: getReportSummaryDB - Filters applied:", filters.length);
-    console.log("DEBUG: getReportSummaryDB - SQL Result:", result);
+    // console.log("DEBUG: getReportSummaryDB - Filters applied:", filters.length);
+    // console.log("DEBUG: getReportSummaryDB - SQL Result:", result);
 
     const { income, expense } = result[0] || { income: 0, expense: 0 };
     const balance = income - expense;
