@@ -1,10 +1,12 @@
 import { nextCookies } from "better-auth/next-js";
 import { createAuthClient } from "better-auth/react";
 import { twoFactorClient } from "better-auth/client/plugins";
+import { adminClient } from "better-auth/client/plugins";
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL,
   plugins: [
+    adminClient(),
     nextCookies(),
     twoFactorClient({
       // twoFactorPage: "/two-factor",

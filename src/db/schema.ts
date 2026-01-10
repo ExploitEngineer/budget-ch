@@ -89,6 +89,7 @@ export const sessions = pgTable("sessions", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  impersonatedBy: text("impersonated_by"),
 });
 
 export const accounts = pgTable("accounts", {
@@ -134,8 +135,10 @@ export const users = pgTable("users", {
   language: text("language").default("en").notNull(),
   notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
   reportFrequency: text("report_frequency").default("off").notNull(),
-  role: userRole().default("user").notNull(),
-  isLocked: boolean("is_locked").default(false).notNull(),
+  role: text("role", { enum: ["user", "admin"] }).default("user").notNull(),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
