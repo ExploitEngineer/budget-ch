@@ -254,12 +254,13 @@
                 "dashboard": "Tableau de bord",
                 "transactions": "Transactions",
                 "budgets": "Budgets",
-                "savings": "Objectifs d’épargne",
+                "savings": "Objectifs d'épargne",
                 "accounts": "Comptes",
                 "reports": "Rapports",
                 "imp-exp": "Importer / Exporter",
                 "settings": "Paramètres",
                 "help": "Aide",
+                "admin": "Admin Dashboard",
                 "logout": "Déconnexion"
             },
             "header": {
@@ -1957,6 +1958,249 @@
                 "destination-account-not-found": "Compte de destination introuvable ou vous n'y avez pas accès",
                 "same-account-transfer": "Impossible de transférer vers le même compte",
                 "unknown-error": "Une erreur inattendue s'est produite"
+            }
+        }
+    },
+    "admin": {
+        "sidebar": {
+            "subtitle": "Administration",
+            "navigation": "ADMIN",
+            "overview": "Aperçu",
+            "users": "Utilisateurs",
+            "audit": "Journal d'audit",
+            "compliance": "Conformité",
+            "back-to-app": "Retour à l'application",
+            "logout": "Déconnexion"
+        },
+        "overview": {
+            "title": "Tableau de bord Admin",
+            "description": "Gérez les utilisateurs, les abonnements et les paramètres système.",
+            "kpi": {
+                "mrr": "Revenu mensuel récurrent",
+                "vs-last-month": "vs mois dernier",
+                "active-subscriptions": "Abonnements actifs",
+                "individual": "Individuel",
+                "family": "Famille",
+                "active-users": "Utilisateurs actifs",
+                "blocked": "Bloqués"
+            },
+            "system-status": {
+                "title": "État du système",
+                "region": "Région",
+                "encryption": "Chiffrement",
+                "logs": "Journaux",
+                "storage": "Stockage"
+            }
+        },
+        "users": {
+            "title": "Gestion des utilisateurs",
+            "description": "Afficher, gérer et inviter des utilisateurs sur la plateforme.",
+            "search-placeholder": "Rechercher par e-mail ou ID...",
+            "search": "Rechercher",
+            "invite": "Inviter un utilisateur",
+            "table": {
+                "showing": "Affichage de {count} sur {total} utilisateurs",
+                "columns": {
+                    "id": "ID",
+                    "user": "Utilisateur",
+                    "status": "Statut",
+                    "plan": "Forfait",
+                    "registered": "Inscrit",
+                    "actions": "Actions"
+                },
+                "status": {
+                    "active": "Actif",
+                    "locked": "Verrouillé",
+                    "unverified": "Non vérifié"
+                },
+                "plan": {
+                    "free": "Gratuit"
+                },
+                "no-users": "Aucun utilisateur trouvé",
+                "previous": "Précédent",
+                "next": "Suivant",
+                "page": "Page {page} sur {totalPages}"
+            },
+            "actions": {
+                "menu": "Ouvrir le menu",
+                "export": "Exporter les données (RGPD)",
+                "exporting": "Exportation...",
+                "export-success": "Données utilisateur exportées avec succès",
+                "export-error": "Échec de l'exportation des données utilisateur",
+                "lock": "Verrouiller l'utilisateur",
+                "unlock": "Déverrouiller l'utilisateur",
+                "lock-success": "Utilisateur verrouillé avec succès",
+                "unlock-success": "Utilisateur déverrouillé avec succès",
+                "lock-error": "Échec de la mise à jour du statut de l'utilisateur",
+                "delete": "Supprimer l'utilisateur"
+            },
+            "invite-dialog": {
+                "title": "Inviter un utilisateur",
+                "description": "Envoyer une invitation à rejoindre la plateforme. L'utilisateur recevra un e-mail avec les instructions.",
+                "email": "Adresse e-mail",
+                "email-placeholder": "utilisateur@exemple.com",
+                "role": "Rôle",
+                "role-user": "Utilisateur",
+                "role-admin": "Administrateur",
+                "include-subscription": "Inclure un abonnement",
+                "subscription-plan": "Plan d'abonnement",
+                "plan-individual": "Individuel",
+                "plan-family": "Famille",
+                "subscription-months": "Durée (mois)",
+                "months-hint": "1-24 mois",
+                "cancel": "Annuler",
+                "send": "Envoyer l'invitation",
+                "sending": "Envoi...",
+                "success": "Invitation envoyée avec succès",
+                "error": "Échec de l'envoi de l'invitation"
+            },
+            "delete-dialog": {
+                "title": "Supprimer l'utilisateur",
+                "description": "Choisissez comment traiter les données de cet utilisateur : {email}",
+                "anonymize": "Anonymiser l'utilisateur",
+                "recommended": "Recommandé",
+                "anonymize-description": "Remplacer les données personnelles par des valeurs anonymisées. L'utilisateur ne peut pas se connecter mais les données sont conservées pour les rapports.",
+                "permanently-delete": "Supprimer définitivement",
+                "delete-description": "Supprimer complètement toutes les données utilisateur. Cette action est irréversible.",
+                "delete-warning": "Cela supprimera définitivement toutes les données utilisateur, y compris les transactions, les budgets et les paramètres. Cette action est irréversible.",
+                "cancel": "Annuler",
+                "processing": "Traitement...",
+                "anonymize-button": "Anonymiser l'utilisateur",
+                "delete-button": "Supprimer définitivement",
+                "anonymize-success": "Utilisateur anonymisé avec succès",
+                "delete-success": "Utilisateur supprimé avec succès",
+                "error": "Échec du traitement de la demande"
+            }
+        },
+        "audit": {
+            "title": "Journaux d'audit",
+            "description": "Examinez toutes les actions administratives effectuées sur la plateforme.",
+            "search-placeholder": "Rechercher par ID utilisateur ou e-mail...",
+            "search": "Rechercher",
+            "filter-action": "Filtrer par action",
+            "all-actions": "Toutes les actions",
+            "export-csv": "Exporter CSV",
+            "exporting": "Exportation...",
+            "export-success": "Journaux d'audit exportés avec succès",
+            "export-error": "Échec de l'exportation des journaux d'audit",
+            "showing": "Affichage de {count} sur {total} journaux",
+            "columns": {
+                "time": "Heure",
+                "action": "Action",
+                "affected": "Utilisateur concerné",
+                "trigger": "Déclenché par",
+                "ref": "Référence"
+            },
+            "actions": {
+                "user_locked": "Utilisateur verrouillé",
+                "user_unlocked": "Utilisateur déverrouillé",
+                "user_deleted": "Utilisateur supprimé",
+                "user_anonymized": "Utilisateur anonymisé",
+                "user_exported": "Utilisateur exporté",
+                "invitation_created": "Invitation créée",
+                "invitation_accepted": "Invitation acceptée",
+                "subscription_granted": "Abonnement accordé"
+            },
+            "no-logs": "Aucun journal d'audit trouvé",
+            "previous": "Précédent",
+            "next": "Suivant",
+            "page": "Page {page} sur {totalPages}"
+        },
+        "compliance": {
+            "title": "Conformité et confidentialité",
+            "description": "Examinez les mesures de protection des données et les informations de conformité.",
+            "items": {
+                "data-principle": {
+                    "title": "Principe des données",
+                    "value": "Accès admin sans visibilité du contenu. Les données personnelles ne sont accessibles qu'aux administrateurs autorisés."
+                },
+                "cloud-storage": {
+                    "title": "Stockage cloud",
+                    "value": "Toutes les données sont stockées dans des centres de données exclusivement européens (Francfort). Les données sont chiffrées au repos avec KMS."
+                },
+                "tracking": {
+                    "title": "Suivi",
+                    "value": "Pas de profilage, pas de publicité. Nous ne vendons ni ne partageons les données utilisateur avec des tiers."
+                },
+                "data-subject-rights": {
+                    "title": "Droits des personnes concernées",
+                    "value": "Les utilisateurs peuvent exporter, bloquer, supprimer ou anonymiser leurs données à tout moment via le libre-service ou une demande admin."
+                },
+                "admin-access": {
+                    "title": "Accès admin",
+                    "value": "Principe du moindre privilège. Le personnel de support a un accès restreint. Toutes les actions admin sont journalisées."
+                },
+                "security": {
+                    "title": "Sécurité",
+                    "value": "Les comptes admin nécessitent la 2FA. Délai d'expiration de session en cas d'inactivité. Journalisation IP à des fins de sécurité."
+                }
+            },
+            "privacy-policy": {
+                "title": "Politique de confidentialité",
+                "description": "Notre politique de confidentialité complète est disponible en ligne. Elle couvre la collecte, le traitement des données et les droits des utilisateurs."
+            },
+            "technical-measures": {
+                "title": "Mesures techniques",
+                "encryption-at-rest": "Chiffrement au repos (AES-256)",
+                "encryption-in-transit": "Chiffrement en transit (TLS 1.3)",
+                "access-logging": "Journalisation des accès activée",
+                "data-backup": "Sauvegardes régulières des données",
+                "session-management": "Gestion sécurisée des sessions",
+                "ip-anonymization": "Anonymisation des adresses IP"
+            }
+        },
+        "accept-invitation": {
+            "loading": "Chargement des détails de l'invitation...",
+            "pending": {
+                "title": "Invitation Admin",
+                "description": "Vous avez été invité à rejoindre BudgetHub.",
+                "email": "E-mail invité",
+                "role": "Rôle",
+                "role-admin": "Administrateur",
+                "role-user": "Utilisateur",
+                "subscription-included": "Abonnement inclus !",
+                "plan-family": "Forfait Famille",
+                "plan-individual": "Forfait Individuel",
+                "month": "mois",
+                "months": "mois",
+                "accept-button": "Accepter l'invitation",
+                "accepting": "Acceptation..."
+            },
+            "success": {
+                "title": "Invitation acceptée !",
+                "toast": "Invitation acceptée avec succès !",
+                "redirecting": "Redirection vers votre tableau de bord...",
+                "button": "Aller au tableau de bord"
+            },
+            "not-authenticated": {
+                "title": "Connexion requise",
+                "description": "Veuillez vous connecter pour accepter cette invitation.",
+                "button": "Se connecter"
+            },
+            "no-account": {
+                "title": "Compte requis",
+                "description": "Vous devez d'abord créer un compte pour accepter cette invitation.",
+                "button": "Créer un compte"
+            },
+            "invalid": {
+                "title": "Invitation invalide",
+                "description": "Ce lien d'invitation est invalide ou n'existe pas."
+            },
+            "expired": {
+                "title": "Invitation expirée",
+                "description": "Cette invitation a expiré. Veuillez demander une nouvelle invitation à l'administrateur."
+            },
+            "already-accepted": {
+                "title": "Déjà acceptée",
+                "description": "Cette invitation a déjà été acceptée. Vous pouvez accéder à votre tableau de bord."
+            },
+            "email-mismatch": {
+                "title": "Mauvais compte",
+                "description": "Cette invitation a été envoyée à une autre adresse e-mail. Veuillez vous connecter avec le bon compte."
+            },
+            "error": {
+                "title": "Erreur",
+                "description": "Une erreur s'est produite lors du traitement de votre invitation. Veuillez réessayer."
             }
         }
     }

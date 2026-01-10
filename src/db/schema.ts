@@ -135,6 +135,7 @@ export const users = pgTable("users", {
   notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
   reportFrequency: text("report_frequency").default("off").notNull(),
   role: userRole().default("user").notNull(),
+  isLocked: boolean("is_locked").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -515,3 +516,58 @@ export type AccountType = "checking" | "savings" | "credit-card" | "cash";
 export type BudgetMarkerColor = "standard" | "green" | "orange" | "red";
 export type NotificationType = "info" | "success" | "error" | "warning";
 export type NotificationChannel = "email" | "web" | "both";
+
+/* ADMIN DASHBOARD SCHEMAS */
+
+export const adminActionTypeEnum = pgEnum("admin_action_type", [
+  "user_locked",
+  "user_unlocked",
+  "user_deleted",
+  "user_anonymized",
+  "user_exported",
+  "invitation_created",
+  "invitation_accepted",
+  "subscription_granted",
+]);
+
+export type AdminActionType = (typeof adminActionTypeEnum.enumValues)[number];
+
+export const adminInvitations = pgTable("admin_invitations", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  role: userRole().notNull().default("user"),
+  subscriptionPlan: text("subscription_plan"), // "individual" | "family" | null
+  subscriptionMonths: integer("subscription_months"), // 1-24 months
+  token: text("token").notNull().unique(),
+  accepted: boolean("accepted").default(false).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AdminInvitation = InferSelectModel<typeof adminInvitations>;
+
+export const adminAuditLogs = pgTable(
+  "admin_audit_logs",
+  {
+    id: uuid("id").notNull().primaryKey().defaultRandom(),
+    action: adminActionTypeEnum("action").notNull(),
+    affectedUserId: text("affected_user_id"),
+    adminId: text("admin_id")
+      .notNull()
+      .references(() => users.id),
+    reference: text("reference"), // e.g., "REQ-8F3A"
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("adminAuditLogs_adminId_idx").on(table.adminId),
+    index("adminAuditLogs_affectedUserId_idx").on(table.affectedUserId),
+    index("adminAuditLogs_action_idx").on(table.action),
+    index("adminAuditLogs_createdAt_idx").on(table.createdAt),
+  ],
+);
+
+export type AdminAuditLog = InferSelectModel<typeof adminAuditLogs>;

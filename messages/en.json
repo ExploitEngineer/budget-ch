@@ -239,6 +239,9 @@
             "fallback": "Or copy and paste this link into your browser:",
             "expire": "This invitation expires in 7 days.",
             "ignore": "If you didn't expect this invitation, you can safely ignore this email."
+        },
+        "admin-invitation": {
+            "subject": "You've been invited to BudgetHub"
         }
     },
     "main-dashboard": {
@@ -260,6 +263,7 @@
                 "imp-exp": "Import / Export",
                 "settings": "Settings",
                 "help": "Help",
+                "admin": "Admin Dashboard",
                 "logout": "Logout"
             },
             "header": {
@@ -1957,6 +1961,249 @@
                 "destination-account-not-found": "Destination account not found or you don't have access to it",
                 "same-account-transfer": "Cannot transfer to the same account",
                 "unknown-error": "An unexpected error occurred"
+            }
+        }
+    },
+    "admin": {
+        "sidebar": {
+            "subtitle": "Owner Admin",
+            "navigation": "ADMIN",
+            "overview": "Overview",
+            "users": "Users",
+            "audit": "Audit Logs",
+            "compliance": "Compliance",
+            "back-to-app": "Back to App",
+            "logout": "Logout"
+        },
+        "overview": {
+            "title": "Admin Dashboard",
+            "description": "Manage users, subscriptions, and system settings.",
+            "kpi": {
+                "mrr": "Monthly Recurring Revenue",
+                "vs-last-month": "vs last month",
+                "active-subscriptions": "Active Subscriptions",
+                "individual": "Individual",
+                "family": "Family",
+                "active-users": "Active Users",
+                "blocked": "Blocked"
+            },
+            "system-status": {
+                "title": "System Status",
+                "region": "Region",
+                "encryption": "Encryption",
+                "logs": "Logs",
+                "storage": "Storage"
+            }
+        },
+        "users": {
+            "title": "User Management",
+            "description": "View, manage, and invite users to the platform.",
+            "search-placeholder": "Search by email or ID...",
+            "search": "Search",
+            "invite": "Invite User",
+            "table": {
+                "showing": "Showing {count} of {total} users",
+                "columns": {
+                    "id": "ID",
+                    "user": "User",
+                    "status": "Status",
+                    "plan": "Plan",
+                    "registered": "Registered",
+                    "actions": "Actions"
+                },
+                "status": {
+                    "active": "Active",
+                    "locked": "Locked",
+                    "unverified": "Unverified"
+                },
+                "plan": {
+                    "free": "Free"
+                },
+                "no-users": "No users found",
+                "previous": "Previous",
+                "next": "Next",
+                "page": "Page {page} of {totalPages}"
+            },
+            "actions": {
+                "menu": "Open menu",
+                "export": "Export Data (GDPR)",
+                "exporting": "Exporting...",
+                "export-success": "User data exported successfully",
+                "export-error": "Failed to export user data",
+                "lock": "Lock User",
+                "unlock": "Unlock User",
+                "lock-success": "User locked successfully",
+                "unlock-success": "User unlocked successfully",
+                "lock-error": "Failed to update user status",
+                "delete": "Delete User"
+            },
+            "invite-dialog": {
+                "title": "Invite User",
+                "description": "Send an invitation to join the platform. The user will receive an email with instructions.",
+                "email": "Email Address",
+                "email-placeholder": "user@example.com",
+                "role": "Role",
+                "role-user": "User",
+                "role-admin": "Administrator",
+                "include-subscription": "Include subscription grant",
+                "subscription-plan": "Subscription Plan",
+                "plan-individual": "Individual",
+                "plan-family": "Family",
+                "subscription-months": "Duration (months)",
+                "months-hint": "1-24 months",
+                "cancel": "Cancel",
+                "send": "Send Invitation",
+                "sending": "Sending...",
+                "success": "Invitation sent successfully",
+                "error": "Failed to send invitation"
+            },
+            "delete-dialog": {
+                "title": "Delete User",
+                "description": "Choose how to handle this user's data: {email}",
+                "anonymize": "Anonymize User",
+                "recommended": "Recommended",
+                "anonymize-description": "Replace personal data with anonymized values. User cannot log in but data is preserved for reporting.",
+                "permanently-delete": "Delete Permanently",
+                "delete-description": "Completely remove all user data. This action cannot be undone.",
+                "delete-warning": "This will permanently delete all user data including transactions, budgets, and settings. This action cannot be undone.",
+                "cancel": "Cancel",
+                "processing": "Processing...",
+                "anonymize-button": "Anonymize User",
+                "delete-button": "Delete Permanently",
+                "anonymize-success": "User anonymized successfully",
+                "delete-success": "User deleted successfully",
+                "error": "Failed to process request"
+            }
+        },
+        "audit": {
+            "title": "Audit Logs",
+            "description": "Review all administrative actions performed on the platform.",
+            "search-placeholder": "Search by user ID or email...",
+            "search": "Search",
+            "filter-action": "Filter by action",
+            "all-actions": "All Actions",
+            "export-csv": "Export CSV",
+            "exporting": "Exporting...",
+            "export-success": "Audit logs exported successfully",
+            "export-error": "Failed to export audit logs",
+            "showing": "Showing {count} of {total} logs",
+            "columns": {
+                "time": "Time",
+                "action": "Action",
+                "affected": "Affected User",
+                "trigger": "Triggered By",
+                "ref": "Reference"
+            },
+            "actions": {
+                "user_locked": "User Locked",
+                "user_unlocked": "User Unlocked",
+                "user_deleted": "User Deleted",
+                "user_anonymized": "User Anonymized",
+                "user_exported": "User Exported",
+                "invitation_created": "Invitation Created",
+                "invitation_accepted": "Invitation Accepted",
+                "subscription_granted": "Subscription Granted"
+            },
+            "no-logs": "No audit logs found",
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page {page} of {totalPages}"
+        },
+        "compliance": {
+            "title": "Compliance & Privacy",
+            "description": "Review data protection measures and compliance information.",
+            "items": {
+                "data-principle": {
+                    "title": "Data Principle",
+                    "value": "Admin access without content visibility. Personal data is only accessible by authorized administrators."
+                },
+                "cloud-storage": {
+                    "title": "Cloud Storage",
+                    "value": "All data is stored in EU-only data centers (Frankfurt). Data is encrypted at rest using KMS."
+                },
+                "tracking": {
+                    "title": "Tracking",
+                    "value": "No profiling, no ads. We do not sell or share user data with third parties."
+                },
+                "data-subject-rights": {
+                    "title": "Data Subject Rights",
+                    "value": "Users can export, block, delete, or anonymize their data at any time via self-service or admin request."
+                },
+                "admin-access": {
+                    "title": "Admin Access",
+                    "value": "Least privilege principle. Support staff has restricted access. All admin actions are logged."
+                },
+                "security": {
+                    "title": "Security",
+                    "value": "Admin accounts require 2FA. Session timeout after inactivity. IP logging for security purposes."
+                }
+            },
+            "privacy-policy": {
+                "title": "Privacy Policy",
+                "description": "Our full privacy policy is available online. It covers data collection, processing, and user rights."
+            },
+            "technical-measures": {
+                "title": "Technical Measures",
+                "encryption-at-rest": "Encryption at rest (AES-256)",
+                "encryption-in-transit": "Encryption in transit (TLS 1.3)",
+                "access-logging": "Access logging enabled",
+                "data-backup": "Regular data backups",
+                "session-management": "Secure session management",
+                "ip-anonymization": "IP address anonymization"
+            }
+        },
+        "accept-invitation": {
+            "loading": "Loading invitation details...",
+            "pending": {
+                "title": "Admin Invitation",
+                "description": "You have been invited to join BudgetHub.",
+                "email": "Invited Email",
+                "role": "Role",
+                "role-admin": "Administrator",
+                "role-user": "User",
+                "subscription-included": "Subscription Included!",
+                "plan-family": "Family Plan",
+                "plan-individual": "Individual Plan",
+                "month": "month",
+                "months": "months",
+                "accept-button": "Accept Invitation",
+                "accepting": "Accepting..."
+            },
+            "success": {
+                "title": "Invitation Accepted!",
+                "toast": "Invitation accepted successfully!",
+                "redirecting": "Redirecting to your dashboard...",
+                "button": "Go to Dashboard"
+            },
+            "not-authenticated": {
+                "title": "Login Required",
+                "description": "Please log in to accept this invitation.",
+                "button": "Go to Login"
+            },
+            "no-account": {
+                "title": "Account Required",
+                "description": "You need to create an account first to accept this invitation.",
+                "button": "Create Account"
+            },
+            "invalid": {
+                "title": "Invalid Invitation",
+                "description": "This invitation link is invalid or does not exist."
+            },
+            "expired": {
+                "title": "Invitation Expired",
+                "description": "This invitation has expired. Please request a new invitation from the administrator."
+            },
+            "already-accepted": {
+                "title": "Already Accepted",
+                "description": "This invitation has already been accepted. You can access your dashboard."
+            },
+            "email-mismatch": {
+                "title": "Wrong Account",
+                "description": "This invitation was sent to a different email address. Please log in with the correct account."
+            },
+            "error": {
+                "title": "Error",
+                "description": "Something went wrong while processing your invitation. Please try again."
             }
         }
     }
