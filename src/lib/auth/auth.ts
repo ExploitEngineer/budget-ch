@@ -37,6 +37,21 @@ export const auth = betterAuth({
         required: false,
         input: false,
       },
+      language: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+      notificationsEnabled: {
+        type: "boolean",
+        required: false,
+        input: false,
+      },
+      reportFrequency: {
+        type: "string",
+        required: false,
+        input: false,
+      },
     },
     deleteUser: {
       enabled: true,
