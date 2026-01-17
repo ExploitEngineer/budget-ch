@@ -150,7 +150,7 @@
             "password": "Mostra password",
             "terms": "Accetto i <terms>Termini</terms> e l’<privacy>Informativa sulla privacy</privacy>"
         },
-        "tip": "Suggerimento: lunghezza ≥ 8, includere numeri e lettere.",
+        "tip": "Suggerimento: Lunghezza ≥ 8, maiuscole, minuscole, numeri e caratteri speciali.",
         "buttons": {
             "create-account": "Crea account",
             "google": "con Google",
@@ -181,6 +181,10 @@
             "name-min": "Il nome deve contenere almeno 2 caratteri.",
             "email-invalid": "Indirizzo e-mail non valido.",
             "password-min": "La password deve contenere almeno 8 caratteri.",
+            "password-uppercase": "La password deve contenere almeno una lettera maiuscola.",
+            "password-lowercase": "La password deve contenere almeno una lettera minuscola.",
+            "password-number": "La password deve contenere almeno un numero.",
+            "password-special": "La password deve contenere almeno un carattere speciale.",
             "accept-terms": "Devi accettare i termini e l'informativa sulla privacy."
         },
         "verify-email": {

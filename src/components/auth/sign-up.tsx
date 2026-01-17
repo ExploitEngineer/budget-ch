@@ -153,7 +153,8 @@ export default function SignUp() {
           />
 
           {/* Show password + tip */}
-          <FormItem className="flex flex-col items-start justify-between border-0 sm:flex-row sm:items-center">
+          <FormItem className="flex flex-col items-start justify-between border-0">
+           <p className="text-sm">{t("tip")}</p>
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={showPassword}
@@ -162,7 +163,6 @@ export default function SignUp() {
               />
               <span className="text-sm">{t("checkboxes.password")}</span>
             </div>
-            <p className="text-sm">{t("tip")}</p>
           </FormItem>
 
           {/* Terms & Privacy */}

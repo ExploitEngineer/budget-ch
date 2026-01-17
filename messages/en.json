@@ -150,7 +150,7 @@
             "password": "Show password",
             "terms": "I accept the <terms>terms</terms> & the <privacy>privacy</privacy>"
         },
-        "tip": "Tip: Length ≥ 8, include numbers & letters.",
+        "tip": "Tip: Length ≥ 8, include uppercase, lowercase, numbers & special characters.",
         "buttons": {
             "create-account": "Create account",
             "google": "with google",
@@ -181,6 +181,10 @@
             "name-min": "Name must be at least 2 characters.",
             "email-invalid": "Invalid email address.",
             "password-min": "Password must be at least 8 characters.",
+            "password-uppercase": "Password must contain at least one uppercase letter.",
+            "password-lowercase": "Password must contain at least one lowercase letter.",
+            "password-number": "Password must contain at least one number.",
+            "password-special": "Password must contain at least one special character.",
             "accept-terms": "You must accept the terms and privacy policy."
         },
         "verify-email": {
