@@ -731,7 +731,7 @@
                 "info": "To create a new recurring transaction, add a new transaction and check 'Make it recurring'.",
                 "table": {
                     "headings": {
-                        "category": "Category",
+                        "name": "Name",
                         "account": "Account",
                         "type": "Type",
                         "amount": "Amount",

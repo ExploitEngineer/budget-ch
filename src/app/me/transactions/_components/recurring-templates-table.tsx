@@ -41,7 +41,8 @@ export default function RecurringTemplatesTable({
       baseDate = startOfDay(new Date(template.startDate));
       // If start date hasn't occurred yet, that's the next occurrence
       if (baseDate >= today) {
-        return format(baseDate, "d.M.yyyy");
+        const newDate = format(baseDate, "d.M.yyyy");
+        return newDate;
       }
     }
 
@@ -51,11 +52,13 @@ export default function RecurringTemplatesTable({
     // If there's an end date and next occurrence is after it, return null
     if (template.endDate) {
       const endDate = startOfDay(new Date(template.endDate));
+      console.log(`${template.id} - endDate: ${endDate}`);
       if (nextDate > endDate) {
         return null;
       }
     }
 
+    const newDate = format(nextDate, "d.M.yyyy");
     return format(nextDate, "d.M.yyyy");
   };
 
@@ -114,8 +117,8 @@ export default function RecurringTemplatesTable({
                       template.type === "income"
                         ? "border-green-500 text-green-600 dark:text-green-400"
                         : template.type === "expense"
-                        ? "border-red-500 text-red-600 dark:text-red-400"
-                        : "border-blue-500 text-blue-600 dark:text-blue-400"
+                          ? "border-red-500 text-red-600 dark:text-red-400"
+                          : "border-blue-500 text-blue-600 dark:text-blue-400"
                     }
                   >
                     {formatType(template.type)}

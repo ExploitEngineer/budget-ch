@@ -731,7 +731,7 @@
                 "info": "Per creare una nuova transazione ricorrente, aggiungi una nuova transazione e seleziona 'Rendi ricorrente'.",
                 "table": {
                     "headings": {
-                        "category": "Categoria",
+                        "name": "Nome",
                         "account": "Conto",
                         "type": "Tipo",
                         "amount": "Importo",

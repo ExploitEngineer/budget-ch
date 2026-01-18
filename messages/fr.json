@@ -731,7 +731,7 @@
                 "info": "Pour créer une nouvelle transaction récurrente, ajoutez une nouvelle transaction et cochez 'Rendre récurrente'.",
                 "table": {
                     "headings": {
-                        "category": "Catégorie",
+                        "name": "Nom",
                         "account": "Compte",
                         "type": "Type",
                         "amount": "Montant",
