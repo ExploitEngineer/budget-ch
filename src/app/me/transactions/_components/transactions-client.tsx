@@ -82,10 +82,10 @@ export default function TransactionsClient() {
           value={activeView}
           onValueChange={(val) => val && setActiveView(val as ViewType)}
         >
-          <ToggleGroupItem value="transactions" aria-label="toggle-transactions" className="text-xs sm:text-sm">
+          <ToggleGroupItem value="transactions" aria-label="toggle-transactions" className="text-xs sm:text-sm px-8">
             {t("view-toggle.transactions")}
           </ToggleGroupItem>
-          <ToggleGroupItem value="recurring" aria-label="toggle-recurring" className="text-xs sm:text-sm">
+          <ToggleGroupItem value="recurring" aria-label="toggle-recurring" className="text-xs sm:text-sm px-8">
             {t("view-toggle.recurring")}
           </ToggleGroupItem>
         </ToggleGroup>
