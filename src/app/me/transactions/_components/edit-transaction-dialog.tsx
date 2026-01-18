@@ -146,6 +146,9 @@ export default function EditTransactionDialog({
         queryKey: transactionKeys.recent(hubId),
       });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recurringTemplates(hubId),
+      });
       toast.success(t("messages.created"));
     },
     onError: (error: Error) => {

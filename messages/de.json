@@ -719,6 +719,90 @@
                 },
                 "no-results": "Keine Ergebnisse.",
                 "rows-selected": "{selected} von {total} Zeile(n) ausgewählt."
+            },
+            "view-toggle": {
+                "transactions": "Transaktionen",
+                "recurring": "Wiederkehrende Transaktionen"
+            },
+            "recurring-templates": {
+                "title": "Wiederkehrende Transaktionen",
+                "empty": "Noch keine wiederkehrenden Transaktionen. Erstellen Sie eine neue Transaktion und aktivieren Sie 'Wiederkehrend machen', um zu beginnen.",
+                "loading": "Wiederkehrende Transaktionen werden geladen...",
+                "info": "Um eine neue wiederkehrende Transaktion zu erstellen, fügen Sie eine neue Transaktion hinzu und aktivieren Sie 'Wiederkehrend machen'.",
+                "table": {
+                    "headings": {
+                        "category": "Kategorie",
+                        "account": "Konto",
+                        "type": "Typ",
+                        "amount": "Betrag",
+                        "frequency": "Frequenz",
+                        "next-occurrence": "Nächste Fälligkeit",
+                        "status": "Status",
+                        "actions": "Aktionen"
+                    },
+                    "frequency-days": "{days} Tage",
+                    "status": {
+                        "active": "Aktiv",
+                        "inactive": "Inaktiv"
+                    },
+                    "next-occurrence-na": "N/V"
+                },
+                "edit-dialog": {
+                    "title": "Wiederkehrende Transaktion bearbeiten",
+                    "close": "Schliessen",
+                    "loading": "Wird geladen...",
+                    "sections": {
+                        "transaction-details": "Transaktionsdetails",
+                        "recurrence-settings": "Wiederholungseinstellungen"
+                    },
+                    "labels": {
+                        "source": "Empfänger / Quelle",
+                        "account": "Konto",
+                        "category": "Kategorie",
+                        "type": "Typ",
+                        "amount": "Betrag (CHF)",
+                        "note": "Notiz",
+                        "destination-account": "Zielkonto",
+                        "frequency-days": "Frequenz (Tage)",
+                        "start-date": "Startdatum",
+                        "end-date": "Enddatum",
+                        "has-end-date": "Enddatum festlegen",
+                        "status": "Status"
+                    },
+                    "placeholders": {
+                        "source": "z.B. Coop, Arbeitgeber…",
+                        "account": "Konto wählen",
+                        "category": "Kategorie auswählen oder hinzufügen",
+                        "note": "Optionale Notiz",
+                        "destination-account": "Zielkonto wählen",
+                        "start-date": "Startdatum wählen",
+                        "end-date": "Enddatum wählen"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Wie oft diese Transaktion wiederholt wird (in Tagen)",
+                        "has-end-date": "Aktivieren, um ein Enddatum für diese wiederkehrende Transaktion festzulegen"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Aktiv",
+                            "inactive": "Inaktiv"
+                        },
+                        "type": {
+                            "income": "Einnahme",
+                            "expense": "Ausgabe",
+                            "transfer": "Überweisung"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Speichern",
+                        "saving": "Wird gespeichert..."
+                    },
+                    "messages": {
+                        "success": "Wiederkehrende Transaktion erfolgreich aktualisiert!",
+                        "error": "Fehler beim Aktualisieren der wiederkehrenden Transaktion",
+                        "load-error": "Fehler beim Laden der wiederkehrenden Transaktion"
+                    }
+                }
             }
         },
         "budgets-page": {

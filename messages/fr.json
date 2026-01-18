@@ -719,6 +719,90 @@
                 },
                 "no-results": "Aucun résultat.",
                 "rows-selected": "{selected} sur {total} ligne(s) sélectionnée(s)."
+            },
+            "view-toggle": {
+                "transactions": "Transactions",
+                "recurring": "Transactions récurrentes"
+            },
+            "recurring-templates": {
+                "title": "Transactions récurrentes",
+                "empty": "Pas encore de transactions récurrentes. Créez une nouvelle transaction et cochez 'Rendre récurrente' pour commencer.",
+                "loading": "Chargement des transactions récurrentes...",
+                "info": "Pour créer une nouvelle transaction récurrente, ajoutez une nouvelle transaction et cochez 'Rendre récurrente'.",
+                "table": {
+                    "headings": {
+                        "category": "Catégorie",
+                        "account": "Compte",
+                        "type": "Type",
+                        "amount": "Montant",
+                        "frequency": "Fréquence",
+                        "next-occurrence": "Prochaine échéance",
+                        "status": "Statut",
+                        "actions": "Actions"
+                    },
+                    "frequency-days": "{days} jours",
+                    "status": {
+                        "active": "Actif",
+                        "inactive": "Inactif"
+                    },
+                    "next-occurrence-na": "N/D"
+                },
+                "edit-dialog": {
+                    "title": "Modifier la transaction récurrente",
+                    "close": "Fermer",
+                    "loading": "Chargement...",
+                    "sections": {
+                        "transaction-details": "Détails de la transaction",
+                        "recurrence-settings": "Paramètres de récurrence"
+                    },
+                    "labels": {
+                        "source": "Destinataire / Source",
+                        "account": "Compte",
+                        "category": "Catégorie",
+                        "type": "Type",
+                        "amount": "Montant (CHF)",
+                        "note": "Note",
+                        "destination-account": "Compte de destination",
+                        "frequency-days": "Fréquence (jours)",
+                        "start-date": "Date de début",
+                        "end-date": "Date de fin",
+                        "has-end-date": "Définir une date de fin",
+                        "status": "Statut"
+                    },
+                    "placeholders": {
+                        "source": "ex. Coop, employeur…",
+                        "account": "Choisir un compte",
+                        "category": "Sélectionner ou ajouter une catégorie",
+                        "note": "Note optionnelle",
+                        "destination-account": "Choisir le compte de destination",
+                        "start-date": "Sélectionner la date de début",
+                        "end-date": "Sélectionner la date de fin"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Fréquence de répétition de cette transaction (en jours)",
+                        "has-end-date": "Cochez pour définir une date de fin pour cette transaction récurrente"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Actif",
+                            "inactive": "Inactif"
+                        },
+                        "type": {
+                            "income": "Revenu",
+                            "expense": "Dépense",
+                            "transfer": "Transfert"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Enregistrer",
+                        "saving": "Enregistrement..."
+                    },
+                    "messages": {
+                        "success": "Transaction récurrente mise à jour avec succès !",
+                        "error": "Échec de la mise à jour de la transaction récurrente",
+                        "load-error": "Échec du chargement de la transaction récurrente"
+                    }
+                }
             }
         },
         "budgets-page": {

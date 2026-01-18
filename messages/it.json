@@ -719,6 +719,90 @@
                 },
                 "no-results": "Nessun risultato.",
                 "rows-selected": "{selected} di {total} riga/e selezionata/e."
+            },
+            "view-toggle": {
+                "transactions": "Transazioni",
+                "recurring": "Transazioni ricorrenti"
+            },
+            "recurring-templates": {
+                "title": "Transazioni ricorrenti",
+                "empty": "Nessuna transazione ricorrente ancora. Crea una nuova transazione e seleziona 'Rendi ricorrente' per iniziare.",
+                "loading": "Caricamento transazioni ricorrenti...",
+                "info": "Per creare una nuova transazione ricorrente, aggiungi una nuova transazione e seleziona 'Rendi ricorrente'.",
+                "table": {
+                    "headings": {
+                        "category": "Categoria",
+                        "account": "Conto",
+                        "type": "Tipo",
+                        "amount": "Importo",
+                        "frequency": "Frequenza",
+                        "next-occurrence": "Prossima scadenza",
+                        "status": "Stato",
+                        "actions": "Azioni"
+                    },
+                    "frequency-days": "{days} giorni",
+                    "status": {
+                        "active": "Attivo",
+                        "inactive": "Inattivo"
+                    },
+                    "next-occurrence-na": "N/D"
+                },
+                "edit-dialog": {
+                    "title": "Modifica transazione ricorrente",
+                    "close": "Chiudi",
+                    "loading": "Caricamento...",
+                    "sections": {
+                        "transaction-details": "Dettagli transazione",
+                        "recurrence-settings": "Impostazioni di ricorrenza"
+                    },
+                    "labels": {
+                        "source": "Destinatario / Fonte",
+                        "account": "Conto",
+                        "category": "Categoria",
+                        "type": "Tipo",
+                        "amount": "Importo (CHF)",
+                        "note": "Nota",
+                        "destination-account": "Conto di destinazione",
+                        "frequency-days": "Frequenza (giorni)",
+                        "start-date": "Data di inizio",
+                        "end-date": "Data di fine",
+                        "has-end-date": "Imposta data di fine",
+                        "status": "Stato"
+                    },
+                    "placeholders": {
+                        "source": "es. Coop, datore di lavoro…",
+                        "account": "Scegli un conto",
+                        "category": "Seleziona o aggiungi una categoria",
+                        "note": "Nota opzionale",
+                        "destination-account": "Scegli il conto di destinazione",
+                        "start-date": "Seleziona la data di inizio",
+                        "end-date": "Seleziona la data di fine"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Frequenza di ripetizione di questa transazione (in giorni)",
+                        "has-end-date": "Seleziona per impostare una data di fine per questa transazione ricorrente"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Attivo",
+                            "inactive": "Inattivo"
+                        },
+                        "type": {
+                            "income": "Entrata",
+                            "expense": "Uscita",
+                            "transfer": "Trasferimento"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Salva",
+                        "saving": "Salvataggio..."
+                    },
+                    "messages": {
+                        "success": "Transazione ricorrente aggiornata con successo!",
+                        "error": "Impossibile aggiornare la transazione ricorrente",
+                        "load-error": "Impossibile caricare la transazione ricorrente"
+                    }
+                }
             }
         },
         "budgets-page": {

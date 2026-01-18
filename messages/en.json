@@ -722,16 +722,16 @@
             },
             "view-toggle": {
                 "transactions": "Transactions",
-                "recurring": "Recurring Templates"
+                "recurring": "Recurring Transactions"
             },
             "recurring-templates": {
-                "title": "Recurring Templates",
-                "empty": "No recurring templates yet. Create a new transaction and check 'Make it recurring' to get started.",
-                "loading": "Loading templates...",
-                "info": "To create a new recurring template, add a new transaction and check 'Make it recurring'.",
+                "title": "Recurring Transactions",
+                "empty": "No recurring transactions yet. Create a new transaction and check 'Make it recurring' to get started.",
+                "loading": "Loading recurring transactions...",
+                "info": "To create a new recurring transaction, add a new transaction and check 'Make it recurring'.",
                 "table": {
                     "headings": {
-                        "name": "Name",
+                        "category": "Category",
                         "account": "Account",
                         "type": "Type",
                         "amount": "Amount",
@@ -748,7 +748,7 @@
                     "next-occurrence-na": "N/A"
                 },
                 "edit-dialog": {
-                    "title": "Edit Recurring Template",
+                    "title": "Edit Recurring Transaction",
                     "close": "Close",
                     "loading": "Loading...",
                     "sections": {
@@ -798,9 +798,9 @@
                         "saving": "Saving..."
                     },
                     "messages": {
-                        "success": "Recurring template updated successfully!",
-                        "error": "Failed to update recurring template",
-                        "load-error": "Failed to load template"
+                        "success": "Recurring transaction updated successfully!",
+                        "error": "Failed to update recurring transaction",
+                        "load-error": "Failed to load recurring transaction"
                     }
                 }
             }
