@@ -709,7 +709,7 @@ export default function EditTransactionDialog({
 
                 {/* Recurring Transaction Section */}
                 <div className="flex flex-col gap-4 pt-2">
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="isRecurring"
                     render={({ field }) => (
@@ -727,7 +727,7 @@ export default function EditTransactionDialog({
                         </div>
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   {isRecurring && (
                     <div className="flex flex-col gap-4 pl-7 sm:flex-row sm:gap-3">
