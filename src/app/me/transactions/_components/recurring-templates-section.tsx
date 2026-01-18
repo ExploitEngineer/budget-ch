@@ -3,8 +3,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Card, CardContent } from "@/components/ui/card";
 import { ErrorState } from "@/components/ui/error-state";
 import { transactionKeys } from "@/lib/query-keys";
 import { getRecurringTransactionTemplates } from "@/lib/services/transaction";
@@ -45,16 +44,12 @@ export default function RecurringTemplatesSection() {
 
   return (
     <Card className="bg-blue-background dark:border-border-blue">
-      <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
-      </CardHeader>
-      <Separator className="dark:bg-border-blue" />
-      <CardContent className="pt-4">
+      <CardContent>
         {/* Info message */}
-        {/*<div className="mb-4 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/30 dark:text-blue-300">
           <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>{t("info")}</span>
-        </div>*/}
+        </div>
 
         {error ? (
           <ErrorState

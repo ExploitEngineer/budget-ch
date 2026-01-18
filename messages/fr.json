@@ -726,9 +726,9 @@
             },
             "recurring-templates": {
                 "title": "Transactions récurrentes",
-                "empty": "Pas encore de transactions récurrentes. Créez une nouvelle transaction et cochez 'Rendre récurrente' pour commencer.",
+                "empty": "Pas encore de transactions récurrentes. Créez une nouvelle transaction et cochez 'Paiement récurrent' pour commencer.",
                 "loading": "Chargement des transactions récurrentes...",
-                "info": "Pour créer une nouvelle transaction récurrente, ajoutez une nouvelle transaction et cochez 'Rendre récurrente'.",
+                "info": "Pour créer une nouvelle transaction récurrente, ajoutez une nouvelle transaction et cochez 'Paiement récurrent'.",
                 "table": {
                     "headings": {
                         "name": "Nom",

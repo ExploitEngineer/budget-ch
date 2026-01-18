@@ -728,7 +728,7 @@
                 "title": "Recurring Transactions",
                 "empty": "No recurring transactions yet. Create a new transaction and check 'Make it recurring' to get started.",
                 "loading": "Loading recurring transactions...",
-                "info": "To create a new recurring transaction, add a new transaction and check 'Make it recurring'.",
+                "info": "To create a new recurring transaction, add a new transaction and check 'Recurring Transaction'.",
                 "table": {
                     "headings": {
                         "name": "Name",

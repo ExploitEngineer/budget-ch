@@ -726,9 +726,9 @@
             },
             "recurring-templates": {
                 "title": "Transazioni ricorrenti",
-                "empty": "Nessuna transazione ricorrente ancora. Crea una nuova transazione e seleziona 'Rendi ricorrente' per iniziare.",
+                "empty": "Nessuna transazione ricorrente ancora. Crea una nuova transazione e seleziona 'Pagamento ricorrente' per iniziare.",
                 "loading": "Caricamento transazioni ricorrenti...",
-                "info": "Per creare una nuova transazione ricorrente, aggiungi una nuova transazione e seleziona 'Rendi ricorrente'.",
+                "info": "Per creare una nuova transazione ricorrente, aggiungi una nuova transazione e seleziona 'Pagamento ricorrente'.",
                 "table": {
                     "headings": {
                         "name": "Nome",

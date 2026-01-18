@@ -726,9 +726,9 @@
             },
             "recurring-templates": {
                 "title": "Wiederkehrende Transaktionen",
-                "empty": "Noch keine wiederkehrenden Transaktionen. Erstellen Sie eine neue Transaktion und aktivieren Sie 'Wiederkehrend machen', um zu beginnen.",
+                "empty": "Noch keine wiederkehrenden Transaktionen. Erstellen Sie eine neue Transaktion und aktivieren Sie 'Wiederkehrende Zahlung', um zu beginnen.",
                 "loading": "Wiederkehrende Transaktionen werden geladen...",
-                "info": "Um eine neue wiederkehrende Transaktion zu erstellen, fügen Sie eine neue Transaktion hinzu und aktivieren Sie 'Wiederkehrend machen'.",
+                "info": "Um eine neue wiederkehrende Transaktion zu erstellen, fügen Sie eine neue Transaktion hinzu und aktivieren Sie 'Wiederkehrende Zahlung'.",
                 "table": {
                     "headings": {
                         "name": "Name",
