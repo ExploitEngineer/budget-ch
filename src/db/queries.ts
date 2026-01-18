@@ -1084,8 +1084,19 @@ export async function updateRecurringTransactionTemplateDB({
 }
 
 // GET Recurring Transaction Templates by Hub
-export async function getRecurringTransactionTemplatesDB(hubId: string) {
+export async function getRecurringTransactionTemplatesDB(
+  hubId: string,
+  statusFilter: 'active' | 'inactive' | 'all' = 'active'
+) {
   try {
+    // Build where conditions based on status filter
+    const whereConditions = statusFilter === 'all'
+      ? eq(recurringTransactionTemplates.hubId, hubId)
+      : and(
+          eq(recurringTransactionTemplates.hubId, hubId),
+          eq(recurringTransactionTemplates.status, statusFilter),
+        );
+
     const templates = await db
       .select({
         id: recurringTransactionTemplates.id,
@@ -1102,6 +1113,7 @@ export async function getRecurringTransactionTemplatesDB(hubId: string) {
         startDate: recurringTransactionTemplates.startDate,
         endDate: recurringTransactionTemplates.endDate,
         status: recurringTransactionTemplates.status,
+        lastGeneratedDate: recurringTransactionTemplates.lastGeneratedDate,
         createdAt: recurringTransactionTemplates.createdAt,
         updatedAt: recurringTransactionTemplates.updatedAt,
         // Related data
@@ -1124,12 +1136,7 @@ export async function getRecurringTransactionTemplatesDB(hubId: string) {
           transactionCategories.id,
         ),
       )
-      .where(
-        and(
-          eq(recurringTransactionTemplates.hubId, hubId),
-          eq(recurringTransactionTemplates.status, "active"),
-        ),
-      )
+      .where(whereConditions)
       .orderBy(recurringTransactionTemplates.startDate);
 
     // Fetch destination account names separately if needed

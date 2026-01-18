@@ -719,6 +719,90 @@
                 },
                 "no-results": "No results.",
                 "rows-selected": "{selected} of {total} row(s) selected."
+            },
+            "view-toggle": {
+                "transactions": "Transactions",
+                "recurring": "Recurring Templates"
+            },
+            "recurring-templates": {
+                "title": "Recurring Templates",
+                "empty": "No recurring templates yet. Create a new transaction and check 'Make it recurring' to get started.",
+                "loading": "Loading templates...",
+                "info": "To create a new recurring template, add a new transaction and check 'Make it recurring'.",
+                "table": {
+                    "headings": {
+                        "name": "Name",
+                        "account": "Account",
+                        "type": "Type",
+                        "amount": "Amount",
+                        "frequency": "Frequency",
+                        "next-occurrence": "Next Occurrence",
+                        "status": "Status",
+                        "actions": "Actions"
+                    },
+                    "frequency-days": "{days} days",
+                    "status": {
+                        "active": "Active",
+                        "inactive": "Inactive"
+                    },
+                    "next-occurrence-na": "N/A"
+                },
+                "edit-dialog": {
+                    "title": "Edit Recurring Template",
+                    "close": "Close",
+                    "loading": "Loading...",
+                    "sections": {
+                        "transaction-details": "Transaction Details",
+                        "recurrence-settings": "Recurrence Settings"
+                    },
+                    "labels": {
+                        "source": "Recipient / Source",
+                        "account": "Account",
+                        "category": "Category",
+                        "type": "Type",
+                        "amount": "Amount (CHF)",
+                        "note": "Note",
+                        "destination-account": "Destination Account",
+                        "frequency-days": "Frequency (Days)",
+                        "start-date": "Start Date",
+                        "end-date": "End Date",
+                        "has-end-date": "Set End Date",
+                        "status": "Status"
+                    },
+                    "placeholders": {
+                        "source": "e.g. Coop, employer…",
+                        "account": "Choose an account",
+                        "category": "Select or add a category",
+                        "note": "Optional note",
+                        "destination-account": "Choose destination account",
+                        "start-date": "Select start date",
+                        "end-date": "Select end date"
+                    },
+                    "descriptions": {
+                        "frequency-days": "How often this transaction repeats (in days)",
+                        "has-end-date": "Check to set an end date for this recurring transaction"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Active",
+                            "inactive": "Inactive"
+                        },
+                        "type": {
+                            "income": "Income",
+                            "expense": "Expense",
+                            "transfer": "Transfer"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Save",
+                        "saving": "Saving..."
+                    },
+                    "messages": {
+                        "success": "Recurring template updated successfully!",
+                        "error": "Failed to update recurring template",
+                        "load-error": "Failed to load template"
+                    }
+                }
             }
         },
         "budgets-page": {

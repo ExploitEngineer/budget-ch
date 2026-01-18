@@ -628,6 +628,39 @@ export async function getUpcomingRecurringTransactions(
   }
 }
 
+// GET All Recurring Transaction Templates (for templates management)
+export async function getRecurringTransactionTemplates(
+  hubIdArg?: string,
+  statusFilter: 'active' | 'inactive' | 'all' = 'all'
+): Promise<{
+  success: boolean;
+  data?: any[];
+  message?: string;
+}> {
+  try {
+    const hdrs = await headers();
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId" };
+    }
+
+    const templates = await getRecurringTransactionTemplatesDB(hubId, statusFilter);
+
+    return {
+      success: true,
+      data: templates,
+    };
+  } catch (err: any) {
+    console.error("Server action error in getRecurringTransactionTemplates:", err);
+    return {
+      success: false,
+      message: err?.message || "Unexpected server error.",
+    };
+  }
+}
+
 // GET Single Recurring Transaction Template
 export async function getRecurringTransactionTemplate(templateId: string): Promise<{
   success: boolean;
@@ -661,10 +694,19 @@ export async function getRecurringTransactionTemplate(templateId: string): Promi
 export async function updateRecurringTransactionTemplate(
   templateId: string,
   updatedData: {
+    // Recurrence settings
     frequencyDays?: number;
     startDate?: Date;
     endDate?: Date | null;
     status?: "active" | "inactive";
+    // Transaction details
+    source?: string | null;
+    amount?: number;
+    financialAccountId?: string;
+    transactionCategoryId?: string | null;
+    destinationAccountId?: string | null;
+    type?: TransactionType;
+    note?: string | null;
   },
 ): Promise<{
   success: boolean;
@@ -691,6 +733,7 @@ export async function updateRecurringTransactionTemplate(
     }
 
     revalidatePath("/me/dashboard");
+    revalidatePath("/me/transactions");
 
     return {
       success: true,

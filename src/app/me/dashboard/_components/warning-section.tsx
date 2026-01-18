@@ -14,7 +14,6 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
-import DashboardTableAdjustDialog from "./dashboard-table-dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ErrorState } from "@/components/ui/error-state";
 import { getUpcomingRecurringTransactions } from "@/lib/services/transaction";
@@ -128,9 +127,6 @@ export function WarningSection() {
                         <TableCell>{data.name}</TableCell>
                         <TableCell>{data.account}</TableCell>
                         <TableCell>{data.amount}</TableCell>
-                        <TableCell>
-                          <DashboardTableAdjustDialog templateId={data.templateId} />
-                        </TableCell>
                       </TableRow>
                     ))
                   ) : (
