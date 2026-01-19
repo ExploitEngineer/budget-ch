@@ -46,7 +46,7 @@ import {
 import { transactionKeys, accountKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { getFinancialAccounts as getFinancialAccountsAPI } from "@/lib/api";
@@ -127,9 +127,10 @@ export default function EditRecurringTemplateDialog({
     enabled: open && !!hubId,
   });
 
-  const accounts: AccountRow[] | undefined = domainAccounts
-    ? mapAccountsToRows(domainAccounts)
-    : undefined;
+  const accounts: AccountRow[] | undefined = useMemo(
+    () => (domainAccounts ? mapAccountsToRows(domainAccounts) : undefined),
+    [domainAccounts]
+  );
 
   const form = useForm<RecurringTemplateValues>({
     resolver: zodResolver(recurringTemplateSchema) as any,
@@ -173,7 +174,8 @@ export default function EditRecurringTemplateDialog({
         status: templateData.status,
       });
     }
-  }, [templateData, accounts, form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [templateData, accounts]);
 
   const updateTemplateMutation = useMutation({
     mutationFn: async (values: RecurringTemplateValues) => {
