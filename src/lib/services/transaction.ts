@@ -222,21 +222,9 @@ export async function createTransaction({
       }
     }
 
-    await createTransactionDB({
-      financialAccountId: account.id,
-      hubId,
-      userId,
-      transactionCategoryId,
-      amount,
-      source,
-      note,
-      transactionType,
-      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
-      recurringTemplateId: recurringTemplateId || null,
-      createdAt,
-    });
-
-    // Create recurring transaction template if isRecurring is true
+    // Create recurring transaction template FIRST if isRecurring is true
+    // This ensures the first transaction is linked to the template
+    let createdTemplateId: string | null = recurringTemplateId || null;
     if (isRecurring && frequencyDays && startDate) {
       const templateResult = await createRecurringTransactionTemplateDB({
         hubId,
@@ -252,13 +240,31 @@ export async function createTransaction({
         endDate: endDate || null,
         status: recurringStatus || "active",
         destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+        // Set lastGeneratedDate to startDate since we're creating the first transaction now
+        lastGeneratedDate: startDate,
       });
 
       if (!templateResult.success) {
         console.error("Failed to create recurring template:", templateResult.message);
         // Don't fail the transaction creation if template creation fails
+      } else if (templateResult.data) {
+        createdTemplateId = templateResult.data.id;
       }
     }
+
+    await createTransactionDB({
+      financialAccountId: account.id,
+      hubId,
+      userId,
+      transactionCategoryId,
+      amount,
+      source,
+      note,
+      transactionType,
+      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+      recurringTemplateId: createdTemplateId,
+      createdAt,
+    });
 
     // Check budget thresholds if this is an expense with a category
     if (transactionType === "expense" && transactionCategoryId) {

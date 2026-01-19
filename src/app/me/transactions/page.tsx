@@ -28,6 +28,7 @@ export default async function TransactionsPage({
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch transactions");
       }
+      console.log("transactions", res.data);
       return res.data ?? [];
     },
   });

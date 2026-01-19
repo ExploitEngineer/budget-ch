@@ -979,6 +979,7 @@ export type CreateRecurringTransactionTemplateArgs = {
   endDate: Date | null;
   status: "active" | "inactive";
   destinationAccountId?: string | null;
+  lastGeneratedDate?: Date | null;
 };
 
 export async function createRecurringTransactionTemplateDB({
@@ -995,6 +996,7 @@ export async function createRecurringTransactionTemplateDB({
   endDate,
   status,
   destinationAccountId,
+  lastGeneratedDate,
 }: CreateRecurringTransactionTemplateArgs) {
   try {
     const [template] = await db
@@ -1013,6 +1015,7 @@ export async function createRecurringTransactionTemplateDB({
         startDate,
         endDate,
         status,
+        lastGeneratedDate: lastGeneratedDate ?? null,
       })
       .returning();
 
