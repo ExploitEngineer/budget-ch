@@ -325,6 +325,7 @@ export const recurringTransactionTemplates = pgTable(
     lastFailedDate: timestamp("last_failed_date", { withTimezone: true }),
     failureReason: text("failure_reason"),
     consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
   },
 );
 

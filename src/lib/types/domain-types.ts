@@ -120,6 +120,7 @@ export interface RecurringTemplateWithDetails {
   status: 'active' | 'inactive';
   lastGeneratedDate: Date | null;
   createdAt: Date;
+  archivedAt: Date | null;
   // Joined fields
   accountName: string | null;
   categoryName: string | null;
