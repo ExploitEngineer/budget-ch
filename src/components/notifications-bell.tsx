@@ -31,6 +31,8 @@ const dateFnsLocales: Record<string, typeof enUS> = {
   it: it,
 };
 
+import { Spinner } from "./ui/spinner";
+
 export function NotificationsBell() {
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
@@ -156,8 +158,8 @@ export function NotificationsBell() {
         <DropdownMenuSeparator />
         <div className="max-h-96 overflow-y-auto">
           {isLoading ? (
-            <div className="p-4 text-center text-sm text-muted-foreground">
-              {t("loading")}
+            <div className="p-4 flex justify-center">
+              <Spinner />
             </div>
           ) : notifications.length === 0 ? (
             <div className="p-4 text-center text-sm text-muted-foreground">

@@ -16,6 +16,8 @@ import { useMemo } from "react";
 import { ErrorState } from "@/components/ui/error-state";
 import { useSessionReady } from "@/hooks/use-session-ready";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function BarChartSection() {
   const t = useTranslations("main-dashboard.dashboard-page.progress-cards");
   const searchParams = useSearchParams();
@@ -61,7 +63,9 @@ export function BarChartSection() {
         {goalsError ? (
           <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: savingGoalKeys.list(hubId, 3) })} />
         ) : savingGoals === undefined || goalsLoading ? (
-          <p className="text-muted-foreground px-6 text-sm">{t("loading")}</p>
+          <div className="flex justify-center py-4 w-full">
+            <Spinner />
+          </div>
         ) : savingGoals.length === 0 ? (
           <p className="text-muted-foreground px-6 text-sm">{t("no-goals")}</p>
         ) : (

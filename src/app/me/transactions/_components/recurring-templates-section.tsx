@@ -13,6 +13,8 @@ import RecurringTemplatesTable from "./recurring-templates-table";
 import type { RecurringTemplateWithDetails } from "@/lib/types/domain-types";
 import { Info } from "lucide-react";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export default function RecurringTemplatesSection() {
   const t = useTranslations("main-dashboard.transactions-page.recurring-templates");
   const searchParams = useSearchParams();
@@ -85,8 +87,8 @@ export default function RecurringTemplatesSection() {
             }
           />
         ) : isLoading ? (
-          <div className="py-8 text-center text-muted-foreground">
-            {t("loading")}
+          <div className="py-8 flex justify-center">
+            <Spinner />
           </div>
         ) : !templates || templates.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">

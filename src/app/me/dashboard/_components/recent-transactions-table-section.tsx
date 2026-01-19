@@ -22,6 +22,8 @@ import type { TransactionWithDetails } from "@/lib/types/domain-types";
 import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
 import { useMemo } from "react";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function RecentTransactionsTableSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const commonT = useTranslations("common");
@@ -78,9 +80,9 @@ export function RecentTransactionsTableSection() {
           {transactionError ? (
             <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: transactionKeys.recent(hubId) })} />
           ) : transactionLoading || !transactions ? (
-            <p className="text-muted-foreground px-6 text-sm">
-              {t("upcoming-cards.loading")}
-            </p>
+            <div className="flex justify-center py-8 w-full">
+              <Spinner />
+            </div>
           ) : (
             <Table className="min-w-[600px]">
               <TableHeader>

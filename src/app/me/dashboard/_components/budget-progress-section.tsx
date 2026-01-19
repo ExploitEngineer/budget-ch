@@ -22,6 +22,8 @@ import type { QuickTask } from "@/db/schema";
 import type { DashboardSavingsGoalsCards } from "@/lib/types/dashboard-types";
 import { useSessionReady } from "@/hooks/use-session-ready";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function BudgetProgressSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const queryClient = useQueryClient();
@@ -187,9 +189,9 @@ export function BudgetProgressSection() {
           {categoriesError ? (
             <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: budgetKeys.topCategories(hubId) })} />
           ) : topCategories === null || categoriesLoading ? (
-            <p className="text-muted-foreground px-6 text-sm">
-              {t("line-progress-cards.loading")}
-            </p>
+            <div className="col-span-2 flex justify-center py-8">
+              <Spinner />
+            </div>
           ) : topCategories?.length === 0 ? (
             <p className="text-muted-foreground px-6 text-sm">
               {t("line-progress-cards.no-categories-found")}
@@ -230,9 +232,9 @@ export function BudgetProgressSection() {
             {tasksError ? (
               <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: taskKeys.list(hubId) })} />
             ) : tasks === null || tasksLoading ? (
-              <p className="text-muted-foreground text-sm">
-                {t("line-progress-cards.loading")}
-              </p>
+              <div className="flex justify-center py-4">
+                <Spinner />
+              </div>
             ) : tasks?.length === 0 ? (
               <p className="text-muted-foreground text-sm">
                 {t("todos.no-tasks")}

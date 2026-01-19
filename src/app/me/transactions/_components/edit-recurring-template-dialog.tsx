@@ -83,6 +83,8 @@ interface EditRecurringTemplateDialogProps {
   onSuccess?: () => void;
 }
 
+import { Spinner } from "@/components/ui/spinner";
+
 export default function EditRecurringTemplateDialog({
   templateId,
   onSuccess,
@@ -257,8 +259,8 @@ export default function EditRecurringTemplateDialog({
         </div>
 
         {templateLoading ? (
-          <div className="py-8 text-center text-muted-foreground">
-            {t("loading")}
+          <div className="py-8 flex justify-center">
+            <Spinner />
           </div>
         ) : templateError ? (
           <div className="py-8 text-center text-red-500">
@@ -360,7 +362,10 @@ export default function EditRecurringTemplateDialog({
                             <SelectContent>
                               {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading...
+                                  <div className="flex items-center gap-2">
+                                    <Spinner className="h-4 w-4" />
+                                    <span>{t("loading-accounts")}</span>
+                                  </div>
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts.map((account) => (
@@ -421,7 +426,10 @@ export default function EditRecurringTemplateDialog({
                             <SelectContent>
                               {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading...
+                                  <div className="flex items-center gap-2">
+                                    <Spinner className="h-4 w-4" />
+                                    <span>{t("loading-accounts")}</span>
+                                  </div>
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts
