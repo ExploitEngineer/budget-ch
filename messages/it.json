@@ -801,7 +801,8 @@
                         "success": "Transazione ricorrente aggiornata con successo!",
                         "error": "Impossibile aggiornare la transazione ricorrente",
                         "load-error": "Impossibile caricare la transazione ricorrente"
-                    }
+                    },
+                    "edit": "Modificare"
                 }
             }
         },

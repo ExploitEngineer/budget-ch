@@ -749,6 +749,7 @@
                 },
                 "edit-dialog": {
                     "title": "Edit Recurring Transaction",
+                    "edit": "Edit",
                     "close": "Close",
                     "loading": "Loading...",
                     "sections": {

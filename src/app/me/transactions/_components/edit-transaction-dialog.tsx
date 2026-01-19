@@ -382,11 +382,17 @@ export default function EditTransactionDialog({
         <DialogTrigger className="cursor-pointer" asChild>
           {isEditMode ? (
             <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
+              className={
+                variant === "gradient"
+                  ? "btn-gradient flex items-center gap-2 dark:text-white"
+                  : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+              }
+              variant={variant === "gradient" ? "default" : "outline"}
             >
-              <Pencil className="h-4 w-4" />
+              <Plus className="h-5 w-5" />
+              <span className="hidden text-sm sm:block">
+                {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
+              </span>
             </Button>
           ) : (
             <Button

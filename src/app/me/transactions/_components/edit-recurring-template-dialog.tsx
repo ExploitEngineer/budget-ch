@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Pencil } from "lucide-react";
+import { CalendarIcon, Pencil, Plus } from "lucide-react";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
@@ -226,13 +226,15 @@ export default function EditRecurringTemplateDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="cursor-pointer" asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8"
-        >
-          <Pencil className="h-4 w-4" />
-        </Button>
+      <Button
+            className={"!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"}
+            variant="outline"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="hidden text-sm sm:block">
+              {t("edit")}
+            </span>
+          </Button>
       </DialogTrigger>
 
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden">

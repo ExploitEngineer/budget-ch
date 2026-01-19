@@ -801,7 +801,8 @@
                         "success": "Wiederkehrende Transaktion erfolgreich aktualisiert!",
                         "error": "Fehler beim Aktualisieren der wiederkehrenden Transaktion",
                         "load-error": "Fehler beim Laden der wiederkehrenden Transaktion"
-                    }
+                    },
+                    "edit": "Bearbeiten"
                 }
             }
         },
