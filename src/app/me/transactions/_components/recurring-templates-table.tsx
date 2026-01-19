@@ -41,7 +41,7 @@ export default function RecurringTemplatesTable({
       baseDate = startOfDay(new Date(template.startDate));
       // If start date hasn't occurred yet, that's the next occurrence
       if (baseDate >= today) {
-        return format(baseDate, "d.M.yyyy");
+        return format(baseDate, "dd/MM/yyyy");
       }
     }
 
@@ -56,7 +56,7 @@ export default function RecurringTemplatesTable({
       }
     }
 
-    return format(nextDate, "d.M.yyyy");
+    return format(nextDate, "dd/MM/yyyy");
   };
 
   // Format transaction type with proper capitalization

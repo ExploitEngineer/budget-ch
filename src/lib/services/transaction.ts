@@ -557,12 +557,21 @@ export async function getUpcomingRecurringTransactions(
 
     for (const template of templates) {
       const startDate = startOfDay(new Date(template.startDate));
-      let currentDate = startDate;
+      let currentDate: Date;
 
-      // If start date is in the past, calculate next occurrence
-      if (template.frequencyDays > 0) {
-        while (isBefore(currentDate, today)) {
-          currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+      // Use lastGeneratedDate if available to calculate next occurrence
+      if (template.lastGeneratedDate) {
+        // Next occurrence is lastGeneratedDate + frequencyDays
+        currentDate = startOfDay(addDays(new Date(template.lastGeneratedDate), template.frequencyDays));
+      } else {
+        // No transactions generated yet, start from startDate
+        currentDate = startDate;
+
+        // If start date is in the past, calculate next occurrence
+        if (template.frequencyDays > 0) {
+          while (isBefore(currentDate, today)) {
+            currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+          }
         }
       }
 
@@ -594,7 +603,7 @@ export async function getUpcomingRecurringTransactions(
             name: template.source || template.categoryName || "—",
             account: template.accountName || "—",
             amount: `CHF ${template.amount.toFixed(2)}`,
-            date: format(currentDate, "d.M.yyyy"),
+            date: format(currentDate, "dd/MM/yyyy"),
             templateId: template.id,
           });
 

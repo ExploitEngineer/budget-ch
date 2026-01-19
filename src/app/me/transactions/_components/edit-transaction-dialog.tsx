@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Plus, X } from "lucide-react";
+import { CalendarIcon, Pencil, Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -380,19 +380,29 @@ export default function EditTransactionDialog({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer" asChild>
-          <Button
-            className={
-              variant === "gradient"
-                ? "btn-gradient flex items-center gap-2 dark:text-white"
-                : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
-            }
-            variant={variant === "gradient" ? "default" : "outline"}
-          >
-            <Plus className="h-5 w-5" />
-            <span className="hidden text-sm sm:block">
-              {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
-            </span>
-          </Button>
+          {isEditMode ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          ) : (
+            <Button
+              className={
+                variant === "gradient"
+                  ? "btn-gradient flex items-center gap-2 dark:text-white"
+                  : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+              }
+              variant={variant === "gradient" ? "default" : "outline"}
+            >
+              <Plus className="h-5 w-5" />
+              <span className="hidden text-sm sm:block">
+                {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
+              </span>
+            </Button>
+          )}
         </DialogTrigger>
 
         <DialogContent

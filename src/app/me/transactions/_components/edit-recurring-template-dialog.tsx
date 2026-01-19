@@ -153,15 +153,16 @@ export default function EditRecurringTemplateDialog({
   const hasEndDate = form.watch("hasEndDate");
   const transactionType = form.watch("type");
 
-  // Update form when template data loads
+  // Update form when template data AND accounts are loaded
+  // We need accounts loaded so the Select component can match the financialAccountId
   useEffect(() => {
-    if (templateData) {
+    if (templateData && accounts) {
       form.reset({
         source: templateData.source || "",
         amount: templateData.amount,
         financialAccountId: templateData.financialAccountId,
         transactionCategoryId: templateData.transactionCategoryId,
-        categoryName: templateData.categoryName,
+        categoryName: templateData.categoryName || "",
         destinationAccountId: templateData.destinationAccountId,
         type: templateData.type,
         note: templateData.note || "",
@@ -172,7 +173,7 @@ export default function EditRecurringTemplateDialog({
         status: templateData.status,
       });
     }
-  }, [templateData, form]);
+  }, [templateData, accounts, form]);
 
   const updateTemplateMutation = useMutation({
     mutationFn: async (values: RecurringTemplateValues) => {
