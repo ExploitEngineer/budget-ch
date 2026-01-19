@@ -16,7 +16,7 @@ import {
   notifications,
   budgetInstances,
 } from "./schema";
-import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, between } from "drizzle-orm";
+import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, isNotNull, between } from "drizzle-orm";
 import type {
   QuickTask,
   UserType,
@@ -1100,13 +1100,17 @@ export async function getRecurringTransactionTemplatesDB(
     // Build where conditions based on status filter and archive status
     const conditions = [eq(recurringTransactionTemplates.hubId, hubId)];
 
-    // Add status filter condition
-    if (statusFilter !== 'all') {
+    // Add status filter condition (only when not showing archived)
+    if (!includeArchived && statusFilter !== 'all') {
       conditions.push(eq(recurringTransactionTemplates.status, statusFilter));
     }
 
-    // By default, exclude archived templates unless explicitly requested
-    if (!includeArchived) {
+    // Filter by archive status:
+    // - When includeArchived is false: show only non-archived (archivedAt IS NULL)
+    // - When includeArchived is true: show ONLY archived (archivedAt IS NOT NULL)
+    if (includeArchived) {
+      conditions.push(isNotNull(recurringTransactionTemplates.archivedAt));
+    } else {
       conditions.push(isNull(recurringTransactionTemplates.archivedAt));
     }
 
