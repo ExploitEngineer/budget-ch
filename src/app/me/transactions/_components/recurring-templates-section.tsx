@@ -45,12 +45,9 @@ export default function RecurringTemplatesSection() {
   });
 
   const handleTemplateUpdated = () => {
-    // Invalidate both archived and non-archived queries
+    // Invalidate all recurring templates queries for this hub (matches both archived and non-archived)
     queryClient.invalidateQueries({
-      queryKey: transactionKeys.recurringTemplates(hubId, true),
-    });
-    queryClient.invalidateQueries({
-      queryKey: transactionKeys.recurringTemplates(hubId, false),
+      queryKey: transactionKeys.recurringTemplatesBase(hubId),
     });
   };
 
@@ -82,7 +79,7 @@ export default function RecurringTemplatesSection() {
           <ErrorState
             onRetry={() =>
               queryClient.invalidateQueries({
-                queryKey: transactionKeys.recurringTemplates(hubId),
+                queryKey: transactionKeys.recurringTemplatesBase(hubId),
               })
             }
           />

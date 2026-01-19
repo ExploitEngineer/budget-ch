@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   
   const access = await validateHubAccess(hubId);
   if (!access.success) {
-    return apiError({ message: access.message ?? "Access denied", status: 403 });
+    return apiError({ message: access.message ?? "Access denied", status: access.status ?? 403 });
   }
   
   const transactions = await getTransactions(hubId);
