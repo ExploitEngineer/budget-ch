@@ -11,6 +11,12 @@ import { getMailTranslations } from "@/lib/mail-translations";
 
 
 export const auth = betterAuth({
+  rateLimit: {
+    enabled: true,
+    window: 10,
+    max: 100,
+    storage: "database",
+},
   database: drizzleAdapter(db, {
     provider: "pg",
     usePlural: true,
@@ -20,12 +26,28 @@ export const auth = betterAuth({
       accounts: schema.accounts,
       verifications: schema.verifications,
       twoFactors: schema.twoFactor,
+      rateLimits: schema.rateLimits,
     },
   }),
   appName: "Budget-ch",
   user: {
     additionalFields: {
       stripeCustomerId: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+      language: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+      notificationsEnabled: {
+        type: "boolean",
+        required: false,
+        input: false,
+      },
+      reportFrequency: {
         type: "string",
         required: false,
         input: false,
@@ -190,6 +212,10 @@ export const auth = betterAuth({
       const t = await getMailTranslations(locale);
       const name = user.name || user.email;
 
+      const verificationUrl = new URL(url);
+      verificationUrl.searchParams.set("callbackURL", `${verificationUrl.origin}/email-verified`);
+      const finalUrl = verificationUrl.toString();
+
       const html = `
       <html>
         <head>
@@ -202,10 +228,10 @@ export const auth = betterAuth({
             <p>${t("emails.auth.verify-email.hi")}</p>
             <p>${t("emails.auth.verify-email.thanks", { name })}</p>
             <p style="text-align: center; margin: 32px 0;">
-              <a href="${url}email-verified" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">${t("emails.auth.verify-email.button")}</a>
+              <a href="${finalUrl}" style="background: #2563eb; color: white; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">${t("emails.auth.verify-email.button")}</a>
             </p>
             <p>${t("emails.auth.verify-email.fallback")}</p>
-            <p style="color: #2563eb; word-break: break-all;">${url}email-verified</p>
+            <p style="color: #2563eb; word-break: break-all;">${finalUrl}</p>
             <p>${t("emails.auth.verify-email.expire")}</p>
             <p>${t("emails.auth.verify-email.ignore")}</p>
             <hr style="margin: 32px 0; border: 0; border-top: 1px solid #ddd;" />

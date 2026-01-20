@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
   if (!access.success) {
     return apiError({
       message: access.message ?? "Access denied",
-      status: 403,
+      status: access.status ?? 403,
     });
   }
 

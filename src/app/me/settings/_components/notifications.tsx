@@ -138,7 +138,7 @@ export function Notifications({
   return (
     <section>
       <Card className="bg-blue-background dark:border-border-blue relative">
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <CardTitle>{t("title")}</CardTitle>
           <div className="flex items-center gap-2">
             {isUpdating && <Loader2 className="h-4 w-4 animate-spin opacity-50" />}
@@ -150,7 +150,7 @@ export function Notifications({
             />
             <label
               htmlFor="global-notifications"
-              className="text-sm cursor-pointer font-medium"
+              className="text-sm cursor-pointer font-medium whitespace-nowrap"
             >
               {t("master-toggle")}
             </label>
@@ -158,7 +158,7 @@ export function Notifications({
         </CardHeader>
         <Separator className="dark:bg-border-blue" />
         <CardContent className={!globalEnabled ? "opacity-50 pointer-events-none grayscale-[0.5]" : ""}>
-          <div className="mb-5 grid grid-cols-2 gap-5">
+          <div className="mb-5 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-5">
             <div>
               <h3 className="mb-3 text-sm opacity-80">
                 {t("labels.email-alerts.title")}
@@ -176,7 +176,7 @@ export function Notifications({
               </div>
             </div>
             <div>
-              <div className="mb-3 flex items-center justify-between">
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <h3 className="text-sm opacity-80">
                   {t("labels.push-browser.title")}
                 </h3>

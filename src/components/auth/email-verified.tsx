@@ -30,7 +30,7 @@ export default function EmailVerified() {
                 {t("success.description")}
               </p>
 
-              <Link href="/signin" className="w-full">
+              <Link href="/login" className="w-full">
                 <Button className="btn-gradient w-full cursor-pointer rounded-xl py-5 font-semibold">
                   {t("success.button")}
                 </Button>
@@ -48,7 +48,7 @@ export default function EmailVerified() {
                   : t("error.generic")}
               </p>
 
-              <Link href="/signin" className="w-full">
+              <Link href="/login" className="w-full">
                 <Button className="btn-gradient w-full cursor-pointer rounded-xl py-5 font-semibold">
                   {t("error.button")}
                 </Button>

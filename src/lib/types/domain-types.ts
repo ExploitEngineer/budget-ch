@@ -98,3 +98,31 @@ export interface TransactionWithDetails extends Transaction {
   accountName: string | null; // From joined FinancialAccount
   userName: string | null; // From joined User
 }
+
+/**
+ * RecurringTemplateWithDetails - Domain view model for recurring templates with joined data
+ * Used for displaying recurring templates with account, category, and destination account names
+ */
+export interface RecurringTemplateWithDetails {
+  id: string;
+  hubId: string;
+  userId: string | null;
+  financialAccountId: string;
+  destinationAccountId: string | null;
+  transactionCategoryId: string | null;
+  type: TransactionType;
+  source: string | null;
+  amount: number;
+  note: string | null;
+  frequencyDays: number;
+  startDate: Date;
+  endDate: Date | null;
+  status: 'active' | 'inactive';
+  lastGeneratedDate: Date | null;
+  createdAt: Date;
+  archivedAt: Date | null;
+  // Joined fields
+  accountName: string | null;
+  categoryName: string | null;
+  destinationAccountName: string | null;
+}

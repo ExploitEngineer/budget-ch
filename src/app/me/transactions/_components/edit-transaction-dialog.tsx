@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { CalendarIcon, Plus, X } from "lucide-react";
+import { CalendarIcon, Pencil, Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { useTranslations } from "next-intl";
@@ -146,6 +146,9 @@ export default function EditTransactionDialog({
         queryKey: transactionKeys.recent(hubId),
       });
       queryClient.invalidateQueries({ queryKey: accountKeys.list(hubId) });
+      queryClient.invalidateQueries({
+        queryKey: transactionKeys.recurringTemplates(hubId),
+      });
       toast.success(t("messages.created"));
     },
     onError: (error: Error) => {
@@ -377,19 +380,35 @@ export default function EditTransactionDialog({
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger className="cursor-pointer" asChild>
-          <Button
-            className={
-              variant === "gradient"
-                ? "btn-gradient flex items-center gap-2 dark:text-white"
-                : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
-            }
-            variant={variant === "gradient" ? "default" : "outline"}
-          >
-            <Plus className="h-5 w-5" />
-            <span className="hidden text-sm sm:block">
-              {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
-            </span>
-          </Button>
+          {isEditMode ? (
+            <Button
+              className={
+                variant === "gradient"
+                  ? "btn-gradient flex items-center gap-2 dark:text-white"
+                  : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+              }
+              variant={variant === "gradient" ? "default" : "outline"}
+            >
+              <Plus className="h-5 w-5" />
+              <span className="hidden text-sm sm:block">
+                {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
+              </span>
+            </Button>
+          ) : (
+            <Button
+              className={
+                variant === "gradient"
+                  ? "btn-gradient flex items-center gap-2 dark:text-white"
+                  : "!bg-dark-blue-background dark:border-border-blue flex cursor-pointer items-center gap-2"
+              }
+              variant={variant === "gradient" ? "default" : "outline"}
+            >
+              <Plus className="h-5 w-5" />
+              <span className="hidden text-sm sm:block">
+                {variant === "gradient" ? t("transaction-edit-dialog.title-2") : text || t("transaction-edit-dialog.title-2")}
+              </span>
+            </Button>
+          )}
         </DialogTrigger>
 
         <DialogContent
@@ -490,7 +509,10 @@ export default function EditTransactionDialog({
                             <SelectContent>
                               {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading accounts...
+                                  <div className="flex items-center gap-2">
+                                    <Spinner className="h-4 w-4" />
+                                    <span>{t("labels.loading-accounts")}</span>
+                                  </div>
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts.map((account) => (
@@ -619,7 +641,10 @@ export default function EditTransactionDialog({
                             <SelectContent>
                               {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading accounts...
+                                  <div className="flex items-center gap-2">
+                                    <Spinner className="h-4 w-4" />
+                                    <span>{t("labels.loading-accounts")}</span>
+                                  </div>
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts
@@ -706,7 +731,7 @@ export default function EditTransactionDialog({
 
                 {/* Recurring Transaction Section */}
                 <div className="flex flex-col gap-4 pt-2">
-                  <FormField
+                  {/* <FormField
                     control={form.control}
                     name="isRecurring"
                     render={({ field }) => (
@@ -724,7 +749,7 @@ export default function EditTransactionDialog({
                         </div>
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   {isRecurring && (
                     <div className="flex flex-col gap-4 pl-7 sm:flex-row sm:gap-3">
@@ -819,7 +844,7 @@ export default function EditTransactionDialog({
                         name="recurringStatus"
                         render={({ field }) => (
                           <FormItem className="flex flex-1 flex-col">
-                            <FormLabel>{t("dialog.labels.recurringStatus")}</FormLabel>
+                            <FormLabel>{t("transaction-edit-dialog.dialog.labels.recurringStatus")}</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -830,10 +855,10 @@ export default function EditTransactionDialog({
                                 </SelectTrigger>
                                 <SelectContent>
                                   <SelectItem value="active">
-                                    {t("dialog.options.active")}
+                                    {t("transaction-edit-dialog.dialog.options.active")}
                                   </SelectItem>
                                   <SelectItem value="inactive">
-                                    {t("dialog.options.inactive")}
+                                    {t("transaction-edit-dialog.dialog.options.inactive")}
                                   </SelectItem>
                                 </SelectContent>
                               </Select>

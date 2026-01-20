@@ -11,8 +11,10 @@ import {
   integer,
   index,
   jsonb,
+  bigint,
 } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
+
 
 export const accessRole = pgEnum("access_role", ["admin", "member"]);
 
@@ -242,6 +244,7 @@ export const hubInvitations = pgTable("hub_invitations", {
   role: accessRole().notNull().default("member"),
   token: text("token").notNull(),
   accepted: boolean("accepted").default(false).notNull(),
+  cancelled: boolean("cancelled").default(false).notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -322,6 +325,7 @@ export const recurringTransactionTemplates = pgTable(
     lastFailedDate: timestamp("last_failed_date", { withTimezone: true }),
     failureReason: text("failure_reason"),
     consecutiveFailures: integer("consecutive_failures").notNull().default(0),
+    archivedAt: timestamp("archived_at", { withTimezone: true }),
   },
 );
 
@@ -492,6 +496,13 @@ export const notifications = pgTable(
     index("notifications_createdAt_idx").on(table.createdAt),
   ],
 );
+
+export const rateLimits = pgTable("rate_limits", {
+  id: text("id").primaryKey(),
+  key: text("key"),
+  count: integer("count"),
+  lastRequest: bigint("last_request", { mode: "number" }),
+});
 
 // Schema-derived types for all key tables
 export type Budget = InferSelectModel<typeof budgets>;

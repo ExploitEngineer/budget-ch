@@ -16,7 +16,7 @@ import {
   notifications,
   budgetInstances,
 } from "./schema";
-import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, between } from "drizzle-orm";
+import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, isNotNull, between } from "drizzle-orm";
 import type {
   QuickTask,
   UserType,
@@ -521,15 +521,6 @@ export async function createFinancialAccountDB({
   note,
 }: financialAccountArgs) {
   try {
-    const existing = await db.query.financialAccounts.findFirst({
-      where: (a) => and(eq(a.hubId, hubId), eq(a.type, type)),
-      columns: { id: true },
-    });
-
-    if (existing) {
-      throw new Error(`An account of type ${type} already exists in this hub.`);
-    }
-
     const [account] = await db
       .insert(financialAccounts)
       .values({
@@ -988,6 +979,7 @@ export type CreateRecurringTransactionTemplateArgs = {
   endDate: Date | null;
   status: "active" | "inactive";
   destinationAccountId?: string | null;
+  lastGeneratedDate?: Date | null;
 };
 
 export async function createRecurringTransactionTemplateDB({
@@ -1004,6 +996,7 @@ export async function createRecurringTransactionTemplateDB({
   endDate,
   status,
   destinationAccountId,
+  lastGeneratedDate,
 }: CreateRecurringTransactionTemplateArgs) {
   try {
     const [template] = await db
@@ -1022,6 +1015,7 @@ export async function createRecurringTransactionTemplateDB({
         startDate,
         endDate,
         status,
+        lastGeneratedDate: lastGeneratedDate ?? null,
       })
       .returning();
 
@@ -1093,8 +1087,35 @@ export async function updateRecurringTransactionTemplateDB({
 }
 
 // GET Recurring Transaction Templates by Hub
-export async function getRecurringTransactionTemplatesDB(hubId: string) {
+export async function getRecurringTransactionTemplatesDB(
+  hubId: string,
+  options: {
+    statusFilter?: 'active' | 'inactive' | 'all';
+    includeArchived?: boolean;
+  } = {}
+) {
+  const { statusFilter = 'active', includeArchived = false } = options;
+
   try {
+    // Build where conditions based on status filter and archive status
+    const conditions = [eq(recurringTransactionTemplates.hubId, hubId)];
+
+    // Add status filter condition (only when not showing archived)
+    if (!includeArchived && statusFilter !== 'all') {
+      conditions.push(eq(recurringTransactionTemplates.status, statusFilter));
+    }
+
+    // Filter by archive status:
+    // - When includeArchived is false: show only non-archived (archivedAt IS NULL)
+    // - When includeArchived is true: show ONLY archived (archivedAt IS NOT NULL)
+    if (includeArchived) {
+      conditions.push(isNotNull(recurringTransactionTemplates.archivedAt));
+    } else {
+      conditions.push(isNull(recurringTransactionTemplates.archivedAt));
+    }
+
+    const whereConditions = conditions.length === 1 ? conditions[0] : and(...conditions);
+
     const templates = await db
       .select({
         id: recurringTransactionTemplates.id,
@@ -1111,8 +1132,10 @@ export async function getRecurringTransactionTemplatesDB(hubId: string) {
         startDate: recurringTransactionTemplates.startDate,
         endDate: recurringTransactionTemplates.endDate,
         status: recurringTransactionTemplates.status,
+        lastGeneratedDate: recurringTransactionTemplates.lastGeneratedDate,
         createdAt: recurringTransactionTemplates.createdAt,
         updatedAt: recurringTransactionTemplates.updatedAt,
+        archivedAt: recurringTransactionTemplates.archivedAt,
         // Related data
         accountName: financialAccounts.name,
         accountType: financialAccounts.type,
@@ -1133,12 +1156,7 @@ export async function getRecurringTransactionTemplatesDB(hubId: string) {
           transactionCategories.id,
         ),
       )
-      .where(
-        and(
-          eq(recurringTransactionTemplates.hubId, hubId),
-          eq(recurringTransactionTemplates.status, "active"),
-        ),
-      )
+      .where(whereConditions)
       .orderBy(recurringTransactionTemplates.startDate);
 
     // Fetch destination account names separately if needed
@@ -1162,6 +1180,58 @@ export async function getRecurringTransactionTemplatesDB(hubId: string) {
   } catch (err: any) {
     console.error("Error fetching recurring transaction templates:", err);
     throw err;
+  }
+}
+
+// ARCHIVE/UNARCHIVE Recurring Transaction Template
+export async function archiveRecurringTransactionTemplateDB({
+  templateId,
+  hubId,
+  archive,
+}: {
+  templateId: string;
+  hubId: string;
+  archive: boolean;
+}): Promise<{ success: boolean; message?: string; data?: any }> {
+  try {
+    const updateData = archive
+      ? {
+          archivedAt: new Date(),
+          status: 'inactive' as const,
+        }
+      : {
+          archivedAt: null,
+          // Keep status as inactive when unarchiving - user can manually activate
+        };
+
+    const [updated] = await db
+      .update(recurringTransactionTemplates)
+      .set(updateData)
+      .where(
+        and(
+          eq(recurringTransactionTemplates.id, templateId),
+          eq(recurringTransactionTemplates.hubId, hubId),
+        ),
+      )
+      .returning();
+
+    if (!updated) {
+      return {
+        success: false,
+        message: "Recurring transaction template not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (err: any) {
+    console.error("Error archiving recurring transaction template:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to archive recurring transaction template",
+    };
   }
 }
 
@@ -2386,8 +2456,8 @@ export async function getReportSummaryDB(
       .from(transactions)
       .where(and(...filters));
 
-    console.log("DEBUG: getReportSummaryDB - Filters applied:", filters.length);
-    console.log("DEBUG: getReportSummaryDB - SQL Result:", result);
+    // console.log("DEBUG: getReportSummaryDB - Filters applied:", filters.length);
+    // console.log("DEBUG: getReportSummaryDB - SQL Result:", result);
 
     const { income, expense } = result[0] || { income: 0, expense: 0 };
     const balance = income - expense;
@@ -2595,7 +2665,7 @@ export async function getHubsByUserDB(
   }
 }
 
-// CREATE Invitation
+// CREATE Invitation (replaces existing pending invitation for same email)
 export async function createHubInvitationDB({
   hubId,
   email,
@@ -2604,6 +2674,18 @@ export async function createHubInvitationDB({
   expiresAt,
 }: HubInvitationProps) {
   try {
+    // Delete any existing pending (not accepted, not cancelled) invitations for this email in this hub
+    await db
+      .delete(hubInvitations)
+      .where(
+        and(
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.email, email),
+          eq(hubInvitations.accepted, false),
+          eq(hubInvitations.cancelled, false)
+        )
+      );
+
     const inserted = await db
       .insert(hubInvitations)
       .values({
@@ -2621,7 +2703,7 @@ export async function createHubInvitationDB({
   }
 }
 
-// GET INVITATIONS by HUB
+// GET INVITATIONS by HUB (excludes cancelled invitations)
 export async function getHubInvitationsByHubDB(hubId: string) {
   try {
     const rows = await db
@@ -2630,15 +2712,46 @@ export async function getHubInvitationsByHubDB(hubId: string) {
         email: hubInvitations.email,
         role: hubInvitations.role,
         accepted: hubInvitations.accepted,
+        cancelled: hubInvitations.cancelled,
         expiresAt: hubInvitations.expiresAt,
         createdAt: hubInvitations.createdAt,
       })
       .from(hubInvitations)
-      .where(eq(hubInvitations.hubId, hubId));
+      .where(
+        and(
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.cancelled, false)
+        )
+      );
 
     return { success: true, data: rows };
   } catch (err: any) {
     return { success: false, message: err.message, data: [] };
+  }
+}
+
+// CANCEL Invitation
+export async function cancelHubInvitationDB(invitationId: string, hubId: string) {
+  try {
+    const result = await db
+      .update(hubInvitations)
+      .set({ cancelled: true })
+      .where(
+        and(
+          eq(hubInvitations.id, invitationId),
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.accepted, false)
+        )
+      )
+      .returning();
+
+    if (result.length === 0) {
+      return { success: false, message: "Invitation not found or already accepted" };
+    }
+
+    return { success: true, message: "Invitation cancelled" };
+  } catch (err: any) {
+    return { success: false, message: err.message };
   }
 }
 
@@ -2667,6 +2780,9 @@ export async function acceptInvitationDB(token: string, userId: string) {
     });
 
     if (!invite) return { success: false, message: "Invitation not found" };
+
+    if (invite.cancelled)
+      return { success: false, message: "Invitation cancelled" };
 
     if (invite.accepted)
       return { success: false, message: "Invitation already accepted" };

@@ -61,6 +61,8 @@ interface DashboardTableAdjustDialogProps {
   templateId: string;
 }
 
+import { Spinner } from "@/components/ui/spinner";
+
 export default function DashboardTableAdjustDialog({
   templateId,
 }: DashboardTableAdjustDialogProps) {
@@ -177,8 +179,8 @@ export default function DashboardTableAdjustDialog({
         </div>
 
         {templateLoading ? (
-          <div className="py-8 text-center text-muted-foreground">
-            {t("dialog.loading")}
+          <div className="py-8 flex justify-center">
+            <Spinner />
           </div>
         ) : templateError ? (
           <div className="py-8 text-center text-red-500">

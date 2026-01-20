@@ -278,7 +278,7 @@ export default function SidebarHeader({
             </div>
           )}
 
-          {route === "settings" && (
+          {/* {route === "settings" && (
             <div className="flex items-center gap-2">
               <Button
                 variant="outline"
@@ -292,7 +292,7 @@ export default function SidebarHeader({
                 <span className="hidden sm:block">{t("save")}</span>
               </Button>
             </div>
-          )}
+          )} */}
 
           {route === "help" && (
             <div className="flex items-center gap-2">

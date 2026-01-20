@@ -9,12 +9,12 @@ import {
     budgetInstances,
     savingGoals,
 } from "@/db/schema";
-import { eq, and, inArray, sql } from "drizzle-orm";
+import { eq, and, inArray, sql, gte, lte } from "drizzle-orm";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
 import { requireAdminRole } from "@/lib/auth/permissions";
-import { apiSuccess, apiError } from "@/lib/api-response";
 import { revalidatePath } from "next/cache";
+import type { ImportType, ImportMode, ValidationReport, FullJsonValidationReport } from "./import-export-types";
 
 /**
  * Import Service
@@ -22,20 +22,59 @@ import { revalidatePath } from "next/cache";
  * Supports "Append" and "Replace" modes.
  */
 
-// --- TYPES ---
+// --- KEY MAPPING HELPERS ---
 
-export type ImportType = "transactions" | "budgets" | "accounts" | "saving-goals" | "transfers" | "full-export" | "full-json";
-export type ImportMode = "append" | "replace";
-
-export type ValidationReport = {
-    validRows: number;
-    invalidRows: number;
-    missingAccounts: string[];
-    newCategories: string[];
-    allCategories: string[];
-    potentialDuplicates: number;
-    totalRows: number;
+const KEY_MAPPINGS = {
+    transactions: {
+        date: ["date", "datum", "data", "échéance"],
+        amount: ["amount", "amount(chf)", "betrag", "betrag(chf)", "importo", "importo(chf)", "montant", "montant(chf)"],
+        category: ["category", "kategorie", "kategorien", "categoria", "catégorie", "catégories", "group", "genre"],
+        account: ["account", "konto", "conto", "compte"],
+        type: ["type", "typ", "tipo"],
+        source: ["source", "recipient", "quelle", "empfänger", "destinatario", "bénéficiaire"],
+        note: ["note", "notiz", "nota", "remarque"],
+    },
+    budgets: {
+        category: ["category", "kategorie", "kategorien", "categoria", "catégorie", "catégories", "group", "genre"],
+        amount: ["allocated", "allocatedamount", "budget", "importo", "montant", "budget(chf)", "importo(chf)", "montant(chf)"],
+        spent: ["spent", "spentamount", "ist", "effettivo", "réel", "actual", "effettivo(chf)", "réel(chf)", "ist(chf)", "spent(chf)"],
+        month: ["month", "monat", "mese", "mois"],
+        year: ["year", "jahr", "anno", "année"],
+        warning: ["warningpercentage", "warning", "avviso", "alerte", "warningat(%)", "alerteà(%)", "warnungbei(%)", "avvisoa(%)"],
+        color: ["markercolor", "color", "indicatore", "marqueur", "colormarker", "farbmarker", "indicatorecolore", "marqueurdecouleur"],
+    },
+    accounts: {
+        name: ["name", "accountname", "konto", "conto", "compte"],
+        balance: ["balance", "initialbalance", "initialbalance(chf)", "kontostand", "saldo", "startingbalance(chf)", "startsaldo(chf)", "saldoiniziale(chf)", "soldeinitial(chf)", "initial(chf)"],
+        type: ["type", "typ", "tipo"],
+        iban: ["iban", "iban/note", "iban/notiz", "iban/nota", "iban/remarque"],
+        note: ["note", "notiz", "nota", "remarque", "iban/note", "iban/notiz", "iban/nota", "iban/remarque"],
+    },
+    savingGoals: {
+        name: ["name", "nom", "nome", "label", "titel"],
+        account: ["account", "konto", "conto", "compte"],
+        goal: ["goalamount", "goal", "target", "targetamount", "betrag", "importo", "montant", "ziel", "obiettivo", "targetamount(chf)", "zielbetrag(chf)", "importoobiettivo(chf)", "montantcible(chf)", "goal(chf)", "target(chf)"],
+        saved: ["amountsaved", "saved", "gespart", "risparmiato", "épargné", "alreadysaved(chf)", "bereitsgespart(chf)", "giàrisparmiato(chf)", "déjàéconomisé(chf)", "saved(chf)"],
+        allocation: ["monthlyallocation", "monthlyallocated", "rate", "assegnazione", "allocation", "monthlyallocation(chf)", "monatlichezuweisung(chf)", "assegnazionemensile(chf)", "allocationmensuelle(chf)", "monthly(chf)"],
+        dueDate: ["duedate", "due_date", "datum", "data", "échéance", "due"],
+    },
+    transfers: {
+        date: ["date", "datum", "data", "échéance"],
+        from: ["from", "von", "da", "de"],
+        to: ["to", "an", "a", "à"],
+        amount: ["amount", "amount(chf)", "betrag", "betrag(chf)", "importo", "importo(chf)", "montant", "montant(chf)"],
+        note: ["note", "notiz", "nota", "remarque"],
+    },
 };
+
+function getMappedValue(item: any, mappings: string[]) {
+    for (const key of mappings) {
+        if (item[key] !== undefined && item[key] !== null) {
+            return item[key];
+        }
+    }
+    return undefined;
+}
 
 // --- CATEGORY HELPERS ---
 
@@ -167,8 +206,8 @@ export async function importTransactions(
                 existingTransactions = await tx.query.transactions.findMany({
                     where: (t: any) => and(
                         eq(t.hubId, hubId),
-                        sql`${t.createdAt} >= ${firstDate}`,
-                        sql`${t.createdAt} <= ${lastDate}`
+                        gte(t.createdAt, firstDate),
+                        lte(t.createdAt, lastDate)
                     ),
                 });
             }
@@ -181,19 +220,23 @@ export async function importTransactions(
         for (let item of data) {
             item = normalizeItem(item);
 
+            const amount = Number(getMappedValue(item, KEY_MAPPINGS.transactions.amount) ?? 0);
+            const dateStr = getMappedValue(item, KEY_MAPPINGS.transactions.date);
+            const parsedDate = normalizeDate(dateStr);
+            const source = (getMappedValue(item, KEY_MAPPINGS.transactions.source) || "").trim();
+            const note = (getMappedValue(item, KEY_MAPPINGS.transactions.note) || "").trim();
+
             if (skipDuplicates) {
-                const itemAmount = Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0);
-                const parsedDate = normalizeDate(item.date || item.datum || item.data);
                 const itemDate = parsedDate ? parsedDate.toISOString().split('T')[0] : '';
-                const itemSource = (item.recipient || item.source || item.quelle || item.empfänger || item.destinatario || item.bénéficiaire || "").trim().toLowerCase();
-                const itemNote = (item.note || item.notiz || item.nota || item.remarque || "").trim().toLowerCase();
+                const itemSource = source.toLowerCase();
+                const itemNote = note.toLowerCase();
 
                 const isDuplicate = existingTransactions.some(et => {
                     const etAmount = et.amount;
                     const etDate = et.createdAt.toISOString().split('T')[0];
                     const etSource = (et.source || "").trim().toLowerCase();
                     const etNote = (et.note || "").trim().toLowerCase();
-                    return etAmount === itemAmount && etDate === itemDate && etSource === itemSource && etNote === itemNote;
+                    return etAmount === amount && etDate === itemDate && etSource === itemSource && etNote === itemNote;
                 });
 
                 if (isDuplicate) {
@@ -201,9 +244,10 @@ export async function importTransactions(
                     continue;
                 }
             }
-            const catName = (item.category || item.kategorie || item.kategorien || item.categoria || item.catégorie || item.catégories || item.group || item.genre || "").trim();
+
+            const catName = (getMappedValue(item, KEY_MAPPINGS.transactions.category) || "").trim();
             const categoryId = await getOrCreateCategory(hubId, catName);
-            const accountName = (item.account || item.konto || item.conto || item.compte || "").trim();
+            const accountName = (getMappedValue(item, KEY_MAPPINGS.transactions.account) || "").trim();
             let accountId = null;
 
             if (accountName) {
@@ -225,21 +269,19 @@ export async function importTransactions(
                     where: (fa) => eq(fa.hubId, hubId),
                 });
                 if (!firstAccount) continue; // Skip if no accounts exist at all
-                item.accountId = firstAccount.id;
-            } else {
-                item.accountId = accountId;
+                accountId = firstAccount.id;
             }
 
             await tx.insert(transactions).values({
                 hubId,
                 userId,
-                financialAccountId: item.accountId,
+                financialAccountId: accountId,
                 transactionCategoryId: categoryId,
-                amount: Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0),
-                type: (item.type || item.typ || item.tipo || "expense") as any,
-                source: item.recipient || item.source || item.quelle || item.empfänger || item.destinatario || item.bénéficiaire || null,
-                note: item.note || item.notiz || item.nota || item.remarque || null,
-                createdAt: normalizeDate(item.date || item.datum || item.data) || new Date(),
+                amount: amount,
+                type: (getMappedValue(item, KEY_MAPPINGS.transactions.type) || "expense") as any,
+                source: source || null,
+                note: note || null,
+                createdAt: parsedDate || new Date(),
             });
             insertedCount++;
         }
@@ -268,16 +310,16 @@ export async function importBudgets(
 
         for (let item of data) {
             item = normalizeItem(item);
-            const categoryName = (item.category || item.kategorie || item.kategorien || item.categoria || item.catégorie || item.catégories || item.group || item.genre || "").trim();
+            const categoryName = (getMappedValue(item, KEY_MAPPINGS.budgets.category) || "").trim();
             const categoryId = await getOrCreateCategory(hubId, categoryName);
             if (!categoryId) continue;
 
-            const month = Number(item.month || item.monat || item.mese || item.mois || defaultMonth);
-            const year = Number(item.year || item.jahr || item.anno || item.année || defaultYear);
-            const amount = Number(item.allocated || item.allocatedamount || item.budget || item.importo || item.montant || item["budget(chf)"] || item["budget(chf)"] || item["importo(chf)"] || item["montant(chf)"] || 0);
-            const spentAmount = Number(item.spent || item.spentamount || item.ist || item.effettivo || item.réel || item.actual || item["effettivo(chf)"] || item["réel(chf)"] || item["ist(chf)"] || item["spent(chf)"] || 0);
-            const warningPercentage = Number(item.warningpercentage || item.warning || item.avviso || item.alerte || item["warningat(%)"] || item["alerteà(%)"] || item["warnungbei(%)"] || item["avvisoa(%)"] || 80);
-            const markerColor = (item.markercolor || item.color || item.indicatore || item.marqueur || item["colormarker"] || item["farbmarker"] || item["indicatorecolore"] || item["marqueurdecouleur"] || "").trim();
+            const month = Number(getMappedValue(item, KEY_MAPPINGS.budgets.month) || defaultMonth);
+            const year = Number(getMappedValue(item, KEY_MAPPINGS.budgets.year) || defaultYear);
+            const amount = Number(getMappedValue(item, KEY_MAPPINGS.budgets.amount) || 0);
+            const spentAmount = Number(getMappedValue(item, KEY_MAPPINGS.budgets.spent) || 0);
+            const warningPercentage = Number(getMappedValue(item, KEY_MAPPINGS.budgets.warning) || 80);
+            const markerColor = (getMappedValue(item, KEY_MAPPINGS.budgets.color) || "").trim();
 
             // 1. Find or Create Budget (the definition)
             const existingBudgets = await tx.select().from(budgets).where(and(eq(budgets.hubId, hubId), eq(budgets.transactionCategoryId, categoryId))).limit(1);
@@ -353,11 +395,11 @@ export async function importTransfers(
 
         for (let item of data) {
             item = normalizeItem(item);
-            const date = normalizeDate(item.date || item.datum || item.data) || new Date();
-            const fromAccountName = (item.from || item.von || item.da || item.de || "").trim();
-            const toAccountName = (item.to || item.an || item.a || item.à || "").trim();
-            const amount = Math.abs(Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0));
-            const note = item.note || item.notiz || item.nota || item.remarque || null;
+            const date = normalizeDate(getMappedValue(item, KEY_MAPPINGS.transfers.date)) || new Date();
+            const fromAccountName = (getMappedValue(item, KEY_MAPPINGS.transfers.from) || "").trim();
+            const toAccountName = (getMappedValue(item, KEY_MAPPINGS.transfers.to) || "").trim();
+            const amount = Math.abs(Number(getMappedValue(item, KEY_MAPPINGS.transfers.amount) || 0));
+            const note = getMappedValue(item, KEY_MAPPINGS.transfers.note) || null;
 
             if (!fromAccountName || !toAccountName || isNaN(amount) || !date) continue;
 
@@ -413,13 +455,13 @@ export async function importAccounts(
 
         for (let item of data) {
             item = normalizeItem(item);
-            const accountName = (item.name || item.accountname || item.konto || item.conto || item.compte || "").trim();
+            const accountName = (getMappedValue(item, KEY_MAPPINGS.accounts.name) || "").trim();
             if (!accountName) continue;
 
-            const initialBalance = Number(item.balance || item.initialbalance || item["initialbalance(chf)"] || item.kontostand || item.saldo || item["startingbalance(chf)"] || item["startsaldo(chf)"] || item["saldoiniziale(chf)"] || item["soldeinitial(chf)"] || item["initial(chf)"] || 0);
-            const accountType = (item.type || item.typ || item.tipo || "checking") as any;
-            const iban = item.iban || item["iban/note"] || item["iban/notiz"] || item["iban/nota"] || item["iban/remarque"] || null;
-            const note = item.note || item.notiz || item.nota || item.remarque || item["iban/note"] || item["iban/notiz"] || item["iban/nota"] || item["iban/remarque"] || null;
+            const initialBalance = Number(getMappedValue(item, KEY_MAPPINGS.accounts.balance) || 0);
+            const accountType = (getMappedValue(item, KEY_MAPPINGS.accounts.type) || "checking") as any;
+            const iban = getMappedValue(item, KEY_MAPPINGS.accounts.iban) || null;
+            const note = getMappedValue(item, KEY_MAPPINGS.accounts.note) || null;
 
             if (mode === "append") {
                 const existing = await tx.query.financialAccounts.findFirst({
@@ -472,10 +514,10 @@ export async function importSavingGoals(
 
         for (let item of data) {
             item = normalizeItem(item);
-            const goalName = (item.name || item.nom || item.nome || item.label || item.titel || "").trim();
+            const goalName = (getMappedValue(item, KEY_MAPPINGS.savingGoals.name) || "").trim();
             if (!goalName) continue;
 
-            const accountName = (item.account || item.konto || item.conto || item.compte || "").trim();
+            const accountName = (getMappedValue(item, KEY_MAPPINGS.savingGoals.account) || "").trim();
             let accountId = null;
             if (accountName) {
                 if (autoCreateAccounts) {
@@ -485,10 +527,10 @@ export async function importSavingGoals(
                 }
             }
 
-            const goalAmount = Number(item.goalamount || item.goal || item.target || item.targetamount || item.betrag || item.importo || item.montant || item.ziel || item.obiettivo || item["targetamount(chf)"] || item["zielbetrag(chf)"] || item["importoobiettivo(chf)"] || item["montantcible(chf)"] || item["goal(chf)"] || item["target(chf)"] || 0);
-            const amountSaved = Number(item.amountsaved || item.saved || item.gespart || item.risparmiato || item.épargné || item["alreadysaved(chf)"] || item["bereitsgespart(chf)"] || item["giàrisparmiato(chf)"] || item["déjàéconomisé(chf)"] || item["saved(chf)"] || 0);
-            const monthlyAllocation = Number(item.monthlyallocation || item.monthlyallocated || item.rate || item.assegnazione || item.allocation || item["monthlyallocation(chf)"] || item["monatlichezuweisung(chf)"] || item["assegnazionemensile(chf)"] || item["allocationmensuelle(chf)"] || item["monthly(chf)"] || 0);
-            const dueDateStr = item.duedate || item.due_date || item.datum || item.data || item.échéance || item.due;
+            const goalAmount = Number(getMappedValue(item, KEY_MAPPINGS.savingGoals.goal) || 0);
+            const amountSaved = Number(getMappedValue(item, KEY_MAPPINGS.savingGoals.saved) || 0);
+            const monthlyAllocation = Number(getMappedValue(item, KEY_MAPPINGS.savingGoals.allocation) || 0);
+            const dueDateStr = getMappedValue(item, KEY_MAPPINGS.savingGoals.dueDate);
             const dueDate = normalizeDate(dueDateStr);
 
             if (mode === "append") {
@@ -530,17 +572,6 @@ export async function importSavingGoals(
 
 // --- FULL EXPORT IMPORT ---
 
-export interface FullJsonValidationReport {
-    accounts: { count: number; valid: boolean };
-    budgets: { count: number; valid: boolean };
-    transactions: { count: number; valid: boolean };
-    savingGoals: { count: number; valid: boolean };
-    transfers: { count: number; valid: boolean };
-    totalItems: number;
-    version?: string;
-    exportedAt?: string;
-}
-
 async function importFullExport(
     hubId: string,
     userId: string,
@@ -548,7 +579,12 @@ async function importFullExport(
     mode: ImportMode
 ) {
     // Handle case where data is wrapped in an array (from JSON parsing)
-    const data = Array.isArray(rawData) ? rawData[0] : rawData;
+    let data = Array.isArray(rawData) ? rawData[0] : rawData;
+
+    // If data has a 'data' property (standardized format), use that
+    if (data && data.data && typeof data.data === 'object' && !Array.isArray(data.data)) {
+        data = data.data;
+    }
 
     // Data is expected to be an object with keys: transactions, budgets, accounts, saving-goals/goals, transfers
     // Import order matters: accounts first, then budgets (which create categories), then transactions/goals/transfers
@@ -577,7 +613,7 @@ async function importFullExport(
     }
 
     // 4. Import Saving Goals (depends on accounts)
-    const goalsData = data["saving-goals"] || data.goals;
+    const goalsData = data["saving-goals"] || data.goals || data.savingGoals;
     if (goalsData && Array.isArray(goalsData)) {
         const res = await importSavingGoals(hubId, userId, goalsData, mode, true); // autoCreateAccounts = true
         totalCount += res.count;
@@ -635,27 +671,39 @@ export async function validateFullJsonAction(
     if (data.transactions && Array.isArray(data.transactions)) {
         report.transactions.count = data.transactions.length;
         report.transactions.valid = data.transactions.every((t: any) => {
-            const hasDate = t.date && !isNaN(Date.parse(t.date));
-            const hasAmount = t.amount !== undefined && !isNaN(Number(t.amount));
+            const item = normalizeItem(t);
+            const dateStr = getMappedValue(item, KEY_MAPPINGS.transactions.date);
+            const amount = getMappedValue(item, KEY_MAPPINGS.transactions.amount);
+            const hasDate = dateStr && !isNaN(Date.parse(dateStr));
+            const hasAmount = amount !== undefined && !isNaN(Number(amount));
             return hasDate && hasAmount;
         });
     }
 
     // Validate saving goals (check both keys for backwards compatibility)
-    const goalsData = data["saving-goals"] || data.goals;
+    const goalsData = data["saving-goals"] || data.goals || data.savingGoals;
     if (goalsData && Array.isArray(goalsData)) {
         report.savingGoals.count = goalsData.length;
-        report.savingGoals.valid = goalsData.every((g: any) => g.name && typeof g.name === "string");
+        report.savingGoals.valid = goalsData.every((g: any) => {
+            const item = normalizeItem(g);
+            const name = getMappedValue(item, KEY_MAPPINGS.savingGoals.name);
+            return name && typeof name === "string";
+        });
     }
 
     // Validate transfers
     if (data.transfers && Array.isArray(data.transfers)) {
         report.transfers.count = data.transfers.length;
         report.transfers.valid = data.transfers.every((t: any) => {
-            const hasDate = t.date && !isNaN(Date.parse(t.date));
-            const hasFrom = t.from && typeof t.from === "string";
-            const hasTo = t.to && typeof t.to === "string";
-            const hasAmount = t.amount !== undefined && !isNaN(Number(t.amount));
+            const item = normalizeItem(t);
+            const dateStr = getMappedValue(item, KEY_MAPPINGS.transfers.date);
+            const from = getMappedValue(item, KEY_MAPPINGS.transfers.from);
+            const to = getMappedValue(item, KEY_MAPPINGS.transfers.to);
+            const amount = getMappedValue(item, KEY_MAPPINGS.transfers.amount);
+            const hasDate = dateStr && !isNaN(Date.parse(dateStr));
+            const hasFrom = from && typeof from === "string";
+            const hasTo = to && typeof to === "string";
+            const hasAmount = amount !== undefined && !isNaN(Number(amount));
             return hasDate && hasFrom && hasTo && hasAmount;
         });
     }
@@ -714,8 +762,8 @@ export async function validateTransactionsAction(
         const item = normalizeItem(rawItem);
 
         // Validate Date and Amount
-        const dateStr = item.date || item.datum || item.data;
-        const amountStr = item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"];
+        const dateStr = getMappedValue(item, KEY_MAPPINGS.transactions.date);
+        const amountStr = getMappedValue(item, KEY_MAPPINGS.transactions.amount);
 
         if (!dateStr || isNaN(Date.parse(dateStr)) || isNaN(Number(amountStr))) {
             report.invalidRows++;
@@ -725,13 +773,13 @@ export async function validateTransactionsAction(
         report.validRows++;
 
         // Track missing accounts
-        const accountName = ((item.account || item.konto || item.conto || item.compte || "") as string).trim();
+        const accountName = ((getMappedValue(item, KEY_MAPPINGS.transactions.account) || "") as string).trim();
         if (accountName && !accountNames.has(accountName.toLowerCase())) {
             missingAccountsSet.add(accountName);
         }
 
         // Track missing categories
-        const categoryName = ((item.category || item.kategorie || item.kategorien || item.categoria || item.catégorie || item.catégories || item.group || item.genre || "") as string).trim();
+        const categoryName = ((getMappedValue(item, KEY_MAPPINGS.transactions.category) || "") as string).trim();
         if (categoryName && categoryName !== "—" && categoryName !== "Uncategorized") {
             allCategoriesSet.add(categoryName);
             if (!categoryNames.has(categoryName.toLowerCase())) {
@@ -760,21 +808,21 @@ export async function validateTransactionsAction(
         const existingTransactions = await db.query.transactions.findMany({
             where: (t) => and(
                 eq(t.hubId, hubId),
-                sql`${t.createdAt} >= ${firstDate}`,
-                sql`${t.createdAt} <= ${lastDate}`
+                gte(t.createdAt, firstDate),
+                lte(t.createdAt, lastDate)
             ),
         });
 
         for (let rawItem of data) {
             const item = normalizeItem(rawItem);
-            const itemAmount = Number(item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"] ?? 0);
+            const itemAmount = Number(getMappedValue(item, KEY_MAPPINGS.transactions.amount) ?? 0);
 
-            const parsedDate = normalizeDate(item.date || item.datum || item.data);
+            const parsedDate = normalizeDate(getMappedValue(item, KEY_MAPPINGS.transactions.date));
             const itemDate = parsedDate ? parsedDate.toISOString().split('T')[0] : '';
             if (!itemDate) continue; // Skip if date is invalid
 
-            const itemSource = (item.recipient || item.source || item.quelle || item.empfänger || item.destinatario || item.bénéficiaire || "").trim().toLowerCase();
-            const itemNote = (item.note || item.notiz || item.nota || item.remarque || "").trim().toLowerCase();
+            const itemSource = (getMappedValue(item, KEY_MAPPINGS.transactions.source) || "").trim().toLowerCase();
+            const itemNote = (getMappedValue(item, KEY_MAPPINGS.transactions.note) || "").trim().toLowerCase();
 
             const isDuplicate = existingTransactions.some(et => {
                 const etAmount = et.amount;
@@ -831,8 +879,8 @@ export async function validateBudgetsAction(
     for (let rawItem of data) {
         const item = normalizeItem(rawItem);
 
-        const categoryName = ((item.category || item.kategorie || item.kategorien || item.categoria || item.catégorie || item.catégories || item.group || item.genre || "") as string).trim();
-        const amountStr = item.allocated || item.allocatedamount || item.budget || item.importo || item.montant || item["budget(chf)"] || item["importo(chf)"] || item["montant(chf)"];
+        const categoryName = ((getMappedValue(item, KEY_MAPPINGS.budgets.category) || "") as string).trim();
+        const amountStr = getMappedValue(item, KEY_MAPPINGS.budgets.amount);
 
         if (!categoryName || categoryName === "—" || isNaN(Number(amountStr))) {
             report.invalidRows++;
@@ -846,8 +894,8 @@ export async function validateBudgetsAction(
         }
 
         // Duplicate check (same category + month + year)
-        const month = Number(item.month || item.monat || item.mese || item.mois || (new Date().getMonth() + 1));
-        const year = Number(item.year || item.jahr || item.anno || item.année || (new Date().getFullYear()));
+        const month = Number(getMappedValue(item, KEY_MAPPINGS.budgets.month) || (new Date().getMonth() + 1));
+        const year = Number(getMappedValue(item, KEY_MAPPINGS.budgets.year) || (new Date().getFullYear()));
 
         const isDuplicate = existingBudgetsWithInstances.some(eb => {
             return (eb.categoryName?.toLowerCase() === categoryName.toLowerCase()) &&
@@ -896,10 +944,8 @@ export async function validateSavingGoalsAction(
     for (let rawItem of data) {
         const item = normalizeItem(rawItem);
 
-        const goalName = (item.name || item.nom || item.nome || item.label || item.titel || "").trim();
-        const goalAmount = item.goalamount || item.goal || item.target || item.targetamount || item.betrag || item.importo || item.montant || item.ziel || item.obiettivo || item["targetamount(chf)"] || item["zielbetrag(chf)"] || item["goal(chf)"] || item["target(chf)"];
-        const dueDateStr = item.duedate || item.due_date || item.datum || item.data || item.échéance || item.due;
-        const dueDate = normalizeDate(dueDateStr);
+        const goalName = (getMappedValue(item, KEY_MAPPINGS.savingGoals.name) || "").trim();
+        const goalAmount = getMappedValue(item, KEY_MAPPINGS.savingGoals.goal);
 
         if (!goalName || isNaN(Number(goalAmount))) {
             report.invalidRows++;
@@ -908,7 +954,7 @@ export async function validateSavingGoalsAction(
 
         report.validRows++;
 
-        const accountName = ((item.account || item.konto || item.conto || item.compte || "") as string).trim();
+        const accountName = ((getMappedValue(item, KEY_MAPPINGS.savingGoals.account) || "") as string).trim();
         if (accountName && !accountNames.has(accountName.toLowerCase())) {
             missingAccountsSet.add(accountName);
         }
@@ -952,11 +998,11 @@ export async function validateTransfersAction(
     for (let rawItem of data) {
         const item = normalizeItem(rawItem);
 
-        const dateStr = item.date || item.datum || item.data;
+        const dateStr = getMappedValue(item, KEY_MAPPINGS.transfers.date);
         const parsedDate = normalizeDate(dateStr);
-        const fromAccount = (item.from || item.von || item.da || item.de || "").trim();
-        const toAccount = (item.to || item.an || item.a || item.à || "").trim();
-        const amount = item.amount ?? item["amount(chf)"] ?? item.betrag ?? item["betrag(chf)"] ?? item.importo ?? item["importo(chf)"] ?? item.montant ?? item["montant(chf)"];
+        const fromAccount = (getMappedValue(item, KEY_MAPPINGS.transfers.from) || "").trim();
+        const toAccount = (getMappedValue(item, KEY_MAPPINGS.transfers.to) || "").trim();
+        const amount = getMappedValue(item, KEY_MAPPINGS.transfers.amount);
 
         if (!dateStr || !parsedDate || !fromAccount || !toAccount || isNaN(Number(amount))) {
             report.invalidRows++;
@@ -1002,8 +1048,8 @@ export async function validateAccountsAction(
     for (let rawItem of data) {
         const item = normalizeItem(rawItem);
 
-        const accountName = (item.name || item.accountname || item.konto || item.conto || item.compte || "").trim();
-        const balance = item.balance || item.initialbalance || item["initialbalance(chf)"] || item.kontostand || item.saldo || item["startingbalance(chf)"] || item["startsaldo(chf)"] || item["saldoiniziale(chf)"] || item["soldeinitial(chf)"] || item["initial(chf)"];
+        const accountName = (getMappedValue(item, KEY_MAPPINGS.accounts.name) || "").trim();
+        const balance = getMappedValue(item, KEY_MAPPINGS.accounts.balance);
 
         if (!accountName || (balance !== undefined && isNaN(Number(balance)))) {
             report.invalidRows++;
@@ -1068,7 +1114,7 @@ export async function importDataAction(
         revalidatePath("/me/transactions");
         revalidatePath("/me/budgets");
         revalidatePath("/me/accounts");
-        revalidatePath("/me/savings");
+        revalidatePath("/me/saving-goals");
 
         return { success: true, message: `Successfully imported ${result.count} items.`, data: result };
     } catch (err: any) {

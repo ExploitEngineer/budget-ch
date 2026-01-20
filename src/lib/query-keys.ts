@@ -30,6 +30,11 @@ export const transactionKeys = {
   list: (hubId: string | null) => [...transactionKeys.lists(), hubId] as const,
   recent: (hubId: string | null) => [...transactionKeys.all, "recent", hubId] as const,
   upcomingRecurring: (hubId: string | null) => [...transactionKeys.all, "upcoming-recurring", hubId] as const,
+  // Base key for invalidating all recurring templates for a hub
+  recurringTemplatesBase: (hubId: string | null) =>
+    [...transactionKeys.all, "recurring-templates", hubId] as const,
+  recurringTemplates: (hubId: string | null, includeArchived?: boolean) =>
+    [...transactionKeys.all, "recurring-templates", hubId, includeArchived ?? false] as const,
 };
 
 /**

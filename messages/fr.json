@@ -72,9 +72,38 @@
                 "button": "Y aller maintenant"
             },
             "error": {
-                "title": "Invitation invalide ou expirée",
-                "description": "Le lien d'invitation n'est pas valide ou a déjà expiré.",
+                "title": "Une erreur s'est produite",
+                "description": "Une erreur inattendue s'est produite lors du traitement de votre invitation.",
                 "set-hub-failed": "Invitation acceptée mais impossible de définir le hub actif"
+            },
+            "not-authenticated": {
+                "title": "Connexion requise",
+                "description": "Veuillez vous connecter pour accepter cette invitation. Après vous être connecté, ouvrez à nouveau le lien d'invitation.",
+                "button": "Aller à la connexion"
+            },
+            "not-found": {
+                "title": "Invitation introuvable",
+                "description": "Ce lien d'invitation n'est pas valide. Veuillez vérifier le lien ou demander une nouvelle invitation."
+            },
+            "expired": {
+                "title": "Invitation expirée",
+                "description": "Cette invitation a expiré. Veuillez demander une nouvelle invitation au propriétaire du hub."
+            },
+            "already-accepted": {
+                "title": "Invitation déjà utilisée",
+                "description": "Cette invitation a déjà été acceptée. Vous pouvez accéder au hub depuis votre tableau de bord."
+            },
+            "email-mismatch": {
+                "title": "Mauvais compte",
+                "description": "Cette invitation a été envoyée à une autre adresse e-mail. Veuillez vous connecter avec le bon compte pour accepter cette invitation."
+            },
+            "already-member": {
+                "title": "Déjà membre",
+                "description": "Vous êtes déjà membre de ce hub. Vous pouvez y accéder depuis votre tableau de bord."
+            },
+            "cancelled": {
+                "title": "Invitation annulée",
+                "description": "Cette invitation a été annulée par le propriétaire du hub. Veuillez demander une nouvelle invitation."
             }
         },
         "goodbye": {
@@ -121,7 +150,7 @@
             "password": "Afficher le mot de passe",
             "terms": "J’accepte les <terms>Conditions</terms> & la <privacy>Politique de confidentialité</privacy>"
         },
-        "tip": "Astuce : longueur ≥ 8, inclure chiffres et lettres.",
+        "tip": "Conseil : Longueur ≥ 8, majuscules, minuscules, chiffres et caractères spéciaux.",
         "buttons": {
             "create-account": "Créer un compte",
             "google": "avec Google",
@@ -152,6 +181,10 @@
             "name-min": "Le nom doit comporter au moins 2 caractères.",
             "email-invalid": "Adresse e-mail invalide.",
             "password-min": "Le mot de passe doit comporter au moins 8 caractères.",
+            "password-uppercase": "Le mot de passe doit contenir au moins une lettre majuscule.",
+            "password-lowercase": "Le mot de passe doit contenir au moins une lettre minuscule.",
+            "password-number": "Le mot de passe doit contenir au moins un chiffre.",
+            "password-special": "Le mot de passe doit contenir au moins un caractère spécial.",
             "accept-terms": "Vous devez accepter les conditions et la politique de confidentialité."
         },
         "verify-email": {
@@ -189,7 +222,7 @@
                 "fallback": "Si le bouton ne fonctionne pas, copiez et collez ce lien dans votre navigateur :",
                 "expire": "Ce lien de vérification expirera dans 24 heures.",
                 "ignore": "Si vous n'avez pas créé de compte, vous pouvez ignorer cet e-mail.",
-                "footer": "© 2025 BudgetHub. Tous droits réservés."
+                "footer": "© 2026 BudgetHub. Tous droits réservés."
             },
             "otp": {
                 "subject": "Votre code de vérification",
@@ -198,7 +231,7 @@
                 "code-is": "Votre code de vérification est :",
                 "expire": "Ce code expirera dans 5 minutes.",
                 "ignore": "Si vous n'avez pas demandé ce code, vous pouvez ignorer cet e-mail en toute sécurité.",
-                "footer": "© 2025 BudgetHub. Tous droits réservés."
+                "footer": "© 2026 BudgetHub. Tous droits réservés."
             }
         },
         "invitation": {
@@ -226,7 +259,7 @@
                 "transactions": "Transactions",
                 "budgets": "Budgets",
                 "savings": "Objectifs d’épargne",
-                "content": "Contenu",
+                "accounts": "Comptes",
                 "reports": "Rapports",
                 "imp-exp": "Importer / Exporter",
                 "settings": "Paramètres",
@@ -327,7 +360,7 @@
                         "has-end-date": "Cocher pour définir une date de fin pour cette transaction récurrente"
                     },
                     "placeholders": {
-                        "date": "25/09/2025",
+                        "date": "25/09/2026",
                         "account": "Choisir un compte",
                         "name": "Saisir le nom",
                         "start-date": "Sélectionner la date de début",
@@ -533,7 +566,7 @@
                         "recurringStatus": "Statut"
                     },
                     "placeholders": {
-                        "date": "21/09/2025",
+                        "date": "21/09/2026",
                         "account": "Choisir un compte",
                         "recipient": "Saisir le bénéficiaire",
                         "category": "Choisir une catégorie",
@@ -686,6 +719,112 @@
                 },
                 "no-results": "Aucun résultat.",
                 "rows-selected": "{selected} sur {total} ligne(s) sélectionnée(s)."
+            },
+            "view-toggle": {
+                "transactions": "Transactions",
+                "recurring": "Transactions récurrentes"
+            },
+            "recurring-templates": {
+                "title": "Transactions récurrentes",
+                "empty": "Pas encore de transactions récurrentes. Créez une nouvelle transaction et cochez 'Paiement récurrent' pour commencer.",
+                "loading": "Chargement des transactions récurrentes...",
+                "info": "Pour créer une nouvelle transaction récurrente, ajoutez une nouvelle transaction et cochez 'Paiement récurrent'.",
+                "table": {
+                    "headings": {
+                        "name": "Nom",
+                        "account": "Compte",
+                        "type": "Type",
+                        "amount": "Montant",
+                        "frequency": "Fréquence",
+                        "next-occurrence": "Prochaine échéance",
+                        "status": "Statut",
+                        "actions": "Actions"
+                    },
+                    "frequency-days": "{days} jours",
+                    "status": {
+                        "active": "Actif",
+                        "inactive": "Inactif",
+                        "archived": "Archivé"
+                    },
+                    "next-occurrence-na": "N/D"
+                },
+                "show-archived": "Afficher les archivés",
+                "archive": {
+                    "button": "Archiver",
+                    "success": "Modèle archivé avec succès !",
+                    "dialog": {
+                        "title": "Archiver le modèle récurrent",
+                        "description": "Êtes-vous sûr ? Le modèle sera défini comme inactif et ne générera plus de transactions. Vous pourrez le restaurer ultérieurement.",
+                        "cancel": "Annuler",
+                        "confirm": "Archiver"
+                    }
+                },
+                "unarchive": {
+                    "button": "Restaurer",
+                    "success": "Modèle restauré avec succès !",
+                    "dialog": {
+                        "title": "Restaurer le modèle récurrent",
+                        "description": "Le modèle restera inactif jusqu'à ce que vous l'activiez manuellement.",
+                        "confirm": "Restaurer"
+                    }
+                },
+                "edit-dialog": {
+                    "title": "Modifier la transaction récurrente",
+                    "close": "Fermer",
+                    "loading": "Chargement...",
+                    "sections": {
+                        "transaction-details": "Détails de la transaction",
+                        "recurrence-settings": "Paramètres de récurrence"
+                    },
+                    "labels": {
+                        "source": "Destinataire / Source",
+                        "account": "Compte",
+                        "category": "Catégorie",
+                        "type": "Type",
+                        "amount": "Montant (CHF)",
+                        "note": "Note",
+                        "destination-account": "Compte de destination",
+                        "frequency-days": "Fréquence (jours)",
+                        "start-date": "Date de début",
+                        "end-date": "Date de fin",
+                        "has-end-date": "Définir une date de fin",
+                        "status": "Statut"
+                    },
+                    "placeholders": {
+                        "source": "ex. Coop, employeur…",
+                        "account": "Choisir un compte",
+                        "category": "Sélectionner ou ajouter une catégorie",
+                        "note": "Note optionnelle",
+                        "destination-account": "Choisir le compte de destination",
+                        "start-date": "Sélectionner la date de début",
+                        "end-date": "Sélectionner la date de fin"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Fréquence de répétition de cette transaction (en jours)",
+                        "has-end-date": "Cochez pour définir une date de fin pour cette transaction récurrente"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Actif",
+                            "inactive": "Inactif"
+                        },
+                        "type": {
+                            "income": "Revenu",
+                            "expense": "Dépense",
+                            "transfer": "Transfert"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Enregistrer",
+                        "saving": "Enregistrement..."
+                    },
+                    "messages": {
+                        "success": "Transaction récurrente mise à jour avec succès !",
+                        "error": "Échec de la mise à jour de la transaction récurrente",
+                        "load-error": "Échec du chargement de la transaction récurrente"
+                    },
+                    "edit": "Modifier"
+                }
             }
         },
         "budgets-page": {
@@ -1259,9 +1398,10 @@
                     }
                 },
                 "export-json-card": {
-                    "title": "Export complet (JSON)",
-                    "content": "Exporte toutes les données de localStorage dans un fichier JSON.",
-                    "button": "Exporter tout"
+                    "title": "Export JSON",
+                    "content": "Exportez vos données dans un format JSON standardisé. L'exportation Hub est compatible avec l'importateur, tandis que l'exportation complète inclut toutes vos données de profil et de hub.",
+                    "button-full": "Exportation RGPD complète",
+                    "button-hub": "Exportation Hub (recommandée)"
                 },
                 "csv-template-card": {
                     "title": "Modèles CSV"
@@ -1465,7 +1605,8 @@
                     "cancel": "Annuler",
                     "send": "Envoyer l'invitation",
                     "sending": "Envoi...",
-                    "upgrade": "Passer à la version supérieure pour inviter"
+                    "upgrade": "Passer à la version supérieure pour inviter",
+                    "cancel-invitation": "Annuler"
                 },
                 "members-table": {
                     "title": "Membres du hub",
@@ -1486,7 +1627,8 @@
                         "email": "Email",
                         "role": "Rôle",
                         "status": "Statut",
-                        "expires": "Expire le"
+                        "expires": "Expire le",
+                        "actions": "Actions"
                     },
                     "statuses": {
                         "accepted": "Acceptée",
@@ -1506,7 +1648,9 @@
                     "load-error": "Échec du chargement des invitations et membres",
                     "invitation-sent": "Invitation envoyée",
                     "send-error": "Échec de l'envoi de l'invitation",
-                    "send-unexpected-error": "Erreur lors de l'envoi de l'invitation"
+                    "send-unexpected-error": "Erreur lors de l'envoi de l'invitation",
+                    "invitation-cancelled": "Invitation annulée",
+                    "cancel-error": "Échec de l'annulation de l'invitation"
                 }
             },
             "appearance-section": {
@@ -1769,7 +1913,8 @@
                 "faqs": "Ouvrir toutes les FAQ",
                 "close-all": "Tout fermer",
                 "attach": "Joindre le diagnostic",
-                "contact-support": "Contacter le support"
+                "contact-support": "Contacter le support",
+                "guide": "Guide Budgethub"
             },
             "faqs-section": {
                 "title": "FAQ",
@@ -1792,14 +1937,10 @@
                 }
             },
             "content-section": {
-                "title": "Contenu",
-                "faq": "FAQ",
-                "contact-support": "Contact & Support",
-                "keyboard-shortcuts": "Raccourcis clavier",
-                "troubleshooting": "Dépannage",
-                "privacy": "Confidentialité",
-                "release-notes": "Notes de version",
-                "help": "Besoin d'aide individuelle ? Créez un ticket – vous recevrez une réponse par e-mail."
+                "title": "À propos de Budgethub",
+                "imprint": "Mentions légales",
+                "data-privacy": "Protection des données",
+                "term-of-use": "Conditions d'utilisation"
             },
             "contact-support-section": {
                 "title": "Contact & Support",

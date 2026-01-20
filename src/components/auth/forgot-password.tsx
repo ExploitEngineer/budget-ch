@@ -96,7 +96,7 @@ export default function ForgotPassword() {
             >
               {isLoading ? <Spinner /> : t("buttons.send-email")}
             </Button>
-            <Link className="flex-1" href="/signin">
+            <Link className="flex-1" href="/login">
               <Button
                 type="button"
                 variant="outline"

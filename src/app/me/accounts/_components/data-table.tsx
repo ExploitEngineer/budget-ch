@@ -23,6 +23,8 @@ import type { FinancialAccount } from "@/lib/types/domain-types";
 import { mapAccountsToRows } from "../account-adapters";
 import { useMemo } from "react";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export interface AccountData {
   id: string;
   name: string;
@@ -146,7 +148,9 @@ export function ContentDataTable() {
               ) : accountsLoading || !accounts ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center">
-                    {t("loading")}
+                    <div className="flex justify-center py-4">
+                      <Spinner />
+                    </div>
                   </TableCell>
                 </TableRow>
               ) : accounts.length === 0 ? (

@@ -54,7 +54,7 @@ export default function SignUp() {
         email: values.email,
         password: values.password,
         // image: "https://example.com/image.png",
-        // callbackURL: "/signin",
+        // callbackURL: "/login",
       });
 
       if (error) {
@@ -64,7 +64,7 @@ export default function SignUp() {
 
       form.reset();
       toast.success(t("messages.success-signup"));
-      router.push("/signin");
+      router.push("/login");
     } catch (err) {
       console.error(err);
       toast.error(t("messages.error-generic"));
@@ -153,7 +153,8 @@ export default function SignUp() {
           />
 
           {/* Show password + tip */}
-          <FormItem className="flex flex-col items-start justify-between border-0 sm:flex-row sm:items-center">
+          <FormItem className="flex flex-col items-start justify-between border-0">
+           <p className="text-sm">{t("tip")}</p>
             <div className="flex items-center gap-2">
               <Checkbox
                 checked={showPassword}
@@ -162,7 +163,6 @@ export default function SignUp() {
               />
               <span className="text-sm">{t("checkboxes.password")}</span>
             </div>
-            <p className="text-sm">{t("tip")}</p>
           </FormItem>
 
           {/* Terms & Privacy */}
@@ -184,7 +184,7 @@ export default function SignUp() {
                       terms: (chunks) => (
                         <a
                           className="text-[#235FE3] underline dark:text-[#6371FF]"
-                          href="/terms"
+                          href="https://www.budgethub.ch/nutzungsbedingungen/"
                           target="_blank"
                           rel="noopener"
                         >
@@ -194,7 +194,7 @@ export default function SignUp() {
                       privacy: (chunks) => (
                         <a
                           className="text-[#235FE3] underline dark:text-[#6371FF]"
-                          href="/privacy"
+                          href="https://www.budgethub.ch/datenschutzerklarung/"
                           target="_blank"
                           rel="noopener"
                         >
@@ -247,7 +247,7 @@ export default function SignUp() {
             <span>{t("already")} </span>
             <Link
               className="text-sm text-[#235FE3] transition-all duration-300 hover:underline dark:text-[#6371FF]"
-              href="/signin"
+              href="/login"
             >
               {t("signin")}
             </Link>

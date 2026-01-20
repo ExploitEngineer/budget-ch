@@ -65,7 +65,7 @@ export default function VerifyEmail() {
           <p>{t("content")}</p>
         </div>
 
-        <Link href="/signin" className="block">
+        <Link href="/login" className="block">
           <Button
             variant="outline"
             className="dark:border-border-blue !bg-dark-blue-background mt-4 w-full cursor-pointer rounded-xl py-5 font-bold"

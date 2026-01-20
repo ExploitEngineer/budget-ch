@@ -12,6 +12,7 @@ import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { getContext } from "../auth/actions";
 import { requireAdminRole } from "../auth/permissions";
+import { getDefaultHubId } from "./hub-logic";
 
 export interface Hub {
   id: string;
@@ -24,20 +25,6 @@ export interface GetHubsResponse {
   success: boolean;
   message?: string;
   data?: Hub[];
-}
-
-// Get user's default hub (owned hub or first member hub)
-export async function getDefaultHubId(userId: string): Promise<string | null> {
-  try {
-    const hubMemberRow = await getFirstHubMemberDB(userId);
-    const ownedHub = await getOwnedHubDB(userId);
-
-    // Prefer member hub first, then owned hub
-    return hubMemberRow?.hubId ?? ownedHub?.id ?? null;
-  } catch (error) {
-    console.error("Error getting default hub:", error);
-    return null;
-  }
 }
 
 // GET Default Hub ID for Current User [Action]

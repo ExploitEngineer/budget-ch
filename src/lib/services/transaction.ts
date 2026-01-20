@@ -20,6 +20,7 @@ import {
   getRecurringTransactionTemplatesDB,
   getRecurringTransactionTemplateByIdDB,
   updateRecurringTransactionTemplateDB,
+  archiveRecurringTransactionTemplateDB,
   getBudgetsDB,
   getActiveRecurringTemplatesDB,
   updateTemplateLastGeneratedDB,
@@ -222,21 +223,9 @@ export async function createTransaction({
       }
     }
 
-    await createTransactionDB({
-      financialAccountId: account.id,
-      hubId,
-      userId,
-      transactionCategoryId,
-      amount,
-      source,
-      note,
-      transactionType,
-      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
-      recurringTemplateId: recurringTemplateId || null,
-      createdAt,
-    });
-
-    // Create recurring transaction template if isRecurring is true
+    // Create recurring transaction template FIRST if isRecurring is true
+    // This ensures the first transaction is linked to the template
+    let createdTemplateId: string | null = recurringTemplateId || null;
     if (isRecurring && frequencyDays && startDate) {
       const templateResult = await createRecurringTransactionTemplateDB({
         hubId,
@@ -252,13 +241,31 @@ export async function createTransaction({
         endDate: endDate || null,
         status: recurringStatus || "active",
         destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+        // Set lastGeneratedDate to startDate since we're creating the first transaction now
+        lastGeneratedDate: startDate,
       });
 
       if (!templateResult.success) {
         console.error("Failed to create recurring template:", templateResult.message);
         // Don't fail the transaction creation if template creation fails
+      } else if (templateResult.data) {
+        createdTemplateId = templateResult.data.id;
       }
     }
+
+    await createTransactionDB({
+      financialAccountId: account.id,
+      hubId,
+      userId,
+      transactionCategoryId,
+      amount,
+      source,
+      note,
+      transactionType,
+      destinationAccountId: transactionType === "transfer" ? destinationAccountId : null,
+      recurringTemplateId: createdTemplateId,
+      createdAt,
+    });
 
     // Check budget thresholds if this is an expense with a category
     if (transactionType === "expense" && transactionCategoryId) {
@@ -543,7 +550,10 @@ export async function getUpcomingRecurringTransactions(
       return { success: false, message: "Missing hubId" };
     }
 
-    const templates = await getRecurringTransactionTemplatesDB(hubId);
+    const templates = await getRecurringTransactionTemplatesDB(hubId, {
+      statusFilter: 'active',
+      includeArchived: false,
+    });
 
     const today = startOfDay(new Date());
     const nextDays = addDays(today, days);
@@ -551,12 +561,21 @@ export async function getUpcomingRecurringTransactions(
 
     for (const template of templates) {
       const startDate = startOfDay(new Date(template.startDate));
-      let currentDate = startDate;
+      let currentDate: Date;
 
-      // If start date is in the past, calculate next occurrence
-      if (template.frequencyDays > 0) {
-        while (isBefore(currentDate, today)) {
-          currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+      // Use lastGeneratedDate if available to calculate next occurrence
+      if (template.lastGeneratedDate) {
+        // Next occurrence is lastGeneratedDate + frequencyDays
+        currentDate = startOfDay(addDays(new Date(template.lastGeneratedDate), template.frequencyDays));
+      } else {
+        // No transactions generated yet, start from startDate
+        currentDate = startDate;
+
+        // If start date is in the past, calculate next occurrence
+        if (template.frequencyDays > 0) {
+          while (isBefore(currentDate, today)) {
+            currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+          }
         }
       }
 
@@ -588,7 +607,7 @@ export async function getUpcomingRecurringTransactions(
             name: template.source || template.categoryName || "—",
             account: template.accountName || "—",
             amount: `CHF ${template.amount.toFixed(2)}`,
-            date: format(currentDate, "d.M.yyyy"),
+            date: format(currentDate, "dd/MM/yyyy"),
             templateId: template.id,
           });
 
@@ -621,6 +640,47 @@ export async function getUpcomingRecurringTransactions(
     };
   } catch (err: any) {
     console.error("Server action error in getUpcomingRecurringTransactions:", err);
+    return {
+      success: false,
+      message: err?.message || "Unexpected server error.",
+    };
+  }
+}
+
+// GET All Recurring Transaction Templates (for templates management)
+export async function getRecurringTransactionTemplates(
+  hubIdArg?: string,
+  options: {
+    statusFilter?: 'active' | 'inactive' | 'all';
+    includeArchived?: boolean;
+  } = {}
+): Promise<{
+  success: boolean;
+  data?: any[];
+  message?: string;
+}> {
+  const { statusFilter = 'all', includeArchived = false } = options;
+
+  try {
+    const hdrs = await headers();
+    const { hubId: sessionHubId } = await getContext(hdrs, false);
+    const hubId = hubIdArg || sessionHubId;
+
+    if (!hubId) {
+      return { success: false, message: "Missing hubId" };
+    }
+
+    const templates = await getRecurringTransactionTemplatesDB(hubId, {
+      statusFilter,
+      includeArchived,
+    });
+
+    return {
+      success: true,
+      data: templates,
+    };
+  } catch (err: any) {
+    console.error("Server action error in getRecurringTransactionTemplates:", err);
     return {
       success: false,
       message: err?.message || "Unexpected server error.",
@@ -661,10 +721,19 @@ export async function getRecurringTransactionTemplate(templateId: string): Promi
 export async function updateRecurringTransactionTemplate(
   templateId: string,
   updatedData: {
+    // Recurrence settings
     frequencyDays?: number;
     startDate?: Date;
     endDate?: Date | null;
     status?: "active" | "inactive";
+    // Transaction details
+    source?: string | null;
+    amount?: number;
+    financialAccountId?: string;
+    transactionCategoryId?: string | null;
+    destinationAccountId?: string | null;
+    type?: TransactionType;
+    note?: string | null;
   },
 ): Promise<{
   success: boolean;
@@ -691,6 +760,7 @@ export async function updateRecurringTransactionTemplate(
     }
 
     revalidatePath("/me/dashboard");
+    revalidatePath("/me/transactions");
 
     return {
       success: true,
@@ -702,6 +772,53 @@ export async function updateRecurringTransactionTemplate(
     return {
       success: false,
       message: err.message || "Unexpected error while updating recurring transaction template.",
+    };
+  }
+}
+
+// ARCHIVE/UNARCHIVE Recurring Transaction Template
+export async function archiveRecurringTransactionTemplate(
+  templateId: string,
+  archive: boolean,
+): Promise<{
+  success: boolean;
+  message?: string;
+  data?: any;
+}> {
+  try {
+    const hdrs = await headers();
+    const { hubId, userRole } = await getContext(hdrs, false);
+
+    requireAdminRole(userRole);
+
+    const res = await archiveRecurringTransactionTemplateDB({
+      templateId,
+      hubId,
+      archive,
+    });
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to archive recurring transaction template.",
+      };
+    }
+
+    revalidatePath("/me/dashboard");
+    revalidatePath("/me/transactions");
+
+    return {
+      success: true,
+      message: archive
+        ? "Recurring transaction template archived successfully!"
+        : "Recurring transaction template restored successfully!",
+      data: res.data,
+    };
+  } catch (err: any) {
+    console.error("Error in archiveRecurringTransactionTemplate:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while archiving recurring transaction template.",
     };
   }
 }

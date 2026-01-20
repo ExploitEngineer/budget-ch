@@ -26,10 +26,6 @@ export function useHelpSectionData() {
       answer: t("faqs-section.data.answer-4"),
     },
     {
-      question: t("faqs-section.data.question-5"),
-      answer: t("faqs-section.data.answer-5"),
-    },
-    {
       question: t("faqs-section.data.question-6"),
       answer: t("faqs-section.data.answer-6"),
     },

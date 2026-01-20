@@ -88,7 +88,7 @@ export async function sendUserReport(user: any, startDate: Date, endDate: Date, 
             totalIncome: formatCurrency(totalIncome),
             totalExpense: formatCurrency(totalExpense),
             hubs: hubSummaries,
-            appUrl: "https://app.budgethub.ch/signin",
+            appUrl: "https://app.budgethub.ch/login",
             labels: {
                 introText: t("notifications.types.monthly-report.labels.introText"),
                 totalIncome: t("notifications.types.monthly-report.labels.totalIncome"),

@@ -25,6 +25,7 @@ import { mapBudgetsToRows } from "@/app/me/budgets/budget-adapters";
 import { mapAccountsToRows } from "@/app/me/accounts/account-adapters";
 import { mapTransactionsToRows } from "@/app/me/transactions/transaction-adapters";
 
+
 export function Export() {
   const t = useTranslations("main-dashboard.import-export-page.export-section");
 
@@ -123,7 +124,8 @@ export function Export() {
     exportAccountTemplate,
     exportTransferTemplate,
     exportSavingGoalTemplate,
-    exportAllDataJSON,
+    exportGDPRDataJSON,
+    exportHubDataJSON,
   } = useExportCSV();
 
   const buttons = [
@@ -230,21 +232,20 @@ export function Export() {
             </CardHeader>
             <Separator className="dark:bg-border-blue" />
             <CardContent className="mt-3 flex flex-col gap-3">
-              <p>{t("export-json-card.content")}</p>
+              <p className="text-xs text-muted-foreground">{t("export-json-card.content")}</p>
               <Button
                 variant="outline"
-                onClick={() =>
-                  exportAllDataJSON({
-                    transactions,
-                    budgets,
-                    accounts,
-                    goals,
-                    transfers: transfers ?? [],
-                  })
-                }
-                className="btn-gradient dark:text-foreground w-auto cursor-pointer hover:text-white"
+                onClick={() => exportHubDataJSON()}
+                className="btn-gradient dark:text-foreground w-full cursor-pointer hover:text-white"
               >
-                {t("export-json-card.button")}
+                {t("export-json-card.button-hub")}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => exportGDPRDataJSON()}
+                className="bg-dark-blue-background dark:border-border-blue text-foreground w-full cursor-pointer hover:bg-slate-800"
+              >
+                {t("export-json-card.button-full")}
               </Button>
             </CardContent>
           </Card>

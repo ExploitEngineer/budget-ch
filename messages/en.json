@@ -72,9 +72,38 @@
                 "button": "Go Now"
             },
             "error": {
-                "title": "Invalid or Expired Invitation",
-                "description": "The invitation link is not valid or has already expired.",
+                "title": "Something Went Wrong",
+                "description": "An unexpected error occurred while processing your invitation.",
                 "set-hub-failed": "Invitation accepted but failed to set active hub"
+            },
+            "not-authenticated": {
+                "title": "Login Required",
+                "description": "Please log in to accept this invitation. After logging in, open the invitation link again.",
+                "button": "Go to Login"
+            },
+            "not-found": {
+                "title": "Invitation Not Found",
+                "description": "This invitation link is invalid. Please check the link or request a new invitation."
+            },
+            "expired": {
+                "title": "Invitation Expired",
+                "description": "This invitation has expired. Please request a new invitation from the hub owner."
+            },
+            "already-accepted": {
+                "title": "Invitation Already Used",
+                "description": "This invitation has already been accepted. You can access the hub from your dashboard."
+            },
+            "email-mismatch": {
+                "title": "Wrong Account",
+                "description": "This invitation was sent to a different email address. Please log in with the correct account to accept this invitation."
+            },
+            "already-member": {
+                "title": "Already a Member",
+                "description": "You are already a member of this hub. You can access it from your dashboard."
+            },
+            "cancelled": {
+                "title": "Invitation Cancelled",
+                "description": "This invitation has been cancelled by the hub owner. Please request a new invitation."
             }
         },
         "goodbye": {
@@ -121,7 +150,7 @@
             "password": "Show password",
             "terms": "I accept the <terms>terms</terms> & the <privacy>privacy</privacy>"
         },
-        "tip": "Tip: Length ≥ 8, include numbers & letters.",
+        "tip": "Tip: Length ≥ 8, include uppercase, lowercase, numbers & special characters.",
         "buttons": {
             "create-account": "Create account",
             "google": "with google",
@@ -152,6 +181,10 @@
             "name-min": "Name must be at least 2 characters.",
             "email-invalid": "Invalid email address.",
             "password-min": "Password must be at least 8 characters.",
+            "password-uppercase": "Password must contain at least one uppercase letter.",
+            "password-lowercase": "Password must contain at least one lowercase letter.",
+            "password-number": "Password must contain at least one number.",
+            "password-special": "Password must contain at least one special character.",
             "accept-terms": "You must accept the terms and privacy policy."
         },
         "verify-email": {
@@ -189,7 +222,7 @@
                 "fallback": "If the button doesn’t work, copy and paste this link into your browser:",
                 "expire": "This verification link will expire in 24 hours.",
                 "ignore": "If you didn’t create an account, you can ignore this email.",
-                "footer": "© 2025 BudgetHub. All rights reserved."
+                "footer": "© 2026 BudgetHub. All rights reserved."
             },
             "otp": {
                 "subject": "Your Verification Code",
@@ -198,7 +231,7 @@
                 "code-is": "Your verification code is:",
                 "expire": "This code will expire in 5 minutes.",
                 "ignore": "If you didn't request this code, you can safely ignore this email.",
-                "footer": "© 2025 BudgetHub. All rights reserved."
+                "footer": "© 2026 BudgetHub. All rights reserved."
             }
         },
         "invitation": {
@@ -226,7 +259,7 @@
                 "transactions": "Transactions",
                 "budgets": "Budgets",
                 "savings": "Savings Goals",
-                "content": "Accounts",
+                "accounts": "Accounts",
                 "reports": "Reports",
                 "imp-exp": "Import / Export",
                 "settings": "Settings",
@@ -327,7 +360,7 @@
                         "has-end-date": "Check to set an end date for this recurring transaction"
                     },
                     "placeholders": {
-                        "date": "09/25/2025",
+                        "date": "09/25/2026",
                         "account": "Choose an account",
                         "name": "Enter name",
                         "start-date": "Select start date",
@@ -533,7 +566,7 @@
                         "recurringStatus": "Status"
                     },
                     "placeholders": {
-                        "date": "09/21/2025",
+                        "date": "09/21/2026",
                         "account": "Choose an account",
                         "recipient": "Enter recipient",
                         "category": "Choose a category",
@@ -686,6 +719,112 @@
                 },
                 "no-results": "No results.",
                 "rows-selected": "{selected} of {total} row(s) selected."
+            },
+            "view-toggle": {
+                "transactions": "Transactions",
+                "recurring": "Recurring Transactions"
+            },
+            "recurring-templates": {
+                "title": "Recurring Transactions",
+                "empty": "No recurring transactions yet. Create a new transaction and check 'Make it recurring' to get started.",
+                "loading": "Loading recurring transactions...",
+                "info": "To create a new recurring transaction, add a new transaction and check 'Recurring Transaction'.",
+                "table": {
+                    "headings": {
+                        "name": "Name",
+                        "account": "Account",
+                        "type": "Type",
+                        "amount": "Amount",
+                        "frequency": "Frequency",
+                        "next-occurrence": "Next Occurrence",
+                        "status": "Status",
+                        "actions": "Actions"
+                    },
+                    "frequency-days": "{days} days",
+                    "status": {
+                        "active": "Active",
+                        "inactive": "Inactive",
+                        "archived": "Archived"
+                    },
+                    "next-occurrence-na": "N/A"
+                },
+                "show-archived": "Show archived",
+                "archive": {
+                    "button": "Archive",
+                    "success": "Template archived successfully!",
+                    "dialog": {
+                        "title": "Archive Recurring Template",
+                        "description": "Are you sure? The template will be set to inactive and won't generate transactions. You can restore it later.",
+                        "cancel": "Cancel",
+                        "confirm": "Archive"
+                    }
+                },
+                "unarchive": {
+                    "button": "Restore",
+                    "success": "Template restored successfully!",
+                    "dialog": {
+                        "title": "Restore Recurring Template",
+                        "description": "The template will remain inactive until you manually activate it.",
+                        "confirm": "Restore"
+                    }
+                },
+                "edit-dialog": {
+                    "title": "Edit Recurring Transaction",
+                    "edit": "Edit",
+                    "close": "Close",
+                    "loading": "Loading...",
+                    "sections": {
+                        "transaction-details": "Transaction Details",
+                        "recurrence-settings": "Recurrence Settings"
+                    },
+                    "labels": {
+                        "source": "Recipient / Source",
+                        "account": "Account",
+                        "category": "Category",
+                        "type": "Type",
+                        "amount": "Amount (CHF)",
+                        "note": "Note",
+                        "destination-account": "Destination Account",
+                        "frequency-days": "Frequency (Days)",
+                        "start-date": "Start Date",
+                        "end-date": "End Date",
+                        "has-end-date": "Set End Date",
+                        "status": "Status"
+                    },
+                    "placeholders": {
+                        "source": "e.g. Coop, employer…",
+                        "account": "Choose an account",
+                        "category": "Select or add a category",
+                        "note": "Optional note",
+                        "destination-account": "Choose destination account",
+                        "start-date": "Select start date",
+                        "end-date": "Select end date"
+                    },
+                    "descriptions": {
+                        "frequency-days": "How often this transaction repeats (in days)",
+                        "has-end-date": "Check to set an end date for this recurring transaction"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Active",
+                            "inactive": "Inactive"
+                        },
+                        "type": {
+                            "income": "Income",
+                            "expense": "Expense",
+                            "transfer": "Transfer"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Save",
+                        "saving": "Saving..."
+                    },
+                    "messages": {
+                        "success": "Recurring transaction updated successfully!",
+                        "error": "Failed to update recurring transaction",
+                        "load-error": "Failed to load recurring transaction"
+                    }
+                }
             }
         },
         "budgets-page": {
@@ -1259,9 +1398,10 @@
                     }
                 },
                 "export-json-card": {
-                    "title": "Full Export (JSON)",
-                    "content": "Exports all data from localStorage into a JSON file.",
-                    "button": "Export All"
+                    "title": "JSON Export",
+                    "content": "Export your data in a standardized JSON format. Hub export is compatible with the importer, while Full export includes all your profile and hub data.",
+                    "button-full": "Full GDPR Export",
+                    "button-hub": "Hub Export (Recommended)"
                 },
                 "csv-template-card": {
                     "title": "CSV Templates"
@@ -1465,7 +1605,8 @@
                     "cancel": "Cancel",
                     "send": "Send Invitation",
                     "sending": "Sending...",
-                    "upgrade": "Upgrade to Invite"
+                    "upgrade": "Upgrade to Invite",
+                    "cancel-invitation": "Cancel"
                 },
                 "members-table": {
                     "title": "Hub Members",
@@ -1486,7 +1627,8 @@
                         "email": "Email",
                         "role": "Role",
                         "status": "Status",
-                        "expires": "Expires"
+                        "expires": "Expires",
+                        "actions": "Actions"
                     },
                     "statuses": {
                         "accepted": "Accepted",
@@ -1506,7 +1648,9 @@
                     "load-error": "Failed to load invitations & members",
                     "invitation-sent": "Invitation sent",
                     "send-error": "Failed to send invitation",
-                    "send-unexpected-error": "Error sending invitation"
+                    "send-unexpected-error": "Error sending invitation",
+                    "invitation-cancelled": "Invitation cancelled",
+                    "cancel-error": "Failed to cancel invitation"
                 }
             },
             "appearance-section": {
@@ -1763,13 +1907,13 @@
         },
         "help-page": {
             "title": "Quick Access",
-            "badge": "/ Search • ? Shortcuts",
             "buttons": {
                 "tour": "Start Quick Tour",
                 "faqs": "Open All FAQs",
                 "close-all": "Close All",
                 "attach": "Attach Diagnostics",
-                "contact-support": "Contact Support"
+                "contact-support": "Contact Support",
+                "guide": "Budgethub Guide"
             },
             "faqs-section": {
                 "title": "FAQ",
@@ -1783,8 +1927,6 @@
                     "answer-3": "Import CSV under Import / Export or enter transactions manually. Manage account balances in Accounts.",
                     "question-4": "Can I invite family members?",
                     "answer-4": "In the Family Plan, you can manage multiple users (Settings → Members & Invitations).",
-                    "question-5": "How do I reset the demo?",
-                    "answer-5": "Under Settings → Data & Privacy, you can select ‘Delete all local data’. Only your browser storage will be cleared.",
                     "question-6": "How do I export my data?",
                     "answer-6": "Under Import / Export, CSV exports as well as a full export (JSON) are available.",
                     "question-7": "Which languages/themes are available?",
@@ -1792,14 +1934,10 @@
                 }
             },
             "content-section": {
-                "title": "Content",
-                "faq": "FAQ",
-                "contact-support": "Contact & Support",
-                "keyboard-shortcuts": "Keyboard shortcuts",
-                "troubleshooting": "Troubleshooting",
-                "privacy": "Privacy",
-                "release-notes": "Release Notes",
-                "help": "Do you need individual help? Create a ticket – you’ll receive a reply by email."
+                "title": "About Budgethub",
+                "imprint": "Imprint",
+                "data-privacy": "Data Privacy",
+                "term-of-use": "Term Of Use"
             },
             "contact-support-section": {
                 "title": "Contact & Support",
@@ -1817,26 +1955,6 @@
                 "error": "Failed to send ticket. Please try again.",
                 "error-empty": "Please enter a message",
                 "error-too-short": "Message is too short (minimum 10 characters)"
-            },
-            "keyboard-shortcuts-section": {
-                "title": "Keyboard Shortcuts",
-                "badge": "? shows this list",
-                "key-functions": {
-                    "search": "Focus search",
-                    "new-account": "New Account / New Transaction (depending on the page)",
-                    "transfer": "Start transfer (Accounts)",
-                    "close": "Close modals/overlays"
-                }
-            },
-            "privary-section": {
-                "title": "Privacy (Short)",
-                "content": "In production, the Terms & Conditions and Privacy Policy linked in the app apply."
-            },
-            "release-notes-section": {
-                "title": "Release Notes",
-                "badge": "v1.0.0",
-                "list-1": "Dashboard, transactions, budgets, savings goals, accounts, reports, import/export, settings.",
-                "list-2": "Light/Dark/Auto theme, DE/FR/IT/EN switching."
             }
         }
     },

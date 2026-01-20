@@ -70,7 +70,7 @@ export default function ResetPassword() {
       } else {
         toast.success(t("messages.password-reset-success"));
         form.reset();
-        router.push("/signin");
+        router.push("/login");
       }
     } catch (err) {
       console.error("Reset password failed:", err);

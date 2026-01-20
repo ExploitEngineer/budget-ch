@@ -94,10 +94,12 @@ export function HubDisplay() {
           role="combobox"
           aria-expanded={open}
           className={cn(
-            "dark:border-border-blue !bg-dark-blue-background w-full justify-between",
+            "dark:border-border-blue !bg-dark-blue-background w-full justify-between overflow-hidden",
           )}
         >
-          {selectedHub?.name || "Select Hub"}
+          <span className="truncate text-left flex-1">
+            {selectedHub?.name || "Select Hub"}
+          </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

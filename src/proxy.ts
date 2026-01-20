@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
 
   if (!sessionCookie) {
     // Redirect to the signin page if the session cookie is not present
-    return NextResponse.redirect(new URL("/signin", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   const response = NextResponse.next();

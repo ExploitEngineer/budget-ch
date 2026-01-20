@@ -72,9 +72,38 @@
                 "button": "Vai ora"
             },
             "error": {
-                "title": "Invito non valido o scaduto",
-                "description": "Il link dell'invito non è valido o è già scaduto.",
+                "title": "Qualcosa è andato storto",
+                "description": "Si è verificato un errore imprevisto durante l'elaborazione del tuo invito.",
                 "set-hub-failed": "Invito accettato ma impossibile impostare l'hub attivo"
+            },
+            "not-authenticated": {
+                "title": "Accesso richiesto",
+                "description": "Effettua l'accesso per accettare questo invito. Dopo aver effettuato l'accesso, apri nuovamente il link dell'invito.",
+                "button": "Vai all'accesso"
+            },
+            "not-found": {
+                "title": "Invito non trovato",
+                "description": "Questo link di invito non è valido. Verifica il link o richiedi un nuovo invito."
+            },
+            "expired": {
+                "title": "Invito scaduto",
+                "description": "Questo invito è scaduto. Richiedi un nuovo invito al proprietario dell'hub."
+            },
+            "already-accepted": {
+                "title": "Invito già utilizzato",
+                "description": "Questo invito è già stato accettato. Puoi accedere all'hub dalla tua dashboard."
+            },
+            "email-mismatch": {
+                "title": "Account sbagliato",
+                "description": "Questo invito è stato inviato a un altro indirizzo email. Effettua l'accesso con l'account corretto per accettare questo invito."
+            },
+            "already-member": {
+                "title": "Già membro",
+                "description": "Sei già membro di questo hub. Puoi accedervi dalla tua dashboard."
+            },
+            "cancelled": {
+                "title": "Invito annullato",
+                "description": "Questo invito è stato annullato dal proprietario dell'hub. Richiedi un nuovo invito."
             }
         },
         "goodbye": {
@@ -121,7 +150,7 @@
             "password": "Mostra password",
             "terms": "Accetto i <terms>Termini</terms> e l’<privacy>Informativa sulla privacy</privacy>"
         },
-        "tip": "Suggerimento: lunghezza ≥ 8, includere numeri e lettere.",
+        "tip": "Suggerimento: Lunghezza ≥ 8, maiuscole, minuscole, numeri e caratteri speciali.",
         "buttons": {
             "create-account": "Crea account",
             "google": "con Google",
@@ -152,6 +181,10 @@
             "name-min": "Il nome deve contenere almeno 2 caratteri.",
             "email-invalid": "Indirizzo e-mail non valido.",
             "password-min": "La password deve contenere almeno 8 caratteri.",
+            "password-uppercase": "La password deve contenere almeno una lettera maiuscola.",
+            "password-lowercase": "La password deve contenere almeno una lettera minuscola.",
+            "password-number": "La password deve contenere almeno un numero.",
+            "password-special": "La password deve contenere almeno un carattere speciale.",
             "accept-terms": "Devi accettare i termini e l'informativa sulla privacy."
         },
         "verify-email": {
@@ -189,7 +222,7 @@
                 "fallback": "Se il pulsante non funziona, copia e incolla questo link nel tuo browser:",
                 "expire": "Questo link di verifica scadrà tra 24 ore.",
                 "ignore": "Se non hai creato un account, puoi ignorare questa e-mail.",
-                "footer": "© 2025 BudgetHub. Tutti i diritti riservati."
+                "footer": "© 2026 BudgetHub. Tutti i diritti riservati."
             },
             "otp": {
                 "subject": "Il tuo codice di verifica",
@@ -198,7 +231,7 @@
                 "code-is": "Il tuo codice di verifica è:",
                 "expire": "Questo codice scadrà tra 5 minuti.",
                 "ignore": "Se non hai richiesto questo codice, puoi ignorare tranquillamente questa e-mail.",
-                "footer": "© 2025 BudgetHub. Tutti i diritti riservati."
+                "footer": "© 2026 BudgetHub. Tutti i diritti riservati."
             }
         },
         "invitation": {
@@ -226,7 +259,7 @@
                 "transactions": "Transazioni",
                 "budgets": "Budget",
                 "savings": "Obiettivi di risparmio",
-                "content": "Contenuto",
+                "accounts": "Conti",
                 "reports": "Report",
                 "imp-exp": "Importa / Esporta",
                 "settings": "Impostazioni",
@@ -327,7 +360,7 @@
                         "has-end-date": "Seleziona per impostare una data di fine per questa transazione ricorrente"
                     },
                     "placeholders": {
-                        "date": "25/09/2025",
+                        "date": "25/09/2026",
                         "account": "Scegli un conto",
                         "name": "Inserisci nome",
                         "start-date": "Seleziona data di inizio",
@@ -533,7 +566,7 @@
                         "recurringStatus": "Stato"
                     },
                     "placeholders": {
-                        "date": "21/09/2025",
+                        "date": "21/09/2026",
                         "account": "Scegli un conto",
                         "recipient": "Inserisci destinatario",
                         "category": "Scegli una categoria",
@@ -686,6 +719,112 @@
                 },
                 "no-results": "Nessun risultato.",
                 "rows-selected": "{selected} di {total} riga/e selezionata/e."
+            },
+            "view-toggle": {
+                "transactions": "Transazioni",
+                "recurring": "Transazioni ricorrenti"
+            },
+            "recurring-templates": {
+                "title": "Transazioni ricorrenti",
+                "empty": "Nessuna transazione ricorrente ancora. Crea una nuova transazione e seleziona 'Pagamento ricorrente' per iniziare.",
+                "loading": "Caricamento transazioni ricorrenti...",
+                "info": "Per creare una nuova transazione ricorrente, aggiungi una nuova transazione e seleziona 'Pagamento ricorrente'.",
+                "table": {
+                    "headings": {
+                        "name": "Nome",
+                        "account": "Conto",
+                        "type": "Tipo",
+                        "amount": "Importo",
+                        "frequency": "Frequenza",
+                        "next-occurrence": "Prossima scadenza",
+                        "status": "Stato",
+                        "actions": "Azioni"
+                    },
+                    "frequency-days": "{days} giorni",
+                    "status": {
+                        "active": "Attivo",
+                        "inactive": "Inattivo",
+                        "archived": "Archiviato"
+                    },
+                    "next-occurrence-na": "N/D"
+                },
+                "show-archived": "Mostra archiviati",
+                "archive": {
+                    "button": "Archivia",
+                    "success": "Modello archiviato con successo!",
+                    "dialog": {
+                        "title": "Archivia modello ricorrente",
+                        "description": "Sei sicuro? Il modello verrà impostato come inattivo e non genererà più transazioni. Potrai ripristinarlo successivamente.",
+                        "cancel": "Annulla",
+                        "confirm": "Archivia"
+                    }
+                },
+                "unarchive": {
+                    "button": "Ripristina",
+                    "success": "Modello ripristinato con successo!",
+                    "dialog": {
+                        "title": "Ripristina modello ricorrente",
+                        "description": "Il modello rimarrà inattivo finché non lo attiverai manualmente.",
+                        "confirm": "Ripristina"
+                    }
+                },
+                "edit-dialog": {
+                    "title": "Modifica transazione ricorrente",
+                    "close": "Chiudi",
+                    "loading": "Caricamento...",
+                    "sections": {
+                        "transaction-details": "Dettagli transazione",
+                        "recurrence-settings": "Impostazioni di ricorrenza"
+                    },
+                    "labels": {
+                        "source": "Destinatario / Fonte",
+                        "account": "Conto",
+                        "category": "Categoria",
+                        "type": "Tipo",
+                        "amount": "Importo (CHF)",
+                        "note": "Nota",
+                        "destination-account": "Conto di destinazione",
+                        "frequency-days": "Frequenza (giorni)",
+                        "start-date": "Data di inizio",
+                        "end-date": "Data di fine",
+                        "has-end-date": "Imposta data di fine",
+                        "status": "Stato"
+                    },
+                    "placeholders": {
+                        "source": "es. Coop, datore di lavoro…",
+                        "account": "Scegli un conto",
+                        "category": "Seleziona o aggiungi una categoria",
+                        "note": "Nota opzionale",
+                        "destination-account": "Scegli il conto di destinazione",
+                        "start-date": "Seleziona la data di inizio",
+                        "end-date": "Seleziona la data di fine"
+                    },
+                    "descriptions": {
+                        "frequency-days": "Frequenza di ripetizione di questa transazione (in giorni)",
+                        "has-end-date": "Seleziona per impostare una data di fine per questa transazione ricorrente"
+                    },
+                    "options": {
+                        "status": {
+                            "active": "Attivo",
+                            "inactive": "Inattivo"
+                        },
+                        "type": {
+                            "income": "Entrata",
+                            "expense": "Uscita",
+                            "transfer": "Trasferimento"
+                        }
+                    },
+                    "buttons": {
+                        "save": "Salva",
+                        "saving": "Salvataggio..."
+                    },
+                    "messages": {
+                        "success": "Transazione ricorrente aggiornata con successo!",
+                        "error": "Impossibile aggiornare la transazione ricorrente",
+                        "load-error": "Impossibile caricare la transazione ricorrente"
+                    },
+                    "edit": "Modificare"
+                }
             }
         },
         "budgets-page": {
@@ -1259,9 +1398,10 @@
                     }
                 },
                 "export-json-card": {
-                    "title": "Esportazione completa (JSON)",
-                    "content": "Esporta tutti i dati da localStorage in un file JSON.",
-                    "button": "Esporta tutto"
+                    "title": "Esportazione JSON",
+                    "content": "Esporta i tuoi dati in un formato JSON standardizzato. L'esportazione dell'hub è compatibile con l'importatore, mentre l'esportazione completa include tutti i dati del tuo profilo e dell'hub.",
+                    "button-full": "Esportazione RGPD completa",
+                    "button-hub": "Esportazione Hub (consigliata)"
                 },
                 "csv-template-card": {
                     "title": "Modelli CSV"
@@ -1465,7 +1605,8 @@
                     "cancel": "Annulla",
                     "send": "Invia invito",
                     "sending": "Invio...",
-                    "upgrade": "Effettua l'upgrade per invitare"
+                    "upgrade": "Effettua l'upgrade per invitare",
+                    "cancel-invitation": "Annulla"
                 },
                 "members-table": {
                     "title": "Membri dell'hub",
@@ -1486,7 +1627,8 @@
                         "email": "Email",
                         "role": "Ruolo",
                         "status": "Stato",
-                        "expires": "Scade il"
+                        "expires": "Scade il",
+                        "actions": "Azioni"
                     },
                     "statuses": {
                         "accepted": "Accettato",
@@ -1506,7 +1648,9 @@
                     "load-error": "Impossibile caricare inviti e membri",
                     "invitation-sent": "Invito inviato",
                     "send-error": "Impossibile inviare l'invito",
-                    "send-unexpected-error": "Errore durante l'invio dell'invito"
+                    "send-unexpected-error": "Errore durante l'invio dell'invito",
+                    "invitation-cancelled": "Invito annullato",
+                    "cancel-error": "Impossibile annullare l'invito"
                 }
             },
             "appearance-section": {
@@ -1769,7 +1913,8 @@
                 "faqs": "Apri tutte le FAQ",
                 "close-all": "Chiudi tutto",
                 "attach": "Allega diagnostica",
-                "contact-support": "Contatta supporto"
+                "contact-support": "Contatta supporto",
+                "guide": "Guida Budgethub"
             },
             "faqs-section": {
                 "title": "FAQ",
@@ -1792,14 +1937,10 @@
                 }
             },
             "content-section": {
-                "title": "Contenuto",
-                "faq": "FAQ",
-                "contact-support": "Contatto & Supporto",
-                "keyboard-shortcuts": "Scorciatoie da tastiera",
-                "troubleshooting": "Risoluzione problemi",
-                "privacy": "Privacy",
-                "release-notes": "Note di rilascio",
-                "help": "Hai bisogno di aiuto individuale? Crea un ticket – riceverai una risposta via email."
+                "title": "Informazioni su Budgethub",
+                "imprint": "Note legali",
+                "data-privacy": "Protezione dei dati",
+                "term-of-use": "Termini di utilizzo"
             },
             "contact-support-section": {
                 "title": "Contatto & Supporto",
