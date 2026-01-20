@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { requireRootAdmin } from "./admin-auth";
 import { auth } from "@/lib/auth/auth";
-import { mailer } from "@/lib/mailer";
+import { adminMailer } from "@/lib/mailer";
 import { getMailTranslations } from "@/lib/mail-translations";
 import {
   createAdminInvitationDB,
@@ -94,8 +94,8 @@ export async function createAdminInvitation(params: CreateInvitationParams) {
     }
 
     // Send invitation email
-    await mailer.sendMail({
-      from: `"BudgetHub Admin" <${process.env.MAIL_USER}>`,
+    await adminMailer.sendMail({
+      from: `"BudgetHub Admin" <${process.env.MAIL_ADMIN_USER || process.env.MAIL_USER}>`,
       to: email,
       subject: t("emails.admin-invitation.subject") || "You've been invited to BudgetHub",
       html: `
