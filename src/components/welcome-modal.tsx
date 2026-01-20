@@ -64,7 +64,7 @@ export function WelcomeModal() {
           </p>
         </div>
         <div className="flex gap-3 mt-6 w-full">
-          <Button onClick={handleOpenGuide} className="flex-1 h-11">
+          <Button onClick={handleOpenGuide} className="btn-gradient dark:text-white flex-1 h-11">
             {t("open-guide")}
           </Button>
           <Button variant="secondary" onClick={handleDismiss} className="flex-1 h-11">
