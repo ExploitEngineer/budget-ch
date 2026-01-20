@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ErrorState } from "@/components/ui/error-state";
 import { transactionKeys } from "@/lib/query-keys";
 import { getRecurringTransactionTemplates } from "@/lib/services/transaction";
@@ -11,23 +13,29 @@ import RecurringTemplatesTable from "./recurring-templates-table";
 import type { RecurringTemplateWithDetails } from "@/lib/types/domain-types";
 import { Info } from "lucide-react";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export default function RecurringTemplatesSection() {
   const t = useTranslations("main-dashboard.transactions-page.recurring-templates");
   const searchParams = useSearchParams();
   const hubId = searchParams.get("hub");
   const queryClient = useQueryClient();
+  const [showArchived, setShowArchived] = useState(false);
 
   const {
     data: templates,
     isLoading,
     error,
   } = useQuery<RecurringTemplateWithDetails[]>({
-    queryKey: transactionKeys.recurringTemplates(hubId),
+    queryKey: transactionKeys.recurringTemplates(hubId, showArchived),
     queryFn: async () => {
       if (!hubId) {
         throw new Error("Hub ID is required");
       }
-      const res = await getRecurringTransactionTemplates(hubId, "all");
+      const res = await getRecurringTransactionTemplates(hubId, {
+        statusFilter: 'all',
+        includeArchived: showArchived,
+      });
       if (!res.success) {
         throw new Error(res.message || "Failed to fetch recurring templates");
       }
@@ -37,8 +45,9 @@ export default function RecurringTemplatesSection() {
   });
 
   const handleTemplateUpdated = () => {
+    // Invalidate all recurring templates queries for this hub (matches both archived and non-archived)
     queryClient.invalidateQueries({
-      queryKey: transactionKeys.recurringTemplates(hubId),
+      queryKey: transactionKeys.recurringTemplatesBase(hubId),
     });
   };
 
@@ -51,17 +60,32 @@ export default function RecurringTemplatesSection() {
           <span>{t("info")}</span>
         </div>
 
+        {/* Show archived toggle */}
+        <div className="mb-4 flex items-center gap-2">
+          <Checkbox
+            id="show-archived"
+            checked={showArchived}
+            onCheckedChange={(checked) => setShowArchived(checked === true)}
+          />
+          <label
+            htmlFor="show-archived"
+            className="text-sm font-medium leading-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            {t("show-archived")}
+          </label>
+        </div>
+
         {error ? (
           <ErrorState
             onRetry={() =>
               queryClient.invalidateQueries({
-                queryKey: transactionKeys.recurringTemplates(hubId),
+                queryKey: transactionKeys.recurringTemplatesBase(hubId),
               })
             }
           />
         ) : isLoading ? (
-          <div className="py-8 text-center text-muted-foreground">
-            {t("loading")}
+          <div className="py-8 flex justify-center">
+            <Spinner />
           </div>
         ) : !templates || templates.length === 0 ? (
           <div className="py-8 text-center text-muted-foreground">

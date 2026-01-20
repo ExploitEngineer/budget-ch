@@ -16,7 +16,7 @@ import {
   notifications,
   budgetInstances,
 } from "./schema";
-import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, between } from "drizzle-orm";
+import { eq, ne, desc, gte, lte, sql, inArray, and, or, isNull, isNotNull, between } from "drizzle-orm";
 import type {
   QuickTask,
   UserType,
@@ -1089,16 +1089,32 @@ export async function updateRecurringTransactionTemplateDB({
 // GET Recurring Transaction Templates by Hub
 export async function getRecurringTransactionTemplatesDB(
   hubId: string,
-  statusFilter: 'active' | 'inactive' | 'all' = 'active'
+  options: {
+    statusFilter?: 'active' | 'inactive' | 'all';
+    includeArchived?: boolean;
+  } = {}
 ) {
+  const { statusFilter = 'active', includeArchived = false } = options;
+
   try {
-    // Build where conditions based on status filter
-    const whereConditions = statusFilter === 'all'
-      ? eq(recurringTransactionTemplates.hubId, hubId)
-      : and(
-          eq(recurringTransactionTemplates.hubId, hubId),
-          eq(recurringTransactionTemplates.status, statusFilter),
-        );
+    // Build where conditions based on status filter and archive status
+    const conditions = [eq(recurringTransactionTemplates.hubId, hubId)];
+
+    // Add status filter condition (only when not showing archived)
+    if (!includeArchived && statusFilter !== 'all') {
+      conditions.push(eq(recurringTransactionTemplates.status, statusFilter));
+    }
+
+    // Filter by archive status:
+    // - When includeArchived is false: show only non-archived (archivedAt IS NULL)
+    // - When includeArchived is true: show ONLY archived (archivedAt IS NOT NULL)
+    if (includeArchived) {
+      conditions.push(isNotNull(recurringTransactionTemplates.archivedAt));
+    } else {
+      conditions.push(isNull(recurringTransactionTemplates.archivedAt));
+    }
+
+    const whereConditions = conditions.length === 1 ? conditions[0] : and(...conditions);
 
     const templates = await db
       .select({
@@ -1119,6 +1135,7 @@ export async function getRecurringTransactionTemplatesDB(
         lastGeneratedDate: recurringTransactionTemplates.lastGeneratedDate,
         createdAt: recurringTransactionTemplates.createdAt,
         updatedAt: recurringTransactionTemplates.updatedAt,
+        archivedAt: recurringTransactionTemplates.archivedAt,
         // Related data
         accountName: financialAccounts.name,
         accountType: financialAccounts.type,
@@ -1163,6 +1180,58 @@ export async function getRecurringTransactionTemplatesDB(
   } catch (err: any) {
     console.error("Error fetching recurring transaction templates:", err);
     throw err;
+  }
+}
+
+// ARCHIVE/UNARCHIVE Recurring Transaction Template
+export async function archiveRecurringTransactionTemplateDB({
+  templateId,
+  hubId,
+  archive,
+}: {
+  templateId: string;
+  hubId: string;
+  archive: boolean;
+}): Promise<{ success: boolean; message?: string; data?: any }> {
+  try {
+    const updateData = archive
+      ? {
+          archivedAt: new Date(),
+          status: 'inactive' as const,
+        }
+      : {
+          archivedAt: null,
+          // Keep status as inactive when unarchiving - user can manually activate
+        };
+
+    const [updated] = await db
+      .update(recurringTransactionTemplates)
+      .set(updateData)
+      .where(
+        and(
+          eq(recurringTransactionTemplates.id, templateId),
+          eq(recurringTransactionTemplates.hubId, hubId),
+        ),
+      )
+      .returning();
+
+    if (!updated) {
+      return {
+        success: false,
+        message: "Recurring transaction template not found",
+      };
+    }
+
+    return {
+      success: true,
+      data: updated,
+    };
+  } catch (err: any) {
+    console.error("Error archiving recurring transaction template:", err);
+    return {
+      success: false,
+      message: err.message || "Failed to archive recurring transaction template",
+    };
   }
 }
 

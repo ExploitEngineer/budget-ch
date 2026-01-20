@@ -23,6 +23,8 @@ import { useSearchParams } from "next/navigation";
 import type { BudgetWithCategory } from "@/lib/types/domain-types";
 import { useSessionReady } from "@/hooks/use-session-ready";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function WarningSection() {
   const t = useTranslations("main-dashboard.dashboard-page");
   const searchParams = useSearchParams();
@@ -101,9 +103,9 @@ export function WarningSection() {
           {upcomingError ? (
             <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: transactionKeys.upcomingRecurring(hubId) })} />
           ) : upcomingLoading || !upcomingTransactions ? (
-            <p className="text-muted-foreground px-6 text-sm">
-              {t("upcoming-cards.loading")}
-            </p>
+            <div className="flex justify-center py-8 w-full">
+              <Spinner />
+            </div>
           ) : (
             <div className="min-w-full">
               <Table className="min-w-[600px]">
@@ -152,7 +154,9 @@ export function WarningSection() {
         <Separator className="dark:bg-border-blue" />
         <CardContent className="space-y-3 pt-6">
           {budgetsLoading ? (
-            <p className="text-muted-foreground text-sm">{t("upcoming-cards.loading")}</p>
+            <div className="flex justify-center py-4 w-full">
+              <Spinner />
+            </div>
           ) : budgetsError ? (
             <ErrorState onRetry={() => queryClient.invalidateQueries({ queryKey: budgetKeys.list(hubId) })} />
           ) : budgetWarnings.length > 0 ? (

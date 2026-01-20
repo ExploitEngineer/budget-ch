@@ -743,9 +743,30 @@
                     "frequency-days": "{days} jours",
                     "status": {
                         "active": "Actif",
-                        "inactive": "Inactif"
+                        "inactive": "Inactif",
+                        "archived": "Archivé"
                     },
                     "next-occurrence-na": "N/D"
+                },
+                "show-archived": "Afficher les archivés",
+                "archive": {
+                    "button": "Archiver",
+                    "success": "Modèle archivé avec succès !",
+                    "dialog": {
+                        "title": "Archiver le modèle récurrent",
+                        "description": "Êtes-vous sûr ? Le modèle sera défini comme inactif et ne générera plus de transactions. Vous pourrez le restaurer ultérieurement.",
+                        "cancel": "Annuler",
+                        "confirm": "Archiver"
+                    }
+                },
+                "unarchive": {
+                    "button": "Restaurer",
+                    "success": "Modèle restauré avec succès !",
+                    "dialog": {
+                        "title": "Restaurer le modèle récurrent",
+                        "description": "Le modèle restera inactif jusqu'à ce que vous l'activiez manuellement.",
+                        "confirm": "Restaurer"
+                    }
                 },
                 "edit-dialog": {
                     "title": "Modifier la transaction récurrente",

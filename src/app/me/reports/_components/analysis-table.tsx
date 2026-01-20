@@ -20,6 +20,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getMonthlyReports, getExpenseCategoriesProgress, getReportSummary, type MonthlyReport, type ExpenseCategoryProgress, type ReportSummary } from "@/lib/api";
 import { reportKeys } from "@/lib/query-keys";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function AnalysisTable({
   initialFrom,
   initialTo,
@@ -202,7 +204,9 @@ export function AnalysisTable({
                     : "Failed to load expense categories progress"}
                 </p>
               ) : expenseCategoriesProgressLoading ? (
-                <p className="text-muted-foreground text-sm">{t("loading")}</p>
+                <div className="flex justify-center py-4">
+                  <Spinner />
+                </div>
               ) : expenseCategoriesProgress &&
                 expenseCategoriesProgress.length > 0 ? (
                 <div className="flex flex-col gap-3">
@@ -257,9 +261,9 @@ export function AnalysisTable({
                 ) : monthlyReports === null || monthlyReports === undefined || reportsLoading ? (
                   <TableRow>
                     <TableCell colSpan={4}>
-                      <p className="text-muted-foreground px-6 text-sm">
-                        {t("loading")}
-                      </p>
+                      <div className="flex justify-center py-4">
+                        <Spinner />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : monthlyReports.length === 0 ? (

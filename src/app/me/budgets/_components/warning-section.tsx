@@ -11,6 +11,8 @@ import { getBudgets } from "@/lib/services/budget";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function WarningSection() {
   const t = useTranslations("main-dashboard.budgets-page.warning-section");
   const commonT = useTranslations("common");
@@ -53,9 +55,9 @@ export function WarningSection() {
         <Separator className="dark:bg-border-blue" />
         <CardContent className="flex flex-wrap items-center gap-2">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground italic">
-              {t("loading")}
-            </p>
+            <div className="flex justify-center py-2 w-full">
+              <Spinner />
+            </div>
           ) : warnings && warnings.length > 0 ? (
             warnings.map((w) => {
               const totalSpent = Number(w.calculatedSpentAmount ?? 0) + Number(w.spentAmount ?? 0);

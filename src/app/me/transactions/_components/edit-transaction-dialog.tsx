@@ -509,7 +509,10 @@ export default function EditTransactionDialog({
                             <SelectContent>
                               {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading accounts...
+                                  <div className="flex items-center gap-2">
+                                    <Spinner className="h-4 w-4" />
+                                    <span>{t("labels.loading-accounts")}</span>
+                                  </div>
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts.map((account) => (
@@ -638,7 +641,10 @@ export default function EditTransactionDialog({
                             <SelectContent>
                               {accountsLoading ? (
                                 <SelectItem value="loading" disabled>
-                                  Loading accounts...
+                                  <div className="flex items-center gap-2">
+                                    <Spinner className="h-4 w-4" />
+                                    <span>{t("labels.loading-accounts")}</span>
+                                  </div>
                                 </SelectItem>
                               ) : accounts && accounts.length > 0 ? (
                                 accounts

@@ -743,9 +743,30 @@
                     "frequency-days": "{days} Tage",
                     "status": {
                         "active": "Aktiv",
-                        "inactive": "Inaktiv"
+                        "inactive": "Inaktiv",
+                        "archived": "Archiviert"
                     },
                     "next-occurrence-na": "N/V"
+                },
+                "show-archived": "Archivierte anzeigen",
+                "archive": {
+                    "button": "Archivieren",
+                    "success": "Vorlage erfolgreich archiviert!",
+                    "dialog": {
+                        "title": "Wiederkehrende Vorlage archivieren",
+                        "description": "Sind Sie sicher? Die Vorlage wird auf inaktiv gesetzt und generiert keine Transaktionen mehr. Sie können sie später wiederherstellen.",
+                        "cancel": "Abbrechen",
+                        "confirm": "Archivieren"
+                    }
+                },
+                "unarchive": {
+                    "button": "Wiederherstellen",
+                    "success": "Vorlage erfolgreich wiederhergestellt!",
+                    "dialog": {
+                        "title": "Wiederkehrende Vorlage wiederherstellen",
+                        "description": "Die Vorlage bleibt inaktiv, bis Sie sie manuell aktivieren.",
+                        "confirm": "Wiederherstellen"
+                    }
                 },
                 "edit-dialog": {
                     "title": "Wiederkehrende Transaktion bearbeiten",

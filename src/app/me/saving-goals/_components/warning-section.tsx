@@ -11,6 +11,8 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { AlertTriangle } from "lucide-react";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function WarningSection() {
   const t = useTranslations("main-dashboard.saving-goals-page.warning-section");
   const searchParams = useSearchParams();
@@ -57,7 +59,9 @@ export function WarningSection() {
         <Separator className="dark:bg-border-blue" />
         <CardContent className="pt-4">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">{t("loading")}</p>
+            <div className="flex justify-center py-4">
+              <Spinner />
+            </div>
           ) : !hasWarnings ? (
             <Badge
               variant="outline"

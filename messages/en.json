@@ -743,9 +743,30 @@
                     "frequency-days": "{days} days",
                     "status": {
                         "active": "Active",
-                        "inactive": "Inactive"
+                        "inactive": "Inactive",
+                        "archived": "Archived"
                     },
                     "next-occurrence-na": "N/A"
+                },
+                "show-archived": "Show archived",
+                "archive": {
+                    "button": "Archive",
+                    "success": "Template archived successfully!",
+                    "dialog": {
+                        "title": "Archive Recurring Template",
+                        "description": "Are you sure? The template will be set to inactive and won't generate transactions. You can restore it later.",
+                        "cancel": "Cancel",
+                        "confirm": "Archive"
+                    }
+                },
+                "unarchive": {
+                    "button": "Restore",
+                    "success": "Template restored successfully!",
+                    "dialog": {
+                        "title": "Restore Recurring Template",
+                        "description": "The template will remain inactive until you manually activate it.",
+                        "confirm": "Restore"
+                    }
                 },
                 "edit-dialog": {
                     "title": "Edit Recurring Transaction",

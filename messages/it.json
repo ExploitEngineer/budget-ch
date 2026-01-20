@@ -743,9 +743,30 @@
                     "frequency-days": "{days} giorni",
                     "status": {
                         "active": "Attivo",
-                        "inactive": "Inattivo"
+                        "inactive": "Inattivo",
+                        "archived": "Archiviato"
                     },
                     "next-occurrence-na": "N/D"
+                },
+                "show-archived": "Mostra archiviati",
+                "archive": {
+                    "button": "Archivia",
+                    "success": "Modello archiviato con successo!",
+                    "dialog": {
+                        "title": "Archivia modello ricorrente",
+                        "description": "Sei sicuro? Il modello verrà impostato come inattivo e non genererà più transazioni. Potrai ripristinarlo successivamente.",
+                        "cancel": "Annulla",
+                        "confirm": "Archivia"
+                    }
+                },
+                "unarchive": {
+                    "button": "Ripristina",
+                    "success": "Modello ripristinato con successo!",
+                    "dialog": {
+                        "title": "Ripristina modello ricorrente",
+                        "description": "Il modello rimarrà inattivo finché non lo attiverai manualmente.",
+                        "confirm": "Ripristina"
+                    }
                 },
                 "edit-dialog": {
                     "title": "Modifica transazione ricorrente",

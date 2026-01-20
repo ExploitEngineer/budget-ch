@@ -20,6 +20,7 @@ import {
   getRecurringTransactionTemplatesDB,
   getRecurringTransactionTemplateByIdDB,
   updateRecurringTransactionTemplateDB,
+  archiveRecurringTransactionTemplateDB,
   getBudgetsDB,
   getActiveRecurringTemplatesDB,
   updateTemplateLastGeneratedDB,
@@ -549,7 +550,10 @@ export async function getUpcomingRecurringTransactions(
       return { success: false, message: "Missing hubId" };
     }
 
-    const templates = await getRecurringTransactionTemplatesDB(hubId);
+    const templates = await getRecurringTransactionTemplatesDB(hubId, {
+      statusFilter: 'active',
+      includeArchived: false,
+    });
 
     const today = startOfDay(new Date());
     const nextDays = addDays(today, days);
@@ -646,12 +650,17 @@ export async function getUpcomingRecurringTransactions(
 // GET All Recurring Transaction Templates (for templates management)
 export async function getRecurringTransactionTemplates(
   hubIdArg?: string,
-  statusFilter: 'active' | 'inactive' | 'all' = 'all'
+  options: {
+    statusFilter?: 'active' | 'inactive' | 'all';
+    includeArchived?: boolean;
+  } = {}
 ): Promise<{
   success: boolean;
   data?: any[];
   message?: string;
 }> {
+  const { statusFilter = 'all', includeArchived = false } = options;
+
   try {
     const hdrs = await headers();
     const { hubId: sessionHubId } = await getContext(hdrs, false);
@@ -661,7 +670,10 @@ export async function getRecurringTransactionTemplates(
       return { success: false, message: "Missing hubId" };
     }
 
-    const templates = await getRecurringTransactionTemplatesDB(hubId, statusFilter);
+    const templates = await getRecurringTransactionTemplatesDB(hubId, {
+      statusFilter,
+      includeArchived,
+    });
 
     return {
       success: true,
@@ -760,6 +772,53 @@ export async function updateRecurringTransactionTemplate(
     return {
       success: false,
       message: err.message || "Unexpected error while updating recurring transaction template.",
+    };
+  }
+}
+
+// ARCHIVE/UNARCHIVE Recurring Transaction Template
+export async function archiveRecurringTransactionTemplate(
+  templateId: string,
+  archive: boolean,
+): Promise<{
+  success: boolean;
+  message?: string;
+  data?: any;
+}> {
+  try {
+    const hdrs = await headers();
+    const { hubId, userRole } = await getContext(hdrs, false);
+
+    requireAdminRole(userRole);
+
+    const res = await archiveRecurringTransactionTemplateDB({
+      templateId,
+      hubId,
+      archive,
+    });
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Failed to archive recurring transaction template.",
+      };
+    }
+
+    revalidatePath("/me/dashboard");
+    revalidatePath("/me/transactions");
+
+    return {
+      success: true,
+      message: archive
+        ? "Recurring transaction template archived successfully!"
+        : "Recurring transaction template restored successfully!",
+      data: res.data,
+    };
+  } catch (err: any) {
+    console.error("Error in archiveRecurringTransactionTemplate:", err);
+    return {
+      success: false,
+      message: err.message || "Unexpected error while archiving recurring transaction template.",
     };
   }
 }

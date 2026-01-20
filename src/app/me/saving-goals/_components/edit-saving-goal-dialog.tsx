@@ -311,7 +311,10 @@ export default function EditSavingGoalDialog({
                         <SelectContent>
                           {accountsLoading ? (
                             <SelectItem value="loading" disabled>
-                              {t("loading-accounts")}
+                              <div className="flex items-center gap-2">
+                                <Spinner className="h-4 w-4" />
+                                <span>{t("loading-accounts")}</span>
+                              </div>
                             </SelectItem>
                           ) : accounts && accounts.length > 0 ? (
                             accounts.map((account) => (

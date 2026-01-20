@@ -8,8 +8,10 @@ function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 60 * 1000, // 1 minute
-        retry: 1,
+        staleTime: 5 * 60 * 1000, // 5 minutes - reduce refetch frequency
+        gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache longer
+        retry: 2, // Retry twice for transient failures
+        retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff: 1s, 2s, 4s... max 10s
         // For server components, we don't want to refetch on window focus or mount or reconnect
         refetchOnWindowFocus: false,
         refetchOnMount: false,

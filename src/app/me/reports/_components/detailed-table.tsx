@@ -18,6 +18,8 @@ import { getDetailedCategories, getMonthlyReports, type CategoryDetail, type Mon
 import { reportKeys } from "@/lib/query-keys";
 import { useSearchParams } from "next/navigation";
 
+import { Spinner } from "@/components/ui/spinner";
+
 export function DetailedTable({
   initialFrom,
   initialTo,
@@ -92,7 +94,9 @@ export function DetailedTable({
         <Separator className="dark:bg-border-blue" />
         <CardContent>
           {loading ? (
-            <p className="text-muted-foreground px-6 text-sm">{t("loading")}</p>
+            <div className="flex justify-center py-8">
+              <Spinner />
+            </div>
           ) : (
             <Table>
               <TableHeader>
