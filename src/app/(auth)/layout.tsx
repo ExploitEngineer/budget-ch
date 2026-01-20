@@ -1,15 +1,24 @@
-"use client";
-
 import { LangSwitcher } from "@/components/lang-switcher";
 import { ModeToggle } from "@/components/theme-toggle";
-import { useTheme } from "next-themes";
 import Image from "next/image";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-export default function AuthLayout({
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Redirect logged-in users to dashboard
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (session) {
+    redirect("/me/dashboard");
+  }
+
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F6F8FF] px-4 dark:[background:var(--fancy-gradient)]">
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">
