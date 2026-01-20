@@ -1,4 +1,17 @@
 {
+    "auth-error": {
+        "banned": {
+            "title": "Konto gesperrt",
+            "description": "Ihr Konto wurde gesperrt und Sie können sich derzeit nicht anmelden.",
+            "contact": "Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an unser Support-Team."
+        },
+        "generic": {
+            "title": "Authentifizierungsfehler",
+            "description": "Bei der Verarbeitung Ihrer Anfrage ist ein Problem aufgetreten. Bitte versuchen Sie es erneut."
+        },
+        "error-code": "Fehlercode",
+        "back-home": "Zur Startseite"
+    },
     "two-factor": {
         "title": "Zwei-Faktor-Authentifizierung",
         "description": "Bitte geben Sie Ihren Bestätigungscode ein, um fortzufahren",
@@ -264,6 +277,7 @@
                 "imp-exp": "Import / Export",
                 "settings": "Einstellungen",
                 "help": "Hilfe",
+                "admin": "Admin-Dashboard",
                 "logout": "Abmelden"
             },
             "header": {
@@ -2063,6 +2077,251 @@
                 "destination-account-not-found": "Zielkonto nicht gefunden oder Sie haben keinen Zugriff darauf",
                 "same-account-transfer": "Überweisung auf dasselbe Konto nicht möglich",
                 "unknown-error": "Ein unerwarteter Fehler ist aufgetreten"
+            }
+        }
+    },
+    "admin": {
+        "sidebar": {
+            "subtitle": "Admin-Bereich",
+            "navigation": "ADMIN",
+            "overview": "Übersicht",
+            "users": "Benutzer",
+            "audit": "Audit-Protokoll",
+            "compliance": "Compliance",
+            "back-to-app": "Zurück zur App",
+            "logout": "Abmelden"
+        },
+        "overview": {
+            "title": "Admin-Dashboard",
+            "description": "Verwalten Sie Benutzer, Abonnements und Systemeinstellungen.",
+            "kpi": {
+                "mrr": "Monatlich wiederkehrender Umsatz",
+                "vs-last-month": "vs. Vormonat",
+                "no-comparison-data": "Nicht genügend Daten für Vergleich",
+                "active-subscriptions": "Aktive Abonnements",
+                "total": "Gesamt",
+                "individual": "Einzelperson",
+                "family": "Familie",
+                "active-users": "Aktive Benutzer",
+                "blocked": "Gesperrt"
+            },
+            "system-status": {
+                "title": "Systemstatus",
+                "region": "Region",
+                "encryption": "Verschlüsselung",
+                "logs": "Protokolle",
+                "storage": "Speicher"
+            }
+        },
+        "users": {
+            "title": "Benutzerverwaltung",
+            "description": "Benutzer anzeigen, verwalten und zur Plattform einladen.",
+            "search-placeholder": "Nach E-Mail oder ID suchen...",
+            "search": "Suchen",
+            "invite": "Benutzer einladen",
+            "table": {
+                "showing": "{count} von {total} Benutzern angezeigt",
+                "columns": {
+                    "id": "ID",
+                    "user": "Benutzer",
+                    "status": "Status",
+                    "plan": "Plan",
+                    "registered": "Registriert",
+                    "actions": "Aktionen"
+                },
+                "status": {
+                    "active": "Aktiv",
+                    "locked": "Gesperrt",
+                    "unverified": "Nicht verifiziert"
+                },
+                "plan": {
+                    "free": "Kostenlos"
+                },
+                "no-users": "Keine Benutzer gefunden",
+                "previous": "Zurück",
+                "next": "Weiter",
+                "page": "Seite {page} von {totalPages}"
+            },
+            "actions": {
+                "menu": "Menü öffnen",
+                "export": "Daten exportieren (DSGVO)",
+                "exporting": "Exportieren...",
+                "export-success": "Benutzerdaten erfolgreich exportiert",
+                "export-error": "Fehler beim Exportieren der Benutzerdaten",
+                "lock": "Benutzer sperren",
+                "unlock": "Benutzer entsperren",
+                "lock-success": "Benutzer erfolgreich gesperrt",
+                "unlock-success": "Benutzer erfolgreich entsperrt",
+                "lock-error": "Fehler beim Aktualisieren des Benutzerstatus",
+                "delete": "Benutzer löschen"
+            },
+            "invite-dialog": {
+                "title": "Benutzer einladen",
+                "description": "Senden Sie eine Einladung zur Plattform. Der Benutzer erhält eine E-Mail mit Anweisungen.",
+                "email": "E-Mail-Adresse",
+                "email-placeholder": "benutzer@beispiel.com",
+                "role": "Rolle",
+                "role-user": "Benutzer",
+                "role-admin": "Administrator",
+                "include-subscription": "Abonnement gewähren",
+                "subscription-plan": "Abonnement-Plan",
+                "plan-individual": "Einzelperson",
+                "plan-family": "Familie",
+                "subscription-months": "Dauer (Monate)",
+                "months-hint": "1-24 Monate",
+                "cancel": "Abbrechen",
+                "send": "Einladung senden",
+                "sending": "Wird gesendet...",
+                "success": "Einladung erfolgreich gesendet",
+                "error": "Fehler beim Senden der Einladung"
+            },
+            "delete-dialog": {
+                "title": "Benutzer löschen",
+                "description": "Wählen Sie, wie mit den Daten dieses Benutzers verfahren werden soll: {email}",
+                "anonymize": "Benutzer anonymisieren",
+                "recommended": "Empfohlen",
+                "anonymize-description": "Persönliche Daten durch anonymisierte Werte ersetzen. Benutzer kann sich nicht anmelden, aber Daten bleiben für Berichte erhalten.",
+                "permanently-delete": "Dauerhaft löschen",
+                "delete-description": "Alle Benutzerdaten vollständig entfernen. Diese Aktion kann nicht rückgängig gemacht werden.",
+                "delete-warning": "Dies löscht dauerhaft alle Benutzerdaten einschließlich Transaktionen, Budgets und Einstellungen. Diese Aktion kann nicht rückgängig gemacht werden.",
+                "cancel": "Abbrechen",
+                "processing": "Wird verarbeitet...",
+                "anonymize-button": "Benutzer anonymisieren",
+                "delete-button": "Dauerhaft löschen",
+                "anonymize-success": "Benutzer erfolgreich anonymisiert",
+                "delete-success": "Benutzer erfolgreich gelöscht",
+                "error": "Fehler bei der Verarbeitung"
+            }
+        },
+        "audit": {
+            "title": "Audit-Protokolle",
+            "description": "Überprüfen Sie alle administrativen Aktionen auf der Plattform.",
+            "search-placeholder": "Nach Benutzer-ID oder E-Mail suchen...",
+            "search": "Suchen",
+            "filter-action": "Nach Aktion filtern",
+            "all-actions": "Alle Aktionen",
+            "export-csv": "CSV exportieren",
+            "exporting": "Exportieren...",
+            "export-success": "Audit-Protokolle erfolgreich exportiert",
+            "export-error": "Fehler beim Exportieren der Audit-Protokolle",
+            "showing": "{count} von {total} Protokollen angezeigt",
+            "columns": {
+                "time": "Zeit",
+                "action": "Aktion",
+                "affected": "Betroffener Benutzer",
+                "trigger": "Ausgelöst von",
+                "ref": "Referenz"
+            },
+            "actions": {
+                "user_locked": "Benutzer gesperrt",
+                "user_unlocked": "Benutzer entsperrt",
+                "user_deleted": "Benutzer gelöscht",
+                "user_anonymized": "Benutzer anonymisiert",
+                "user_exported": "Benutzer exportiert",
+                "invitation_created": "Einladung erstellt",
+                "invitation_accepted": "Einladung angenommen",
+                "subscription_granted": "Abonnement gewährt"
+            },
+            "no-logs": "Keine Audit-Protokolle gefunden",
+            "previous": "Zurück",
+            "next": "Weiter",
+            "page": "Seite {page} von {totalPages}"
+        },
+        "compliance": {
+            "title": "Compliance & Datenschutz",
+            "description": "Datenschutzmaßnahmen und Compliance-Informationen überprüfen.",
+            "items": {
+                "data-principle": {
+                    "title": "Datengrundsatz",
+                    "value": "Admin-Zugriff ohne Inhaltssichtbarkeit. Personenbezogene Daten sind nur für autorisierte Administratoren zugänglich."
+                },
+                "cloud-storage": {
+                    "title": "Cloud-Speicher",
+                    "value": "Alle Daten werden nur in EU-Rechenzentren (Frankfurt) gespeichert. Daten werden im Ruhezustand mit KMS verschlüsselt."
+                },
+                "tracking": {
+                    "title": "Tracking",
+                    "value": "Kein Profiling, keine Werbung. Wir verkaufen oder teilen keine Benutzerdaten mit Dritten."
+                },
+                "data-subject-rights": {
+                    "title": "Betroffenenrechte",
+                    "value": "Benutzer können ihre Daten jederzeit über Self-Service oder Admin-Anfrage exportieren, sperren, löschen oder anonymisieren."
+                },
+                "admin-access": {
+                    "title": "Admin-Zugriff",
+                    "value": "Prinzip der geringsten Privilegien. Support-Mitarbeiter haben eingeschränkten Zugriff. Alle Admin-Aktionen werden protokolliert."
+                },
+                "security": {
+                    "title": "Sicherheit",
+                    "value": "Admin-Konten erfordern 2FA. Sitzungs-Timeout bei Inaktivität. IP-Protokollierung für Sicherheitszwecke."
+                }
+            },
+            "privacy-policy": {
+                "title": "Datenschutzrichtlinie",
+                "description": "Unsere vollständige Datenschutzrichtlinie ist online verfügbar. Sie umfasst Datenerfassung, Verarbeitung und Benutzerrechte."
+            },
+            "technical-measures": {
+                "title": "Technische Maßnahmen",
+                "encryption-at-rest": "Verschlüsselung im Ruhezustand (AES-256)",
+                "encryption-in-transit": "Verschlüsselung bei Übertragung (TLS 1.3)",
+                "access-logging": "Zugriffsprotokollierung aktiviert",
+                "data-backup": "Regelmäßige Datensicherungen",
+                "session-management": "Sichere Sitzungsverwaltung",
+                "ip-anonymization": "IP-Adress-Anonymisierung"
+            }
+        },
+        "accept-invitation": {
+            "loading": "Einladungsdetails werden geladen...",
+            "pending": {
+                "title": "Admin-Einladung",
+                "description": "Sie wurden eingeladen, BudgetHub beizutreten.",
+                "email": "Eingeladene E-Mail",
+                "role": "Rolle",
+                "role-admin": "Administrator",
+                "role-user": "Benutzer",
+                "subscription-included": "Abonnement inklusive!",
+                "plan-family": "Familienplan",
+                "plan-individual": "Einzelplan",
+                "month": "Monat",
+                "months": "Monate",
+                "accept-button": "Einladung annehmen",
+                "accepting": "Wird angenommen..."
+            },
+            "success": {
+                "title": "Einladung angenommen!",
+                "toast": "Einladung erfolgreich angenommen!",
+                "redirecting": "Weiterleitung zu Ihrem Dashboard...",
+                "button": "Zum Dashboard"
+            },
+            "not-authenticated": {
+                "title": "Anmeldung erforderlich",
+                "description": "Bitte melden Sie sich an, um diese Einladung anzunehmen.",
+                "button": "Zur Anmeldung"
+            },
+            "no-account": {
+                "title": "Konto erforderlich",
+                "description": "Sie müssen zuerst ein Konto erstellen, um diese Einladung anzunehmen.",
+                "button": "Konto erstellen"
+            },
+            "invalid": {
+                "title": "Ungültige Einladung",
+                "description": "Dieser Einladungslink ist ungültig oder existiert nicht."
+            },
+            "expired": {
+                "title": "Einladung abgelaufen",
+                "description": "Diese Einladung ist abgelaufen. Bitte fordern Sie eine neue Einladung vom Administrator an."
+            },
+            "already-accepted": {
+                "title": "Bereits angenommen",
+                "description": "Diese Einladung wurde bereits angenommen. Sie können auf Ihr Dashboard zugreifen."
+            },
+            "email-mismatch": {
+                "title": "Falsches Konto",
+                "description": "Diese Einladung wurde an eine andere E-Mail-Adresse gesendet. Bitte melden Sie sich mit dem richtigen Konto an."
+            },
+            "error": {
+                "title": "Fehler",
+                "description": "Bei der Verarbeitung Ihrer Einladung ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
             }
         }
     }

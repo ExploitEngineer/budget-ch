@@ -15,8 +15,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { InferSelectModel } from "drizzle-orm";
 
-
-export const accessRole = pgEnum("access_role", ["admin", "member"]);
+export const accessRole = pgEnum("access_role", ["admin", "member"]); // For hub members
+export const userRoles = ["user", "admin"] as const;
 
 export const transactionType = pgEnum("transaction_type", [
   "income",
@@ -90,6 +90,7 @@ export const sessions = pgTable("sessions", {
   userId: text("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  impersonatedBy: text("impersonated_by"),
 });
 
 export const accounts = pgTable("accounts", {
@@ -135,6 +136,10 @@ export const users = pgTable("users", {
   language: text("language").default("en").notNull(),
   notificationsEnabled: boolean("notifications_enabled").default(true).notNull(),
   reportFrequency: text("report_frequency").default("off").notNull(),
+  role: text("role", { enum: userRoles }).default("user").notNull(),
+  banned: boolean("banned").default(false),
+  banReason: text("ban_reason"),
+  banExpires: timestamp("ban_expires"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -523,3 +528,58 @@ export type AccountType = "checking" | "savings" | "credit-card" | "cash";
 export type BudgetMarkerColor = "standard" | "green" | "orange" | "red";
 export type NotificationType = "info" | "success" | "error" | "warning";
 export type NotificationChannel = "email" | "web" | "both";
+
+/* ADMIN DASHBOARD SCHEMAS */
+
+export const adminActionTypeEnum = pgEnum("admin_action_type", [
+  "user_locked",
+  "user_unlocked",
+  "user_deleted",
+  "user_anonymized",
+  "user_exported",
+  "invitation_created",
+  "invitation_accepted",
+  "subscription_granted",
+]);
+
+export type AdminActionType = (typeof adminActionTypeEnum.enumValues)[number];
+
+export const adminInvitations = pgTable("admin_invitations", {
+  id: uuid("id").notNull().primaryKey().defaultRandom(),
+  email: text("email").notNull(),
+  role: text("role", { enum: userRoles }).notNull().default("user"),
+  subscriptionPlan: text("subscription_plan"), // "individual" | "family" | null
+  subscriptionMonths: integer("subscription_months"), // 1-24 months
+  token: text("token").notNull().unique(),
+  accepted: boolean("accepted").default(false).notNull(),
+  expiresAt: timestamp("expires_at").notNull(),
+  createdBy: text("created_by")
+    .notNull()
+    .references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type AdminInvitation = InferSelectModel<typeof adminInvitations>;
+
+export const adminAuditLogs = pgTable(
+  "admin_audit_logs",
+  {
+    id: uuid("id").notNull().primaryKey().defaultRandom(),
+    action: adminActionTypeEnum("action").notNull(),
+    affectedUserId: text("affected_user_id"),
+    adminId: text("admin_id")
+      .notNull()
+      .references(() => users.id),
+    reference: text("reference"), // e.g., "REQ-8F3A"
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => [
+    index("adminAuditLogs_adminId_idx").on(table.adminId),
+    index("adminAuditLogs_affectedUserId_idx").on(table.affectedUserId),
+    index("adminAuditLogs_action_idx").on(table.action),
+    index("adminAuditLogs_createdAt_idx").on(table.createdAt),
+  ],
+);
+
+export type AdminAuditLog = InferSelectModel<typeof adminAuditLogs>;

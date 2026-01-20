@@ -7,6 +7,7 @@ import { createAuthMiddleware, APIError } from "better-auth/api";
 import { ensureUserOnboarding } from "@/lib/services/user";
 import { mailer } from "@/lib/mailer";
 import { getMailTranslations } from "@/lib/mail-translations";
+import { admin } from "better-auth/plugins";
 
 
 
@@ -261,6 +262,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    admin(),
     twoFactor({
       issuer: "Budget-ch",
       /*
