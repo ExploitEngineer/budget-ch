@@ -19,7 +19,7 @@ import { useTheme } from "next-themes";
 export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sidebar> & { user: { email: string; name: string } }) {
   const [mounted, setMounted] = useState<boolean>(false);
   const { } = useTheme();
-  const { open } = useSidebar();
+  const { open, isMobile } = useSidebar();
 
   useEffect(() => {
     setMounted(true);
@@ -29,30 +29,32 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
     return null;
   }
 
+  const showFullLogo = isMobile || open;
+
   return (
     <Sidebar
       collapsible="icon"
       {...props}
       className={cn(
         "dark:bg-blue-background bg-gray-100/55",
-        open ? "p-2" : "p-0",
+        showFullLogo ? "p-2" : "p-0",
       )}
     >
       <SidebarHeader
         className={cn(
           "dark:bg-blue-background flex items-center justify-start transition-all duration-300",
-          open ? "pb-3" : "pb-0",
+          showFullLogo ? "pb-3" : "pb-0",
         )}
       >
         <div className="relative m-0 flex h-auto w-full items-center justify-start p-0 pt-1">
-          {open ? (
+          {showFullLogo ? (
             <>
               <div className="relative me-9 h-[45px] w-full">
                 <Image
                   src="/assets/images/logo.png"
                   alt="company logo"
                   fill
-                  className="m-0 object-cover p-0 dark:hidden pe-0"
+                  className="m-0 object-contain p-0 dark:hidden pe-0"
                   priority
                   sizes="100vw"
                 />
@@ -60,7 +62,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
                   src="/assets/images/dark-logo.png"
                   alt="company logo"
                   fill
-                  className="m-0 object-cover p-0 hidden dark:block pe-10"
+                  className="m-0 object-contain p-0 hidden dark:block pe-10"
                   priority
                   sizes="100vw"
                 />
@@ -72,7 +74,7 @@ export function AppSidebar({ user, ...props }: React.ComponentProps<typeof Sideb
                 src="/assets/images/small-logo.png"
                 alt="company small logo"
                 fill
-                className="m-0 object-cover p-0"
+                className="m-0 object-contain p-0"
                 priority
                 sizes="30px"
               />
