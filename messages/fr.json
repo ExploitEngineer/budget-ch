@@ -256,6 +256,17 @@
             "fallback": "Ou copiez et collez ce lien dans votre navigateur :",
             "expire": "Cette invitation expire dans 7 jours.",
             "ignore": "Si vous n'attendiez pas cette invitation, vous pouvez ignorer cet e-mail en toute sécurité."
+        },
+        "admin-invitation": {
+            "subject": "Vous avez été invité à BudgetHub",
+            "title": "Invitation d'administrateur BudgetHub",
+            "hello": "Bonjour,",
+            "invited": "Un administrateur BudgetHub vous a invité à rejoindre la plateforme{isAdmin, select, true { en tant qu'administrateur} other {}}.",
+            "subscription": "Vous recevrez un abonnement <strong>{plan}</strong> pendant <strong>{months} mois</strong>.",
+            "button": "Accepter l'invitation",
+            "copy-link": "Ou copiez ce lien :",
+            "expires": "Cette invitation expire dans 14 jours.",
+            "ignore": "Si vous n'attendiez pas cette invitation, vous pouvez ignorer cet e-mail en toute sécurité."
         }
     },
     "main-dashboard": {

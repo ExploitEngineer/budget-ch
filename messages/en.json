@@ -258,7 +258,15 @@
             "ignore": "If you didn't expect this invitation, you can safely ignore this email."
         },
         "admin-invitation": {
-            "subject": "You've been invited to BudgetHub"
+            "subject": "You've been invited to BudgetHub",
+            "title": "BudgetHub Admin Invitation",
+            "hello": "Hello,",
+            "invited": "A BudgetHub administrator has invited you to join the platform{isAdmin, select, true { as an administrator} other {}}.",
+            "subscription": "You will receive a <strong>{plan}</strong> subscription for <strong>{months} month{months, plural, one {} other {s}}</strong>.",
+            "button": "Accept Invitation",
+            "copy-link": "Or copy this link:",
+            "expires": "This invitation expires in 14 days.",
+            "ignore": "If you did not expect this invitation, you can safely ignore this email."
         }
     },
     "main-dashboard": {

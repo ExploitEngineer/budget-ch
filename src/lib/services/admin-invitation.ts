@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { requireRootAdmin } from "./admin-auth";
 import { auth } from "@/lib/auth/auth";
-import { adminMailer } from "@/lib/mailer";
+import { adminMailer, mailer } from "@/lib/mailer";
 import { getMailTranslations } from "@/lib/mail-translations";
 import {
   createAdminInvitationDB,
@@ -89,20 +89,23 @@ export async function createAdminInvitation(params: CreateInvitationParams) {
     if (subscriptionPlan && subscriptionMonths) {
       const planName = subscriptionPlan === "individual" ? "Individual" : "Family";
       subscriptionInfo = `<p style="background: #e8f5e9; padding: 12px; border-radius: 5px; margin: 15px 0;">
-        You will receive a <strong>${planName}</strong> subscription for <strong>${subscriptionMonths} month${subscriptionMonths > 1 ? "s" : ""}</strong>.
+        ${t("emails.admin-invitation.subscription", {
+          plan: planName,
+          months: subscriptionMonths,
+        })}
       </p>`;
     }
 
     // Send invitation email
     await adminMailer.sendMail({
-      from: `"BudgetHub Admin" <${process.env.MAIL_ADMIN_USER || process.env.MAIL_USER}>`,
+      from: `"BudgetHub" <${process.env.MAIL_ADMIN_USER || process.env.MAIL_USER!}>`,
       to: email,
-      subject: t("emails.admin-invitation.subject") || "You've been invited to BudgetHub",
+      subject: t("emails.admin-invitation.subject"),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #235FE3;">BudgetHub Admin Invitation</h2>
-          <p>Hello,</p>
-          <p>A BudgetHub administrator has invited you to join the platform${role === "admin" ? " as an administrator" : ""}.</p>
+          <h2 style="color: #235FE3;">${t("emails.admin-invitation.title")}</h2>
+          <p>${t("emails.admin-invitation.hello")}</p>
+          <p>${t("emails.admin-invitation.invited", { isAdmin: role === "admin" })}</p>
           ${subscriptionInfo}
           <p style="margin: 20px 0;">
             <a href="${link}" style="
@@ -113,15 +116,15 @@ export async function createAdminInvitation(params: CreateInvitationParams) {
               text-decoration: none;
               border-radius: 5px;
             ">
-              Accept Invitation
+              ${t("emails.admin-invitation.button")}
             </a>
           </p>
-          <p>Or copy this link: <br/>
+          <p>${t("emails.admin-invitation.copy-link")} <br/>
              <span style="word-break: break-all; color: #666;">${link}</span>
           </p>
-          <p style="color: #999; font-size: 12px;">This invitation expires in 14 days.</p>
+          <p style="color: #999; font-size: 12px;">${t("emails.admin-invitation.expires")}</p>
           <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #999;">If you did not expect this invitation, you can safely ignore this email.</p>
+          <p style="font-size: 12px; color: #999;">${t("emails.admin-invitation.ignore")}</p>
         </div>
       `,
     });
