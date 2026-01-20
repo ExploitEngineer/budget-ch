@@ -5,10 +5,6 @@ import { useTranslations } from "next-intl";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { checkOnboardingStatus, completeOnboarding } from "@/lib/services/user";
@@ -56,23 +52,25 @@ export function WelcomeModal() {
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleDismiss()}>
-      <DialogContent showCloseButton={false}>
-        <DialogHeader>
-          <DialogTitle className="text-xl">
+      <DialogContent showCloseButton={false} className="p-8 sm:max-w-md">
+        <div className="flex flex-col items-center text-center space-y-4">
+          <h2 className="text-2xl font-bold">
             {t("title")} <span aria-hidden="true">👋</span>
-          </DialogTitle>
-          <DialogDescription className="text-base pt-2">
-            {t("description")}
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="pt-2">
-          <Button variant="outline" onClick={handleDismiss}>
-            {t("later")}
-          </Button>
-          <Button onClick={handleOpenGuide}>
+          </h2>
+          <p className="text-muted-foreground leading-relaxed">
+            {t("description-1")}
+            <br />
+            {t("description-2")} <span className="font-semibold text-foreground">{t("help")}</span>.
+          </p>
+        </div>
+        <div className="flex gap-3 mt-6 w-full">
+          <Button onClick={handleOpenGuide} className="flex-1 h-11">
             {t("open-guide")}
           </Button>
-        </DialogFooter>
+          <Button variant="secondary" onClick={handleDismiss} className="flex-1 h-11">
+            {t("later")}
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

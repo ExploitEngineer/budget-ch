@@ -2327,7 +2327,9 @@
     },
     "welcome-modal": {
         "title": "Willkommen bei BudgetHub",
-        "description": "Starten Sie in weniger als 2 Minuten. Erfahren Sie, wie Sie das Dashboard, Budgets und Transaktionen nutzen. Hilfreiche Ressourcen und Support finden Sie jederzeit unter Hilfe.",
+        "description-1": "Starten Sie in weniger als 2 Minuten. Erfahren Sie, wie Sie das Dashboard, Budgets und Transaktionen nutzen.",
+        "description-2": "Hilfreiche Ressourcen und Support finden Sie jederzeit unter",
+        "help": "Hilfe",
         "open-guide": "Anleitung öffnen",
         "later": "Später"
     }

@@ -2307,7 +2307,9 @@
     },
     "welcome-modal": {
         "title": "Welcome to BudgetHub",
-        "description": "Get started in under 2 minutes. Learn how to use the dashboard, budgets, and transactions. You can also find helpful resources and support anytime under Help.",
+        "description-1": "Get started in under 2 minutes. Learn how to use the dashboard, budgets, and transactions.",
+        "description-2": "You can also find helpful resources and support anytime under",
+        "help": "Help",
         "open-guide": "Open guide",
         "later": "Later"
     }

@@ -2327,7 +2327,9 @@
     },
     "welcome-modal": {
         "title": "Benvenuto su BudgetHub",
-        "description": "Inizia in meno di 2 minuti. Scopri come utilizzare la dashboard, i budget e le transazioni. Puoi trovare risorse utili e supporto in qualsiasi momento nella sezione Aiuto.",
+        "description-1": "Inizia in meno di 2 minuti. Scopri come utilizzare la dashboard, i budget e le transazioni.",
+        "description-2": "Puoi trovare risorse utili e supporto in qualsiasi momento nella sezione",
+        "help": "Aiuto",
         "open-guide": "Apri la guida",
         "later": "Più tardi"
     }

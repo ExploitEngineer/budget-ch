@@ -2327,7 +2327,9 @@
     },
     "welcome-modal": {
         "title": "Bienvenue sur BudgetHub",
-        "description": "Démarrez en moins de 2 minutes. Découvrez comment utiliser le tableau de bord, les budgets et les transactions. Vous trouverez des ressources utiles et de l'aide à tout moment dans la section Aide.",
+        "description-1": "Démarrez en moins de 2 minutes. Découvrez comment utiliser le tableau de bord, les budgets et les transactions.",
+        "description-2": "Vous trouverez des ressources utiles et de l'aide à tout moment dans la section",
+        "help": "Aide",
         "open-guide": "Ouvrir le guide",
         "later": "Plus tard"
     }
