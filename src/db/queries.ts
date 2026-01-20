@@ -3558,3 +3558,43 @@ export async function getUserHubsDB(userId: string) {
     return { success: false, message: err.message };
   }
 }
+
+export async function getOnboardingStatusDB(userId: string) {
+  try {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId),
+      columns: {
+        isOnboarded: true,
+      },
+    });
+
+    if (!user) {
+      return { success: false, message: "User not found" };
+    }
+
+    return {
+      success: true,
+      data: { isOnboarded: user.isOnboarded },
+    };
+  } catch (err: any) {
+    console.error("Error fetching onboarding status:", err);
+    return { success: false, message: err.message };
+  }
+}
+
+export async function markUserOnboardedDB(userId: string) {
+  try {
+    await db
+      .update(users)
+      .set({ isOnboarded: true, updatedAt: new Date() })
+      .where(eq(users.id, userId));
+
+    return {
+      success: true,
+      message: "User marked as onboarded",
+    };
+  } catch (err: any) {
+    console.error("Error marking user as onboarded:", err);
+    return { success: false, message: err.message };
+  }
+}

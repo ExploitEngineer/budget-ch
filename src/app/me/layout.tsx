@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { HubSync } from "@/components/hub-sync";
 import { UpgradeToastListener } from "@/components/upgrade-toast-listener";
+import { WelcomeModal } from "@/components/welcome-modal";
 import { SessionReadyProvider } from "@/hooks/use-session-ready";
 
 export default async function DashboardLayout({
@@ -27,6 +28,7 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <UpgradeToastListener />
+      <WelcomeModal />
       <AppSidebar
         user={{
           name: session.user.name,

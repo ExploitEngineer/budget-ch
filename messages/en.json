@@ -2304,5 +2304,11 @@
                 "description": "Something went wrong while processing your invitation. Please try again."
             }
         }
+    },
+    "welcome-modal": {
+        "title": "Welcome to BudgetHub",
+        "description": "Get started in under 2 minutes. Learn how to use the dashboard, budgets, and transactions. You can also find helpful resources and support anytime under Help.",
+        "open-guide": "Open guide",
+        "later": "Later"
     }
 }
