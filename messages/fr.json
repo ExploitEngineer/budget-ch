@@ -21,6 +21,10 @@
         "retry": "Réessayer",
         "currency": "CHF",
         "percent": "{value}%",
+        "plans": {
+            "individual": "Individuel",
+            "family": "Famille"
+        },
         "validations": {
             "required": "Requis",
             "name-required": "Le nom est requis",

@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import { requireRootAdmin } from "./admin-auth";
 import { auth } from "@/lib/auth/auth";
 import { adminMailer, mailer } from "@/lib/mailer";
-import { getMailTranslations } from "@/lib/mail-translations";
 import {
   createAdminInvitationDB,
   getAdminInvitationByTokenDB,
@@ -15,6 +14,7 @@ import {
 } from "@/db/admin-queries";
 import { getUserByEmailDB, updateUser } from "@/db/queries";
 import { grantSubscription } from "./admin-subscription-grant";
+import { buildAdminInvitationEmailHtml } from "@/lib/email-templates/admin-invitation";
 import type { AdminInvitation } from "@/db/schema";
 
 // ============================================
@@ -79,54 +79,25 @@ export async function createAdminInvitation(params: CreateInvitationParams) {
     // Get recipient's language preference if they exist
     const existingUser = await getUserByEmailDB(email);
     const locale = existingUser?.language || adminUser.language || "en";
-    const t = await getMailTranslations(locale);
 
     // Build invitation link
     const link = `${process.env.BETTER_AUTH_URL}/accept-admin-invitation?token=${token}`;
 
-    // Build subscription info text
-    let subscriptionInfo = "";
-    if (subscriptionPlan && subscriptionMonths) {
-      const planName = subscriptionPlan === "individual" ? "Individual" : "Family";
-      subscriptionInfo = `<p style="background: #e8f5e9; padding: 12px; border-radius: 5px; margin: 15px 0;">
-        ${t("emails.admin-invitation.subscription", {
-          plan: planName,
-          months: subscriptionMonths,
-        })}
-      </p>`;
-    }
+    // Build email content
+    const { subject, html } = await buildAdminInvitationEmailHtml({
+      link,
+      role,
+      subscriptionPlan: subscriptionPlan ?? null,
+      subscriptionMonths: subscriptionMonths ?? null,
+      locale,
+    });
 
     // Send invitation email
     await adminMailer.sendMail({
       from: `"BudgetHub" <${process.env.MAIL_ADMIN_USER || process.env.MAIL_USER!}>`,
       to: email,
-      subject: t("emails.admin-invitation.subject"),
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2 style="color: #235FE3;">${t("emails.admin-invitation.title")}</h2>
-          <p>${t("emails.admin-invitation.hello")}</p>
-          <p>${t("emails.admin-invitation.invited", { isAdmin: role === "admin" })}</p>
-          ${subscriptionInfo}
-          <p style="margin: 20px 0;">
-            <a href="${link}" style="
-              display: inline-block;
-              background-color: #235FE3;
-              color: white;
-              padding: 12px 24px;
-              text-decoration: none;
-              border-radius: 5px;
-            ">
-              ${t("emails.admin-invitation.button")}
-            </a>
-          </p>
-          <p>${t("emails.admin-invitation.copy-link")} <br/>
-             <span style="word-break: break-all; color: #666;">${link}</span>
-          </p>
-          <p style="color: #999; font-size: 12px;">${t("emails.admin-invitation.expires")}</p>
-          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 12px; color: #999;">${t("emails.admin-invitation.ignore")}</p>
-        </div>
-      `,
+      subject,
+      html,
     });
 
     // Create audit log
