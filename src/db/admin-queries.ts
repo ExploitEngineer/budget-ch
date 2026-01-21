@@ -30,7 +30,7 @@ import type {
   AdminActionType,
   userRoles,
 } from "./schema";
-import { eq, desc, sql, inArray, and, or, ilike, count } from "drizzle-orm";
+import { eq, desc, asc, sql, inArray, and, or, ilike, count, isNull } from "drizzle-orm";
 
 // ============================================
 // USER MANAGEMENT QUERIES
@@ -42,12 +42,18 @@ export interface UserWithSubscription extends UserType {
 
 export interface GetUsersFilters {
   search?: string;
+  status?: "active" | "banned";
+  plan?: "free" | "individual" | "family";
+  sort?: "created_desc" | "created_asc" | "name_asc" | "name_desc";
   page?: number;
   limit?: number;
 }
 
 export async function getAllUsersWithFiltersDB({
   search,
+  status,
+  plan,
+  sort = "created_desc",
   page = 1,
   limit = 20,
 }: GetUsersFilters = {}): Promise<{
@@ -59,32 +65,138 @@ export async function getAllUsersWithFiltersDB({
   try {
     const offset = (page - 1) * limit;
 
-    // Build where clause
-    let whereClause;
+    // Build where conditions
+    const conditions: any[] = [];
+
     if (search && search.trim()) {
       const searchTerm = `%${search.trim()}%`;
-      whereClause = or(
-        ilike(users.email, searchTerm),
-        ilike(users.name, searchTerm),
-        ilike(users.id, searchTerm),
+      conditions.push(
+        or(
+          ilike(users.email, searchTerm),
+          ilike(users.name, searchTerm),
+          ilike(users.id, searchTerm),
+        ),
       );
     }
 
-    // Get total count
-    const [countResult] = await db
-      .select({ count: count() })
-      .from(users)
-      .where(whereClause);
-    const total = countResult?.count ?? 0;
+    if (status === "active") {
+      conditions.push(eq(users.banned, false));
+    } else if (status === "banned") {
+      conditions.push(eq(users.banned, true));
+    }
 
-    // Get paginated users
-    const userResults = await db
-      .select()
-      .from(users)
-      .where(whereClause)
-      .orderBy(desc(users.createdAt))
-      .limit(limit)
-      .offset(offset);
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    // Determine sort order
+    let orderByClause;
+    switch (sort) {
+      case "created_asc":
+        orderByClause = asc(users.createdAt);
+        break;
+      case "name_asc":
+        orderByClause = asc(users.name);
+        break;
+      case "name_desc":
+        orderByClause = desc(users.name);
+        break;
+      case "created_desc":
+      default:
+        orderByClause = desc(users.createdAt);
+        break;
+    }
+
+    // For plan filtering, we need to join with subscriptions
+    // First, get all users matching the basic filters
+    let userResults;
+    let total;
+
+    if (plan) {
+      // Need to filter by plan - requires joining with subscriptions
+      if (plan === "free") {
+        // Users without an active subscription
+        const usersWithSub = await db
+          .select({ userId: subscriptions.userId })
+          .from(subscriptions)
+          .where(eq(subscriptions.status, "active"));
+        const userIdsWithSub = usersWithSub.map((u) => u.userId);
+
+        const planConditions = [...conditions];
+        if (userIdsWithSub.length > 0) {
+          planConditions.push(
+            sql`${users.id} NOT IN (${sql.join(userIdsWithSub.map(id => sql`${id}`), sql`, `)})`,
+          );
+        }
+
+        const planWhereClause = planConditions.length > 0 ? and(...planConditions) : undefined;
+
+        const [countResult] = await db
+          .select({ count: count() })
+          .from(users)
+          .where(planWhereClause);
+        total = countResult?.count ?? 0;
+
+        userResults = await db
+          .select()
+          .from(users)
+          .where(planWhereClause)
+          .orderBy(orderByClause)
+          .limit(limit)
+          .offset(offset);
+      } else {
+        // Users with specific plan (individual or family)
+        const usersWithPlan = await db
+          .select({ userId: subscriptions.userId })
+          .from(subscriptions)
+          .where(
+            and(
+              eq(subscriptions.status, "active"),
+              eq(subscriptions.subscriptionPlan, plan),
+            ),
+          );
+        const userIdsWithPlan = usersWithPlan.map((u) => u.userId);
+
+        if (userIdsWithPlan.length === 0) {
+          return {
+            users: [],
+            total: 0,
+            page,
+            totalPages: 0,
+          };
+        }
+
+        const planConditions = [...conditions, inArray(users.id, userIdsWithPlan)];
+        const planWhereClause = and(...planConditions);
+
+        const [countResult] = await db
+          .select({ count: count() })
+          .from(users)
+          .where(planWhereClause);
+        total = countResult?.count ?? 0;
+
+        userResults = await db
+          .select()
+          .from(users)
+          .where(planWhereClause)
+          .orderBy(orderByClause)
+          .limit(limit)
+          .offset(offset);
+      }
+    } else {
+      // No plan filter
+      const [countResult] = await db
+        .select({ count: count() })
+        .from(users)
+        .where(whereClause);
+      total = countResult?.count ?? 0;
+
+      userResults = await db
+        .select()
+        .from(users)
+        .where(whereClause)
+        .orderBy(orderByClause)
+        .limit(limit)
+        .offset(offset);
+    }
 
     // Get subscriptions for these users
     const userIds = userResults.map((u) => u.id);

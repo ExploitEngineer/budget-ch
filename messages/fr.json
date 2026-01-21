@@ -258,6 +258,9 @@
             "invited": "Vous avez été invité à rejoindre un hub avec le rôle : <strong>{role}</strong>.",
             "button": "Accepter l'invitation",
             "fallback": "Ou copiez et collez ce lien dans votre navigateur :",
+            "help-title": "Comment accepter cette invitation :",
+            "help-new-user": "Si vous n'avez pas encore de compte, veuillez d'abord en créer un, puis cliquez sur le lien ci-dessus.",
+            "help-existing-user": "Si vous avez déjà un compte, veuillez d'abord vous connecter, puis cliquez sur le lien pour accepter l'invitation.",
             "expire": "Cette invitation expire dans 7 jours.",
             "ignore": "Si vous n'attendiez pas cette invitation, vous pouvez ignorer cet e-mail en toute sécurité."
         },
@@ -269,6 +272,9 @@
             "subscription": "Vous recevrez un abonnement <strong>{plan}</strong> pendant <strong>{months} mois</strong>.",
             "button": "Accepter l'invitation",
             "copy-link": "Ou copiez ce lien :",
+            "help-title": "Comment accepter cette invitation :",
+            "help-new-user": "Si vous n'avez pas encore de compte, veuillez d'abord en créer un, puis cliquez sur le lien ci-dessus.",
+            "help-existing-user": "Si vous avez déjà un compte, veuillez d'abord vous connecter, puis cliquez sur le lien pour accepter l'invitation.",
             "expires": "Cette invitation expire dans 14 jours.",
             "ignore": "Si vous n'attendiez pas cette invitation, vous pouvez ignorer cet e-mail en toute sécurité."
         }
@@ -2134,6 +2140,23 @@
             "search-placeholder": "Rechercher par e-mail ou ID...",
             "search": "Rechercher",
             "invite": "Inviter un utilisateur",
+            "filters": {
+                "status": "Statut",
+                "plan": "Forfait",
+                "sort": "Trier",
+                "all": "Tous",
+                "status-active": "Actif",
+                "status-banned": "Banni",
+                "plan-free": "Gratuit",
+                "plan-individual": "Individuel",
+                "plan-family": "Famille",
+                "sort-created-desc": "Plus récent",
+                "sort-created-asc": "Plus ancien",
+                "sort-name-asc": "Nom A-Z",
+                "sort-name-desc": "Nom Z-A",
+                "apply": "Appliquer",
+                "reset": "Réinitialiser les filtres"
+            },
             "table": {
                 "showing": "Affichage de {count} sur {total} utilisateurs",
                 "columns": {

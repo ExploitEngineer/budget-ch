@@ -258,6 +258,9 @@
             "invited": "You have been invited to join a hub with the role: <strong>{role}</strong>.",
             "button": "Accept Invitation",
             "fallback": "Or copy and paste this link into your browser:",
+            "help-title": "How to accept this invitation:",
+            "help-new-user": "If you don't have an account yet, please create one first, then click the link above.",
+            "help-existing-user": "If you already have an account, please log in first, then click the link to accept the invitation.",
             "expire": "This invitation expires in 7 days.",
             "ignore": "If you didn't expect this invitation, you can safely ignore this email."
         },
@@ -269,6 +272,9 @@
             "subscription": "You will receive a <strong>{plan}</strong> subscription for <strong>{months} month{months, plural, one {} other {s}}</strong>.",
             "button": "Accept Invitation",
             "copy-link": "Or copy this link:",
+            "help-title": "How to accept this invitation:",
+            "help-new-user": "If you don't have an account yet, please create one first, then click the link above.",
+            "help-existing-user": "If you already have an account, please log in first, then click the link to accept the invitation.",
             "expires": "This invitation expires in 14 days.",
             "ignore": "If you did not expect this invitation, you can safely ignore this email."
         }
@@ -2111,6 +2117,23 @@
             "search-placeholder": "Search by email or ID...",
             "search": "Search",
             "invite": "Invite User",
+            "filters": {
+                "status": "Status",
+                "plan": "Plan",
+                "sort": "Sort",
+                "all": "All",
+                "status-active": "Active",
+                "status-banned": "Banned",
+                "plan-free": "Free",
+                "plan-individual": "Individual",
+                "plan-family": "Family",
+                "sort-created-desc": "Newest first",
+                "sort-created-asc": "Oldest first",
+                "sort-name-asc": "Name A-Z",
+                "sort-name-desc": "Name Z-A",
+                "apply": "Apply",
+                "reset": "Reset filters"
+            },
             "table": {
                 "showing": "Showing {count} of {total} users",
                 "columns": {

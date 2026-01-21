@@ -14,6 +14,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { AdminUser } from "../page";
 import { UserActionsMenu } from "./user-actions-menu";
 import { useTranslations } from "next-intl";
+import { format } from "date-fns";
 
 interface UsersTableProps {
   users: AdminUser[];
@@ -57,14 +58,15 @@ export function UsersTable({
   };
 
   const getPlanBadge = (user: AdminUser) => {
-    if (!user.subscription?.plan) {
+    let plan = user.subscription?.subscriptionPlan;
+    if (!plan || plan === "free") {
       return (
         <Badge variant="outline" className="text-xs">
           {t("users.table.plan.free")}
         </Badge>
       );
     }
-    const plan = user.subscription.plan;
+
     const variant = plan === "family" ? "default" : "secondary";
     return (
       <Badge variant={variant} className="text-xs capitalize">
@@ -74,11 +76,7 @@ export function UsersTable({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("de-CH", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    });
+    return format(new Date(dateString), "MM/dd/yyyy");
   };
 
   const truncateId = (id: string) => {

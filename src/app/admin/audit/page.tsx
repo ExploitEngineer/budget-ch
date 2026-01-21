@@ -23,6 +23,7 @@ import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 interface AuditLog {
   id: string;
@@ -155,13 +156,7 @@ export default function AdminAuditPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("de-CH", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return format(new Date(dateString), "MM/dd/yyyy");
   };
 
   const getActionBadge = (action: string) => {

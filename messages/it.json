@@ -258,6 +258,9 @@
             "invited": "Sei stato invitato a unirti a un hub con il ruolo: <strong>{role}</strong>.",
             "button": "Accetta invito",
             "fallback": "Oppure copia e incolla questo link nel tuo browser:",
+            "help-title": "Come accettare questo invito:",
+            "help-new-user": "Se non hai ancora un account, creane uno prima, poi clicca sul link qui sopra.",
+            "help-existing-user": "Se hai già un account, effettua prima l'accesso, poi clicca sul link per accettare l'invito.",
             "expire": "Questo invito scade tra 7 giorni.",
             "ignore": "Se non ti aspettavi questo invito, puoi ignorare tranquillamente questa e-mail."
         },
@@ -269,6 +272,9 @@
             "subscription": "Riceverai un abbonamento <strong>{plan}</strong> per <strong>{months} {months, plural, one {mese} other {mesi}}</strong>.",
             "button": "Accetta invito",
             "copy-link": "Oppure copia questo link:",
+            "help-title": "Come accettare questo invito:",
+            "help-new-user": "Se non hai ancora un account, creane uno prima, poi clicca sul link qui sopra.",
+            "help-existing-user": "Se hai già un account, effettua prima l'accesso, poi clicca sul link per accettare l'invito.",
             "expires": "Questo invito scade tra 14 giorni.",
             "ignore": "Se non ti aspettavi questo invito, puoi ignorare tranquillamente questa e-mail."
         }
@@ -2134,6 +2140,23 @@
             "search-placeholder": "Cerca per email o ID...",
             "search": "Cerca",
             "invite": "Invita utente",
+            "filters": {
+                "status": "Stato",
+                "plan": "Piano",
+                "sort": "Ordina",
+                "all": "Tutti",
+                "status-active": "Attivo",
+                "status-banned": "Bannato",
+                "plan-free": "Gratuito",
+                "plan-individual": "Individuale",
+                "plan-family": "Famiglia",
+                "sort-created-desc": "Più recenti",
+                "sort-created-asc": "Più vecchi",
+                "sort-name-asc": "Nome A-Z",
+                "sort-name-desc": "Nome Z-A",
+                "apply": "Applica",
+                "reset": "Reimposta filtri"
+            },
             "table": {
                 "showing": "Visualizzazione di {count} di {total} utenti",
                 "columns": {

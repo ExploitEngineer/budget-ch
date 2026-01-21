@@ -108,8 +108,15 @@ export async function sendHubInvitation({
       <p>${t("emails.invitation.fallback")} <br/>
          <span style="word-break: break-all; color: #666;">${link}</span>
       </p>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; font-size: 14px;">
+        <p style="margin: 0 0 10px 0;"><strong>${t("emails.invitation.help-title")}</strong></p>
+        <ul style="margin: 0; padding-left: 20px; color: #555;">
+          <li style="margin-bottom: 8px;">${t("emails.invitation.help-new-user")}</li>
+          <li>${t("emails.invitation.help-existing-user")}</li>
+        </ul>
+      </div>
       <p style="color: #999; font-size: 12px;">${t("emails.invitation.expire")}</p>
-      <hr />
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
       <p style="font-size: 12px; color: #999;">${t("emails.invitation.ignore")}</p>
     </div>
   `,

@@ -3,7 +3,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, UserPlus, RotateCcw } from "lucide-react";
 import { UsersTable } from "./_components/users-table";
 import { InviteDialog } from "./_components/invite-dialog";
 import { useTranslations } from "next-intl";
@@ -19,7 +26,7 @@ export interface AdminUser {
   emailVerified: boolean;
   createdAt: string;
   subscription: {
-    plan: string | null;
+    subscriptionPlan: string | null;
     status: string | null;
   } | null;
 }
@@ -44,6 +51,9 @@ export default function AdminUsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [planFilter, setPlanFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("created_desc");
   const t = useTranslations("admin");
 
   const fetchUsers = useCallback(async () => {
@@ -56,6 +66,15 @@ export default function AdminUsersPage() {
       if (searchQuery) {
         params.set("search", searchQuery);
       }
+      if (statusFilter !== "all") {
+        params.set("status", statusFilter);
+      }
+      if (planFilter !== "all") {
+        params.set("plan", planFilter);
+      }
+      if (sortBy) {
+        params.set("sort", sortBy);
+      }
 
       const res = await fetch(`/api/admin/users?${params.toString()}`);
       const data: UsersResponse = await res.json();
@@ -64,6 +83,7 @@ export default function AdminUsersPage() {
         setUsers(data.data.users);
         setTotalPages(data.data.totalPages);
         setTotal(data.data.total);
+        console.log("[Admin Users] DATA: ", data.data);
       } else {
         toast.error(data.message || "Failed to fetch users");
       }
@@ -72,7 +92,7 @@ export default function AdminUsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, searchQuery]);
+  }, [page, searchQuery, statusFilter, planFilter, sortBy]);
 
   useEffect(() => {
     fetchUsers();
@@ -82,6 +102,19 @@ export default function AdminUsersPage() {
     e.preventDefault();
     setPage(1);
     fetchUsers();
+  };
+
+  const handleApplyFilters = () => {
+    setPage(1);
+    fetchUsers();
+  };
+
+  const handleResetFilters = () => {
+    setStatusFilter("all");
+    setPlanFilter("all");
+    setSortBy("created_desc");
+    setSearchQuery("");
+    setPage(1);
   };
 
   const handleRefresh = () => {
@@ -116,6 +149,55 @@ export default function AdminUsersPage() {
         <Button onClick={() => setInviteDialogOpen(true)} className="w-full lg:w-auto">
           <UserPlus className="h-4 w-4 mr-2" />
           {t("users.invite")}
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[140px]">
+            <span className="text-muted-foreground mr-1">{t("users.filters.status")}</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("users.filters.all")}</SelectItem>
+            <SelectItem value="active">{t("users.filters.status-active")}</SelectItem>
+            <SelectItem value="banned">{t("users.filters.status-banned")}</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={planFilter} onValueChange={setPlanFilter}>
+          <SelectTrigger className="w-[140px]">
+            <span className="text-muted-foreground mr-1">{t("users.filters.plan")}</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("users.filters.all")}</SelectItem>
+            <SelectItem value="free">{t("users.filters.plan-free")}</SelectItem>
+            <SelectItem value="individual">{t("users.filters.plan-individual")}</SelectItem>
+            <SelectItem value="family">{t("users.filters.plan-family")}</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={sortBy} onValueChange={setSortBy}>
+          <SelectTrigger className="w-[180px]">
+            <span className="text-muted-foreground mr-1">{t("users.filters.sort")}</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="created_desc">{t("users.filters.sort-created-desc")}</SelectItem>
+            <SelectItem value="created_asc">{t("users.filters.sort-created-asc")}</SelectItem>
+            <SelectItem value="name_asc">{t("users.filters.sort-name-asc")}</SelectItem>
+            <SelectItem value="name_desc">{t("users.filters.sort-name-desc")}</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button variant="secondary" onClick={handleApplyFilters}>
+          {t("users.filters.apply")}
+        </Button>
+
+        <Button variant="ghost" size="icon" onClick={handleResetFilters} title={t("users.filters.reset")}>
+          <RotateCcw className="h-4 w-4" />
         </Button>
       </div>
 
