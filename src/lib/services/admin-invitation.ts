@@ -30,7 +30,7 @@ export interface CreateInvitationParams {
 
 export async function createAdminInvitation(params: CreateInvitationParams) {
   const hdrs = await headers();
-  const { userId: adminId, user: adminUser } = await requireRootAdmin(hdrs);
+  const { userId: adminId } = await requireRootAdmin(hdrs);
 
   const { email, role, subscriptionPlan, subscriptionMonths } = params;
 
@@ -78,7 +78,7 @@ export async function createAdminInvitation(params: CreateInvitationParams) {
 
     // Get recipient's language preference if they exist
     const existingUser = await getUserByEmailDB(email);
-    const locale = existingUser?.language || adminUser.language || "en";
+    const locale = existingUser?.language || "de"; // || adminUser.language || "en";
 
     // Build invitation link
     const link = `${process.env.BETTER_AUTH_URL}/accept-admin-invitation?token=${token}`;

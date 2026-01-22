@@ -47,7 +47,7 @@ export async function sendHubInvitation({
       columns: { language: true },
     });
 
-    const locale = recipientUser?.language || inviterUser?.language || "en";
+    const locale = recipientUser?.language || "de" // || inviterUser?.language || "en";
     const t = await getMailTranslations(locale);
 
     const existingMembers = await getHubMembers(hubId);
