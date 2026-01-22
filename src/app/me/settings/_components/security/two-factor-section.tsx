@@ -10,6 +10,7 @@ interface TwoFactorSectionProps {
   loadingStatus: boolean;
   twoFactorStatus: TwoFactorStatus;
   loading: boolean;
+  hasPassword: boolean;
   onEnableClick: () => void;
   onVerifyClick: () => void;
   onRestartSetup: () => void;
@@ -21,6 +22,7 @@ export function TwoFactorSection({
   loadingStatus,
   twoFactorStatus,
   loading,
+  hasPassword,
   onEnableClick,
   onVerifyClick,
   onRestartSetup,
@@ -55,7 +57,7 @@ export function TwoFactorSection({
 
       {!loadingStatus && (
         <div className="flex flex-wrap items-center gap-2">
-          {!isTwoFactorEnabled && !isTwoFactorPending && (
+          {!isTwoFactorEnabled && !isTwoFactorPending && hasPassword && (
             <Button
               variant="outline"
               onClick={onEnableClick}
@@ -64,6 +66,11 @@ export function TwoFactorSection({
             >
               {loading ? <Spinner /> : t("labels.two-factor.buttons.enable")}
             </Button>
+          )}
+          {!isTwoFactorEnabled && !isTwoFactorPending && !hasPassword && (
+            <p className="text-sm text-muted-foreground">
+              {t("labels.two-factor.social-provider-message")}
+            </p>
           )}
           {isTwoFactorPending && (
             <>

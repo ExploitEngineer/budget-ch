@@ -1785,6 +1785,7 @@
                     "two-factor": {
                         "title": "Two-Factor Authentication",
                         "content": "TOTP compatible with common authenticator apps like Google Authenticator, Authy, or Microsoft Authenticator.",
+                        "social-provider-message": "Your account uses social sign-in. Two-factor authentication is managed by your provider (e.g., Google). Enable 2FA in your provider's account settings for additional security.",
                         "status": {
                             "enabled": "Enabled",
                             "disabled": "Disabled",

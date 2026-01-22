@@ -3,6 +3,9 @@
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth/auth";
 import { getContext } from "@/lib/auth/actions";
+import db from "@/db/db";
+import * as schema from "@/db/schema";
+import { eq, and } from "drizzle-orm";
 
 export async function enableTwoFactor(password: string) {
   try {
@@ -242,6 +245,29 @@ export async function getTwoFactorStatus() {
       message: `Failed to get two-factor status: ${err.message}`,
       data: null,
     };
+  }
+}
+
+export async function checkHasPassword() {
+  try {
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs });
+
+    if (!session?.user) {
+      return { success: false, data: false };
+    }
+
+    const account = await db.query.accounts.findFirst({
+      where: and(
+        eq(schema.accounts.userId, session.user.id),
+        eq(schema.accounts.providerId, "credential")
+      ),
+    });
+
+    return { success: true, data: !!account };
+  } catch (err: any) {
+    console.error("Error checking password status:", err);
+    return { success: false, data: false };
   }
 }
 

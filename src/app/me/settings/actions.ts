@@ -13,6 +13,7 @@ import {
   viewBackupCodes,
   regenerateBackupCodes,
   getTwoFactorStatus,
+  checkHasPassword,
 } from "@/lib/services/security";
 import { exportFullUserData, exportHubData } from "@/lib/services/export-service";
 
@@ -78,4 +79,8 @@ export async function exportFullUserDataAction() {
 
 export async function exportHubDataAction(hubId?: string) {
   return await exportHubData(hubId);
+}
+
+export async function checkHasPasswordAction() {
+  return await checkHasPassword();
 }

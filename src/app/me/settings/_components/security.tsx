@@ -12,6 +12,7 @@ import {
   getTotpUriAction,
   getTwoFactorStatusAction,
   regenerateBackupCodesAction,
+  checkHasPasswordAction,
 } from "../actions";
 import type { TwoFactorStatus } from "@/lib/types/common-types";
 import { PasswordConfirmationDialog } from "./security/password-confirmation-dialog";
@@ -28,6 +29,7 @@ export function Security() {
   const [twoFactorStatus, setTwoFactorStatus] =
     useState<TwoFactorStatus>("disabled");
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
+  const [hasPassword, setHasPassword] = useState<boolean>(true);
 
   // Dialog states
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -61,6 +63,7 @@ export function Security() {
 
   useEffect(() => {
     loadTwoFactorStatus();
+    loadHasPassword();
   }, []);
 
   const loadTwoFactorStatus = async () => {
@@ -76,6 +79,17 @@ export function Security() {
       console.error("Error loading 2FA status:", err);
     } finally {
       setLoadingStatus(false);
+    }
+  };
+
+  const loadHasPassword = async () => {
+    try {
+      const result = await checkHasPasswordAction();
+      if (result.success) {
+        setHasPassword(result.data);
+      }
+    } catch (err) {
+      console.error("Error checking password status:", err);
     }
   };
 
@@ -295,6 +309,7 @@ export function Security() {
               loadingStatus={loadingStatus}
               twoFactorStatus={twoFactorStatus}
               loading={loading}
+              hasPassword={hasPassword}
               onEnableClick={() => setPasswordDialogOpen(true)}
               onVerifyClick={() => setVerifyDialogOpen(true)}
               onRestartSetup={resetTwoFactorSetup}

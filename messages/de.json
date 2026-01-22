@@ -1785,6 +1785,7 @@
                     "two-factor": {
                         "title": "Zwei-Faktor-Authentifizierung",
                         "content": "TOTP kompatibel mit gängigen Authenticator-Apps wie Google Authenticator, Authy oder Microsoft Authenticator.",
+                        "social-provider-message": "Ihr Konto verwendet Social Sign-in. Die Zwei-Faktor-Authentifizierung wird von Ihrem Anbieter (z.B. Google) verwaltet. Aktivieren Sie 2FA in den Kontoeinstellungen Ihres Anbieters für zusätzliche Sicherheit.",
                         "status": {
                             "enabled": "Aktiviert",
                             "disabled": "Deaktiviert",
