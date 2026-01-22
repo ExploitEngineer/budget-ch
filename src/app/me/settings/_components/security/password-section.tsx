@@ -7,14 +7,20 @@ import { useTranslations } from "next-intl";
 
 interface PasswordSectionProps {
   loading: boolean;
+  hasPassword: boolean;
   onResetPasswordClick: () => void;
 }
 
 export function PasswordSection({
   loading,
+  hasPassword,
   onResetPasswordClick,
 }: PasswordSectionProps) {
   const t = useTranslations("main-dashboard.settings-page.security-section");
+
+  if (!hasPassword) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-6">

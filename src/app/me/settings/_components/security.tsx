@@ -319,6 +319,7 @@ export function Security() {
 
             <PasswordSection
               loading={loading}
+              hasPassword={hasPassword}
               onResetPasswordClick={handleResetEmailSend}
             />
           </div>
