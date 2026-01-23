@@ -1,6 +1,8 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { auth } from "@/lib/auth/auth";
+import { verifyTotpForOAuth, verifyBackupCodeForOAuth } from "@/lib/services/security";
 import {
   getHubByIdDB,
   getFirstHubMemberDB,
@@ -67,4 +69,27 @@ export async function getContext(headersObj: Headers, requireAccount = false) {
   const subscription = await getSubscriptionByUserId(userId);
 
   return { userId, hubId: activeHubId, userRole, financialAccountId, user, subscription: subscription ?? null };
+}
+
+export async function clearPending2fa() {
+  const cookieStore = await cookies();
+  cookieStore.delete("pending_2fa");
+}
+
+export async function verifyTotpForOAuthAction(code: string) {
+  const result = await verifyTotpForOAuth(code);
+  if (result.success) {
+    const cookieStore = await cookies();
+    cookieStore.delete("pending_2fa");
+  }
+  return result;
+}
+
+export async function verifyBackupCodeForOAuthAction(code: string) {
+  const result = await verifyBackupCodeForOAuth(code);
+  if (result.success) {
+    const cookieStore = await cookies();
+    cookieStore.delete("pending_2fa");
+  }
+  return result;
 }

@@ -3,6 +3,7 @@ import { ModeToggle } from "@/components/theme-toggle";
 import Image from "next/image";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default async function AuthLayout({
@@ -16,7 +17,14 @@ export default async function AuthLayout({
   });
 
   if (session) {
-    redirect("/me/dashboard");
+    // Allow access if user has pending 2FA verification (OAuth + 2FA flow)
+    const cookieStore = await cookies();
+    const pending2fa = cookieStore.get("pending_2fa");
+    if (pending2fa) {
+      // User needs to complete 2FA verification, allow access to auth pages
+    } else {
+      redirect("/me/dashboard");
+    }
   }
 
   return (

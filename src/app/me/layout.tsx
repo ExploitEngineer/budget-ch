@@ -2,6 +2,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { HubSync } from "@/components/hub-sync";
 import { UpgradeToastListener } from "@/components/upgrade-toast-listener";
@@ -19,6 +20,13 @@ export default async function DashboardLayout({
 
   if (!session) {
     redirect("/login");
+  }
+
+  // If user has pending 2FA verification (OAuth + 2FA flow), redirect to verify
+  const cookieStore = await cookies();
+  const pending2fa = cookieStore.get("pending_2fa");
+  if (pending2fa) {
+    redirect("/two-factor?flow=oauth");
   }
 
   // Note: Hub ID is managed via cookie (source of truth)

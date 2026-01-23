@@ -6,6 +6,8 @@ import { getContext } from "@/lib/auth/actions";
 import db from "@/db/db";
 import * as schema from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+import { symmetricDecrypt, symmetricEncrypt } from "better-auth/crypto";
+import { createOTP } from "@better-auth/utils/otp";
 
 export async function enableTwoFactor(password: string) {
   try {
@@ -278,6 +280,114 @@ export async function setPasswordForUser(newPassword: string) {
       message: `Failed to set password: ${err.message}`,
       data: null,
     };
+  }
+}
+
+export async function verifyTotpForOAuth(code: string) {
+  try {
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs });
+
+    if (!session?.user) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    if (!session.user.twoFactorEnabled) {
+      return { success: false, message: "Two-factor authentication is not enabled" };
+    }
+
+    const twoFactorRecord = await db.query.twoFactor.findFirst({
+      where: eq(schema.twoFactor.userId, session.user.id),
+    });
+
+    if (!twoFactorRecord) {
+      return { success: false, message: "TOTP not configured" };
+    }
+
+    const secret = process.env.BETTER_AUTH_SECRET;
+    if (!secret) {
+      return { success: false, message: "Server configuration error" };
+    }
+
+    const decryptedSecret = await symmetricDecrypt({
+      key: secret,
+      data: twoFactorRecord.secret,
+    });
+
+    const isValid = await createOTP(decryptedSecret, {
+      period: 30,
+      digits: 6,
+    }).verify(code);
+
+    if (!isValid) {
+      return { success: false, message: "Invalid verification code" };
+    }
+
+    return { success: true, message: "Verified successfully" };
+  } catch (err: any) {
+    console.error("Error verifying TOTP for OAuth:", err);
+    return { success: false, message: "Verification failed" };
+  }
+}
+
+export async function verifyBackupCodeForOAuth(code: string) {
+  try {
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs });
+
+    if (!session?.user) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    if (!session.user.twoFactorEnabled) {
+      return { success: false, message: "Two-factor authentication is not enabled" };
+    }
+
+    const twoFactorRecord = await db.query.twoFactor.findFirst({
+      where: eq(schema.twoFactor.userId, session.user.id),
+    });
+
+    if (!twoFactorRecord) {
+      return { success: false, message: "Backup codes not configured" };
+    }
+
+    const secret = process.env.BETTER_AUTH_SECRET;
+    if (!secret) {
+      return { success: false, message: "Server configuration error" };
+    }
+
+    const decryptedCodes = await symmetricDecrypt({
+      key: secret,
+      data: twoFactorRecord.backupCodes,
+    });
+
+    const backupCodes: string[] = JSON.parse(decryptedCodes);
+    const normalizedInput = code.replace(/[-\s]/g, "").toLowerCase();
+
+    const matchIndex = backupCodes.findIndex(
+      (c) => c.replace(/[-\s]/g, "").toLowerCase() === normalizedInput,
+    );
+
+    if (matchIndex === -1) {
+      return { success: false, message: "Invalid backup code" };
+    }
+
+    // Remove used code and update DB
+    const updatedCodes = backupCodes.filter((_, i) => i !== matchIndex);
+    const encryptedCodes = await symmetricEncrypt({
+      key: secret,
+      data: JSON.stringify(updatedCodes),
+    });
+
+    await db
+      .update(schema.twoFactor)
+      .set({ backupCodes: encryptedCodes })
+      .where(eq(schema.twoFactor.userId, session.user.id));
+
+    return { success: true, message: "Backup code verified successfully" };
+  } catch (err: any) {
+    console.error("Error verifying backup code for OAuth:", err);
+    return { success: false, message: "Verification failed" };
   }
 }
 
