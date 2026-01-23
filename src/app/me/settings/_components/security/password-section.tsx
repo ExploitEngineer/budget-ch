@@ -38,11 +38,8 @@ export function PasswordSection({
           onClick={onResetPasswordClick}
           className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
         >
-          {loading ? (
-            <Spinner />
-          ) : (
-            t("labels.password.buttons.reset-password")
-          )}
+          {loading && <Spinner className="mr-2 h-4 w-4" />}
+          {t("labels.password.buttons.reset-password")}
         </Button>
       </div>
       {/* <p className="text-sm opacity-80">{t("labels.password.content")}</p> */}

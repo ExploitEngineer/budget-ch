@@ -64,7 +64,8 @@ export function TwoFactorSection({
               disabled={loading}
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
-              {loading ? <Spinner /> : t("labels.two-factor.buttons.enable")}
+              {loading && <Spinner className="mr-2 h-4 w-4" />}
+              {t("labels.two-factor.buttons.enable")}
             </Button>
           )}
           {!isTwoFactorEnabled && !isTwoFactorPending && !hasPassword && (

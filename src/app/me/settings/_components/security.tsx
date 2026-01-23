@@ -26,10 +26,11 @@ import { PasswordSection } from "./security/password-section";
 export function Security() {
   const t = useTranslations("main-dashboard.settings-page.security-section");
   const [loading, setLoading] = useState<boolean>(false);
+  const [resetPasswordLoading, setResetPasswordLoading] = useState<boolean>(false);
   const [twoFactorStatus, setTwoFactorStatus] =
     useState<TwoFactorStatus>("disabled");
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
-  const [hasPassword, setHasPassword] = useState<boolean>(true);
+  const [hasPassword, setHasPassword] = useState<boolean>(false);
 
   // Dialog states
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -94,7 +95,7 @@ export function Security() {
   };
 
   const handleResetEmailSend = async (): Promise<void> => {
-    setLoading(true);
+    setResetPasswordLoading(true);
     try {
       const res = await getUserEmail();
 
@@ -121,7 +122,7 @@ export function Security() {
       console.error(err);
       toast.error(t("labels.password.messages.error"));
     } finally {
-      setLoading(false);
+      setResetPasswordLoading(false);
     }
   };
 
@@ -318,7 +319,7 @@ export function Security() {
             />
 
             <PasswordSection
-              loading={loading}
+              loading={resetPasswordLoading}
               hasPassword={hasPassword}
               onResetPasswordClick={handleResetEmailSend}
             />
