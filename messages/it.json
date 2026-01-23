@@ -202,7 +202,8 @@
             "password-lowercase": "La password deve contenere almeno una lettera minuscola.",
             "password-number": "La password deve contenere almeno un numero.",
             "password-special": "La password deve contenere almeno un carattere speciale.",
-            "accept-terms": "Devi accettare i termini e l'informativa sulla privacy."
+            "accept-terms": "Devi accettare i termini e l'informativa sulla privacy.",
+            "passwords-not-match": "Le password non corrispondono."
         },
         "verify-email": {
             "title": "Verifica la tua e-mail",
@@ -1786,6 +1787,7 @@
                         "title": "Autenticazione a due fattori",
                         "content": "Compatibile TOTP con le comuni app di autenticazione come Google Authenticator, Authy o Microsoft Authenticator.",
                         "social-provider-message": "Il tuo account utilizza l'accesso social. L'autenticazione a due fattori è gestita dal tuo provider (es. Google). Attiva la 2FA nelle impostazioni del tuo provider per maggiore sicurezza.",
+                        "set-password-prompt": "Devi impostare una password prima di attivare l'autenticazione a due fattori.",
                         "status": {
                             "enabled": "Attivato",
                             "disabled": "Disattivato",
@@ -1865,13 +1867,28 @@
                     "password": {
                         "title": "Password",
                         "content": "Il reset invia un link via email (demo).",
+                        "no-password-message": "Non hai una password impostata. Imposta una password per abilitare le funzionalità di sicurezza aggiuntive.",
                         "buttons": {
                             "change-password": "Cambia password",
-                            "reset-password": "Reimposta password"
+                            "reset-password": "Reimposta password",
+                            "set-password": "Imposta password"
                         },
                         "messages": {
                             "reset-email-sent": "Email di reimpostazione password inviata",
-                            "error": "Si è verificato un errore"
+                            "error": "Si è verificato un errore",
+                            "set-password-success": "Password impostata con successo",
+                            "set-password-error": "Impossibile impostare la password"
+                        },
+                        "dialogs": {
+                            "set-password": {
+                                "title": "Imposta password",
+                                "description": "Crea una password per il tuo account per abilitare l'autenticazione a due fattori.",
+                                "new-password-label": "Nuova password",
+                                "new-password-placeholder": "Inserisci la tua nuova password",
+                                "confirm-password-label": "Conferma password",
+                                "confirm-password-placeholder": "Conferma la tua nuova password",
+                                "submit": "Imposta password"
+                            }
                         }
                     }
                 }

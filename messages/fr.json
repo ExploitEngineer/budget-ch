@@ -202,7 +202,8 @@
             "password-lowercase": "Le mot de passe doit contenir au moins une lettre minuscule.",
             "password-number": "Le mot de passe doit contenir au moins un chiffre.",
             "password-special": "Le mot de passe doit contenir au moins un caractère spécial.",
-            "accept-terms": "Vous devez accepter les conditions et la politique de confidentialité."
+            "accept-terms": "Vous devez accepter les conditions et la politique de confidentialité.",
+            "passwords-not-match": "Les mots de passe ne correspondent pas."
         },
         "verify-email": {
             "title": "Vérifiez votre e-mail",
@@ -1786,6 +1787,7 @@
                         "title": "Authentification à deux facteurs",
                         "content": "Compatible TOTP avec les applications d'authentification courantes comme Google Authenticator, Authy ou Microsoft Authenticator.",
                         "social-provider-message": "Votre compte utilise la connexion sociale. L'authentification à deux facteurs est gérée par votre fournisseur (ex: Google). Activez la 2FA dans les paramètres de votre fournisseur pour plus de sécurité.",
+                        "set-password-prompt": "Vous devez définir un mot de passe avant d'activer l'authentification à deux facteurs.",
                         "status": {
                             "enabled": "Activé",
                             "disabled": "Désactivé",
@@ -1865,13 +1867,28 @@
                     "password": {
                         "title": "Mot de passe",
                         "content": "Le réinitialisation envoie un lien par e-mail (demo).",
+                        "no-password-message": "Vous n'avez pas de mot de passe défini. Définissez un mot de passe pour activer les fonctionnalités de sécurité supplémentaires.",
                         "buttons": {
                             "change-password": "Changer le mot de passe",
-                            "reset-password": "Réinitialiser le mot de passe"
+                            "reset-password": "Réinitialiser le mot de passe",
+                            "set-password": "Définir le mot de passe"
                         },
                         "messages": {
                             "reset-email-sent": "E-mail de réinitialisation du mot de passe envoyé",
-                            "error": "Une erreur s'est produite"
+                            "error": "Une erreur s'est produite",
+                            "set-password-success": "Mot de passe défini avec succès",
+                            "set-password-error": "Échec de la définition du mot de passe"
+                        },
+                        "dialogs": {
+                            "set-password": {
+                                "title": "Définir le mot de passe",
+                                "description": "Créez un mot de passe pour votre compte afin d'activer l'authentification à deux facteurs.",
+                                "new-password-label": "Nouveau mot de passe",
+                                "new-password-placeholder": "Entrez votre nouveau mot de passe",
+                                "confirm-password-label": "Confirmer le mot de passe",
+                                "confirm-password-placeholder": "Confirmez votre nouveau mot de passe",
+                                "submit": "Définir le mot de passe"
+                            }
                         }
                     }
                 }

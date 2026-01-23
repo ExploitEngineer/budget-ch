@@ -248,6 +248,39 @@ export async function getTwoFactorStatus() {
   }
 }
 
+export async function setPasswordForUser(newPassword: string) {
+  try {
+    const hdrs = await headers();
+    const session = await auth.api.getSession({ headers: hdrs });
+
+    if (!session?.user) {
+      return {
+        success: false,
+        message: "Unauthorized",
+        data: null,
+      };
+    }
+
+    await auth.api.setPassword({
+      body: { newPassword },
+      headers: hdrs,
+    });
+
+    return {
+      success: true,
+      message: "Password set successfully",
+      data: null,
+    };
+  } catch (err: any) {
+    console.error("Error setting password:", err);
+    return {
+      success: false,
+      message: `Failed to set password: ${err.message}`,
+      data: null,
+    };
+  }
+}
+
 export async function checkHasPassword() {
   try {
     const hdrs = await headers();

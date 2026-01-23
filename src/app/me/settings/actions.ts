@@ -14,6 +14,7 @@ import {
   regenerateBackupCodes,
   getTwoFactorStatus,
   checkHasPassword,
+  setPasswordForUser,
 } from "@/lib/services/security";
 import { exportFullUserData, exportHubData } from "@/lib/services/export-service";
 
@@ -83,4 +84,8 @@ export async function exportHubDataAction(hubId?: string) {
 
 export async function checkHasPasswordAction() {
   return await checkHasPassword();
+}
+
+export async function setPasswordAction(newPassword: string) {
+  return await setPasswordForUser(newPassword);
 }

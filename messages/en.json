@@ -202,7 +202,8 @@
             "password-lowercase": "Password must contain at least one lowercase letter.",
             "password-number": "Password must contain at least one number.",
             "password-special": "Password must contain at least one special character.",
-            "accept-terms": "You must accept the terms and privacy policy."
+            "accept-terms": "You must accept the terms and privacy policy.",
+            "passwords-not-match": "Passwords do not match."
         },
         "verify-email": {
             "title": "Verify your email",
@@ -1786,6 +1787,7 @@
                         "title": "Two-Factor Authentication",
                         "content": "TOTP compatible with common authenticator apps like Google Authenticator, Authy, or Microsoft Authenticator.",
                         "social-provider-message": "Your account uses social sign-in. Two-factor authentication is managed by your provider (e.g., Google). Enable 2FA in your provider's account settings for additional security.",
+                        "set-password-prompt": "You need to set a password before enabling two-factor authentication.",
                         "status": {
                             "enabled": "Enabled",
                             "disabled": "Disabled",
@@ -1865,13 +1867,28 @@
                     "password": {
                         "title": "Password",
                         "content": "Reset sends an email link (demo).",
+                        "no-password-message": "You don't have a password set. Set a password to enable additional security features.",
                         "buttons": {
                             "change-password": "Change Password",
-                            "reset-password": "Reset Password"
+                            "reset-password": "Reset Password",
+                            "set-password": "Set Password"
                         },
                         "messages": {
                             "reset-email-sent": "Password reset email sent",
-                            "error": "An error occurred"
+                            "error": "An error occurred",
+                            "set-password-success": "Password set successfully",
+                            "set-password-error": "Failed to set password"
+                        },
+                        "dialogs": {
+                            "set-password": {
+                                "title": "Set Password",
+                                "description": "Create a password for your account to enable two-factor authentication.",
+                                "new-password-label": "New Password",
+                                "new-password-placeholder": "Enter your new password",
+                                "confirm-password-label": "Confirm Password",
+                                "confirm-password-placeholder": "Confirm your new password",
+                                "submit": "Set Password"
+                            }
                         }
                     }
                 }

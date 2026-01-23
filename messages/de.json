@@ -202,7 +202,8 @@
             "password-lowercase": "Das Passwort muss mindestens einen Kleinbuchstaben enthalten.",
             "password-number": "Das Passwort muss mindestens eine Zahl enthalten.",
             "password-special": "Das Passwort muss mindestens ein Sonderzeichen enthalten.",
-            "accept-terms": "Sie müssen den Bedingungen und der Datenschutzrichtlinie zustimmen."
+            "accept-terms": "Sie müssen den Bedingungen und der Datenschutzrichtlinie zustimmen.",
+            "passwords-not-match": "Passwörter stimmen nicht überein."
         },
         "verify-email": {
             "title": "Bestätige deine E-Mail-Adresse",
@@ -1786,6 +1787,7 @@
                         "title": "Zwei-Faktor-Authentifizierung",
                         "content": "TOTP kompatibel mit gängigen Authenticator-Apps wie Google Authenticator, Authy oder Microsoft Authenticator.",
                         "social-provider-message": "Ihr Konto verwendet Social Sign-in. Die Zwei-Faktor-Authentifizierung wird von Ihrem Anbieter (z.B. Google) verwaltet. Aktivieren Sie 2FA in den Kontoeinstellungen Ihres Anbieters für zusätzliche Sicherheit.",
+                        "set-password-prompt": "Sie müssen ein Passwort festlegen, bevor Sie die Zwei-Faktor-Authentifizierung aktivieren können.",
                         "status": {
                             "enabled": "Aktiviert",
                             "disabled": "Deaktiviert",
@@ -1865,13 +1867,28 @@
                     "password": {
                         "title": "Passwort",
                         "content": "\"Zurücksetzen\" sendet einen E-Mail-Link (Demo).",
+                        "no-password-message": "Sie haben kein Passwort festgelegt. Legen Sie ein Passwort fest, um zusätzliche Sicherheitsfunktionen zu aktivieren.",
                         "buttons": {
                             "change-password": "Passwort ändern",
-                            "reset-password": "Passwort zurücksetzen"
+                            "reset-password": "Passwort zurücksetzen",
+                            "set-password": "Passwort festlegen"
                         },
                         "messages": {
                             "reset-email-sent": "E-Mail zum Zurücksetzen des Passworts gesendet",
-                            "error": "Ein Fehler ist aufgetreten"
+                            "error": "Ein Fehler ist aufgetreten",
+                            "set-password-success": "Passwort erfolgreich festgelegt",
+                            "set-password-error": "Passwort konnte nicht festgelegt werden"
+                        },
+                        "dialogs": {
+                            "set-password": {
+                                "title": "Passwort festlegen",
+                                "description": "Erstellen Sie ein Passwort für Ihr Konto, um die Zwei-Faktor-Authentifizierung zu aktivieren.",
+                                "new-password-label": "Neues Passwort",
+                                "new-password-placeholder": "Geben Sie Ihr neues Passwort ein",
+                                "confirm-password-label": "Passwort bestätigen",
+                                "confirm-password-placeholder": "Bestätigen Sie Ihr neues Passwort",
+                                "submit": "Passwort festlegen"
+                            }
                         }
                     }
                 }

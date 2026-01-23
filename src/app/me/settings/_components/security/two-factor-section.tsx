@@ -16,6 +16,7 @@ interface TwoFactorSectionProps {
   onRestartSetup: () => void;
   onRegenerateBackupCodesClick: () => void;
   onDisableClick: () => void;
+  onSetPasswordClick: () => void;
 }
 
 export function TwoFactorSection({
@@ -28,6 +29,7 @@ export function TwoFactorSection({
   onRestartSetup,
   onRegenerateBackupCodesClick,
   onDisableClick,
+  onSetPasswordClick,
 }: TwoFactorSectionProps) {
   const t = useTranslations("main-dashboard.settings-page.security-section");
 
@@ -69,9 +71,19 @@ export function TwoFactorSection({
             </Button>
           )}
           {!isTwoFactorEnabled && !isTwoFactorPending && !hasPassword && (
-            <p className="text-sm text-muted-foreground">
-              {t("labels.two-factor.social-provider-message")}
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-muted-foreground">
+                {t("labels.two-factor.set-password-prompt")}
+              </p>
+              <Button
+                variant="outline"
+                onClick={onSetPasswordClick}
+                disabled={loading}
+                className="dark:border-border-blue !bg-dark-blue-background w-fit cursor-pointer"
+              >
+                {t("labels.password.buttons.set-password")}
+              </Button>
+            </div>
           )}
           {isTwoFactorPending && (
             <>
