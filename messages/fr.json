@@ -1642,7 +1642,8 @@
                     "send": "Envoyer l'invitation",
                     "sending": "Envoi...",
                     "upgrade": "Passer à la version supérieure pour inviter",
-                    "cancel-invitation": "Annuler"
+                    "cancel-invitation": "Annuler",
+                    "remove-member": "Retirer"
                 },
                 "members-table": {
                     "title": "Membres du hub",
@@ -1652,7 +1653,8 @@
                         "name": "Nom",
                         "email": "Email",
                         "role": "Rôle",
-                        "joined": "Rejoint le"
+                        "joined": "Rejoint le",
+                        "actions": "Actions"
                     }
                 },
                 "invitations-table": {
@@ -1686,7 +1688,16 @@
                     "send-error": "Échec de l'envoi de l'invitation",
                     "send-unexpected-error": "Erreur lors de l'envoi de l'invitation",
                     "invitation-cancelled": "Invitation annulée",
-                    "cancel-error": "Échec de l'annulation de l'invitation"
+                    "cancel-error": "Échec de l'annulation de l'invitation",
+                    "member-removed": "Membre retiré avec succès",
+                    "remove-error": "Échec du retrait du membre"
+                },
+                "remove-dialog": {
+                    "title": "Retirer le membre",
+                    "description": "Êtes-vous sûr de vouloir retirer {name} du hub ? L'accès à toutes les données partagées sera perdu.",
+                    "cancel": "Annuler",
+                    "confirm": "Retirer",
+                    "removing": "Retrait..."
                 }
             },
             "appearance-section": {

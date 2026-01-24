@@ -7,6 +7,7 @@ import {
   cancelHubInvitationDB,
   getHubMembersDB,
   getUserByEmailDB,
+  removeHubMemberDB,
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "@/lib/auth/actions";
@@ -16,6 +17,7 @@ import db from "@/db/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AccessRole } from "@/db/queries";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 interface SendInvitationParams {
   hubId: string;
@@ -193,5 +195,25 @@ export async function cancelHubInvitation(invitationId: string, hubId: string) {
     return res;
   } catch (err: any) {
     return { success: false, message: err.message || "Error cancelling invitation" };
+  }
+}
+
+// REMOVE Member
+export async function removeHubMember(memberUserId: string, hubId: string) {
+  try {
+    const hdrs = await headers();
+    const { userId, userRole } = await getContext(hdrs, false);
+
+    if (!userId) return { success: false, message: "Not authenticated" };
+
+    requireAdminRole(userRole);
+
+    if (userId === memberUserId) {
+      return { success: false, message: "Cannot remove yourself" };
+    }
+
+    return await removeHubMemberDB(memberUserId, hubId);
+  } catch (err: any) {
+    return { success: false, message: err.message || "Error removing member" };
   }
 }

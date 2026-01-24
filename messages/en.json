@@ -1642,7 +1642,8 @@
                     "send": "Send Invitation",
                     "sending": "Sending...",
                     "upgrade": "Upgrade to Invite",
-                    "cancel-invitation": "Cancel"
+                    "cancel-invitation": "Cancel",
+                    "remove-member": "Remove"
                 },
                 "members-table": {
                     "title": "Hub Members",
@@ -1652,7 +1653,8 @@
                         "name": "Name",
                         "email": "Email",
                         "role": "Role",
-                        "joined": "Joined"
+                        "joined": "Joined",
+                        "actions": "Actions"
                     }
                 },
                 "invitations-table": {
@@ -1686,7 +1688,16 @@
                     "send-error": "Failed to send invitation",
                     "send-unexpected-error": "Error sending invitation",
                     "invitation-cancelled": "Invitation cancelled",
-                    "cancel-error": "Failed to cancel invitation"
+                    "cancel-error": "Failed to cancel invitation",
+                    "member-removed": "Member removed successfully",
+                    "remove-error": "Failed to remove member"
+                },
+                "remove-dialog": {
+                    "title": "Remove Member",
+                    "description": "Are you sure you want to remove {name} from the hub? They will lose access to all shared data.",
+                    "cancel": "Cancel",
+                    "confirm": "Remove",
+                    "removing": "Removing..."
                 }
             },
             "appearance-section": {

@@ -2868,6 +2868,31 @@ export async function getHubMembersDB(hubId: string) {
   }
 }
 
+// REMOVE MEMBER FROM HUB
+export async function removeHubMemberDB(userId: string, hubId: string) {
+  try {
+    const member = await db.query.hubMembers.findFirst({
+      where: and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)),
+    });
+
+    if (!member) {
+      return { success: false, message: "Member not found" };
+    }
+
+    if (member.isOwner) {
+      return { success: false, message: "Cannot remove the hub owner" };
+    }
+
+    await db
+      .delete(hubMembers)
+      .where(and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)));
+
+    return { success: true, message: "Member removed successfully" };
+  } catch (err: any) {
+    return { success: false, message: err.message };
+  }
+}
+
 // GET Hub Settings
 export async function getHubSettingsDB(hubId: string) {
   try {

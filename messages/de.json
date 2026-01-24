@@ -1642,7 +1642,8 @@
                     "send": "Einladung senden",
                     "sending": "Senden...",
                     "upgrade": "Upgrade für Einladung",
-                    "cancel-invitation": "Abbrechen"
+                    "cancel-invitation": "Abbrechen",
+                    "remove-member": "Entfernen"
                 },
                 "members-table": {
                     "title": "Hub-Mitglieder",
@@ -1652,7 +1653,8 @@
                         "name": "Name",
                         "email": "E-Mail",
                         "role": "Rolle",
-                        "joined": "Beigetreten am"
+                        "joined": "Beigetreten am",
+                        "actions": "Aktionen"
                     }
                 },
                 "invitations-table": {
@@ -1686,7 +1688,16 @@
                     "send-error": "Fehler beim Senden der Einladung",
                     "send-unexpected-error": "Fehler beim Senden der Einladung",
                     "invitation-cancelled": "Einladung abgebrochen",
-                    "cancel-error": "Fehler beim Abbrechen der Einladung"
+                    "cancel-error": "Fehler beim Abbrechen der Einladung",
+                    "member-removed": "Mitglied erfolgreich entfernt",
+                    "remove-error": "Fehler beim Entfernen des Mitglieds"
+                },
+                "remove-dialog": {
+                    "title": "Mitglied entfernen",
+                    "description": "Möchtest du {name} wirklich aus dem Hub entfernen? Der Zugriff auf alle gemeinsamen Daten geht verloren.",
+                    "cancel": "Abbrechen",
+                    "confirm": "Entfernen",
+                    "removing": "Entfernen..."
                 }
             },
             "appearance-section": {
