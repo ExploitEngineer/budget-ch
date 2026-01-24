@@ -111,6 +111,7 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
   const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
   const [invitationToDelete, setInvitationToDelete] = useState<Invitation | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, startDeleteTransition] = useTransition();
 
   const form = useForm<HubInvitesValues>({
     resolver: zodResolver(hubInvitesSchema),
@@ -198,7 +199,7 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
   };
 
   const handleDeleteInvitation = async (invitation: Invitation): Promise<void> => {
-    startTransition(async (): Promise<void> => {
+    startDeleteTransition(async (): Promise<void> => {
       try {
         const result = await deleteHubInvitation(invitation.id, hubId);
         if (result.success) {
@@ -257,7 +258,7 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
               variant="ghost"
               size="sm"
               onClick={() => setInvitationToDelete(info.row.original)}
-              disabled={isPending}
+              disabled={isDeleting}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
             >
               {t("buttons.delete-invitation")}
@@ -266,7 +267,7 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
         },
       },
     ],
-    [t, isPending, hubId],
+    [t, isDeleting, hubId],
   );
 
   const membersTable = useReactTable({
@@ -677,15 +678,15 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>
+            <AlertDialogCancel disabled={isDeleting}>
               {t("delete-invitation-dialog.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => invitationToDelete && handleDeleteInvitation(invitationToDelete)}
-              disabled={isPending}
+              disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700 text-white"
             >
-              {isPending
+              {isDeleting
                 ? t("delete-invitation-dialog.deleting")
                 : t("delete-invitation-dialog.confirm")}
             </AlertDialogAction>
