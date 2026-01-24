@@ -4,7 +4,7 @@ import {
   createHubInvitationDB,
   getHubInvitationsByHubDB,
   acceptInvitationDB,
-  cancelHubInvitationDB,
+  deleteHubInvitationDB,
   getHubMembersDB,
   getUserByEmailDB,
   removeHubMemberDB,
@@ -179,8 +179,8 @@ export async function getHubMembers(hubId: string) {
   return await getHubMembersDB(hubId);
 }
 
-// CANCEL Invitation
-export async function cancelHubInvitation(invitationId: string, hubId: string) {
+// DELETE Invitation
+export async function deleteHubInvitation(invitationId: string, hubId: string) {
   try {
     const hdrs = await headers();
 
@@ -191,10 +191,10 @@ export async function cancelHubInvitation(invitationId: string, hubId: string) {
       return { success: false, message: "Not authenticated" };
     }
 
-    const res = await cancelHubInvitationDB(invitationId, hubId);
+    const res = await deleteHubInvitationDB(invitationId, hubId);
     return res;
   } catch (err: any) {
-    return { success: false, message: err.message || "Error cancelling invitation" };
+    return { success: false, message: err.message || "Error deleting invitation" };
   }
 }
 

@@ -28,7 +28,7 @@ import {
   sendHubInvitation,
   getHubInvitations,
   getHubMembers,
-  cancelHubInvitation,
+  deleteHubInvitation,
   removeHubMember,
 } from "@/lib/services/hub-invitation";
 import { Spinner } from "@/components/ui/spinner";
@@ -109,6 +109,7 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
 
   const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
+  const [invitationToDelete, setInvitationToDelete] = useState<Invitation | null>(null);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<HubInvitesValues>({
@@ -196,23 +197,24 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
     });
   };
 
-  const handleCancelInvitation = async (invitationId: string): Promise<void> => {
+  const handleDeleteInvitation = async (invitation: Invitation): Promise<void> => {
     startTransition(async (): Promise<void> => {
       try {
-        const result = await cancelHubInvitation(invitationId, hubId);
+        const result = await deleteHubInvitation(invitation.id, hubId);
         if (result.success) {
-          toast.success(t("messages.invitation-cancelled"));
-          // Refresh invitations list
+          toast.success(t("messages.invitation-deleted"));
           const invRes = await getHubInvitations(hubId);
           if (invRes.success && Array.isArray(invRes.data)) {
             setInvitations(invRes.data);
           }
         } else {
-          toast.error(result.message || t("messages.cancel-error"));
+          toast.error(result.message || t("messages.delete-error"));
         }
       } catch (e) {
         console.error(e);
-        toast.error(t("messages.cancel-error"));
+        toast.error(t("messages.delete-error"));
+      } finally {
+        setInvitationToDelete(null);
       }
     });
   };
@@ -250,19 +252,15 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
         id: "actions",
         header: () => t("invitations-table.table-headings.actions"),
         cell: (info) => {
-          // Only show cancel button for pending (not accepted) invitations
-          if (info.row.original.accepted) {
-            return null;
-          }
           return (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleCancelInvitation(info.row.original.id)}
+              onClick={() => setInvitationToDelete(info.row.original)}
               disabled={isPending}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
             >
-              {t("buttons.cancel-invitation")}
+              {t("buttons.delete-invitation")}
             </Button>
           );
         },
@@ -656,6 +654,40 @@ export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps)
               {isPending
                 ? t("remove-dialog.removing")
                 : t("remove-dialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!invitationToDelete}
+        onOpenChange={(open) => !open && setInvitationToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("delete-invitation-dialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {invitationToDelete?.accepted
+                ? t("delete-invitation-dialog.description-accepted", {
+                    email: invitationToDelete?.email || "",
+                  })
+                : t("delete-invitation-dialog.description-pending", {
+                    email: invitationToDelete?.email || "",
+                  })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>
+              {t("delete-invitation-dialog.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => invitationToDelete && handleDeleteInvitation(invitationToDelete)}
+              disabled={isPending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isPending
+                ? t("delete-invitation-dialog.deleting")
+                : t("delete-invitation-dialog.confirm")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -1642,7 +1642,7 @@
                     "send": "Invia invito",
                     "sending": "Invio...",
                     "upgrade": "Effettua l'upgrade per invitare",
-                    "cancel-invitation": "Annulla",
+                    "delete-invitation": "Elimina",
                     "remove-member": "Rimuovi"
                 },
                 "members-table": {
@@ -1687,8 +1687,8 @@
                     "invitation-sent": "Invito inviato",
                     "send-error": "Impossibile inviare l'invito",
                     "send-unexpected-error": "Errore durante l'invio dell'invito",
-                    "invitation-cancelled": "Invito annullato",
-                    "cancel-error": "Impossibile annullare l'invito",
+                    "invitation-deleted": "Invito eliminato",
+                    "delete-error": "Impossibile eliminare l'invito",
                     "member-removed": "Membro rimosso con successo",
                     "remove-error": "Impossibile rimuovere il membro"
                 },
@@ -1698,6 +1698,14 @@
                     "cancel": "Annulla",
                     "confirm": "Rimuovi",
                     "removing": "Rimozione..."
+                },
+                "delete-invitation-dialog": {
+                    "title": "Elimina invito",
+                    "description-pending": "Sei sicuro di voler eliminare l'invito per {email}? Questo annullerà anche l'invito in attesa, rendendo il link di invito non valido.",
+                    "description-accepted": "Sei sicuro di voler eliminare il record dell'invito per {email}? Questo rimuove solo l'invito dalla lista.",
+                    "cancel": "Annulla",
+                    "confirm": "Elimina",
+                    "deleting": "Eliminazione..."
                 }
             },
             "appearance-section": {

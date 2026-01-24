@@ -1642,7 +1642,7 @@
                     "send": "Send Invitation",
                     "sending": "Sending...",
                     "upgrade": "Upgrade to Invite",
-                    "cancel-invitation": "Cancel",
+                    "delete-invitation": "Delete",
                     "remove-member": "Remove"
                 },
                 "members-table": {
@@ -1687,8 +1687,8 @@
                     "invitation-sent": "Invitation sent",
                     "send-error": "Failed to send invitation",
                     "send-unexpected-error": "Error sending invitation",
-                    "invitation-cancelled": "Invitation cancelled",
-                    "cancel-error": "Failed to cancel invitation",
+                    "invitation-deleted": "Invitation deleted",
+                    "delete-error": "Failed to delete invitation",
                     "member-removed": "Member removed successfully",
                     "remove-error": "Failed to remove member"
                 },
@@ -1698,6 +1698,14 @@
                     "cancel": "Cancel",
                     "confirm": "Remove",
                     "removing": "Removing..."
+                },
+                "delete-invitation-dialog": {
+                    "title": "Delete Invitation",
+                    "description-pending": "Are you sure you want to delete the invitation for {email}? This will also cancel the pending invitation, making the invite link invalid.",
+                    "description-accepted": "Are you sure you want to delete the invitation record for {email}? This only removes the invitation from the list.",
+                    "cancel": "Cancel",
+                    "confirm": "Delete",
+                    "deleting": "Deleting..."
                 }
             },
             "appearance-section": {

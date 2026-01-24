@@ -2730,26 +2730,24 @@ export async function getHubInvitationsByHubDB(hubId: string) {
   }
 }
 
-// CANCEL Invitation
-export async function cancelHubInvitationDB(invitationId: string, hubId: string) {
+// DELETE Invitation
+export async function deleteHubInvitationDB(invitationId: string, hubId: string) {
   try {
     const result = await db
-      .update(hubInvitations)
-      .set({ cancelled: true })
+      .delete(hubInvitations)
       .where(
         and(
           eq(hubInvitations.id, invitationId),
-          eq(hubInvitations.hubId, hubId),
-          eq(hubInvitations.accepted, false)
+          eq(hubInvitations.hubId, hubId)
         )
       )
       .returning();
 
     if (result.length === 0) {
-      return { success: false, message: "Invitation not found or already accepted" };
+      return { success: false, message: "Invitation not found" };
     }
 
-    return { success: true, message: "Invitation cancelled" };
+    return { success: true, message: "Invitation deleted" };
   } catch (err: any) {
     return { success: false, message: err.message };
   }

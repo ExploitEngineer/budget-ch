@@ -1642,7 +1642,7 @@
                     "send": "Einladung senden",
                     "sending": "Senden...",
                     "upgrade": "Upgrade für Einladung",
-                    "cancel-invitation": "Abbrechen",
+                    "delete-invitation": "Löschen",
                     "remove-member": "Entfernen"
                 },
                 "members-table": {
@@ -1687,8 +1687,8 @@
                     "invitation-sent": "Einladung gesendet",
                     "send-error": "Fehler beim Senden der Einladung",
                     "send-unexpected-error": "Fehler beim Senden der Einladung",
-                    "invitation-cancelled": "Einladung abgebrochen",
-                    "cancel-error": "Fehler beim Abbrechen der Einladung",
+                    "invitation-deleted": "Einladung gelöscht",
+                    "delete-error": "Fehler beim Löschen der Einladung",
                     "member-removed": "Mitglied erfolgreich entfernt",
                     "remove-error": "Fehler beim Entfernen des Mitglieds"
                 },
@@ -1698,6 +1698,14 @@
                     "cancel": "Abbrechen",
                     "confirm": "Entfernen",
                     "removing": "Entfernen..."
+                },
+                "delete-invitation-dialog": {
+                    "title": "Einladung löschen",
+                    "description-pending": "Möchtest du die Einladung für {email} wirklich löschen? Dies macht auch den Einladungslink ungültig.",
+                    "description-accepted": "Möchtest du den Einladungseintrag für {email} wirklich löschen? Dies entfernt nur die Einladung aus der Liste.",
+                    "cancel": "Abbrechen",
+                    "confirm": "Löschen",
+                    "deleting": "Löschen..."
                 }
             },
             "appearance-section": {

@@ -1642,7 +1642,7 @@
                     "send": "Envoyer l'invitation",
                     "sending": "Envoi...",
                     "upgrade": "Passer à la version supérieure pour inviter",
-                    "cancel-invitation": "Annuler",
+                    "delete-invitation": "Supprimer",
                     "remove-member": "Retirer"
                 },
                 "members-table": {
@@ -1687,8 +1687,8 @@
                     "invitation-sent": "Invitation envoyée",
                     "send-error": "Échec de l'envoi de l'invitation",
                     "send-unexpected-error": "Erreur lors de l'envoi de l'invitation",
-                    "invitation-cancelled": "Invitation annulée",
-                    "cancel-error": "Échec de l'annulation de l'invitation",
+                    "invitation-deleted": "Invitation supprimée",
+                    "delete-error": "Échec de la suppression de l'invitation",
                     "member-removed": "Membre retiré avec succès",
                     "remove-error": "Échec du retrait du membre"
                 },
@@ -1698,6 +1698,14 @@
                     "cancel": "Annuler",
                     "confirm": "Retirer",
                     "removing": "Retrait..."
+                },
+                "delete-invitation-dialog": {
+                    "title": "Supprimer l'invitation",
+                    "description-pending": "Êtes-vous sûr de vouloir supprimer l'invitation pour {email} ? Cela annulera également l'invitation en attente, rendant le lien d'invitation invalide.",
+                    "description-accepted": "Êtes-vous sûr de vouloir supprimer l'enregistrement d'invitation pour {email} ? Cela ne fait que retirer l'invitation de la liste.",
+                    "cancel": "Annuler",
+                    "confirm": "Supprimer",
+                    "deleting": "Suppression..."
                 }
             },
             "appearance-section": {
