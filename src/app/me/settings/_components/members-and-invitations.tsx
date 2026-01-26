@@ -51,7 +51,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 import { useTranslations } from "next-intl";
 import {
   AlertDialog,
@@ -91,7 +91,7 @@ const formatDate = (value?: string | Date): string => {
   if (!value) return "-";
 
   try {
-    return format(new Date(value), "dd MMM yyyy");
+    return formatInAppTimezone(new Date(value), "dd MMM yyyy");
   } catch {
     return "-";
   }

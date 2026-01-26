@@ -23,7 +23,7 @@ import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 
 interface AuditLog {
   id: string;
@@ -156,7 +156,7 @@ export default function AdminAuditPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "MM/dd/yyyy");
+    return formatInAppTimezone(new Date(dateString), "MM/dd/yyyy");
   };
 
   const getActionBadge = (action: string) => {

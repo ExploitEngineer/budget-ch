@@ -31,6 +31,7 @@ import type {
 } from "@/lib/services/budget";
 import type { SavingGoalsSummary } from "@/lib/services/saving-goal";
 import type { TransactionType } from "@/lib/types/common-types";
+import { getMonthStartUTC, getMonthBoundariesUTC } from "@/lib/timezone";
 
 export type AccessRole = "admin" | "member";
 
@@ -1782,8 +1783,7 @@ export async function getBudgetsByMonthDB(
   message?: string;
 }> {
   try {
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+    const { start: startDate, end: endDate } = getMonthBoundariesUTC(month, year);
 
     // Create a subquery to calculate gross spent amounts from transactions for each category
     // Gross spent = sum of expenses
@@ -2486,8 +2486,7 @@ export async function getHubTotalExpensesDB(
   year: number,
 ) {
   try {
-    const startDate = new Date(Date.UTC(year, month - 1, 1));
-    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
+    const { start: startDate, end: endDate } = getMonthBoundariesUTC(month, year);
 
     const result = await db
       .select({
@@ -3008,7 +3007,7 @@ export async function getMonthlyTransactionCount(
   userId: string,
 ): Promise<number> {
   const now = new Date();
-  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const firstDayOfMonth = getMonthStartUTC(now);
 
   return await db.$count(
     transactions,

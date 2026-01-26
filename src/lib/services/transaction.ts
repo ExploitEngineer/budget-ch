@@ -36,7 +36,16 @@ import type { TransactionType } from "../types/common-types";
 import type { TransactionWithDetails } from "../types/domain-types";
 import db from "@/db/db";
 import { requireAdminRole } from "@/lib/auth/permissions";
-import { addDays, format, isBefore, isAfter, startOfDay, isSameDay, subHours } from "date-fns";
+import { subHours } from "date-fns";
+import {
+  addDays,
+  isBefore,
+  isAfter,
+  isSameDay,
+  getDayStartUTC,
+  getMonthStartUTC,
+  formatInAppTimezone,
+} from "@/lib/timezone";
 import { sendNotification } from "@/lib/notifications";
 import { BUDGET_THRESHOLD_80, BUDGET_THRESHOLD_100, RECURRING_PAYMENT_SUCCESS, RECURRING_PAYMENT_FAILED, RECURRING_PAYMENT_SUMMARY } from "@/lib/notifications/types";
 import { transactions, notifications } from "@/db/schema";
@@ -303,7 +312,7 @@ export async function createTransaction({
 
               // Get current month boundaries for duplicate checking
               const now = new Date();
-              const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+              const startOfMonth = getMonthStartUTC(now);
 
               // Check existing notifications for this budget this month
               const monthlyNotificationsResult = await db
@@ -555,18 +564,18 @@ export async function getUpcomingRecurringTransactions(
       includeArchived: false,
     });
 
-    const today = startOfDay(new Date());
+    const today = getDayStartUTC();
     const nextDays = addDays(today, days);
     const upcomingTransactions: UpcomingRecurringTransaction[] = [];
 
     for (const template of templates) {
-      const startDate = startOfDay(new Date(template.startDate));
+      const startDate = getDayStartUTC(new Date(template.startDate));
       let currentDate: Date;
 
       // Use lastGeneratedDate if available to calculate next occurrence
       if (template.lastGeneratedDate) {
         // Next occurrence is lastGeneratedDate + frequencyDays
-        currentDate = startOfDay(addDays(new Date(template.lastGeneratedDate), template.frequencyDays));
+        currentDate = getDayStartUTC(addDays(new Date(template.lastGeneratedDate), template.frequencyDays));
       } else {
         // No transactions generated yet, start from startDate
         currentDate = startDate;
@@ -574,7 +583,7 @@ export async function getUpcomingRecurringTransactions(
         // If start date is in the past, calculate next occurrence
         if (template.frequencyDays > 0) {
           while (isBefore(currentDate, today)) {
-            currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+            currentDate = getDayStartUTC(addDays(currentDate, template.frequencyDays));
           }
         }
       }
@@ -591,7 +600,7 @@ export async function getUpcomingRecurringTransactions(
 
         // Check if endDate exists and if currentDate is after endDate
         if (template.endDate) {
-          const endDate = startOfDay(new Date(template.endDate));
+          const endDate = getDayStartUTC(new Date(template.endDate));
           if (isAfter(currentDate, endDate)) {
             break;
           }
@@ -607,7 +616,7 @@ export async function getUpcomingRecurringTransactions(
             name: template.source || template.categoryName || "—",
             account: template.accountName || "—",
             amount: `CHF ${template.amount.toFixed(2)}`,
-            date: format(currentDate, "dd/MM/yyyy"),
+            date: formatInAppTimezone(currentDate, "dd/MM/yyyy"),
             templateId: template.id,
           });
 
@@ -617,7 +626,7 @@ export async function getUpcomingRecurringTransactions(
         }
 
         // Move to next occurrence
-        currentDate = startOfDay(addDays(currentDate, template.frequencyDays));
+        currentDate = getDayStartUTC(addDays(currentDate, template.frequencyDays));
 
         // Stop if we've gone past the specified day window
         if (isAfter(currentDate, nextDays)) {
@@ -1429,7 +1438,7 @@ export async function generateRecurringTransactions() {
       errors: [] as Array<{ templateId: string; error: string }>,
     };
 
-    const today = startOfDay(new Date());
+    const today = getDayStartUTC();
 
     // Group templates by hubId for batched notifications
     const hubSummaries: Record<string, HubSummary> = {};
@@ -1458,13 +1467,13 @@ export async function generateRecurringTransactions() {
 
           // Calculate next due date for skipped items
           const lastGenerated = template.lastGeneratedDate
-            ? startOfDay(new Date(template.lastGeneratedDate))
-            : startOfDay(new Date(template.startDate));
+            ? getDayStartUTC(new Date(template.lastGeneratedDate))
+            : getDayStartUTC(new Date(template.startDate));
           const nextDue = addDays(lastGenerated, template.frequencyDays);
 
           hubSummary.skipped.push({
             name: template.source || template.categoryName || "Unnamed",
-            nextDue: format(nextDue, "d.M.yyyy"),
+            nextDue: formatInAppTimezone(nextDue, "d.M.yyyy"),
           });
           continue;
         }
@@ -1594,12 +1603,12 @@ function isTemplateDue(
 ): boolean {
   // If never generated, check if start date has passed
   if (!template.lastGeneratedDate) {
-    const startDate = startOfDay(new Date(template.startDate));
+    const startDate = getDayStartUTC(new Date(template.startDate));
     return isBefore(startDate, today) || isSameDay(startDate, today);
   }
 
   // Check if enough days have passed since last generation
-  const lastGenerated = startOfDay(new Date(template.lastGeneratedDate));
+  const lastGenerated = getDayStartUTC(new Date(template.lastGeneratedDate));
   const nextDueDate = addDays(lastGenerated, template.frequencyDays);
 
   return isBefore(nextDueDate, today) || isSameDay(nextDueDate, today);

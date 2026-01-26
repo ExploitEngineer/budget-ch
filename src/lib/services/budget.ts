@@ -18,14 +18,15 @@ import {
 } from "@/db/queries";
 import { requireAdminRole } from "@/lib/auth/permissions";
 import {
-  startOfDay,
-  endOfMonth,
+  getDayStartUTC,
+  getMonthEndUTC,
+  getMonthBoundariesUTC,
   addDays,
   isBefore,
   isAfter,
   isSameDay,
-  format
-} from "date-fns";
+  formatInAppTimezone,
+} from "@/lib/timezone";
 import type {
   BudgetWithCategory,
   BudgetAmounts,
@@ -216,8 +217,8 @@ export async function getBudgetForecast(
       return { success: false, message: "Missing hubId parameter." };
     }
 
-    const today = startOfDay(new Date());
-    const monthEnd = endOfMonth(today);
+    const today = getDayStartUTC();
+    const monthEnd = getMonthEndUTC();
 
     // 1. Get Budget Amounts
     const amountsRes = await getBudgetsAmounts(undefined, undefined, hubId);
@@ -233,19 +234,19 @@ export async function getBudgetForecast(
     let upcomingRecurringTotal = 0;
 
     for (const template of templates) {
-      const startDate = startOfDay(new Date(template.startDate));
+      const startDate = getDayStartUTC(new Date(template.startDate));
       let nextOccur = startDate;
 
       if (template.frequencyDays > 0) {
         while (isBefore(nextOccur, today)) {
-          nextOccur = startOfDay(addDays(nextOccur, template.frequencyDays));
+          nextOccur = getDayStartUTC(addDays(nextOccur, template.frequencyDays));
         }
       }
 
       // Sum all occurrences between today and monthEnd
       while (isBefore(nextOccur, monthEnd) || isSameDay(nextOccur, monthEnd)) {
         // Check end date
-        if (template.endDate && isAfter(nextOccur, startOfDay(new Date(template.endDate)))) {
+        if (template.endDate && isAfter(nextOccur, getDayStartUTC(new Date(template.endDate)))) {
           break;
         }
 
@@ -256,7 +257,7 @@ export async function getBudgetForecast(
           upcomingRecurringTotal -= Number(template.amount);
         }
 
-        nextOccur = startOfDay(addDays(nextOccur, template.frequencyDays));
+        nextOccur = getDayStartUTC(addDays(nextOccur, template.frequencyDays));
       }
     }
 
@@ -267,7 +268,7 @@ export async function getBudgetForecast(
       message: "Forecast calculated",
       data: {
         forecastValue: forecast,
-        forecastDate: format(monthEnd, "dd.MM.yyyy"),
+        forecastDate: formatInAppTimezone(monthEnd, "dd.MM.yyyy"),
       },
     };
   } catch (err: any) {
@@ -637,10 +638,13 @@ export async function ensureBudgetInstances(
     // Get Previous Month Data if Carry Over Enabled
     let prevMonthBudgets: any[] = [];
     if (carryOverEnabled) {
-      const prevDate = new Date(Date.UTC(year, month - 1, 1));
-      prevDate.setMonth(prevDate.getMonth() - 1);
-      const pm = prevDate.getMonth() + 1;
-      const py = prevDate.getFullYear();
+      // Calculate previous month/year
+      let pm = month - 1;
+      let py = year;
+      if (pm === 0) {
+        pm = 12;
+        py = year - 1;
+      }
 
       const res = await getBudgetsByMonthDB(hubId, pm, py);
       if (res.success && res.data) {

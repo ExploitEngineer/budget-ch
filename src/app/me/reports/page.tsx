@@ -7,7 +7,7 @@ import SidebarHeader from "@/components/sidebar-header";
 import { ReportCardsSection } from "./_components/report-cards";
 import { AnalysisTable } from "./_components/analysis-table";
 import { DetailedTable } from "./_components/detailed-table";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { getMonthStartUTC, getMonthEndUTC } from "@/lib/timezone";
 import { reportKeys } from "@/lib/query-keys";
 import {
   getDetailedCategories,
@@ -38,8 +38,8 @@ export default async function Report({ searchParams }: ReportsPageProps) {
 
   // Default to current month if no dates are provided
   const now = new Date();
-  const from = fromParam || startOfMonth(now).toISOString();
-  const to = toParam || endOfMonth(now).toISOString();
+  const from = fromParam || getMonthStartUTC(now).toISOString();
+  const to = toParam || getMonthEndUTC(now).toISOString();
   const groupBy = groupByParam || "month";
 
   const queryClient = new QueryClient();

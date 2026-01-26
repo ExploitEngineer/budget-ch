@@ -14,7 +14,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { AdminUser } from "../page";
 import { UserActionsMenu } from "./user-actions-menu";
 import { useTranslations } from "next-intl";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 
 interface UsersTableProps {
   users: AdminUser[];
@@ -76,7 +76,7 @@ export function UsersTable({
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), "MM/dd/yyyy");
+    return formatInAppTimezone(new Date(dateString), "MM/dd/yyyy");
   };
 
   const truncateId = (id: string) => {

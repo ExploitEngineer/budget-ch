@@ -11,7 +11,7 @@ import {
   type KPIStats,
 } from "@/db/admin-queries";
 import type { AdminActionType } from "@/db/schema";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 
 // ============================================
 // GET AUDIT LOGS
@@ -41,7 +41,7 @@ export async function exportAuditLogsCSV(filters?: {
     // Build CSV content
     const headers = ["Time", "Action", "Affected User", "Affected Email", "Triggered By", "Admin Email", "Reference"];
     const rows = logs.map((log) => [
-      format(log.createdAt, "yyyy-MM-dd HH:mm:ss"),
+      formatInAppTimezone(log.createdAt, "yyyy-MM-dd HH:mm:ss"),
       formatActionName(log.action),
       log.affectedUserId || "-",
       log.affectedUser?.email || "-",
