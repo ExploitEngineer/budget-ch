@@ -19,7 +19,6 @@ import {
   Settings,
   CircleQuestionMark,
   LogOut,
-  ShieldCheck,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -50,7 +49,6 @@ export function NavMain() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
-  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   const router = useRouter();
   const t = useTranslations("main-dashboard");
@@ -69,14 +67,6 @@ export function NavMain() {
   useEffect((): void => {
     canAccessFeature("reports").then((res: FeatureAccessResult): void => {
       setHasAccess(res.canAccess);
-    });
-
-    // Check if user is admin
-    authClient.getSession().then((session) => {
-      if (session?.data?.user) {
-        const user = session.data.user as { role?: string };
-        setIsAdmin(user.role === "admin");
-      }
     });
   }, []);
 
@@ -164,16 +154,6 @@ export function NavMain() {
       url: "/me/help",
       icon: CircleQuestionMark,
     },
-    // Admin Dashboard link - only for admin users
-    ...(isAdmin
-      ? [
-          {
-            title: t("sidebar.links.admin"),
-            url: "/admin",
-            icon: ShieldCheck,
-          },
-        ]
-      : []),
     {
       title: t("sidebar.links.logout"),
       icon: LogOut,
@@ -247,8 +227,7 @@ export function NavMain() {
                 </SidebarMenuItem>
               </Link>
               {(item.title === t("sidebar.links.reports") ||
-                item.title === t("sidebar.links.help") ||
-                item.title === t("sidebar.links.admin")) && (
+                item.title === t("sidebar.links.help")) && (
                 <Separator className="dark:bg-[#1A2441]" />
               )}
             </div>

@@ -52,26 +52,3 @@ export const getUserResetPasswordSchema = (t: any) =>
 export type UserResetPasswordValues = z.infer<
   ReturnType<typeof getUserResetPasswordSchema>
 >;
-
-export const getSetPasswordSchema = (t: any) =>
-  z
-    .object({
-      newPassword: z
-        .string()
-        .min(8, { message: t("validations.password-min") })
-        .regex(/[A-Z]/, { message: t("validations.password-uppercase") })
-        .regex(/[a-z]/, { message: t("validations.password-lowercase") })
-        .regex(/[0-9]/, { message: t("validations.password-number") })
-        .regex(/[^A-Za-z0-9]/, {
-          message: t("validations.password-special"),
-        }),
-      confirmPassword: z
-        .string()
-        .min(8, { message: t("validations.password-min") }),
-    })
-    .refine((data) => data.newPassword === data.confirmPassword, {
-      message: t("validations.passwords-not-match"),
-      path: ["confirmPassword"],
-    });
-
-export type SetPasswordValues = z.infer<ReturnType<typeof getSetPasswordSchema>>;

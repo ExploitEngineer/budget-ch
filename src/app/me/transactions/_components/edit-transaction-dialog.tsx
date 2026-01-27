@@ -35,7 +35,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Pencil, Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { formatInAppTimezone } from "@/lib/timezone";
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import {
   TransactionDialogSchema,
@@ -458,7 +458,7 @@ export default function EditTransactionDialog({
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
-                                  ? formatInAppTimezone(field.value, "dd/MM/yyyy")
+                                  ? format(field.value, "dd/MM/yyyy")
                                   : t("transaction-edit-dialog.dialog.placeholders.date")}
                               </Button>
                             </PopoverTrigger>
@@ -788,7 +788,7 @@ export default function EditTransactionDialog({
                                   >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
-                                      ? formatInAppTimezone(field.value, "dd/MM/yyyy")
+                                      ? format(field.value, "dd/MM/yyyy")
                                       : t("transaction-edit-dialog.dialog.placeholders.startDate")}
                                   </Button>
                                 </PopoverTrigger>
@@ -821,7 +821,7 @@ export default function EditTransactionDialog({
                                   >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
-                                      ? formatInAppTimezone(field.value, "dd/MM/yyyy")
+                                      ? format(field.value, "dd/MM/yyyy")
                                       : t("transaction-edit-dialog.dialog.placeholders.endDate")}
                                   </Button>
                                 </PopoverTrigger>

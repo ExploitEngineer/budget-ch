@@ -19,7 +19,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { CalendarIcon, Filter as FilterIcon } from "lucide-react";
-import { formatInAppTimezone } from "@/lib/timezone";
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { filterDialogSchema, FilterDialogValues } from "@/lib/validations";
 import {
@@ -136,7 +136,7 @@ export default function FilterDialog({
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {field.value
-                              ? formatInAppTimezone(field.value, "MM/dd/yyyy")
+                              ? format(field.value, "MM/dd/yyyy")
                               : t("dialog-box.labels.fromPlaceholder")}
                           </Button>
                         </PopoverTrigger>
@@ -170,7 +170,7 @@ export default function FilterDialog({
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {field.value
-                              ? formatInAppTimezone(field.value, "MM/dd/yyyy")
+                              ? format(field.value, "MM/dd/yyyy")
                               : t("dialog-box.labels.toPlaceholder")}
                           </Button>
                         </PopoverTrigger>

@@ -1,32 +1,15 @@
+"use client";
+
 import { LangSwitcher } from "@/components/lang-switcher";
 import { ModeToggle } from "@/components/theme-toggle";
+import { useTheme } from "next-themes";
 import Image from "next/image";
-import { auth } from "@/lib/auth/auth";
-import { headers } from "next/headers";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
-export default async function AuthLayout({
+export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Redirect logged-in users to dashboard
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (session) {
-    // Allow access if user has pending 2FA verification (OAuth + 2FA flow)
-    const cookieStore = await cookies();
-    const pending2fa = cookieStore.get("pending_2fa");
-    if (pending2fa) {
-      // User needs to complete 2FA verification, allow access to auth pages
-    } else {
-      redirect("/me/dashboard");
-    }
-  }
-
   return (
     <main className="flex min-h-screen w-full flex-col items-center justify-center bg-[#F6F8FF] px-4 dark:[background:var(--fancy-gradient)]">
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">

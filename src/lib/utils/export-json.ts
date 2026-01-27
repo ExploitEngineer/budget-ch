@@ -1,7 +1,7 @@
 import type { BudgetRow, AccountRow, TransactionRow } from "@/lib/types/ui-types";
 import type { SavingGoal } from "@/lib/types/domain-types";
 import type { TransferData } from "@/app/me/accounts/_components/latest-transfers";
-import { formatInAppTimezone } from "@/lib/timezone";
+import { format } from "date-fns";
 
 /**
  * Full JSON Export Format - matches what the importer expects
@@ -117,12 +117,12 @@ export function transformDataForExport(data: {
     saved: goal.amountSaved,
     monthlyAllocation: goal.monthlyAllocation,
     account: goal.accountName || null, // accountName comes from API join
-    dueDate: goal.dueDate ? formatInAppTimezone(new Date(goal.dueDate), "yyyy-MM-dd") : null,
+    dueDate: goal.dueDate ? format(new Date(goal.dueDate), "yyyy-MM-dd") : null,
   }));
 
   // Transform transfers (TransferData -> ExportTransfer)
   const transfers: ExportTransfer[] = (data.transfers || []).map((t) => ({
-    date: formatInAppTimezone(new Date(t.date), "yyyy-MM-dd"),
+    date: format(new Date(t.date), "yyyy-MM-dd"),
     from: t.source || "",
     to: t.destination || "",
     amount: Math.abs(t.amount),

@@ -134,8 +134,11 @@ export function VerifyTotpDialog({
                 onClick={onVerify}
                 disabled={loading || totpCode.length !== 6}
               >
-                {loading && <Spinner className="mr-2 h-4 w-4" />}
-                {t("labels.two-factor.dialogs.verify.submit")}
+                {loading ? (
+                  <Spinner />
+                ) : (
+                  t("labels.two-factor.dialogs.verify.submit")
+                )}
               </Button>
             </>
           )}

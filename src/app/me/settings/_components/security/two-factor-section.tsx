@@ -10,26 +10,22 @@ interface TwoFactorSectionProps {
   loadingStatus: boolean;
   twoFactorStatus: TwoFactorStatus;
   loading: boolean;
-  hasPassword: boolean;
   onEnableClick: () => void;
   onVerifyClick: () => void;
   onRestartSetup: () => void;
   onRegenerateBackupCodesClick: () => void;
   onDisableClick: () => void;
-  onSetPasswordClick: () => void;
 }
 
 export function TwoFactorSection({
   loadingStatus,
   twoFactorStatus,
   loading,
-  hasPassword,
   onEnableClick,
   onVerifyClick,
   onRestartSetup,
   onRegenerateBackupCodesClick,
   onDisableClick,
-  onSetPasswordClick,
 }: TwoFactorSectionProps) {
   const t = useTranslations("main-dashboard.settings-page.security-section");
 
@@ -59,31 +55,15 @@ export function TwoFactorSection({
 
       {!loadingStatus && (
         <div className="flex flex-wrap items-center gap-2">
-          {!isTwoFactorEnabled && !isTwoFactorPending && hasPassword && (
+          {!isTwoFactorEnabled && !isTwoFactorPending && (
             <Button
               variant="outline"
               onClick={onEnableClick}
               disabled={loading}
               className="dark:border-border-blue !bg-dark-blue-background cursor-pointer"
             >
-              {loading && <Spinner className="mr-2 h-4 w-4" />}
-              {t("labels.two-factor.buttons.enable")}
+              {loading ? <Spinner /> : t("labels.two-factor.buttons.enable")}
             </Button>
-          )}
-          {!isTwoFactorEnabled && !isTwoFactorPending && !hasPassword && (
-            <div className="flex flex-col gap-2">
-              <p className="text-sm text-muted-foreground">
-                {t("labels.two-factor.set-password-prompt")}
-              </p>
-              <Button
-                variant="outline"
-                onClick={onSetPasswordClick}
-                disabled={loading}
-                className="dark:border-border-blue !bg-dark-blue-background w-fit cursor-pointer"
-              >
-                {t("labels.password.buttons.set-password")}
-              </Button>
-            </div>
           )}
           {isTwoFactorPending && (
             <>

@@ -6,8 +6,7 @@ import {
 import { mailer } from "@/lib/mailer";
 import fs from "fs";
 import path from "path";
-import { subMonths, subQuarters, startOfQuarter, endOfQuarter } from "date-fns";
-import { getMonthStartUTC, getMonthEndUTC, formatInAppTimezone } from "@/lib/timezone";
+import { startOfMonth, endOfMonth, subMonths, format, startOfQuarter, endOfQuarter, subQuarters } from "date-fns";
 import { enUS, de, fr, it } from "date-fns/locale";
 import { getMailTranslations } from "@/lib/mail-translations";
 
@@ -28,8 +27,8 @@ export async function sendAutomatedReports(frequency: 'monthly' | 'quarterly') {
 
     if (frequency === 'monthly') {
         const lastMonth = subMonths(now, 1);
-        startDate = getMonthStartUTC(lastMonth);
-        endDate = getMonthEndUTC(lastMonth);
+        startDate = startOfMonth(lastMonth);
+        endDate = endOfMonth(lastMonth);
     } else {
         const lastQuarter = subQuarters(now, 1);
         startDate = startOfQuarter(lastQuarter);
@@ -77,7 +76,7 @@ export async function sendUserReport(user: any, startDate: Date, endDate: Date, 
 
         const locale = locales[user.language] || enUS;
         const periodName = frequency === 'monthly'
-            ? formatInAppTimezone(startDate, 'MMMM yyyy', locale)
+            ? format(startDate, 'MMMM yyyy', { locale })
             : `Q${Math.floor(startDate.getMonth() / 3) + 1} ${startDate.getFullYear()}`;
 
         const reportTypeKey = frequency === 'monthly' ? 'monthly-report' : 'quarterly-report';

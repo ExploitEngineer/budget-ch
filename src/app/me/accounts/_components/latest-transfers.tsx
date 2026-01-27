@@ -17,7 +17,7 @@ import { transferKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { useExportCSV } from "@/hooks/use-export-csv";
 import { useSearchParams } from "next/navigation";
-import { formatInAppTimezone } from "@/lib/timezone";
+import { format } from "date-fns";
 
 export interface TransferData {
   date: string;
@@ -119,7 +119,7 @@ export function LatestTransfers() {
               {(transfers ?? []).map((tx, index) => (
                 <TableRow key={index} className="dark:border-border-blue">
                   <TableCell>
-                    {formatInAppTimezone(new Date(tx.date), "dd.MM.yyyy")}
+                    {format(new Date(tx.date), "dd.MM.yyyy")}
                   </TableCell>
                   <TableCell>{tx.source}</TableCell>
                   <TableCell>{tx.destination}</TableCell>

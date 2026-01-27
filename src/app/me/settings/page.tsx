@@ -16,7 +16,7 @@ import type { SubscriptionDetails } from "./types";
 
 export default async function Settings() {
   const hdrs = await headers();
-  const { hubId, user, subscription, userRole } = await getContext(hdrs, false);
+  const { hubId, user, subscription } = await getContext(hdrs, false);
 
   const subscriptionPrices = await fetchPrices();
 
@@ -48,7 +48,7 @@ export default async function Settings() {
           user={user}
           subscription={subscriptionInfo}
         />
-        <MembersInvitations hubId={hubId} userRole={userRole} />
+        <MembersInvitations hubId={hubId} />
         <LocalizationAppearance />
         <Notifications
           notificationsEnabled={user.notificationsEnabled}

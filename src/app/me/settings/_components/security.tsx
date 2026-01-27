@@ -12,8 +12,6 @@ import {
   getTotpUriAction,
   getTwoFactorStatusAction,
   regenerateBackupCodesAction,
-  checkHasPasswordAction,
-  setPasswordAction,
 } from "../actions";
 import type { TwoFactorStatus } from "@/lib/types/common-types";
 import { PasswordConfirmationDialog } from "./security/password-confirmation-dialog";
@@ -23,20 +21,13 @@ import { RegenerateBackupCodesDialog } from "./security/regenerate-backup-codes-
 import { DisableTwoFactorDialog } from "./security/disable-two-factor-dialog";
 import { TwoFactorSection } from "./security/two-factor-section";
 import { PasswordSection } from "./security/password-section";
-import { SetPasswordDialog } from "./security/set-password-dialog";
 
 export function Security() {
   const t = useTranslations("main-dashboard.settings-page.security-section");
   const [loading, setLoading] = useState<boolean>(false);
-  const [resetPasswordLoading, setResetPasswordLoading] = useState<boolean>(false);
   const [twoFactorStatus, setTwoFactorStatus] =
     useState<TwoFactorStatus>("disabled");
   const [loadingStatus, setLoadingStatus] = useState<boolean>(true);
-  const [hasPassword, setHasPassword] = useState<boolean>(false);
-
-  // Set password states
-  const [createPasswordDialogOpen, setCreatePasswordDialogOpen] = useState(false);
-  const [setPasswordLoading, setSetPasswordLoading] = useState(false);
 
   // Dialog states
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -70,7 +61,6 @@ export function Security() {
 
   useEffect(() => {
     loadTwoFactorStatus();
-    loadHasPassword();
   }, []);
 
   const loadTwoFactorStatus = async () => {
@@ -89,40 +79,8 @@ export function Security() {
     }
   };
 
-  const loadHasPassword = async () => {
-    try {
-      const result = await checkHasPasswordAction();
-      if (result.success) {
-        setHasPassword(result.data);
-      }
-    } catch (err) {
-      console.error("Error checking password status:", err);
-    }
-  };
-
-  const handleSetPassword = async (newPassword: string) => {
-    setSetPasswordLoading(true);
-    try {
-      const result = await setPasswordAction(newPassword);
-      if (result.success) {
-        setHasPassword(true);
-        setCreatePasswordDialogOpen(false);
-        toast.success(t("labels.password.messages.set-password-success"));
-      } else {
-        toast.error(
-          result.message || t("labels.password.messages.set-password-error"),
-        );
-      }
-    } catch (err) {
-      console.error("Error setting password:", err);
-      toast.error(t("labels.password.messages.set-password-error"));
-    } finally {
-      setSetPasswordLoading(false);
-    }
-  };
-
   const handleResetEmailSend = async (): Promise<void> => {
-    setResetPasswordLoading(true);
+    setLoading(true);
     try {
       const res = await getUserEmail();
 
@@ -149,7 +107,7 @@ export function Security() {
       console.error(err);
       toast.error(t("labels.password.messages.error"));
     } finally {
-      setResetPasswordLoading(false);
+      setLoading(false);
     }
   };
 
@@ -337,32 +295,20 @@ export function Security() {
               loadingStatus={loadingStatus}
               twoFactorStatus={twoFactorStatus}
               loading={loading}
-              hasPassword={hasPassword}
               onEnableClick={() => setPasswordDialogOpen(true)}
               onVerifyClick={() => setVerifyDialogOpen(true)}
               onRestartSetup={resetTwoFactorSetup}
               onRegenerateBackupCodesClick={() => setRegenerateDialogOpen(true)}
               onDisableClick={() => setDisableDialogOpen(true)}
-              onSetPasswordClick={() => setCreatePasswordDialogOpen(true)}
             />
 
             <PasswordSection
-              loading={resetPasswordLoading}
-              hasPassword={hasPassword}
+              loading={loading}
               onResetPasswordClick={handleResetEmailSend}
-              onSetPasswordClick={() => setCreatePasswordDialogOpen(true)}
-              setPasswordLoading={setPasswordLoading}
             />
           </div>
         </CardContent>
       </Card>
-
-      <SetPasswordDialog
-        open={createPasswordDialogOpen}
-        onOpenChange={setCreatePasswordDialogOpen}
-        onSubmit={handleSetPassword}
-        loading={setPasswordLoading}
-      />
 
       <PasswordConfirmationDialog
         open={passwordDialogOpen}

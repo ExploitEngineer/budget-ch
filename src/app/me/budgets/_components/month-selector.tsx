@@ -3,8 +3,7 @@
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { addMonths, subMonths } from "date-fns";
-import { formatInAppTimezone } from "@/lib/timezone";
+import { format, addMonths, subMonths } from "date-fns";
 import { useTranslations, useLocale } from "next-intl";
 
 export function MonthSelector() {
@@ -52,7 +51,7 @@ export function MonthSelector() {
                 <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="min-w-[120px] text-center font-medium">
-                {formatInAppTimezone(date, "MMMM yyyy", currentLocale)}
+                {format(date, "MMMM yyyy", { locale: currentLocale })}
             </span>
             <Button
                 variant="outline"

@@ -8,10 +8,6 @@
         "retry": "Retry",
         "currency": "CHF",
         "percent": "{value}%",
-        "plans": {
-            "individual": "Individual",
-            "family": "Family"
-        },
         "validations": {
             "required": "Required",
             "name-required": "Name is required",
@@ -33,19 +29,6 @@
             "10": "November",
             "11": "December"
         }
-    },
-    "auth-error": {
-        "banned": {
-            "title": "Account Suspended",
-            "description": "Your account has been suspended and you cannot sign in at this time.",
-            "contact": "If you believe this is an error, please contact our support team for assistance."
-        },
-        "generic": {
-            "title": "Authentication Error",
-            "description": "We encountered an issue while processing your request. Please try again."
-        },
-        "error-code": "Error code",
-        "back-home": "Return to Homepage"
     },
     "two-factor": {
         "title": "Two-Factor Authentication",
@@ -202,8 +185,7 @@
             "password-lowercase": "Password must contain at least one lowercase letter.",
             "password-number": "Password must contain at least one number.",
             "password-special": "Password must contain at least one special character.",
-            "accept-terms": "You must accept the terms and privacy policy.",
-            "passwords-not-match": "Passwords do not match."
+            "accept-terms": "You must accept the terms and privacy policy."
         },
         "verify-email": {
             "title": "Verify your email",
@@ -259,25 +241,8 @@
             "invited": "You have been invited to join a hub with the role: <strong>{role}</strong>.",
             "button": "Accept Invitation",
             "fallback": "Or copy and paste this link into your browser:",
-            "help-title": "How to accept this invitation:",
-            "help-new-user": "If you don't have an account yet, please create one first, then click the link above.",
-            "help-existing-user": "If you already have an account, please log in first, then click the link to accept the invitation.",
             "expire": "This invitation expires in 7 days.",
             "ignore": "If you didn't expect this invitation, you can safely ignore this email."
-        },
-        "admin-invitation": {
-            "subject": "You've been invited to BudgetHub",
-            "title": "BudgetHub Admin Invitation",
-            "hello": "Hello,",
-            "invited": "A BudgetHub administrator has invited you to join the platform{isAdmin, select, true { as an administrator} other {}}.",
-            "subscription": "You will receive a <strong>{plan}</strong> subscription for <strong>{months} month{months, plural, one {} other {s}}</strong>.",
-            "button": "Accept Invitation",
-            "copy-link": "Or copy this link:",
-            "help-title": "How to accept this invitation:",
-            "help-new-user": "If you don't have an account yet, please create one first, then click the link above.",
-            "help-existing-user": "If you already have an account, please log in first, then click the link to accept the invitation.",
-            "expires": "This invitation expires in 14 days.",
-            "ignore": "If you did not expect this invitation, you can safely ignore this email."
         }
     },
     "main-dashboard": {
@@ -299,7 +264,6 @@
                 "imp-exp": "Import / Export",
                 "settings": "Settings",
                 "help": "Help",
-                "admin": "Admin Dashboard",
                 "logout": "Logout"
             },
             "header": {
@@ -1642,8 +1606,7 @@
                     "send": "Send Invitation",
                     "sending": "Sending...",
                     "upgrade": "Upgrade to Invite",
-                    "delete-invitation": "Delete",
-                    "remove-member": "Remove"
+                    "cancel-invitation": "Cancel"
                 },
                 "members-table": {
                     "title": "Hub Members",
@@ -1653,8 +1616,7 @@
                         "name": "Name",
                         "email": "Email",
                         "role": "Role",
-                        "joined": "Joined",
-                        "actions": "Actions"
+                        "joined": "Joined"
                     }
                 },
                 "invitations-table": {
@@ -1687,25 +1649,8 @@
                     "invitation-sent": "Invitation sent",
                     "send-error": "Failed to send invitation",
                     "send-unexpected-error": "Error sending invitation",
-                    "invitation-deleted": "Invitation deleted",
-                    "delete-error": "Failed to delete invitation",
-                    "member-removed": "Member removed successfully",
-                    "remove-error": "Failed to remove member"
-                },
-                "remove-dialog": {
-                    "title": "Remove Member",
-                    "description": "Are you sure you want to remove {name} from the hub? They will lose access to all shared data.",
-                    "cancel": "Cancel",
-                    "confirm": "Remove",
-                    "removing": "Removing..."
-                },
-                "delete-invitation-dialog": {
-                    "title": "Delete Invitation",
-                    "description-pending": "Are you sure you want to delete the invitation for {email}? This will also cancel the pending invitation, making the invite link invalid.",
-                    "description-accepted": "Are you sure you want to delete the invitation record for {email}? This only removes the invitation from the list.",
-                    "cancel": "Cancel",
-                    "confirm": "Delete",
-                    "deleting": "Deleting..."
+                    "invitation-cancelled": "Invitation cancelled",
+                    "cancel-error": "Failed to cancel invitation"
                 }
             },
             "appearance-section": {
@@ -1805,8 +1750,6 @@
                     "two-factor": {
                         "title": "Two-Factor Authentication",
                         "content": "TOTP compatible with common authenticator apps like Google Authenticator, Authy, or Microsoft Authenticator.",
-                        "social-provider-message": "Your account uses social sign-in. Two-factor authentication is managed by your provider (e.g., Google). Enable 2FA in your provider's account settings for additional security.",
-                        "set-password-prompt": "You need to set a password before enabling two-factor authentication.",
                         "status": {
                             "enabled": "Enabled",
                             "disabled": "Disabled",
@@ -1886,28 +1829,13 @@
                     "password": {
                         "title": "Password",
                         "content": "Reset sends an email link (demo).",
-                        "no-password-message": "You don't have a password set. Set a password to enable additional security features.",
                         "buttons": {
                             "change-password": "Change Password",
-                            "reset-password": "Reset Password",
-                            "set-password": "Set Password"
+                            "reset-password": "Reset Password"
                         },
                         "messages": {
                             "reset-email-sent": "Password reset email sent",
-                            "error": "An error occurred",
-                            "set-password-success": "Password set successfully",
-                            "set-password-error": "Failed to set password"
-                        },
-                        "dialogs": {
-                            "set-password": {
-                                "title": "Set Password",
-                                "description": "Create a password for your account to enable two-factor authentication.",
-                                "new-password-label": "New Password",
-                                "new-password-placeholder": "Enter your new password",
-                                "confirm-password-label": "Confirm Password",
-                                "confirm-password-placeholder": "Confirm your new password",
-                                "submit": "Set Password"
-                            }
+                            "error": "An error occurred"
                         }
                     }
                 }
@@ -2114,275 +2042,5 @@
                 "unknown-error": "An unexpected error occurred"
             }
         }
-    },
-    "admin": {
-        "sidebar": {
-            "subtitle": "Owner Admin",
-            "navigation": "ADMIN",
-            "overview": "Overview",
-            "users": "Users",
-            "audit": "Audit Logs",
-            "compliance": "Compliance",
-            "back-to-app": "Back to App",
-            "logout": "Logout"
-        },
-        "overview": {
-            "title": "Admin Dashboard",
-            "description": "Manage users, subscriptions, and system settings.",
-            "kpi": {
-                "mrr": "Monthly Recurring Revenue",
-                "vs-last-month": "vs last month",
-                "no-comparison-data": "Not enough data for comparison",
-                "active-subscriptions": "Active Subscriptions",
-                "total": "Total",
-                "individual": "Individual",
-                "family": "Family",
-                "active-users": "Active Users",
-                "blocked": "Blocked"
-            },
-            "system-status": {
-                "title": "System Status",
-                "region": "Region",
-                "encryption": "Encryption",
-                "logs": "Logs",
-                "storage": "Storage"
-            }
-        },
-        "users": {
-            "title": "User Management",
-            "description": "View, manage, and invite users to the platform.",
-            "search-placeholder": "Search by email or ID...",
-            "search": "Search",
-            "invite": "Invite User",
-            "filters": {
-                "status": "Status",
-                "plan": "Plan",
-                "sort": "Sort",
-                "all": "All",
-                "status-active": "Active",
-                "status-banned": "Banned",
-                "plan-free": "Free",
-                "plan-individual": "Individual",
-                "plan-family": "Family",
-                "sort-created-desc": "Newest first",
-                "sort-created-asc": "Oldest first",
-                "sort-name-asc": "Name A-Z",
-                "sort-name-desc": "Name Z-A",
-                "apply": "Apply",
-                "reset": "Reset filters"
-            },
-            "table": {
-                "showing": "Showing {count} of {total} users",
-                "columns": {
-                    "id": "ID",
-                    "user": "User",
-                    "status": "Status",
-                    "plan": "Plan",
-                    "registered": "Registered",
-                    "actions": "Actions"
-                },
-                "status": {
-                    "active": "Active",
-                    "locked": "Locked",
-                    "unverified": "Unverified"
-                },
-                "plan": {
-                    "free": "Free"
-                },
-                "no-users": "No users found",
-                "previous": "Previous",
-                "next": "Next",
-                "page": "Page {page} of {totalPages}"
-            },
-            "actions": {
-                "menu": "Open menu",
-                "export": "Export Data (GDPR)",
-                "exporting": "Exporting...",
-                "export-success": "User data exported successfully",
-                "export-error": "Failed to export user data",
-                "lock": "Lock User",
-                "unlock": "Unlock User",
-                "lock-success": "User locked successfully",
-                "unlock-success": "User unlocked successfully",
-                "lock-error": "Failed to update user status",
-                "delete": "Delete User"
-            },
-            "invite-dialog": {
-                "title": "Invite User",
-                "description": "Send an invitation to join the platform. The user will receive an email with instructions.",
-                "email": "Email Address",
-                "email-placeholder": "user@example.com",
-                "role": "Role",
-                "role-user": "User",
-                "role-admin": "Administrator",
-                "include-subscription": "Include subscription grant",
-                "subscription-plan": "Subscription Plan",
-                "plan-individual": "Individual",
-                "plan-family": "Family",
-                "subscription-months": "Duration (months)",
-                "months-hint": "1-24 months",
-                "cancel": "Cancel",
-                "send": "Send Invitation",
-                "sending": "Sending...",
-                "success": "Invitation sent successfully",
-                "error": "Failed to send invitation"
-            },
-            "delete-dialog": {
-                "title": "Delete User",
-                "description": "Choose how to handle this user's data: {email}",
-                "anonymize": "Anonymize User",
-                "recommended": "Recommended",
-                "anonymize-description": "Replace personal data with anonymized values. User cannot log in but data is preserved for reporting.",
-                "permanently-delete": "Delete Permanently",
-                "delete-description": "Completely remove all user data. This action cannot be undone.",
-                "delete-warning": "This will permanently delete all user data including transactions, budgets, and settings. This action cannot be undone.",
-                "cancel": "Cancel",
-                "processing": "Processing...",
-                "anonymize-button": "Anonymize User",
-                "delete-button": "Delete Permanently",
-                "anonymize-success": "User anonymized successfully",
-                "delete-success": "User deleted successfully",
-                "error": "Failed to process request"
-            }
-        },
-        "audit": {
-            "title": "Audit Logs",
-            "description": "Review all administrative actions performed on the platform.",
-            "search-placeholder": "Search by user ID or email...",
-            "search": "Search",
-            "filter-action": "Filter by action",
-            "all-actions": "All Actions",
-            "export-csv": "Export CSV",
-            "exporting": "Exporting...",
-            "export-success": "Audit logs exported successfully",
-            "export-error": "Failed to export audit logs",
-            "showing": "Showing {count} of {total} logs",
-            "columns": {
-                "time": "Time",
-                "action": "Action",
-                "affected": "Affected User",
-                "trigger": "Triggered By",
-                "ref": "Reference"
-            },
-            "actions": {
-                "user_locked": "User Locked",
-                "user_unlocked": "User Unlocked",
-                "user_deleted": "User Deleted",
-                "user_anonymized": "User Anonymized",
-                "user_exported": "User Exported",
-                "invitation_created": "Invitation Created",
-                "invitation_accepted": "Invitation Accepted",
-                "subscription_granted": "Subscription Granted"
-            },
-            "no-logs": "No audit logs found",
-            "previous": "Previous",
-            "next": "Next",
-            "page": "Page {page} of {totalPages}"
-        },
-        "compliance": {
-            "title": "Compliance & Privacy",
-            "description": "Review data protection measures and compliance information.",
-            "items": {
-                "data-principle": {
-                    "title": "Data Principle",
-                    "value": "Admin access without content visibility. Personal data is only accessible by authorized administrators."
-                },
-                "cloud-storage": {
-                    "title": "Cloud Storage",
-                    "value": "All data is stored in EU-only data centers (Frankfurt). Data is encrypted at rest using KMS."
-                },
-                "tracking": {
-                    "title": "Tracking",
-                    "value": "No profiling, no ads. We do not sell or share user data with third parties."
-                },
-                "data-subject-rights": {
-                    "title": "Data Subject Rights",
-                    "value": "Users can export, block, delete, or anonymize their data at any time via self-service or admin request."
-                },
-                "admin-access": {
-                    "title": "Admin Access",
-                    "value": "Least privilege principle. Support staff has restricted access. All admin actions are logged."
-                },
-                "security": {
-                    "title": "Security",
-                    "value": "Admin accounts require 2FA. Session timeout after inactivity. IP logging for security purposes."
-                }
-            },
-            "privacy-policy": {
-                "title": "Privacy Policy",
-                "description": "Our full privacy policy is available online. It covers data collection, processing, and user rights."
-            },
-            "technical-measures": {
-                "title": "Technical Measures",
-                "encryption-at-rest": "Encryption at rest (AES-256)",
-                "encryption-in-transit": "Encryption in transit (TLS 1.3)",
-                "access-logging": "Access logging enabled",
-                "data-backup": "Regular data backups",
-                "session-management": "Secure session management",
-                "ip-anonymization": "IP address anonymization"
-            }
-        },
-        "accept-invitation": {
-            "loading": "Loading invitation details...",
-            "pending": {
-                "title": "Admin Invitation",
-                "description": "You have been invited to join BudgetHub.",
-                "email": "Invited Email",
-                "role": "Role",
-                "role-admin": "Administrator",
-                "role-user": "User",
-                "subscription-included": "Subscription Included!",
-                "plan-family": "Family Plan",
-                "plan-individual": "Individual Plan",
-                "month": "month",
-                "months": "months",
-                "accept-button": "Accept Invitation",
-                "accepting": "Accepting..."
-            },
-            "success": {
-                "title": "Invitation Accepted!",
-                "toast": "Invitation accepted successfully!",
-                "redirecting": "Redirecting to your dashboard...",
-                "button": "Go to Dashboard"
-            },
-            "not-authenticated": {
-                "title": "Login Required",
-                "description": "Please log in to accept this invitation.",
-                "button": "Go to Login"
-            },
-            "no-account": {
-                "title": "Account Required",
-                "description": "You need to create an account first to accept this invitation.",
-                "button": "Create Account"
-            },
-            "invalid": {
-                "title": "Invalid Invitation",
-                "description": "This invitation link is invalid or does not exist."
-            },
-            "expired": {
-                "title": "Invitation Expired",
-                "description": "This invitation has expired. Please request a new invitation from the administrator."
-            },
-            "already-accepted": {
-                "title": "Already Accepted",
-                "description": "This invitation has already been accepted. You can access your dashboard."
-            },
-            "email-mismatch": {
-                "title": "Wrong Account",
-                "description": "This invitation was sent to a different email address. Please log in with the correct account."
-            },
-            "error": {
-                "title": "Error",
-                "description": "Something went wrong while processing your invitation. Please try again."
-            }
-        }
-    },
-    "welcome-modal": {
-        "title": "Welcome to BudgetHub",
-        "description-1": "Get started in under 2 minutes. Learn how to use the dashboard, budgets, and transactions.",
-        "description-2": "You can also find helpful resources and support anytime under",
-        "help": "Help",
-        "open-guide": "Open guide",
-        "later": "Later"
     }
 }

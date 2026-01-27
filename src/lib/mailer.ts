@@ -26,16 +26,3 @@ export const supportMailer = nodemailer.createTransport({
     rejectUnauthorized: false,
   },
 });
-
-export const adminMailer = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false, // Use STARTTLS
-  auth: {
-    user: process.env.MAIL_ADMIN_USER || process.env.MAIL_USER!,
-    pass: process.env.MAIL_ADMIN_PASS || process.env.MAIL_PASS!,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});

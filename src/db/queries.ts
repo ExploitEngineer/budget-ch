@@ -31,7 +31,6 @@ import type {
 } from "@/lib/services/budget";
 import type { SavingGoalsSummary } from "@/lib/services/saving-goal";
 import type { TransactionType } from "@/lib/types/common-types";
-import { getMonthStartUTC, getMonthBoundariesUTC } from "@/lib/timezone";
 
 export type AccessRole = "admin" | "member";
 
@@ -1783,7 +1782,8 @@ export async function getBudgetsByMonthDB(
   message?: string;
 }> {
   try {
-    const { start: startDate, end: endDate } = getMonthBoundariesUTC(month, year);
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
 
     // Create a subquery to calculate gross spent amounts from transactions for each category
     // Gross spent = sum of expenses
@@ -2486,7 +2486,8 @@ export async function getHubTotalExpensesDB(
   year: number,
 ) {
   try {
-    const { start: startDate, end: endDate } = getMonthBoundariesUTC(month, year);
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(Date.UTC(year, month, 0, 23, 59, 59, 999));
 
     const result = await db
       .select({
@@ -2729,24 +2730,26 @@ export async function getHubInvitationsByHubDB(hubId: string) {
   }
 }
 
-// DELETE Invitation
-export async function deleteHubInvitationDB(invitationId: string, hubId: string) {
+// CANCEL Invitation
+export async function cancelHubInvitationDB(invitationId: string, hubId: string) {
   try {
     const result = await db
-      .delete(hubInvitations)
+      .update(hubInvitations)
+      .set({ cancelled: true })
       .where(
         and(
           eq(hubInvitations.id, invitationId),
-          eq(hubInvitations.hubId, hubId)
+          eq(hubInvitations.hubId, hubId),
+          eq(hubInvitations.accepted, false)
         )
       )
       .returning();
 
     if (result.length === 0) {
-      return { success: false, message: "Invitation not found" };
+      return { success: false, message: "Invitation not found or already accepted" };
     }
 
-    return { success: true, message: "Invitation deleted" };
+    return { success: true, message: "Invitation cancelled" };
   } catch (err: any) {
     return { success: false, message: err.message };
   }
@@ -2862,31 +2865,6 @@ export async function getHubMembersDB(hubId: string) {
     return { success: true, data: rows };
   } catch (err: any) {
     return { success: false, message: err.message, data: [] };
-  }
-}
-
-// REMOVE MEMBER FROM HUB
-export async function removeHubMemberDB(userId: string, hubId: string) {
-  try {
-    const member = await db.query.hubMembers.findFirst({
-      where: and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)),
-    });
-
-    if (!member) {
-      return { success: false, message: "Member not found" };
-    }
-
-    if (member.isOwner) {
-      return { success: false, message: "Cannot remove the hub owner" };
-    }
-
-    await db
-      .delete(hubMembers)
-      .where(and(eq(hubMembers.userId, userId), eq(hubMembers.hubId, hubId)));
-
-    return { success: true, message: "Member removed successfully" };
-  } catch (err: any) {
-    return { success: false, message: err.message };
   }
 }
 
@@ -3007,7 +2985,7 @@ export async function getMonthlyTransactionCount(
   userId: string,
 ): Promise<number> {
   const now = new Date();
-  const firstDayOfMonth = getMonthStartUTC(now);
+  const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   return await db.$count(
     transactions,
@@ -3577,46 +3555,6 @@ export async function getUserHubsDB(userId: string) {
     };
   } catch (err: any) {
     console.error("Error fetching user hubs:", err);
-    return { success: false, message: err.message };
-  }
-}
-
-export async function getOnboardingStatusDB(userId: string) {
-  try {
-    const user = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: {
-        isOnboarded: true,
-      },
-    });
-
-    if (!user) {
-      return { success: false, message: "User not found" };
-    }
-
-    return {
-      success: true,
-      data: { isOnboarded: user.isOnboarded },
-    };
-  } catch (err: any) {
-    console.error("Error fetching onboarding status:", err);
-    return { success: false, message: err.message };
-  }
-}
-
-export async function markUserOnboardedDB(userId: string) {
-  try {
-    await db
-      .update(users)
-      .set({ isOnboarded: true, updatedAt: new Date() })
-      .where(eq(users.id, userId));
-
-    return {
-      success: true,
-      message: "User marked as onboarded",
-    };
-  } catch (err: any) {
-    console.error("Error marking user as onboarded:", err);
     return { success: false, message: err.message };
   }
 }

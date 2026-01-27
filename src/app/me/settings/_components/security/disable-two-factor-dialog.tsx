@@ -77,8 +77,11 @@ export function DisableTwoFactorDialog({
             onClick={onSubmit}
             disabled={loading || !password}
           >
-            {loading && <Spinner className="mr-2 h-4 w-4" />}
-            {t("labels.two-factor.dialogs.disable.confirm")}
+            {loading ? (
+              <Spinner />
+            ) : (
+              t("labels.two-factor.dialogs.disable.confirm")
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

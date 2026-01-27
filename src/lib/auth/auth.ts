@@ -7,7 +7,6 @@ import { createAuthMiddleware, APIError } from "better-auth/api";
 import { ensureUserOnboarding } from "@/lib/services/user";
 import { mailer } from "@/lib/mailer";
 import { getMailTranslations } from "@/lib/mail-translations";
-import { admin } from "better-auth/plugins";
 
 
 
@@ -144,21 +143,6 @@ export const auth = betterAuth({
             console.error(`Error in ${isOAuthCallback ? 'OAuth callback' : 'sign-up'} hook: ${err.message}`);
           }
         }
-
-        // For OAuth callback: if user has 2FA enabled, set pending_2fa cookie
-        // This cookie persists for the session duration to enforce 2FA verification
-        if (isOAuthCallback && user.twoFactorEnabled) {
-          const isProduction = process.env.NODE_ENV === "production";
-          const cookieValue = [
-            "pending_2fa=1",
-            "path=/",
-            "Max-Age=604800",
-            "HttpOnly",
-            "SameSite=Lax",
-            isProduction ? "Secure" : "",
-          ].filter(Boolean).join("; ");
-          ctx.setHeader("Set-Cookie", cookieValue);
-        }
       }
       if (ctx.path.startsWith("/sign-out")) {
         // Clear activeHubId cookie server-side
@@ -277,7 +261,6 @@ export const auth = betterAuth({
     },
   },
   plugins: [
-    admin(),
     twoFactor({
       issuer: "Budget-ch",
       /*

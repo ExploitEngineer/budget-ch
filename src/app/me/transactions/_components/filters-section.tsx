@@ -27,7 +27,7 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { formatInAppTimezone } from "@/lib/timezone";
+import { format } from "date-fns";
 import { useTranslations } from "next-intl";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -153,7 +153,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
-                                  ? formatInAppTimezone(field.value, "dd/MM/yyyy")
+                                  ? format(field.value, "dd/MM/yyyy")
                                   : t("transaction-edit-dialog.dialog.placeholders.pick-date")}
                               </Button>
                             </PopoverTrigger>
@@ -185,7 +185,7 @@ export function FiltersSection({ onFilter, onReset }: FiltersSectionProps) {
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
-                                  ? formatInAppTimezone(field.value, "dd/MM/yyyy")
+                                  ? format(field.value, "dd/MM/yyyy")
                                   : t("transaction-edit-dialog.dialog.placeholders.pick-date")}
                               </Button>
                             </PopoverTrigger>
