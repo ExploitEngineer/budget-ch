@@ -10,7 +10,8 @@ import {
   BUDGET_THRESHOLD_80,
   BUDGET_THRESHOLD_100,
 } from "./types";
-import { addDays, startOfDay, differenceInDays, format } from "date-fns";
+import { format } from "date-fns";
+import { addDays, getDayStartUTC, differenceInDays } from "@/lib/timezone";
 import { subscriptions, hubs, notifications } from "@/db/schema";
 import { getBudgetsDB } from "@/db/queries";
 
@@ -24,7 +25,7 @@ export async function checkSubscriptionExpiry(): Promise<{
   processed?: number;
 }> {
   try {
-    const today = startOfDay(new Date());
+    const today = getDayStartUTC();
     const threeDaysFromNow = addDays(today, 3);
     const oneDayFromNow = addDays(today, 1);
 
@@ -41,7 +42,7 @@ export async function checkSubscriptionExpiry(): Promise<{
     let processed = 0;
 
     for (const subscription of allSubscriptions) {
-      const periodEnd = startOfDay(new Date(subscription.currentPeriodEnd));
+      const periodEnd = getDayStartUTC(new Date(subscription.currentPeriodEnd));
       const daysUntilExpiry = differenceInDays(periodEnd, today);
 
       const hub = await db.query.hubs.findFirst({

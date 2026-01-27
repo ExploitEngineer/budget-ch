@@ -19,8 +19,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Budget CH",
-  description: "Budget Calculator for Switzerland",
+  title: "Budget App Schweiz - Budgethub.ch",
+  description: "Budget Tracker for Switzerland",
 };
 
 export default function RootLayout({

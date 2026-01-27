@@ -36,7 +36,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CalendarIcon, Plus, X } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 import { useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -301,7 +301,7 @@ export default function CreateTransactionDialog({
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
-                                  ? format(field.value, "dd/MM/yyyy")
+                                  ? formatInAppTimezone(field.value, "dd/MM/yyyy")
                                   : t("transaction-edit-dialog.dialog.placeholders.date")}
                               </Button>
                             </PopoverTrigger>
@@ -631,7 +631,7 @@ export default function CreateTransactionDialog({
                                   >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
-                                      ? format(field.value, "dd/MM/yyyy")
+                                      ? formatInAppTimezone(field.value, "dd/MM/yyyy")
                                       : t("transaction-edit-dialog.dialog.placeholders.startDate")}
                                   </Button>
                                 </PopoverTrigger>
@@ -664,7 +664,7 @@ export default function CreateTransactionDialog({
                                   >
                                     <CalendarIcon className="mr-2 h-4 w-4" />
                                     {field.value
-                                      ? format(field.value, "dd/MM/yyyy")
+                                      ? formatInAppTimezone(field.value, "dd/MM/yyyy")
                                       : t("transaction-edit-dialog.dialog.placeholders.endDate")}
                                   </Button>
                                 </PopoverTrigger>

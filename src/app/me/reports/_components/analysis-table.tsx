@@ -13,7 +13,8 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
-import { subMonths, subQuarters, subYears, format, startOfMonth, startOfQuarter, startOfYear, endOfMonth, endOfQuarter, endOfYear } from "date-fns";
+import { subMonths, subQuarters, subYears, startOfQuarter, startOfYear, endOfQuarter, endOfYear } from "date-fns";
+import { getMonthStartUTC, getMonthEndUTC } from "@/lib/timezone";
 import { useTranslations } from "next-intl";
 import { useQuery } from "@tanstack/react-query";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -45,7 +46,7 @@ export function AnalysisTable({
     const now = new Date();
     if (groupBy === "quarter") return startOfQuarter(subQuarters(now, 4)).toISOString();
     if (groupBy === "year") return startOfYear(subYears(now, 2)).toISOString();
-    return startOfMonth(subMonths(now, 8)).toISOString(); // Default 9 months including current
+    return getMonthStartUTC(subMonths(now, 8)).toISOString(); // Default 9 months including current
   })();
 
   const {

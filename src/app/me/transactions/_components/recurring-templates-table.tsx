@@ -24,7 +24,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, addDays, startOfDay } from "date-fns";
+import { formatInAppTimezone, addDays, getDayStartUTC } from "@/lib/timezone";
 import { Archive, ArchiveRestore } from "lucide-react";
 import { toast } from "sonner";
 import type { RecurringTemplateWithDetails } from "@/lib/types/domain-types";
@@ -98,16 +98,16 @@ export default function RecurringTemplatesTable({
       return null;
     }
 
-    const today = startOfDay(new Date());
+    const today = getDayStartUTC();
     let baseDate: Date;
 
     if (template.lastGeneratedDate) {
-      baseDate = startOfDay(new Date(template.lastGeneratedDate));
+      baseDate = getDayStartUTC(new Date(template.lastGeneratedDate));
     } else {
-      baseDate = startOfDay(new Date(template.startDate));
+      baseDate = getDayStartUTC(new Date(template.startDate));
       // If start date hasn't occurred yet, that's the next occurrence
       if (baseDate >= today) {
-        return format(baseDate, "dd/MM/yyyy");
+        return formatInAppTimezone(baseDate, "dd/MM/yyyy");
       }
     }
 
@@ -116,13 +116,13 @@ export default function RecurringTemplatesTable({
 
     // If there's an end date and next occurrence is after it, return null
     if (template.endDate) {
-      const endDate = startOfDay(new Date(template.endDate));
+      const endDate = getDayStartUTC(new Date(template.endDate));
       if (nextDate > endDate) {
         return null;
       }
     }
 
-    return format(nextDate, "dd/MM/yyyy");
+    return formatInAppTimezone(nextDate, "dd/MM/yyyy");
   };
 
   // Format transaction type with proper capitalization

@@ -10,6 +10,8 @@ import {
   updateUser,
   updateUserNotificationsEnabledDB,
   updateUserReportFrequencyDB,
+  getOnboardingStatusDB,
+  markUserOnboardedDB,
 } from "@/db/queries";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
@@ -196,6 +198,56 @@ export async function updateUserReportFrequency(frequency: string) {
     return {
       success: false,
       message: `Failed to update report preference: ${err.message}`,
+    };
+  }
+}
+
+// CHECK onboarding status
+export async function checkOnboardingStatus() {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    const res = await getOnboardingStatusDB(userId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Error fetching onboarding status",
+      };
+    }
+
+    return { success: true, data: res.data };
+  } catch (err: any) {
+    console.error("Error fetching onboarding status: ", err);
+    return {
+      success: false,
+      message: `Failed to fetch onboarding status: ${err.message}`,
+    };
+  }
+}
+
+// COMPLETE onboarding (mark user as onboarded)
+export async function completeOnboarding() {
+  try {
+    const hdrs = await headers();
+    const { userId } = await getContext(hdrs, false);
+
+    const res = await markUserOnboardedDB(userId);
+
+    if (!res.success) {
+      return {
+        success: false,
+        message: res.message || "Error completing onboarding",
+      };
+    }
+
+    return { success: true, message: "Onboarding completed successfully" };
+  } catch (err: any) {
+    console.error("Error completing onboarding: ", err);
+    return {
+      success: false,
+      message: `Failed to complete onboarding: ${err.message}`,
     };
   }
 }
