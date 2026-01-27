@@ -1,12 +1,13 @@
 /**
  * Transaction adapters - Transform domain types to UI types for transactions
- * 
+ *
  * These functions convert TransactionWithDetails (domain type) to TransactionRow (UI type)
  * by adding UI-specific formatting and computed values.
  */
 
 import type { TransactionWithDetails } from "@/lib/types/domain-types";
 import type { TransactionRow } from "@/lib/types/ui-types";
+import { formatInAppTimezone } from "@/lib/timezone";
 
 /**
  * Maps a TransactionWithDetails domain type to TransactionRow UI type
@@ -16,7 +17,7 @@ export function mapTransactionToTransactionRow(
   transaction: TransactionWithDetails,
 ): TransactionRow {
   const date = transaction.createdAt
-    ? new Date(transaction.createdAt).toLocaleDateString("en-GB")
+    ? formatInAppTimezone(new Date(transaction.createdAt), "dd/MM/yyyy")
     : null;
 
   /* DEBUG: Log first 3 transactions to see raw data

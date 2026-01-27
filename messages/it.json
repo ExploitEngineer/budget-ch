@@ -1,4 +1,17 @@
 {
+    "auth-error": {
+        "banned": {
+            "title": "Account sospeso",
+            "description": "Il tuo account e stato sospeso e non puoi accedere al momento.",
+            "contact": "Se ritieni che questo sia un errore, contatta il nostro team di supporto."
+        },
+        "generic": {
+            "title": "Errore di autenticazione",
+            "description": "Si e verificato un problema durante l'elaborazione della richiesta. Riprova."
+        },
+        "error-code": "Codice errore",
+        "back-home": "Torna alla home"
+    },
     "common": {
         "loading": "Caricamento...",
         "updating": "Aggiornamento...",
@@ -8,6 +21,10 @@
         "retry": "Riprova",
         "currency": "CHF",
         "percent": "{value}%",
+        "plans": {
+            "individual": "Individuale",
+            "family": "Famiglia"
+        },
         "validations": {
             "required": "Obbligatorio",
             "name-required": "Il nome è obbligatorio",
@@ -185,7 +202,8 @@
             "password-lowercase": "La password deve contenere almeno una lettera minuscola.",
             "password-number": "La password deve contenere almeno un numero.",
             "password-special": "La password deve contenere almeno un carattere speciale.",
-            "accept-terms": "Devi accettare i termini e l'informativa sulla privacy."
+            "accept-terms": "Devi accettare i termini e l'informativa sulla privacy.",
+            "passwords-not-match": "Le password non corrispondono."
         },
         "verify-email": {
             "title": "Verifica la tua e-mail",
@@ -241,7 +259,24 @@
             "invited": "Sei stato invitato a unirti a un hub con il ruolo: <strong>{role}</strong>.",
             "button": "Accetta invito",
             "fallback": "Oppure copia e incolla questo link nel tuo browser:",
+            "help-title": "Come accettare questo invito:",
+            "help-new-user": "Se non hai ancora un account, creane uno prima, poi clicca sul link qui sopra.",
+            "help-existing-user": "Se hai già un account, effettua prima l'accesso, poi clicca sul link per accettare l'invito.",
             "expire": "Questo invito scade tra 7 giorni.",
+            "ignore": "Se non ti aspettavi questo invito, puoi ignorare tranquillamente questa e-mail."
+        },
+        "admin-invitation": {
+            "subject": "Sei stato invitato a BudgetHub",
+            "title": "Invito amministratore BudgetHub",
+            "hello": "Ciao,",
+            "invited": "Un amministratore di BudgetHub ti ha invitato a unirti alla piattaforma{isAdmin, select, true { come amministratore} other {}}.",
+            "subscription": "Riceverai un abbonamento <strong>{plan}</strong> per <strong>{months} {months, plural, one {mese} other {mesi}}</strong>.",
+            "button": "Accetta invito",
+            "copy-link": "Oppure copia questo link:",
+            "help-title": "Come accettare questo invito:",
+            "help-new-user": "Se non hai ancora un account, creane uno prima, poi clicca sul link qui sopra.",
+            "help-existing-user": "Se hai già un account, effettua prima l'accesso, poi clicca sul link per accettare l'invito.",
+            "expires": "Questo invito scade tra 14 giorni.",
             "ignore": "Se non ti aspettavi questo invito, puoi ignorare tranquillamente questa e-mail."
         }
     },
@@ -264,6 +299,7 @@
                 "imp-exp": "Importa / Esporta",
                 "settings": "Impostazioni",
                 "help": "Aiuto",
+                "admin": "Dashboard Admin",
                 "logout": "Esci"
             },
             "header": {
@@ -1606,7 +1642,8 @@
                     "send": "Invia invito",
                     "sending": "Invio...",
                     "upgrade": "Effettua l'upgrade per invitare",
-                    "cancel-invitation": "Annulla"
+                    "delete-invitation": "Elimina",
+                    "remove-member": "Rimuovi"
                 },
                 "members-table": {
                     "title": "Membri dell'hub",
@@ -1616,7 +1653,8 @@
                         "name": "Nome",
                         "email": "Email",
                         "role": "Ruolo",
-                        "joined": "Entrato il"
+                        "joined": "Entrato il",
+                        "actions": "Azioni"
                     }
                 },
                 "invitations-table": {
@@ -1649,8 +1687,25 @@
                     "invitation-sent": "Invito inviato",
                     "send-error": "Impossibile inviare l'invito",
                     "send-unexpected-error": "Errore durante l'invio dell'invito",
-                    "invitation-cancelled": "Invito annullato",
-                    "cancel-error": "Impossibile annullare l'invito"
+                    "invitation-deleted": "Invito eliminato",
+                    "delete-error": "Impossibile eliminare l'invito",
+                    "member-removed": "Membro rimosso con successo",
+                    "remove-error": "Impossibile rimuovere il membro"
+                },
+                "remove-dialog": {
+                    "title": "Rimuovi membro",
+                    "description": "Sei sicuro di voler rimuovere {name} dall'hub? Perderà l'accesso a tutti i dati condivisi.",
+                    "cancel": "Annulla",
+                    "confirm": "Rimuovi",
+                    "removing": "Rimozione..."
+                },
+                "delete-invitation-dialog": {
+                    "title": "Elimina invito",
+                    "description-pending": "Sei sicuro di voler eliminare l'invito per {email}? Questo annullerà anche l'invito in attesa, rendendo il link di invito non valido.",
+                    "description-accepted": "Sei sicuro di voler eliminare il record dell'invito per {email}? Questo rimuove solo l'invito dalla lista.",
+                    "cancel": "Annulla",
+                    "confirm": "Elimina",
+                    "deleting": "Eliminazione..."
                 }
             },
             "appearance-section": {
@@ -1750,6 +1805,8 @@
                     "two-factor": {
                         "title": "Autenticazione a due fattori",
                         "content": "Compatibile TOTP con le comuni app di autenticazione come Google Authenticator, Authy o Microsoft Authenticator.",
+                        "social-provider-message": "Il tuo account utilizza l'accesso social. L'autenticazione a due fattori è gestita dal tuo provider (es. Google). Attiva la 2FA nelle impostazioni del tuo provider per maggiore sicurezza.",
+                        "set-password-prompt": "Devi impostare una password prima di attivare l'autenticazione a due fattori.",
                         "status": {
                             "enabled": "Attivato",
                             "disabled": "Disattivato",
@@ -1829,13 +1886,28 @@
                     "password": {
                         "title": "Password",
                         "content": "Il reset invia un link via email (demo).",
+                        "no-password-message": "Non hai una password impostata. Imposta una password per abilitare le funzionalità di sicurezza aggiuntive.",
                         "buttons": {
                             "change-password": "Cambia password",
-                            "reset-password": "Reimposta password"
+                            "reset-password": "Reimposta password",
+                            "set-password": "Imposta password"
                         },
                         "messages": {
                             "reset-email-sent": "Email di reimpostazione password inviata",
-                            "error": "Si è verificato un errore"
+                            "error": "Si è verificato un errore",
+                            "set-password-success": "Password impostata con successo",
+                            "set-password-error": "Impossibile impostare la password"
+                        },
+                        "dialogs": {
+                            "set-password": {
+                                "title": "Imposta password",
+                                "description": "Crea una password per il tuo account per abilitare l'autenticazione a due fattori.",
+                                "new-password-label": "Nuova password",
+                                "new-password-placeholder": "Inserisci la tua nuova password",
+                                "confirm-password-label": "Conferma password",
+                                "confirm-password-placeholder": "Conferma la tua nuova password",
+                                "submit": "Imposta password"
+                            }
                         }
                     }
                 }
@@ -2065,5 +2137,275 @@
                 "unknown-error": "Si è verificato un errore imprevisto"
             }
         }
+    },
+    "admin": {
+        "sidebar": {
+            "subtitle": "Amministrazione",
+            "navigation": "ADMIN",
+            "overview": "Panoramica",
+            "users": "Utenti",
+            "audit": "Registro audit",
+            "compliance": "Conformità",
+            "back-to-app": "Torna all'app",
+            "logout": "Esci"
+        },
+        "overview": {
+            "title": "Dashboard Admin",
+            "description": "Gestisci utenti, abbonamenti e impostazioni di sistema.",
+            "kpi": {
+                "mrr": "Entrate mensili ricorrenti",
+                "vs-last-month": "vs mese scorso",
+                "no-comparison-data": "Dati insufficienti per il confronto",
+                "active-subscriptions": "Abbonamenti attivi",
+                "total": "Totale",
+                "individual": "Individuale",
+                "family": "Famiglia",
+                "active-users": "Utenti attivi",
+                "blocked": "Bloccati"
+            },
+            "system-status": {
+                "title": "Stato del sistema",
+                "region": "Regione",
+                "encryption": "Crittografia",
+                "logs": "Log",
+                "storage": "Archiviazione"
+            }
+        },
+        "users": {
+            "title": "Gestione utenti",
+            "description": "Visualizza, gestisci e invita utenti sulla piattaforma.",
+            "search-placeholder": "Cerca per email o ID...",
+            "search": "Cerca",
+            "invite": "Invita utente",
+            "filters": {
+                "status": "Stato",
+                "plan": "Piano",
+                "sort": "Ordina",
+                "all": "Tutti",
+                "status-active": "Attivo",
+                "status-banned": "Bannato",
+                "plan-free": "Gratuito",
+                "plan-individual": "Individuale",
+                "plan-family": "Famiglia",
+                "sort-created-desc": "Più recenti",
+                "sort-created-asc": "Più vecchi",
+                "sort-name-asc": "Nome A-Z",
+                "sort-name-desc": "Nome Z-A",
+                "apply": "Applica",
+                "reset": "Reimposta filtri"
+            },
+            "table": {
+                "showing": "Visualizzazione di {count} di {total} utenti",
+                "columns": {
+                    "id": "ID",
+                    "user": "Utente",
+                    "status": "Stato",
+                    "plan": "Piano",
+                    "registered": "Registrato",
+                    "actions": "Azioni"
+                },
+                "status": {
+                    "active": "Attivo",
+                    "locked": "Bloccato",
+                    "unverified": "Non verificato"
+                },
+                "plan": {
+                    "free": "Gratuito"
+                },
+                "no-users": "Nessun utente trovato",
+                "previous": "Precedente",
+                "next": "Successivo",
+                "page": "Pagina {page} di {totalPages}"
+            },
+            "actions": {
+                "menu": "Apri menu",
+                "export": "Esporta dati (GDPR)",
+                "exporting": "Esportazione...",
+                "export-success": "Dati utente esportati con successo",
+                "export-error": "Impossibile esportare i dati utente",
+                "lock": "Blocca utente",
+                "unlock": "Sblocca utente",
+                "lock-success": "Utente bloccato con successo",
+                "unlock-success": "Utente sbloccato con successo",
+                "lock-error": "Impossibile aggiornare lo stato dell'utente",
+                "delete": "Elimina utente"
+            },
+            "invite-dialog": {
+                "title": "Invita utente",
+                "description": "Invia un invito per unirsi alla piattaforma. L'utente riceverà un'email con le istruzioni.",
+                "email": "Indirizzo email",
+                "email-placeholder": "utente@esempio.com",
+                "role": "Ruolo",
+                "role-user": "Utente",
+                "role-admin": "Amministratore",
+                "include-subscription": "Includi abbonamento",
+                "subscription-plan": "Piano di abbonamento",
+                "plan-individual": "Individuale",
+                "plan-family": "Famiglia",
+                "subscription-months": "Durata (mesi)",
+                "months-hint": "1-24 mesi",
+                "cancel": "Annulla",
+                "send": "Invia invito",
+                "sending": "Invio...",
+                "success": "Invito inviato con successo",
+                "error": "Impossibile inviare l'invito"
+            },
+            "delete-dialog": {
+                "title": "Elimina utente",
+                "description": "Scegli come gestire i dati di questo utente: {email}",
+                "anonymize": "Anonimizza utente",
+                "recommended": "Consigliato",
+                "anonymize-description": "Sostituisci i dati personali con valori anonimizzati. L'utente non può accedere ma i dati vengono conservati per i report.",
+                "permanently-delete": "Elimina definitivamente",
+                "delete-description": "Rimuovi completamente tutti i dati utente. Questa azione non può essere annullata.",
+                "delete-warning": "Questo eliminerà definitivamente tutti i dati utente incluse transazioni, budget e impostazioni. Questa azione non può essere annullata.",
+                "cancel": "Annulla",
+                "processing": "Elaborazione...",
+                "anonymize-button": "Anonimizza utente",
+                "delete-button": "Elimina definitivamente",
+                "anonymize-success": "Utente anonimizzato con successo",
+                "delete-success": "Utente eliminato con successo",
+                "error": "Impossibile elaborare la richiesta"
+            }
+        },
+        "audit": {
+            "title": "Registri audit",
+            "description": "Rivedi tutte le azioni amministrative eseguite sulla piattaforma.",
+            "search-placeholder": "Cerca per ID utente o email...",
+            "search": "Cerca",
+            "filter-action": "Filtra per azione",
+            "all-actions": "Tutte le azioni",
+            "export-csv": "Esporta CSV",
+            "exporting": "Esportazione...",
+            "export-success": "Registri audit esportati con successo",
+            "export-error": "Impossibile esportare i registri audit",
+            "showing": "Visualizzazione di {count} di {total} registri",
+            "columns": {
+                "time": "Ora",
+                "action": "Azione",
+                "affected": "Utente interessato",
+                "trigger": "Attivato da",
+                "ref": "Riferimento"
+            },
+            "actions": {
+                "user_locked": "Utente bloccato",
+                "user_unlocked": "Utente sbloccato",
+                "user_deleted": "Utente eliminato",
+                "user_anonymized": "Utente anonimizzato",
+                "user_exported": "Utente esportato",
+                "invitation_created": "Invito creato",
+                "invitation_accepted": "Invito accettato",
+                "subscription_granted": "Abbonamento concesso"
+            },
+            "no-logs": "Nessun registro audit trovato",
+            "previous": "Precedente",
+            "next": "Successivo",
+            "page": "Pagina {page} di {totalPages}"
+        },
+        "compliance": {
+            "title": "Conformità e privacy",
+            "description": "Rivedi le misure di protezione dei dati e le informazioni sulla conformità.",
+            "items": {
+                "data-principle": {
+                    "title": "Principio dei dati",
+                    "value": "Accesso admin senza visibilità dei contenuti. I dati personali sono accessibili solo agli amministratori autorizzati."
+                },
+                "cloud-storage": {
+                    "title": "Archiviazione cloud",
+                    "value": "Tutti i dati sono archiviati in data center esclusivamente europei (Francoforte). I dati sono crittografati a riposo usando KMS."
+                },
+                "tracking": {
+                    "title": "Tracciamento",
+                    "value": "Nessun profiling, nessuna pubblicità. Non vendiamo né condividiamo i dati utente con terze parti."
+                },
+                "data-subject-rights": {
+                    "title": "Diritti degli interessati",
+                    "value": "Gli utenti possono esportare, bloccare, eliminare o anonimizzare i loro dati in qualsiasi momento tramite self-service o richiesta admin."
+                },
+                "admin-access": {
+                    "title": "Accesso admin",
+                    "value": "Principio del minimo privilegio. Il personale di supporto ha accesso limitato. Tutte le azioni admin sono registrate."
+                },
+                "security": {
+                    "title": "Sicurezza",
+                    "value": "Gli account admin richiedono 2FA. Timeout sessione per inattività. Registrazione IP per scopi di sicurezza."
+                }
+            },
+            "privacy-policy": {
+                "title": "Informativa sulla privacy",
+                "description": "La nostra informativa sulla privacy completa è disponibile online. Copre la raccolta, l'elaborazione dei dati e i diritti degli utenti."
+            },
+            "technical-measures": {
+                "title": "Misure tecniche",
+                "encryption-at-rest": "Crittografia a riposo (AES-256)",
+                "encryption-in-transit": "Crittografia in transito (TLS 1.3)",
+                "access-logging": "Registrazione accessi abilitata",
+                "data-backup": "Backup regolari dei dati",
+                "session-management": "Gestione sicura delle sessioni",
+                "ip-anonymization": "Anonimizzazione indirizzi IP"
+            }
+        },
+        "accept-invitation": {
+            "loading": "Caricamento dettagli invito...",
+            "pending": {
+                "title": "Invito Admin",
+                "description": "Sei stato invitato a unirti a BudgetHub.",
+                "email": "Email invitata",
+                "role": "Ruolo",
+                "role-admin": "Amministratore",
+                "role-user": "Utente",
+                "subscription-included": "Abbonamento incluso!",
+                "plan-family": "Piano Famiglia",
+                "plan-individual": "Piano Individuale",
+                "month": "mese",
+                "months": "mesi",
+                "accept-button": "Accetta invito",
+                "accepting": "Accettazione..."
+            },
+            "success": {
+                "title": "Invito accettato!",
+                "toast": "Invito accettato con successo!",
+                "redirecting": "Reindirizzamento alla tua dashboard...",
+                "button": "Vai alla Dashboard"
+            },
+            "not-authenticated": {
+                "title": "Accesso richiesto",
+                "description": "Accedi per accettare questo invito.",
+                "button": "Vai al login"
+            },
+            "no-account": {
+                "title": "Account richiesto",
+                "description": "Devi prima creare un account per accettare questo invito.",
+                "button": "Crea account"
+            },
+            "invalid": {
+                "title": "Invito non valido",
+                "description": "Questo link di invito non è valido o non esiste."
+            },
+            "expired": {
+                "title": "Invito scaduto",
+                "description": "Questo invito è scaduto. Richiedi un nuovo invito all'amministratore."
+            },
+            "already-accepted": {
+                "title": "Già accettato",
+                "description": "Questo invito è già stato accettato. Puoi accedere alla tua dashboard."
+            },
+            "email-mismatch": {
+                "title": "Account sbagliato",
+                "description": "Questo invito è stato inviato a un altro indirizzo email. Accedi con l'account corretto."
+            },
+            "error": {
+                "title": "Errore",
+                "description": "Si è verificato un errore durante l'elaborazione del tuo invito. Riprova."
+            }
+        }
+    },
+    "welcome-modal": {
+        "title": "Benvenuto su BudgetHub",
+        "description-1": "Inizia in meno di 2 minuti. Scopri come utilizzare la dashboard, i budget e le transazioni.",
+        "description-2": "Puoi trovare risorse utili e supporto in qualsiasi momento nella sezione",
+        "help": "Aiuto",
+        "open-guide": "Apri la guida",
+        "later": "Più tardi"
     }
 }

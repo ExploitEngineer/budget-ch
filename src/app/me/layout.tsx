@@ -2,9 +2,11 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { auth } from "@/lib/auth/auth";
 import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { HubSync } from "@/components/hub-sync";
 import { UpgradeToastListener } from "@/components/upgrade-toast-listener";
+import { WelcomeModal } from "@/components/welcome-modal";
 import { SessionReadyProvider } from "@/hooks/use-session-ready";
 
 export default async function DashboardLayout({
@@ -20,6 +22,13 @@ export default async function DashboardLayout({
     redirect("/login");
   }
 
+  // If user has pending 2FA verification (OAuth + 2FA flow), redirect to verify
+  const cookieStore = await cookies();
+  const pending2fa = cookieStore.get("pending_2fa");
+  if (pending2fa) {
+    redirect("/two-factor?flow=oauth");
+  }
+
   // Note: Hub ID is managed via cookie (source of truth)
   // Middleware syncs cookie to URL when navigating
   // HubSync component handles default hub when no cookie/URL param exists
@@ -27,6 +36,7 @@ export default async function DashboardLayout({
   return (
     <SidebarProvider>
       <UpgradeToastListener />
+      <WelcomeModal />
       <AppSidebar
         user={{
           name: session.user.name,

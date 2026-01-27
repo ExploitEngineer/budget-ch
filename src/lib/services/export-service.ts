@@ -18,7 +18,7 @@ import {
 import { eq, or, inArray, and } from "drizzle-orm";
 import { getContext } from "../auth/actions";
 import { headers } from "next/headers";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 
 export async function exportHubData(hubIdArg?: string) {
   try {
@@ -92,7 +92,7 @@ export async function exportHubData(hubIdArg?: string) {
         };
       }),
       transactions: hubTransactions.filter(t => t.type !== 'transfer').map(t => ({
-        date: format(t.createdAt, "yyyy-MM-dd"),
+        date: formatInAppTimezone(t.createdAt, "yyyy-MM-dd"),
         category: categoryMap.get(t.transactionCategoryId || "") || "Uncategorized",
         account: accountMap.get(t.financialAccountId || "") || "Unknown",
         amount: t.amount,
@@ -101,7 +101,7 @@ export async function exportHubData(hubIdArg?: string) {
         note: t.note,
       })),
       transfers: hubTransactions.filter(t => t.type === 'transfer').map(t => ({
-        date: format(t.createdAt, "yyyy-MM-dd"),
+        date: formatInAppTimezone(t.createdAt, "yyyy-MM-dd"),
         from: accountMap.get(t.financialAccountId || "") || "Unknown",
         to: accountMap.get(t.destinationAccountId || "") || "Unknown",
         amount: Math.abs(t.amount),
@@ -113,7 +113,7 @@ export async function exportHubData(hubIdArg?: string) {
         saved: sg.amountSaved,
         monthlyAllocation: sg.monthlyAllocation,
         account: accountMap.get(sg.financialAccountId || "") || null,
-        dueDate: sg.dueDate ? format(sg.dueDate, "yyyy-MM-dd") : null,
+        dueDate: sg.dueDate ? formatInAppTimezone(sg.dueDate, "yyyy-MM-dd") : null,
       })),
     };
 

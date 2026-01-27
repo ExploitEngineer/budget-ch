@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 import { useTranslations } from "next-intl";
 import { z } from "zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -291,7 +291,7 @@ export default function DashboardTableAdjustDialog({
                             >
                               <CalendarIcon className="mr-2 h-4 w-4" />
                               {field.value
-                                ? format(field.value, "dd/MM/yyyy")
+                                ? formatInAppTimezone(field.value, "dd/MM/yyyy")
                                 : t("dialog.placeholders.start-date")}
                             </Button>
                           </PopoverTrigger>
@@ -348,7 +348,7 @@ export default function DashboardTableAdjustDialog({
                               >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
                                 {field.value
-                                  ? format(field.value, "dd/MM/yyyy")
+                                  ? formatInAppTimezone(field.value, "dd/MM/yyyy")
                                   : t("dialog.placeholders.end-date")}
                               </Button>
                             </PopoverTrigger>

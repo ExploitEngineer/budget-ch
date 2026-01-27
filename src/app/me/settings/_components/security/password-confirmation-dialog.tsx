@@ -73,7 +73,8 @@ export function PasswordConfirmationDialog({
             {t("labels.two-factor.dialogs.cancel")}
           </Button>
           <Button onClick={onSubmit} disabled={loading || !password}>
-            {loading ? <Spinner /> : t("labels.two-factor.dialogs.continue")}
+            {loading && <Spinner className="mr-2 h-4 w-4" />}
+            {t("labels.two-factor.dialogs.continue")}
           </Button>
         </DialogFooter>
       </DialogContent>

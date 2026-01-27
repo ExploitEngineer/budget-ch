@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth/auth-client";
+import { clearPending2fa, verifyTotpForOAuthAction, verifyBackupCodeForOAuthAction } from "@/lib/auth/actions";
 import { toast } from "sonner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ export default function TwoFactorPage() {
   const [activeTab, setActiveTab] = useState("totp");
 
   const redirectTo = searchParams.get("redirect") || "/me/dashboard";
+  const isOAuthFlow = searchParams.get("flow") === "oauth";
 
   const handleVerifyTotp = async () => {
     if (!totpCode || totpCode.length !== 6) {
@@ -31,14 +33,22 @@ export default function TwoFactorPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await authClient.twoFactor.verifyTotp({
-        code: totpCode,
-        trustDevice,
-      });
-
-      if (error) {
-        toast.error(error.message || t("messages.verify-error"));
-        return;
+      if (isOAuthFlow) {
+        const result = await verifyTotpForOAuthAction(totpCode);
+        if (!result.success) {
+          toast.error(result.message || t("messages.verify-error"));
+          return;
+        }
+      } else {
+        const { error } = await authClient.twoFactor.verifyTotp({
+          code: totpCode,
+          trustDevice,
+        });
+        if (error) {
+          toast.error(error.message || t("messages.verify-error"));
+          return;
+        }
+        await clearPending2fa();
       }
 
       toast.success(t("messages.verify-success"));
@@ -59,14 +69,22 @@ export default function TwoFactorPage() {
 
     setLoading(true);
     try {
-      const { data, error } = await authClient.twoFactor.verifyBackupCode({
-        code: backupCode,
-        trustDevice,
-      });
-
-      if (error) {
-        toast.error(error.message || t("messages.backup-code-error"));
-        return;
+      if (isOAuthFlow) {
+        const result = await verifyBackupCodeForOAuthAction(backupCode);
+        if (!result.success) {
+          toast.error(result.message || t("messages.backup-code-error"));
+          return;
+        }
+      } else {
+        const { error } = await authClient.twoFactor.verifyBackupCode({
+          code: backupCode,
+          trustDevice,
+        });
+        if (error) {
+          toast.error(error.message || t("messages.backup-code-error"));
+          return;
+        }
+        await clearPending2fa();
       }
 
       toast.success(t("messages.backup-code-success"));

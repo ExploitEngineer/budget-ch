@@ -28,7 +28,8 @@ import {
   sendHubInvitation,
   getHubInvitations,
   getHubMembers,
-  cancelHubInvitation,
+  deleteHubInvitation,
+  removeHubMember,
 } from "@/lib/services/hub-invitation";
 import { Spinner } from "@/components/ui/spinner";
 import {
@@ -50,11 +51,22 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { format } from "date-fns";
+import { formatInAppTimezone } from "@/lib/timezone";
 import { useTranslations } from "next-intl";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 interface MembersInvitationsProps {
   hubId: string;
+  userRole: string;
 }
 
 interface Invitation {
@@ -79,13 +91,13 @@ const formatDate = (value?: string | Date): string => {
   if (!value) return "-";
 
   try {
-    return format(new Date(value), "dd MMM yyyy");
+    return formatInAppTimezone(new Date(value), "dd MMM yyyy");
   } catch {
     return "-";
   }
 };
 
-export function MembersInvitations({ hubId }: MembersInvitationsProps) {
+export function MembersInvitations({ hubId, userRole }: MembersInvitationsProps) {
   const t = useTranslations(
     "main-dashboard.settings-page.members-invitations-section",
   );
@@ -96,7 +108,10 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
   const [canSend, setCanSend] = useState<boolean>(true);
   const [subscriptionPlan, setSubscriptionPlan] = useState<string | null>(null);
 
+  const [memberToRemove, setMemberToRemove] = useState<Member | null>(null);
+  const [invitationToDelete, setInvitationToDelete] = useState<Invitation | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isDeleting, startDeleteTransition] = useTransition();
 
   const form = useForm<HubInvitesValues>({
     resolver: zodResolver(hubInvitesSchema),
@@ -135,27 +150,72 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
         header: () => t("members-table.table-headings.joined"),
         cell: (info) => formatDate(info.row.original.joinedAt),
       },
+      ...(userRole === "admin"
+        ? [
+            {
+              id: "actions",
+              header: () => t("members-table.table-headings.actions"),
+              cell: (info: any) => {
+                if (info.row.original.isOwner) return null;
+                return (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setMemberToRemove(info.row.original)}
+                    disabled={isPending}
+                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
+                  >
+                    {t("buttons.remove-member")}
+                  </Button>
+                );
+              },
+            } as ColumnDef<Member>,
+          ]
+        : []),
     ],
-    [t],
+    [t, userRole, isPending],
   );
 
-  const handleCancelInvitation = async (invitationId: string): Promise<void> => {
+  const handleRemoveMember = async (member: Member): Promise<void> => {
     startTransition(async (): Promise<void> => {
       try {
-        const result = await cancelHubInvitation(invitationId, hubId);
+        const result = await removeHubMember(member.id, hubId);
         if (result.success) {
-          toast.success(t("messages.invitation-cancelled"));
-          // Refresh invitations list
+          toast.success(t("messages.member-removed"));
+          const membRes = await getHubMembers(hubId);
+          if (membRes.success && Array.isArray(membRes.data)) {
+            setMembers(membRes.data as Member[]);
+          }
+        } else {
+          toast.error(result.message || t("messages.remove-error"));
+        }
+      } catch (e) {
+        console.error(e);
+        toast.error(t("messages.remove-error"));
+      } finally {
+        setMemberToRemove(null);
+      }
+    });
+  };
+
+  const handleDeleteInvitation = async (invitation: Invitation): Promise<void> => {
+    startDeleteTransition(async (): Promise<void> => {
+      try {
+        const result = await deleteHubInvitation(invitation.id, hubId);
+        if (result.success) {
+          toast.success(t("messages.invitation-deleted"));
           const invRes = await getHubInvitations(hubId);
           if (invRes.success && Array.isArray(invRes.data)) {
             setInvitations(invRes.data);
           }
         } else {
-          toast.error(result.message || t("messages.cancel-error"));
+          toast.error(result.message || t("messages.delete-error"));
         }
       } catch (e) {
         console.error(e);
-        toast.error(t("messages.cancel-error"));
+        toast.error(t("messages.delete-error"));
+      } finally {
+        setInvitationToDelete(null);
       }
     });
   };
@@ -193,25 +253,21 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
         id: "actions",
         header: () => t("invitations-table.table-headings.actions"),
         cell: (info) => {
-          // Only show cancel button for pending (not accepted) invitations
-          if (info.row.original.accepted) {
-            return null;
-          }
           return (
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleCancelInvitation(info.row.original.id)}
-              disabled={isPending}
+              onClick={() => setInvitationToDelete(info.row.original)}
+              disabled={isDeleting}
               className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950"
             >
-              {t("buttons.cancel-invitation")}
+              {t("buttons.delete-invitation")}
             </Button>
           );
         },
       },
     ],
-    [t, isPending, hubId],
+    [t, isDeleting, hubId],
   );
 
   const membersTable = useReactTable({
@@ -573,6 +629,70 @@ export function MembersInvitations({ hubId }: MembersInvitationsProps) {
           </div>
         </CardContent>
       </Card>
+
+      <AlertDialog
+        open={!!memberToRemove}
+        onOpenChange={(open) => !open && setMemberToRemove(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("remove-dialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("remove-dialog.description", {
+                name: memberToRemove?.name || memberToRemove?.email || "",
+              })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>
+              {t("remove-dialog.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => memberToRemove && handleRemoveMember(memberToRemove)}
+              disabled={isPending}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isPending
+                ? t("remove-dialog.removing")
+                : t("remove-dialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog
+        open={!!invitationToDelete}
+        onOpenChange={(open) => !open && setInvitationToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("delete-invitation-dialog.title")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {invitationToDelete?.accepted
+                ? t("delete-invitation-dialog.description-accepted", {
+                    email: invitationToDelete?.email || "",
+                  })
+                : t("delete-invitation-dialog.description-pending", {
+                    email: invitationToDelete?.email || "",
+                  })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              {t("delete-invitation-dialog.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => invitationToDelete && handleDeleteInvitation(invitationToDelete)}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting
+                ? t("delete-invitation-dialog.deleting")
+                : t("delete-invitation-dialog.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

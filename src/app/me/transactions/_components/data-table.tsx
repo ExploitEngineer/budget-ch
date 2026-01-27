@@ -369,7 +369,7 @@ export function DataTable({
   }, [table]);
 
   const showDeleteSelectedButton = React.useMemo(() => {
-    return selectedRowCount > 0 && selectedRowCount < totalRowCount;
+    return selectedRowCount > 0; //&& selectedRowCount < totalRowCount;
   }, [selectedRowCount, totalRowCount]);
 
   // Calculate total balance from filtered rows
@@ -438,7 +438,7 @@ export function DataTable({
                 {t("data-table.header.buttons.deleteSelected")}
               </Button>
             )}
-            <Button
+            {/* <Button
               size="sm"
               variant="destructive"
               className="cursor-pointer"
@@ -446,7 +446,7 @@ export function DataTable({
               onClick={() => setConfirmDialogOpen(true)}
             >
               {t("data-table.header.buttons.deleteAll")}
-            </Button>
+            </Button> */}
             <Button
               size="sm"
               variant="outline"

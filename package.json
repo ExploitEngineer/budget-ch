@@ -22,6 +22,7 @@
     "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
+    "@better-auth/utils": "^0.3.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -46,7 +47,9 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "drizzle-orm": "^0.44.6",
+    "intl-messageformat": "^11.1.1",
     "ky": "^1.14.0",
     "lucide-react": "^0.544.0",
     "next": "16.0.8",

@@ -156,7 +156,7 @@ export function DataPrivacy() {
         <Separator className="dark:bg-border-blue" />
         <CardContent>
           <div className="flex flex-col gap-2">
-            <h3 className="text-sm">{t("labels.data-export.title")}</h3>
+            {/* <h3 className="text-sm">{t("labels.data-export.title")}</h3> */}
             <div className="flex flex-wrap items-center gap-2">
               {/* <Button
                 variant="outline"

@@ -4,9 +4,10 @@ import {
   createHubInvitationDB,
   getHubInvitationsByHubDB,
   acceptInvitationDB,
-  cancelHubInvitationDB,
+  deleteHubInvitationDB,
   getHubMembersDB,
   getUserByEmailDB,
+  removeHubMemberDB,
 } from "@/db/queries";
 import { headers } from "next/headers";
 import { getContext } from "@/lib/auth/actions";
@@ -16,6 +17,7 @@ import db from "@/db/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { AccessRole } from "@/db/queries";
+import { requireAdminRole } from "@/lib/auth/permissions";
 
 interface SendInvitationParams {
   hubId: string;
@@ -47,7 +49,7 @@ export async function sendHubInvitation({
       columns: { language: true },
     });
 
-    const locale = recipientUser?.language || inviterUser?.language || "en";
+    const locale = recipientUser?.language || "de" // || inviterUser?.language || "en";
     const t = await getMailTranslations(locale);
 
     const existingMembers = await getHubMembers(hubId);
@@ -108,8 +110,15 @@ export async function sendHubInvitation({
       <p>${t("emails.invitation.fallback")} <br/>
          <span style="word-break: break-all; color: #666;">${link}</span>
       </p>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 15px 0; font-size: 14px;">
+        <p style="margin: 0 0 10px 0;"><strong>${t("emails.invitation.help-title")}</strong></p>
+        <ul style="margin: 0; padding-left: 20px; color: #555;">
+          <li style="margin-bottom: 8px;">${t("emails.invitation.help-new-user")}</li>
+          <li>${t("emails.invitation.help-existing-user")}</li>
+        </ul>
+      </div>
       <p style="color: #999; font-size: 12px;">${t("emails.invitation.expire")}</p>
-      <hr />
+      <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
       <p style="font-size: 12px; color: #999;">${t("emails.invitation.ignore")}</p>
     </div>
   `,
@@ -170,8 +179,8 @@ export async function getHubMembers(hubId: string) {
   return await getHubMembersDB(hubId);
 }
 
-// CANCEL Invitation
-export async function cancelHubInvitation(invitationId: string, hubId: string) {
+// DELETE Invitation
+export async function deleteHubInvitation(invitationId: string, hubId: string) {
   try {
     const hdrs = await headers();
 
@@ -182,9 +191,29 @@ export async function cancelHubInvitation(invitationId: string, hubId: string) {
       return { success: false, message: "Not authenticated" };
     }
 
-    const res = await cancelHubInvitationDB(invitationId, hubId);
+    const res = await deleteHubInvitationDB(invitationId, hubId);
     return res;
   } catch (err: any) {
-    return { success: false, message: err.message || "Error cancelling invitation" };
+    return { success: false, message: err.message || "Error deleting invitation" };
+  }
+}
+
+// REMOVE Member
+export async function removeHubMember(memberUserId: string, hubId: string) {
+  try {
+    const hdrs = await headers();
+    const { userId, userRole } = await getContext(hdrs, false);
+
+    if (!userId) return { success: false, message: "Not authenticated" };
+
+    requireAdminRole(userRole);
+
+    if (userId === memberUserId) {
+      return { success: false, message: "Cannot remove yourself" };
+    }
+
+    return await removeHubMemberDB(memberUserId, hubId);
+  } catch (err: any) {
+    return { success: false, message: err.message || "Error removing member" };
   }
 }
